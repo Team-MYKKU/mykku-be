@@ -2,7 +2,6 @@ package com.example.mykku.member.adapter.input.web
 
 import com.example.mykku.BaseDocumentTest
 import com.example.mykku.docs.ApiRequestConfig
-import com.example.mykku.docs.Tag
 import com.example.mykku.feed.application.dto.AuthorResult
 import com.example.mykku.feed.application.dto.CommentPreviewResult
 import com.example.mykku.feed.application.dto.FeedImageResult
@@ -28,9 +27,6 @@ class MemberFeedDocumentTest : BaseDocumentTest() {
     inner class GetMyFeeds {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.MEMBER_API,
-            summary = "내가 쓴 피드 목록 조회",
-            description = "현재 로그인한 회원이 작성한 피드 목록을 조회합니다.",
             queryParameters = listOf(
                 parameterWithName("page").description("페이지 번호 (0부터 시작, 기본값: 0)").optional(),
                 parameterWithName("size").description("페이지 크기 (기본값: 20)").optional()

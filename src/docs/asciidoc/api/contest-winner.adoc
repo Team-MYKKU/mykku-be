@@ -1,0 +1,97 @@
+[[contest-winner-list]]
+=== 수상작 목록 조회
+
+모든 콘테스트의 수상작 미리보기를 조회합니다.
+
+operation::contest-winner/list/200[snippets='http-request,http-response,response-fields']
+
+[[contest-winner-detail]]
+=== 수상작 상세 조회
+
+특정 콘테스트의 수상작 상세 정보를 조회합니다.
+
+operation::contest-winner/detail/200[snippets='http-request,path-parameters,http-response,response-fields']
+
+[[contest-winner-detail-error]]
+==== 에러 응답
+
+.`CONTEST_NOT_FOUND`
+[%collapsible]
+====
+include::{snippets}/contest-winner/detail/CONTEST_NOT_FOUND/http-response.adoc[]
+====
+
+[[contest-winner-announcement]]
+=== 수상자 발표 공지 조회
+
+특정 콘테스트의 수상자 발표 공지글(제목/본문/발표일)을 조회합니다.
+
+operation::contest-winner/announcement/200[snippets='http-request,path-parameters,http-response,response-fields']
+
+[[contest-winner-announcement-error]]
+==== 에러 응답
+
+.`WINNER_ANNOUNCEMENT_NOT_FOUND`
+[%collapsible]
+====
+include::{snippets}/contest-winner/announcement/WINNER_ANNOUNCEMENT_NOT_FOUND/http-response.adoc[]
+====
+
+[[contest-winner-my-status]]
+=== 내 수상 여부 조회
+
+특정 콘테스트에서 인증된 사용자의 수상 여부를 조회합니다.
+
+operation::contest-winner/my-status/200[snippets='http-request,request-headers,path-parameters,http-response,response-fields']
+
+[[contest-winner-my-status-error]]
+==== 에러 응답
+
+.`CONTEST_NOT_FOUND`
+[%collapsible]
+====
+include::{snippets}/contest-winner/my-status/CONTEST_NOT_FOUND/http-response.adoc[]
+====
+
+.`WINNER_NOT_ANNOUNCED`
+[%collapsible]
+====
+include::{snippets}/contest-winner/my-status/WINNER_NOT_ANNOUNCED/http-response.adoc[]
+====
+
+[[contest-winner-my-awards]]
+=== 내 수상 콘테스트 목록 조회
+
+인증된 사용자가 수상한 콘테스트 목록을 페이지네이션으로 조회합니다.
+
+operation::contest-winner/my-awards/200[snippets='http-request,request-headers,query-parameters,http-response,response-fields']
+
+[[contest-winner-my-award-feeds]]
+=== 내 수상 피드 목록 조회
+
+인증된 사용자가 수상한 피드 목록을 페이지네이션으로 조회합니다.
+
+operation::contest-winner/my-award-feeds/200[snippets='http-request,request-headers,query-parameters,http-response,response-fields']
+
+[[contest-winner-my-awards-preview]]
+=== 내 수상 미리보기 조회
+
+인증된 사용자의 최근 수상 콘테스트 3개의 썸네일과 ID를 조회합니다.
+
+operation::contest-winner/my-awards-preview/200[snippets='http-request,request-headers,http-response,response-fields']
+
+[[contest-winner-update-acceptance-speech]]
+=== 수상 소감 등록
+
+수상자 본인이 수상 소감을 등록합니다.
+
+operation::contest-winner/update-acceptance-speech/200[snippets='http-request,request-headers,path-parameters,request-fields,http-response,response-fields']
+
+[[contest-winner-update-acceptance-speech-error]]
+==== 에러 응답
+
+.`NOT_WINNER_OWNER`
+[%collapsible]
+====
+include::{snippets}/contest-winner/update-acceptance-speech/NOT_WINNER_OWNER/http-response.adoc[]
+====

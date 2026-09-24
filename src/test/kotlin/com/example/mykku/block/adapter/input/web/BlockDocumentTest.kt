@@ -7,7 +7,6 @@ import com.example.mykku.block.application.dto.MemberBlockListResult
 import com.example.mykku.block.application.dto.MemberBlockResult
 import com.example.mykku.docs.ApiRequestConfig
 import com.example.mykku.docs.RestDocumentationResponse
-import com.example.mykku.docs.Tag
 import com.example.mykku.block.exception.BlockErrorCode
 import com.example.mykku.block.exception.BlockException
 import io.restassured.http.ContentType
@@ -28,9 +27,6 @@ class BlockDocumentTest : BaseDocumentTest() {
     inner class BlockMember {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.BLOCK_API,
-            summary = "사용자 차단",
-            description = "특정 사용자를 차단합니다. 양방향 차단이 적용되어 서로의 콘텐츠를 볼 수 없습니다.",
             requestBodyFields = listOf(
                 fieldWithPath("memberId").type(JsonFieldType.STRING).description("차단할 사용자 ID")
             ),
@@ -126,9 +122,6 @@ class BlockDocumentTest : BaseDocumentTest() {
     inner class UnblockMember {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.BLOCK_API,
-            summary = "사용자 차단 해제",
-            description = "차단된 사용자의 차단을 해제합니다.",
             pathParameters = listOf(
                 parameterWithName("memberId").description("차단 해제할 사용자 ID")
             ),
@@ -184,9 +177,6 @@ class BlockDocumentTest : BaseDocumentTest() {
     inner class GetMemberBlocks {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.BLOCK_API,
-            summary = "차단한 사용자 목록 조회",
-            description = "내가 차단한 사용자 목록을 조회합니다.",
             queryParameters = listOf(
                 parameterWithName("page").description("페이지 번호 (0부터 시작)").optional(),
                 parameterWithName("size").description("페이지 크기 (기본값: 20)").optional()
@@ -252,9 +242,6 @@ class BlockDocumentTest : BaseDocumentTest() {
     inner class BlockKeyword {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.BLOCK_API,
-            summary = "키워드 차단",
-            description = "특정 키워드를 차단합니다. 해당 키워드가 포함된 콘텐츠가 목록에서 필터링됩니다.",
             requestBodyFields = listOf(
                 fieldWithPath("keyword").type(JsonFieldType.STRING).description("차단할 키워드 (최대 50자)")
             ),
@@ -368,9 +355,6 @@ class BlockDocumentTest : BaseDocumentTest() {
     inner class UnblockKeyword {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.BLOCK_API,
-            summary = "키워드 차단 해제",
-            description = "차단된 키워드를 해제합니다.",
             pathParameters = listOf(
                 parameterWithName("keyword").description("차단 해제할 키워드")
             ),
@@ -426,9 +410,6 @@ class BlockDocumentTest : BaseDocumentTest() {
     inner class GetKeywordBlocks {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.BLOCK_API,
-            summary = "차단한 키워드 목록 조회",
-            description = "내가 차단한 키워드 목록을 조회합니다.",
             queryParameters = listOf(
                 parameterWithName("page").description("페이지 번호 (0부터 시작)").optional(),
                 parameterWithName("size").description("페이지 크기 (기본값: 20)").optional()

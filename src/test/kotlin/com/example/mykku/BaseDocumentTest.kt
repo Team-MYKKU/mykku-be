@@ -446,9 +446,6 @@ abstract class BaseDocumentTest {
     protected fun response(): RestDocumentationResponse = RestDocumentationResponse()
 
     protected fun RestDocumentationRequest.applyConfig(config: ApiRequestConfig): RestDocumentationRequest {
-        tag(config.tag)
-        summary(config.summary)
-        description(config.description)
         if (config.pathParameters.isNotEmpty()) {
             pathParameter(*config.pathParameters.toTypedArray())
         }

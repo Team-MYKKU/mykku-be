@@ -3,7 +3,6 @@ package com.example.mykku.preference.adapter.input.web
 import com.example.mykku.BaseDocumentTest
 import com.example.mykku.docs.ApiRequestConfig
 import com.example.mykku.docs.RestDocumentationResponse
-import com.example.mykku.docs.Tag
 import com.example.mykku.preference.application.dto.GenrePreferenceResult
 import com.example.mykku.preference.application.dto.GoodsPreferenceResult
 import com.example.mykku.preference.application.dto.MoodPreferenceResult
@@ -30,9 +29,6 @@ class PreferenceDocumentTest : BaseDocumentTest() {
     inner class UpdateGenrePreference {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.PREFERENCE_API,
-            summary = "장르 취향 저장",
-            description = "장르 취향을 저장합니다.",
             requestBodyFields = listOf(
                 fieldWithPath("genreTypes").type(JsonFieldType.ARRAY)
                     .description("장르 취향 목록 (${GenreType.entries.joinToString { it.name }})")
@@ -99,9 +95,6 @@ class PreferenceDocumentTest : BaseDocumentTest() {
     inner class GetGenrePreference {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.PREFERENCE_API,
-            summary = "장르 취향 조회",
-            description = "장르 취향을 조회합니다.",
             headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
@@ -140,9 +133,6 @@ class PreferenceDocumentTest : BaseDocumentTest() {
     inner class UpdateGoodsPreference {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.PREFERENCE_API,
-            summary = "굿즈 취향 저장",
-            description = "굿즈 취향을 저장합니다.",
             requestBodyFields = listOf(
                 fieldWithPath("goodsTypes").type(JsonFieldType.ARRAY)
                     .description("굿즈 취향 목록 (${GoodsType.entries.joinToString { it.name }})")
@@ -185,9 +175,6 @@ class PreferenceDocumentTest : BaseDocumentTest() {
     inner class GetGoodsPreference {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.PREFERENCE_API,
-            summary = "굿즈 취향 조회",
-            description = "굿즈 취향을 조회합니다.",
             headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
@@ -226,9 +213,6 @@ class PreferenceDocumentTest : BaseDocumentTest() {
     inner class UpdateMoodPreference {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.PREFERENCE_API,
-            summary = "분위기 취향 저장",
-            description = "분위기 취향을 저장합니다.",
             requestBodyFields = listOf(
                 fieldWithPath("moodTypes").type(JsonFieldType.ARRAY)
                     .description("분위기 취향 목록 (${MoodType.entries.joinToString { it.name }})")
@@ -271,9 +255,6 @@ class PreferenceDocumentTest : BaseDocumentTest() {
     inner class GetMoodPreference {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.PREFERENCE_API,
-            summary = "분위기 취향 조회",
-            description = "분위기 취향을 조회합니다.",
             headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 

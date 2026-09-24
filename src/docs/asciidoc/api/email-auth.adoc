@@ -1,0 +1,83 @@
+[[email-auth-send-code]]
+=== 인증 코드 발송
+
+이메일로 인증 코드를 발송합니다.
+
+operation::email-auth/send-code/200[snippets='http-request,request-fields,http-response,response-fields']
+
+[[email-auth-send-code-error]]
+==== 에러 응답
+
+.`TOO_MANY_REQUESTS`
+[%collapsible]
+====
+include::{snippets}/email-auth/send-code/TOO_MANY_REQUESTS/http-response.adoc[]
+====
+
+[[email-auth-verify-code]]
+=== 인증 코드 검증
+
+발송된 인증 코드를 검증합니다.
+
+operation::email-auth/verify-code/200[snippets='http-request,request-fields,http-response,response-fields']
+
+[[email-auth-verify-code-error]]
+==== 에러 응답
+
+.`INVALID_VERIFICATION_CODE`
+[%collapsible]
+====
+include::{snippets}/email-auth/verify-code/INVALID_VERIFICATION_CODE/http-response.adoc[]
+====
+
+.`VERIFICATION_CODE_EXPIRED`
+[%collapsible]
+====
+include::{snippets}/email-auth/verify-code/VERIFICATION_CODE_EXPIRED/http-response.adoc[]
+====
+
+[[email-auth-signup]]
+=== 이메일 회원가입
+
+이메일로 회원가입합니다.
+
+operation::email-auth/signup/200[snippets='http-request,request-fields,http-response,response-fields']
+
+[[email-auth-signup-error]]
+==== 에러 응답
+
+.`EMAIL_ALREADY_EXISTS`
+[%collapsible]
+====
+include::{snippets}/email-auth/signup/EMAIL_ALREADY_EXISTS/http-response.adoc[]
+====
+
+[[email-auth-login]]
+=== 이메일 로그인
+
+이메일로 로그인합니다.
+
+operation::email-auth/login/200[snippets='http-request,request-fields,http-response,response-fields']
+
+[[email-auth-login-error]]
+==== 에러 응답
+
+.`INVALID_EMAIL_OR_PASSWORD`
+[%collapsible]
+====
+include::{snippets}/email-auth/login/INVALID_EMAIL_OR_PASSWORD/http-response.adoc[]
+====
+
+[[email-auth-reset-password]]
+=== 비밀번호 재설정
+
+인증 코드를 통해 비밀번호를 재설정합니다.
+
+operation::email-auth/reset-password/200[snippets='http-request,request-fields,http-response,response-fields']
+
+[[email-auth-send-temporary-password]]
+=== 임시 비밀번호 발송
+
+임시 비밀번호를 이메일로 발송합니다.
+
+operation::email-auth/send-temporary-password/200[snippets='http-request,request-fields,http-response,response-fields']

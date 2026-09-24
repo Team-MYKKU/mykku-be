@@ -3,7 +3,6 @@ package com.example.mykku.dailymessage.adapter.input.web
 import com.example.mykku.BaseDocumentTest
 import com.example.mykku.docs.ApiRequestConfig
 import com.example.mykku.docs.RestDocumentationResponse
-import com.example.mykku.docs.Tag
 import com.example.mykku.dailymessage.application.dto.DailyMessageResult
 import com.example.mykku.dailymessage.application.dto.DailyMessageSummaryResult
 import com.example.mykku.dailymessage.exception.DailyMessageErrorCode
@@ -31,9 +30,6 @@ class DailyMessageDocumentTest : BaseDocumentTest() {
     inner class GetDailyMessages {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.DAILY_MESSAGE_API,
-            summary = "하루 덕담 목록 조회",
-            description = "특정 날짜 이전의 하루 덕담 목록을 조회합니다.",
             queryParameters = listOf(
                 parameterWithName("date").description("기준 날짜 (YYYY-MM-DD 형식)"),
                 parameterWithName("page").description("페이지 번호 (기본값: 0)").optional(),
@@ -119,9 +115,6 @@ class DailyMessageDocumentTest : BaseDocumentTest() {
     inner class GetDailyMessageDetail {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.DAILY_MESSAGE_API,
-            summary = "하루 덕담 상세 조회",
-            description = "특정 하루 덕담의 상세 정보를 조회합니다.",
             pathParameters = listOf(
                 parameterWithName("id").description("조회할 하루 덕담 ID")
             )

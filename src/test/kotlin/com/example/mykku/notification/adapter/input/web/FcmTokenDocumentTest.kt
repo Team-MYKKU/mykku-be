@@ -2,7 +2,6 @@ package com.example.mykku.notification.adapter.input.web
 
 import com.example.mykku.BaseDocumentTest
 import com.example.mykku.docs.ApiRequestConfig
-import com.example.mykku.docs.Tag
 import com.example.mykku.notification.application.dto.FcmTokenResult
 import io.restassured.http.ContentType
 import org.junit.jupiter.api.DisplayName
@@ -24,9 +23,6 @@ class FcmTokenDocumentTest : BaseDocumentTest() {
     inner class RegisterFcmToken {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.FCM_TOKEN_API,
-            summary = "FCM 토큰 등록",
-            description = "Firebase Cloud Messaging 토큰을 등록합니다.",
             requestBodyFields = listOf(
                 fieldWithPath("token").type(JsonFieldType.STRING).description("Firebase Cloud Messaging 토큰"),
                 fieldWithPath("deviceId").type(JsonFieldType.STRING).description("기기 고유 식별자"),
@@ -83,9 +79,6 @@ class FcmTokenDocumentTest : BaseDocumentTest() {
     inner class GetFcmTokenList {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.FCM_TOKEN_API,
-            summary = "FCM 토큰 목록 조회",
-            description = "등록된 FCM 토큰 목록을 조회합니다.",
             headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
@@ -138,9 +131,6 @@ class FcmTokenDocumentTest : BaseDocumentTest() {
     inner class DeleteFcmToken {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.FCM_TOKEN_API,
-            summary = "FCM 토큰 삭제",
-            description = "등록된 FCM 토큰을 삭제합니다.",
             pathParameters = listOf(
                 parameterWithName("deviceId").description("삭제할 기기 ID")
             ),

@@ -3,7 +3,6 @@ package com.example.mykku.notification.adapter.input.web
 import com.example.mykku.BaseDocumentTest
 import com.example.mykku.docs.ApiRequestConfig
 import com.example.mykku.docs.RestDocumentationResponse
-import com.example.mykku.docs.Tag
 import com.example.mykku.notification.application.dto.NotificationResult
 import com.example.mykku.notification.domain.vo.NotificationType
 import com.example.mykku.notification.exception.NotificationErrorCode
@@ -29,9 +28,6 @@ class NotificationDocumentTest : BaseDocumentTest() {
     inner class GetNotificationList {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.NOTIFICATION_API,
-            summary = "알림 목록 조회",
-            description = "사용자의 알림 목록을 페이지네이션으로 조회합니다.",
             queryParameters = listOf(
                 parameterWithName("page").description("페이지 번호 (0부터 시작, 기본값: 0)").optional(),
                 parameterWithName("size").description("페이지 크기 (기본값: 20)").optional()
@@ -138,9 +134,6 @@ class NotificationDocumentTest : BaseDocumentTest() {
     inner class GetUnreadNotificationList {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.NOTIFICATION_API,
-            summary = "읽지 않은 알림 목록 조회",
-            description = "읽지 않은 알림 목록을 페이지네이션으로 조회합니다.",
             queryParameters = listOf(
                 parameterWithName("page").description("페이지 번호 (0부터 시작, 기본값: 0)").optional(),
                 parameterWithName("size").description("페이지 크기 (기본값: 20)").optional()
@@ -247,9 +240,6 @@ class NotificationDocumentTest : BaseDocumentTest() {
     inner class GetUnreadNotificationCount {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.NOTIFICATION_API,
-            summary = "읽지 않은 알림 개수 조회",
-            description = "읽지 않은 알림의 개수를 조회합니다.",
             headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
@@ -283,9 +273,6 @@ class NotificationDocumentTest : BaseDocumentTest() {
     inner class MarkNotificationRead {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.NOTIFICATION_API,
-            summary = "알림 읽음 처리",
-            description = "특정 알림을 읽음 처리합니다.",
             pathParameters = listOf(
                 parameterWithName("notificationId").description("읽음 처리할 알림 ID")
             ),
@@ -322,9 +309,6 @@ class NotificationDocumentTest : BaseDocumentTest() {
     inner class MarkAllNotificationRead {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.NOTIFICATION_API,
-            summary = "모든 알림 읽음 처리",
-            description = "모든 알림을 읽음 처리합니다.",
             headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
@@ -356,9 +340,6 @@ class NotificationDocumentTest : BaseDocumentTest() {
     inner class DeleteNotification {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.NOTIFICATION_API,
-            summary = "알림 삭제",
-            description = "특정 알림을 삭제합니다.",
             pathParameters = listOf(
                 parameterWithName("notificationId").description("삭제할 알림 ID")
             ),

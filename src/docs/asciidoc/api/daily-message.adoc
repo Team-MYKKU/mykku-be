@@ -1,0 +1,22 @@
+[[daily-message-list]]
+=== 하루 덕담 목록 조회
+
+특정 날짜 이전의 하루 덕담 목록을 조회합니다.
+
+operation::daily-message/list/200[snippets='http-request,query-parameters,http-response,response-fields']
+
+[[daily-message-detail]]
+=== 하루 덕담 상세 조회
+
+특정 하루 덕담의 상세 정보를 조회합니다.
+
+operation::daily-message/detail/200[snippets='http-request,path-parameters,http-response,response-fields']
+
+[[daily-message-detail-error]]
+==== 에러 응답
+
+.`DAILY_MESSAGE_NOT_FOUND`
+[%collapsible]
+====
+include::{snippets}/daily-message/detail/DAILY_MESSAGE_NOT_FOUND/http-response.adoc[]
+====

@@ -3,7 +3,6 @@ package com.example.mykku.role.adapter.input.web
 import com.example.mykku.BaseDocumentTest
 import com.example.mykku.docs.ApiRequestConfig
 import com.example.mykku.docs.RestDocumentationResponse
-import com.example.mykku.docs.Tag
 import com.example.mykku.role.application.dto.ChangeRepresentativeRoleCommand
 import com.example.mykku.role.application.dto.MemberRoleResult
 import com.example.mykku.role.application.dto.RoleResult
@@ -30,9 +29,6 @@ class RoleDocumentTest : BaseDocumentTest() {
     inner class GetMyRoles {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.ROLE_API,
-            summary = "내 칭호 목록 조회",
-            description = "로그인한 회원의 칭호 목록을 조회합니다.",
             headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
@@ -89,9 +85,6 @@ class RoleDocumentTest : BaseDocumentTest() {
     inner class GetRoles {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.ROLE_API,
-            summary = "전체 칭호 목록 조회",
-            description = "서비스에 등록된 모든 칭호를 조회합니다. 칭호 획득 API에 사용할 칭호 ID를 얻는 용도입니다.",
             headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
@@ -134,11 +127,6 @@ class RoleDocumentTest : BaseDocumentTest() {
     inner class GetNewRoles {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.ROLE_API,
-            summary = "새로 획득한 칭호 조회",
-            description = "아직 사용자에게 노출되지 않은 신규 획득 칭호를 조회합니다. " +
-                "칭호는 활동에 따라 서버가 자동으로 부여하므로 클라이언트는 이 API를 폴링해 획득 연출을 띄우면 됩니다. " +
-                "조회하는 순간 확인 처리되어 같은 칭호는 다시 반환되지 않습니다.",
             headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
@@ -191,9 +179,6 @@ class RoleDocumentTest : BaseDocumentTest() {
     inner class ChangeRepresentativeRole {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.ROLE_API,
-            summary = "대표 칭호 변경",
-            description = "대표 칭호를 변경합니다.",
             pathParameters = listOf(
                 parameterWithName("memberRoleId").description("대표로 설정할 보유 칭호 ID")
             ),

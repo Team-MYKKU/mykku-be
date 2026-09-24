@@ -1,0 +1,134 @@
+[[like-board-list]]
+=== 즐겨찾기한 게시판 목록 조회
+
+사용자가 즐겨찾기한 게시판 목록을 조회합니다.
+
+operation::like/board-list/200[snippets='http-request,request-headers,query-parameters,http-response,response-fields']
+
+[[like-board-create]]
+=== 게시판 즐겨찾기
+
+게시판을 즐겨찾기에 추가합니다.
+
+operation::like/board-create/200[snippets='http-request,request-headers,path-parameters,http-response,response-fields']
+
+[[like-board-create-error]]
+==== 에러 응답
+
+.`LIKE_BOARD_ALREADY_LIKED`
+[%collapsible]
+====
+include::{snippets}/like/board-create/LIKE_BOARD_ALREADY_LIKED/http-response.adoc[]
+====
+
+[[like-board-delete]]
+=== 게시판 즐겨찾기 취소
+
+게시판 즐겨찾기를 취소합니다.
+
+operation::like/board-delete/200[snippets='http-request,request-headers,path-parameters,http-response,response-fields']
+
+[[like-board-delete-error]]
+==== 에러 응답
+
+.`LIKE_BOARD_NOT_FOUND`
+[%collapsible]
+====
+include::{snippets}/like/board-delete/LIKE_BOARD_NOT_FOUND/http-response.adoc[]
+====
+
+[[like-feed-create]]
+=== 피드 좋아요
+
+피드에 좋아요를 누릅니다.
+
+operation::like/feed-create/200[snippets='http-request,request-headers,path-parameters,http-response,response-fields']
+
+[[like-feed-create-error]]
+==== 에러 응답
+
+.`LIKE_FEED_ALREADY_LIKED`
+[%collapsible]
+====
+include::{snippets}/like/feed-create/LIKE_FEED_ALREADY_LIKED/http-response.adoc[]
+====
+
+[[like-feed-delete]]
+=== 피드 좋아요 취소
+
+피드 좋아요를 취소합니다.
+
+operation::like/feed-delete/200[snippets='http-request,request-headers,path-parameters,http-response,response-fields']
+
+[[like-feed-delete-error]]
+==== 에러 응답
+
+.`LIKE_FEED_NOT_FOUND`
+[%collapsible]
+====
+include::{snippets}/like/feed-delete/LIKE_FEED_NOT_FOUND/http-response.adoc[]
+====
+
+[[like-comment-create]]
+=== 댓글 좋아요
+
+댓글에 좋아요를 누릅니다.
+
+operation::like/comment-create/200[snippets='http-request,request-headers,path-parameters,http-response,response-fields']
+
+[[like-comment-create-error]]
+==== 에러 응답
+
+.`LIKE_FEED_COMMENT_ALREADY_LIKED`
+[%collapsible]
+====
+include::{snippets}/like/comment-create/LIKE_FEED_COMMENT_ALREADY_LIKED/http-response.adoc[]
+====
+
+[[like-comment-delete]]
+=== 댓글 좋아요 취소
+
+댓글 좋아요를 취소합니다.
+
+operation::like/comment-delete/200[snippets='http-request,request-headers,path-parameters,http-response,response-fields']
+
+[[like-comment-delete-error]]
+==== 에러 응답
+
+.`LIKE_FEED_COMMENT_NOT_FOUND`
+[%collapsible]
+====
+include::{snippets}/like/comment-delete/LIKE_FEED_COMMENT_NOT_FOUND/http-response.adoc[]
+====
+
+[[like-daily-message-comment-create]]
+=== 하루 덕담 댓글 좋아요
+
+하루 덕담 댓글에 좋아요를 누릅니다.
+
+operation::like/daily-message-comment-create/200[snippets='http-request,request-headers,path-parameters,http-response,response-fields']
+
+[[like-daily-message-comment-create-error]]
+==== 에러 응답
+
+.`LIKE_DAILY_MESSAGE_COMMENT_ALREADY_LIKED`
+[%collapsible]
+====
+include::{snippets}/like/daily-message-comment-create/LIKE_DAILY_MESSAGE_COMMENT_ALREADY_LIKED/http-response.adoc[]
+====
+
+[[like-daily-message-comment-delete]]
+=== 하루 덕담 댓글 좋아요 취소
+
+하루 덕담 댓글 좋아요를 취소합니다.
+
+operation::like/daily-message-comment-delete/200[snippets='http-request,request-headers,path-parameters,http-response,response-fields']
+
+[[like-daily-message-comment-delete-error]]
+==== 에러 응답
+
+.`LIKE_DAILY_MESSAGE_COMMENT_NOT_FOUND`
+[%collapsible]
+====
+include::{snippets}/like/daily-message-comment-delete/LIKE_DAILY_MESSAGE_COMMENT_NOT_FOUND/http-response.adoc[]
+====

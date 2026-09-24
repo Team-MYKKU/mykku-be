@@ -23,7 +23,6 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import com.example.mykku.docs.ApiRequestConfig
 import com.example.mykku.docs.RestDocumentationResponse
-import com.example.mykku.docs.Tag
 import com.example.mykku.contest.exception.ContestErrorCode
 import com.example.mykku.contest.exception.ContestException
 import io.restassured.http.ContentType
@@ -42,11 +41,7 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
     @DisplayName("수상작 목록 조회")
     inner class GetContestsWithWinners {
 
-        private val apiConfig = ApiRequestConfig(
-            tag = Tag.CONTEST_WINNER_API,
-            summary = "수상작 목록 조회",
-            description = "모든 콘테스트의 수상작 미리보기를 조회합니다."
-        )
+        private val apiConfig = ApiRequestConfig()
 
         @Test
         fun `성공`() {
@@ -134,9 +129,6 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
     inner class GetContestWinnerDetail {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.CONTEST_WINNER_API,
-            summary = "수상작 상세 조회",
-            description = "특정 콘테스트의 수상작 상세 정보를 조회합니다.",
             pathParameters = listOf(
                 parameterWithName("contestId").description("콘테스트 ID")
             )
@@ -241,9 +233,6 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
     inner class GetContestWinnerAnnouncement {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.CONTEST_WINNER_API,
-            summary = "수상자 발표 공지 조회",
-            description = "특정 콘테스트의 수상자 발표 공지글(제목/본문/발표일)을 조회합니다.",
             pathParameters = listOf(
                 parameterWithName("contestId").description("콘테스트 ID")
             )
@@ -312,9 +301,6 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
     inner class GetMyWinnerStatus {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.CONTEST_WINNER_API,
-            summary = "내 수상 여부 조회",
-            description = "특정 콘테스트에서 인증된 사용자의 수상 여부를 조회합니다.",
             pathParameters = listOf(
                 parameterWithName("contestId").description("콘테스트 ID")
             ),
@@ -403,9 +389,6 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
     inner class GetMyAwardContests {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.CONTEST_WINNER_API,
-            summary = "내 수상 콘테스트 목록 조회",
-            description = "인증된 사용자가 수상한 콘테스트 목록을 페이지네이션으로 조회합니다.",
             queryParameters = listOf(
                 parameterWithName("page").description("페이지 번호 (0부터 시작)").optional(),
                 parameterWithName("size").description("페이지 크기 (기본 20)").optional()
@@ -491,9 +474,6 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
     inner class GetMyAwardFeeds {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.CONTEST_WINNER_API,
-            summary = "내 수상 피드 목록 조회",
-            description = "인증된 사용자가 수상한 피드 목록을 페이지네이션으로 조회합니다.",
             queryParameters = listOf(
                 parameterWithName("page").description("페이지 번호 (0부터 시작)").optional(),
                 parameterWithName("size").description("페이지 크기 (기본 20)").optional()
@@ -602,9 +582,6 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
     inner class GetMyAwardsPreview {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.CONTEST_WINNER_API,
-            summary = "내 수상 미리보기 조회",
-            description = "인증된 사용자의 최근 수상 콘테스트 3개의 썸네일과 ID를 조회합니다.",
             headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
@@ -646,9 +623,6 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
     inner class UpdateAcceptanceSpeech {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.CONTEST_WINNER_API,
-            summary = "수상 소감 등록",
-            description = "수상자 본인이 수상 소감을 등록합니다.",
             pathParameters = listOf(
                 parameterWithName("winnerId").description("수상자 ID")
             ),

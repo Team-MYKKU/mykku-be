@@ -3,7 +3,6 @@ package com.example.mykku.feed.adapter.input.web
 import com.example.mykku.BaseDocumentTest
 import com.example.mykku.docs.ApiRequestConfig
 import com.example.mykku.docs.RestDocumentationResponse
-import com.example.mykku.docs.Tag
 import com.example.mykku.feed.adapter.input.web.dto.CreateFeedCommentRequest
 import com.example.mykku.feed.adapter.input.web.dto.UpdateFeedCommentRequest
 import com.example.mykku.feed.application.dto.CommentAuthorResult
@@ -28,9 +27,6 @@ class FeedCommentDocumentTest : BaseDocumentTest() {
     inner class CreateComment {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.FEED_COMMENT_API,
-            summary = "피드 댓글 생성",
-            description = "피드에 댓글을 작성합니다.",
             pathParameters = listOf(
                 parameterWithName("feedId").description("댓글을 작성할 피드 ID")
             ),
@@ -124,9 +120,6 @@ class FeedCommentDocumentTest : BaseDocumentTest() {
     inner class CreateReply {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.FEED_COMMENT_API,
-            summary = "피드 답글 생성",
-            description = "피드 댓글에 답글을 작성합니다.",
             pathParameters = listOf(
                 parameterWithName("feedId").description("댓글을 작성할 피드 ID")
             ),
@@ -193,9 +186,6 @@ class FeedCommentDocumentTest : BaseDocumentTest() {
     inner class UpdateComment {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.FEED_COMMENT_API,
-            summary = "피드 댓글 수정",
-            description = "피드 댓글을 수정합니다.",
             pathParameters = listOf(
                 parameterWithName("commentId").description("수정할 댓글 ID")
             ),
@@ -304,9 +294,6 @@ class FeedCommentDocumentTest : BaseDocumentTest() {
     inner class DeleteComment {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.FEED_COMMENT_API,
-            summary = "피드 댓글 삭제",
-            description = "피드 댓글을 삭제합니다.",
             pathParameters = listOf(
                 parameterWithName("commentId").description("삭제할 댓글 ID")
             ),

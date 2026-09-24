@@ -3,7 +3,6 @@ package com.example.mykku.feed.adapter.input.web
 import com.example.mykku.BaseDocumentTest
 import com.example.mykku.docs.ApiRequestConfig
 import com.example.mykku.docs.RestDocumentationResponse
-import com.example.mykku.docs.Tag
 import com.example.mykku.feed.application.dto.AuthorResult
 import com.example.mykku.feed.application.dto.CommentAuthorResult
 import com.example.mykku.feed.application.dto.CreateFeedResult
@@ -35,33 +34,6 @@ class FeedDocumentTest : BaseDocumentTest() {
     inner class CreateFeed {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.FEED_API,
-            summary = "피드 작성",
-            description = """
-                |새로운 피드를 작성합니다. 이미지는 최대 10개까지 첨부 가능합니다.
-                |
-                |## Request Parts (multipart/form-data)
-                |
-                |### request (application/json, 필수)
-                |```json
-                |{
-                |  "title": "피드 제목",
-                |  "content": "피드 내용 (최대 1000자)",
-                |  "boardId": 1,
-                |  "tags": ["태그1", "태그2"]
-                |}
-                |```
-                |
-                || 필드 | 타입 | 필수 | 설명 |
-                ||------|------|------|------|
-                || title | string | O | 피드 제목 |
-                || content | string | O | 피드 내용 (최대 1000자) |
-                || boardId | number | O | 게시판 ID |
-                || tags | array | X | 태그 목록 (최대 7개) |
-                |
-                |### images (multipart/form-data, 선택)
-                |업로드할 이미지 파일들 (최대 10개)
-            """.trimMargin(),
             requestParts = listOf(
                 RequestDocumentation.partWithName("request")
                     .description("피드 생성 요청 정보 (JSON)"),
@@ -289,9 +261,6 @@ class FeedDocumentTest : BaseDocumentTest() {
     inner class GetFeedDetail {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.FEED_API,
-            summary = "피드 상세 조회",
-            description = "특정 피드의 상세 정보를 조회합니다.",
             pathParameters = listOf(
                 parameterWithName("feedId").description("조회할 피드의 ID")
             )
@@ -407,9 +376,6 @@ class FeedDocumentTest : BaseDocumentTest() {
     inner class GetFeedComments {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.FEED_API,
-            summary = "피드 댓글 목록 조회",
-            description = "특정 피드의 댓글 목록을 조회합니다. 대댓글도 함께 반환됩니다.",
             pathParameters = listOf(
                 parameterWithName("feedId").description("피드 ID")
             ),
@@ -549,35 +515,6 @@ class FeedDocumentTest : BaseDocumentTest() {
     inner class UpdateFeed {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.FEED_API,
-            summary = "피드 수정",
-            description = """
-                |기존 피드를 수정합니다. 제목, 내용, 게시판, 태그, 이미지를 수정할 수 있습니다.
-                |
-                |## Request Parts (multipart/form-data)
-                |
-                |### request (application/json, 필수)
-                |```json
-                |{
-                |  "title": "수정된 피드 제목",
-                |  "content": "수정된 피드 내용",
-                |  "boardId": 2,
-                |  "tags": ["수정된태그1", "수정된태그2"],
-                |  "deleteImageIds": [1, 2]
-                |}
-                |```
-                |
-                || 필드 | 타입 | 필수 | 설명 |
-                ||------|------|------|------|
-                || title | string | X | 피드 제목 (미입력시 기존 유지) |
-                || content | string | X | 피드 내용 (최대 1000자, 미입력시 기존 유지) |
-                || boardId | number | X | 게시판 ID (미입력시 기존 유지) |
-                || tags | array | X | 태그 목록 (최대 7개, 미입력시 기존 유지) |
-                || deleteImageIds | array | X | 삭제할 이미지 ID 목록 |
-                |
-                |### images (multipart/form-data, 선택)
-                |새로 추가할 이미지 파일들 (기존 이미지 + 새 이미지 합계 최대 10개)
-            """.trimMargin(),
             pathParameters = listOf(
                 parameterWithName("feedId").description("수정할 피드의 ID")
             ),
@@ -785,9 +722,6 @@ class FeedDocumentTest : BaseDocumentTest() {
     inner class DeleteFeed {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.FEED_API,
-            summary = "피드 삭제",
-            description = "피드를 삭제합니다. 작성자만 삭제할 수 있으며, 관련된 모든 데이터(이미지, 태그, 댓글, 좋아요, 스크랩)가 함께 삭제됩니다.",
             pathParameters = listOf(
                 parameterWithName("feedId").description("삭제할 피드의 ID")
             ),

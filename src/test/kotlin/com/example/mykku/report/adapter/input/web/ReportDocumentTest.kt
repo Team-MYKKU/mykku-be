@@ -3,7 +3,6 @@ package com.example.mykku.report.adapter.input.web
 import com.example.mykku.BaseDocumentTest
 import com.example.mykku.docs.ApiRequestConfig
 import com.example.mykku.docs.RestDocumentationResponse
-import com.example.mykku.docs.Tag
 import com.example.mykku.report.application.dto.ReportResult
 import com.example.mykku.report.domain.vo.ReportReason
 import com.example.mykku.report.domain.vo.ReportStatus
@@ -27,9 +26,6 @@ class ReportDocumentTest : BaseDocumentTest() {
     inner class CreateReport {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.REPORT_API,
-            summary = "콘텐츠 신고",
-            description = "게시글 또는 댓글을 신고합니다. 같은 대상은 한 번만 신고할 수 있고, 자신의 콘텐츠는 신고할 수 없습니다.",
             requestBodyFields = listOf(
                 fieldWithPath("targetType").type(JsonFieldType.STRING)
                     .description("신고 대상 종류 (FEED: 게시글, FEED_COMMENT: 댓글)"),
@@ -161,11 +157,7 @@ class ReportDocumentTest : BaseDocumentTest() {
     @DisplayName("신고 사유 목록 조회")
     inner class GetReportReasons {
 
-        private val apiConfig = ApiRequestConfig(
-            tag = Tag.REPORT_API,
-            summary = "신고 사유 목록 조회",
-            description = "신고 시 선택할 수 있는 사유 목록을 조회합니다. 인증이 필요하지 않습니다."
-        )
+        private val apiConfig = ApiRequestConfig()
 
         @Test
         fun `성공`() {

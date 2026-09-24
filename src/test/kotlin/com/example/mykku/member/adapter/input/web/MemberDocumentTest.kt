@@ -3,7 +3,6 @@ package com.example.mykku.member.adapter.input.web
 import com.example.mykku.BaseDocumentTest
 import com.example.mykku.docs.ApiRequestConfig
 import com.example.mykku.docs.RestDocumentationResponse
-import com.example.mykku.docs.Tag
 import com.example.mykku.member.adapter.input.web.dto.ChangeMemberIdRequest
 import com.example.mykku.member.adapter.input.web.dto.ChangePasswordRequest
 import com.example.mykku.member.adapter.input.web.dto.CheckMemberIdRequest
@@ -35,9 +34,6 @@ class MemberDocumentTest : BaseDocumentTest() {
     inner class ChangePassword {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.MEMBER_API,
-            summary = "비밀번호 변경",
-            description = "현재 비밀번호를 확인하고 새로운 비밀번호로 변경합니다.",
             requestBodyFields = listOf(
                 fieldWithPath("currentPassword").type(JsonFieldType.STRING)
                     .description("현재 비밀번호"),
@@ -108,9 +104,6 @@ class MemberDocumentTest : BaseDocumentTest() {
     inner class GetMyProfile {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.MEMBER_API,
-            summary = "내 프로필 조회",
-            description = "로그인한 사용자의 프로필 정보를 조회합니다.",
             headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
@@ -164,9 +157,6 @@ class MemberDocumentTest : BaseDocumentTest() {
     inner class UpdateProfile {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.MEMBER_API,
-            summary = "프로필 수정",
-            description = "닉네임과 프로필 이미지를 수정합니다.",
             requestBodyFields = listOf(
                 fieldWithPath("nickname").type(JsonFieldType.STRING)
                     .description("새로운 닉네임 (최대 10자, 한글/영문/숫자만 허용)").optional(),
@@ -282,29 +272,6 @@ class MemberDocumentTest : BaseDocumentTest() {
     inner class UpdateProfileWithImage {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.MEMBER_API,
-            summary = "프로필 수정 (이미지 업로드)",
-            description = """
-                |닉네임과 프로필 이미지 파일을 함께 수정합니다.
-                |
-                |## Request Parts (multipart/form-data)
-                |
-                |### request (application/json, 선택)
-                |```json
-                |{
-                |  "nickname": "새닉네임"
-                |}
-                |```
-                |
-                || 필드 | 타입 | 필수 | 설명 |
-                ||------|------|------|------|
-                || nickname | string | X | 새로운 닉네임 (최대 10자, 한글/영문/숫자만 허용) |
-                |
-                |### profileImage (multipart/form-data, 선택)
-                |업로드할 프로필 이미지 파일. 전달하면 업로드된 이미지 URL로 프로필 이미지가 변경됩니다.
-                |
-                |JSON(application/json)으로 요청하면 기존과 동일하게 profileImage URL 문자열로 수정할 수 있습니다.
-            """.trimMargin(),
             requestParts = listOf(
                 RequestDocumentation.partWithName("request")
                     .description("프로필 수정 요청 정보 (JSON, 선택사항)").optional(),
@@ -375,9 +342,6 @@ class MemberDocumentTest : BaseDocumentTest() {
     inner class SetupProfile {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.MEMBER_API,
-            summary = "프로필 설정",
-            description = "회원가입 후 아이디와 닉네임을 설정합니다.",
             requestBodyFields = listOf(
                 fieldWithPath("memberId").type(JsonFieldType.STRING)
                     .description("아이디 (영문/숫자, 최대 16자)"),
@@ -465,9 +429,6 @@ class MemberDocumentTest : BaseDocumentTest() {
     inner class ChangeMemberId {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.MEMBER_API,
-            summary = "아이디 변경",
-            description = "회원 아이디(memberId)를 변경합니다. 중복되지 않은 아이디로 자유롭게 변경할 수 있습니다.",
             requestBodyFields = listOf(
                 fieldWithPath("memberId").type(JsonFieldType.STRING)
                     .description("새로운 아이디 (영문/숫자, 최대 16자)")
@@ -550,9 +511,6 @@ class MemberDocumentTest : BaseDocumentTest() {
     inner class Withdraw {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.MEMBER_API,
-            summary = "회원 탈퇴",
-            description = "회원 탈퇴를 진행합니다. 작성한 콘텐츠(피드, 댓글 등)는 유지되며 작성자가 '탈퇴한 회원'으로 표시됩니다.",
             headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
@@ -579,9 +537,6 @@ class MemberDocumentTest : BaseDocumentTest() {
     inner class CheckMemberId {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.MEMBER_API,
-            summary = "아이디 중복 확인",
-            description = "사용하려는 아이디의 중복 여부를 확인합니다.",
             requestBodyFields = listOf(
                 fieldWithPath("memberId").type(JsonFieldType.STRING)
                     .description("확인할 아이디 (영문/숫자, 최대 16자)")

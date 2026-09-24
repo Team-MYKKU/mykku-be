@@ -2,7 +2,6 @@ package com.example.mykku.member.adapter.input.web
 
 import com.example.mykku.BaseDocumentTest
 import com.example.mykku.docs.ApiRequestConfig
-import com.example.mykku.docs.Tag
 import com.example.mykku.event.application.dto.MyParticipatedEventResult
 import com.example.mykku.event.application.dto.PagedMyParticipatedEventsResult
 import com.example.mykku.event.domain.vo.EventStatusType
@@ -25,9 +24,6 @@ class MemberEventDocumentTest : BaseDocumentTest() {
     inner class GetMyParticipatedEvents {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.MEMBER_API,
-            summary = "내가 참여한 이벤트 목록 조회",
-            description = "현재 로그인한 회원이 참여한 이벤트 목록을 조회합니다. 각 이벤트의 당첨 여부를 포함합니다.",
             queryParameters = listOf(
                 parameterWithName("page").description("페이지 번호 (0부터 시작, 기본값: 0)").optional(),
                 parameterWithName("size").description("페이지 크기 (기본값: 20)").optional()

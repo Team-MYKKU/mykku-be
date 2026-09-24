@@ -3,7 +3,6 @@ package com.example.mykku.dailymessage.adapter.input.web
 import com.example.mykku.BaseDocumentTest
 import com.example.mykku.docs.ApiRequestConfig
 import com.example.mykku.docs.RestDocumentationResponse
-import com.example.mykku.docs.Tag
 import com.example.mykku.dailymessage.application.dto.CommentResult
 import com.example.mykku.dailymessage.application.dto.DailyMessageCommentsResult
 import com.example.mykku.dailymessage.application.dto.ReplyResult
@@ -30,9 +29,6 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
     inner class GetComments {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.DAILY_MESSAGE_COMMENT_API,
-            summary = "하루 덕담 댓글 목록 조회",
-            description = "하루 덕담의 댓글 목록을 페이지네이션으로 조회합니다.",
             pathParameters = listOf(
                 parameterWithName("dailyMessageId").description("조회할 하루 덕담 ID")
             ),
@@ -151,9 +147,6 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
     inner class CreateComment {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.DAILY_MESSAGE_COMMENT_API,
-            summary = "하루 덕담 댓글 생성",
-            description = "하루 덕담에 댓글을 작성합니다.",
             pathParameters = listOf(
                 parameterWithName("dailyMessageId").description("댓글을 작성할 하루 덕담 ID")
             ),
@@ -253,9 +246,6 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
     inner class CreateReply {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.DAILY_MESSAGE_COMMENT_API,
-            summary = "하루 덕담 답글 생성",
-            description = "하루 덕담 댓글에 답글을 작성합니다.",
             pathParameters = listOf(
                 parameterWithName("dailyMessageId").description("댓글을 작성할 하루 덕담 ID")
             ),
@@ -328,9 +318,6 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
     inner class UpdateComment {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.DAILY_MESSAGE_COMMENT_API,
-            summary = "하루 덕담 댓글 수정",
-            description = "하루 덕담 댓글을 수정합니다.",
             pathParameters = listOf(
                 parameterWithName("commentId").description("수정할 댓글 ID")
             ),
@@ -445,9 +432,6 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
     inner class DeleteComment {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.DAILY_MESSAGE_COMMENT_API,
-            summary = "하루 덕담 댓글 삭제",
-            description = "하루 덕담 댓글을 삭제합니다.",
             pathParameters = listOf(
                 parameterWithName("commentId").description("삭제할 댓글 ID")
             ),

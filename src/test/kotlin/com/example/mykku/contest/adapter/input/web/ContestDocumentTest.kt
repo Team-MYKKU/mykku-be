@@ -8,7 +8,6 @@ import com.example.mykku.contest.application.dto.PagedContestsResult
 import com.example.mykku.contest.domain.vo.ContestStatusType
 import com.example.mykku.docs.ApiRequestConfig
 import com.example.mykku.docs.RestDocumentationResponse
-import com.example.mykku.docs.Tag
 import com.example.mykku.contest.exception.ContestErrorCode
 import com.example.mykku.contest.exception.ContestException
 import io.restassured.http.ContentType
@@ -29,9 +28,6 @@ class ContestDocumentTest : BaseDocumentTest() {
     inner class GetContestList {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.CONTEST_API,
-            summary = "공모전 목록 조회",
-            description = "공모전 목록을 조회합니다. 상태와 정렬 방식으로 필터링할 수 있습니다.",
             queryParameters = listOf(
                 parameterWithName("status").description("공모전 상태 (ACTIVE, EXPIRED, ALL) 기본값: ACTIVE").optional(),
                 parameterWithName("sortType").description("정렬 방식 (LATEST, OLDEST, POPULAR) 기본값: LATEST")
@@ -121,9 +117,6 @@ class ContestDocumentTest : BaseDocumentTest() {
     inner class GetContestDetail {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.CONTEST_API,
-            summary = "공모전 상세 조회",
-            description = "특정 공모전의 상세 정보를 조회합니다.",
             pathParameters = listOf(
                 parameterWithName("contestId").description("공모전 ID")
             ),

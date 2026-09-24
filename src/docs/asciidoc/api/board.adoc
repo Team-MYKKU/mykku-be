@@ -1,0 +1,20 @@
+[[board-list]]
+=== 게시판 목록 조회
+
+전체 게시판 목록을 조회합니다.
+
+operation::board/list/200[snippets='http-request,http-response,response-fields']
+
+[[board-feeds]]
+=== 보드별 피드 목록 조회
+
+특정 게시판의 피드 목록을 조회합니다.
+
+operation::board/feeds/200[snippets='http-request,path-parameters,query-parameters,http-response,response-fields']
+
+[[board-popular-feeds]]
+=== 보드별 인기 피드 목록 조회
+
+특정 게시판의 인기 피드 목록(최근 7일, 좋아요 순 상위 3개)을 조회합니다.
+
+operation::board/popular-feeds/200[snippets='http-request,path-parameters,http-response,response-fields']

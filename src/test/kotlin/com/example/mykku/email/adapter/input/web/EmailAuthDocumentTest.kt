@@ -5,7 +5,6 @@ import com.example.mykku.auth.adapter.input.web.dto.LoginResponse
 import com.example.mykku.auth.adapter.input.web.dto.MemberInfo
 import com.example.mykku.docs.ApiRequestConfig
 import com.example.mykku.docs.RestDocumentationResponse
-import com.example.mykku.docs.Tag
 import com.example.mykku.email.domain.VerificationPurpose
 import com.example.mykku.email.dto.EmailLoginRequest
 import com.example.mykku.email.dto.ResetPasswordRequest
@@ -33,9 +32,6 @@ class EmailAuthDocumentTest : BaseDocumentTest() {
     inner class SendVerificationCode {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.EMAIL_AUTH_API,
-            summary = "인증 코드 발송",
-            description = "이메일로 인증 코드를 발송합니다.",
             requestBodyFields = listOf(
                 fieldWithPath("email").type(JsonFieldType.STRING).description("인증 코드를 받을 이메일 주소"),
                 fieldWithPath("purpose").type(JsonFieldType.STRING)
@@ -102,9 +98,6 @@ class EmailAuthDocumentTest : BaseDocumentTest() {
     inner class VerifyCode {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.EMAIL_AUTH_API,
-            summary = "인증 코드 검증",
-            description = "발송된 인증 코드를 검증합니다.",
             requestBodyFields = listOf(
                 fieldWithPath("email").type(JsonFieldType.STRING).description("인증할 이메일 주소"),
                 fieldWithPath("code").type(JsonFieldType.STRING).description("발송받은 6자리 인증 코드"),
@@ -199,9 +192,6 @@ class EmailAuthDocumentTest : BaseDocumentTest() {
     inner class Signup {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.EMAIL_AUTH_API,
-            summary = "이메일 회원가입",
-            description = "이메일로 회원가입합니다.",
             requestBodyFields = listOf(
                 fieldWithPath("email").type(JsonFieldType.STRING).description("가입할 이메일 주소"),
                 fieldWithPath("password").type(JsonFieldType.STRING).description("비밀번호 (최소 8자, 영문/숫자/특수문자 포함)")
@@ -298,9 +288,6 @@ class EmailAuthDocumentTest : BaseDocumentTest() {
     inner class Login {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.EMAIL_AUTH_API,
-            summary = "이메일 로그인",
-            description = "이메일로 로그인합니다.",
             requestBodyFields = listOf(
                 fieldWithPath("email").type(JsonFieldType.STRING).description("이메일 주소"),
                 fieldWithPath("password").type(JsonFieldType.STRING).description("비밀번호")
@@ -397,9 +384,6 @@ class EmailAuthDocumentTest : BaseDocumentTest() {
     inner class ResetPassword {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.EMAIL_AUTH_API,
-            summary = "비밀번호 재설정",
-            description = "인증 코드를 통해 비밀번호를 재설정합니다.",
             requestBodyFields = listOf(
                 fieldWithPath("email").type(JsonFieldType.STRING).description("비밀번호를 재설정할 이메일 주소"),
                 fieldWithPath("code").type(JsonFieldType.STRING).description("발송받은 6자리 인증 코드"),
@@ -443,9 +427,6 @@ class EmailAuthDocumentTest : BaseDocumentTest() {
     inner class SendTemporaryPassword {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.EMAIL_AUTH_API,
-            summary = "임시 비밀번호 발송",
-            description = "임시 비밀번호를 이메일로 발송합니다.",
             requestBodyFields = listOf(
                 fieldWithPath("email").type(JsonFieldType.STRING).description("임시 비밀번호를 받을 이메일 주소")
             )

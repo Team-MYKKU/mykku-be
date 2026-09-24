@@ -6,7 +6,6 @@ import com.example.mykku.contest.application.dto.PagedContestsResult
 import com.example.mykku.contest.domain.vo.ContestStatusType
 import com.example.mykku.contest.domain.vo.ContestWinnerStatus
 import com.example.mykku.docs.ApiRequestConfig
-import com.example.mykku.docs.Tag
 import io.restassured.http.ContentType
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -25,9 +24,6 @@ class MemberContestDocumentTest : BaseDocumentTest() {
     inner class GetMyParticipatedContests {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.MEMBER_API,
-            summary = "내가 참여한 콘테스트 목록 조회",
-            description = "현재 로그인한 회원이 참여한 콘테스트 목록을 조회합니다.",
             queryParameters = listOf(
                 parameterWithName("page").description("페이지 번호 (0부터 시작, 기본값: 0)").optional(),
                 parameterWithName("size").description("페이지 크기 (기본값: 20)").optional()

@@ -1,0 +1,131 @@
+[[member-change-password]]
+=== 비밀번호 변경
+
+현재 비밀번호를 확인하고 새로운 비밀번호로 변경합니다.
+
+operation::member/change-password/200[snippets='http-request,request-headers,request-fields,http-response,response-fields']
+
+[[member-change-password-error]]
+==== 에러 응답
+
+.`INVALID_CURRENT_PASSWORD`
+[%collapsible]
+====
+include::{snippets}/member/change-password/INVALID_CURRENT_PASSWORD/http-response.adoc[]
+====
+
+[[member-get-my-profile]]
+=== 내 프로필 조회
+
+로그인한 사용자의 프로필 정보를 조회합니다.
+
+operation::member/get-my-profile/200[snippets='http-request,request-headers,http-response,response-fields']
+
+[[member-update-profile]]
+=== 프로필 수정
+
+닉네임과 프로필 이미지를 수정합니다.
+
+operation::member/update-profile/200[snippets='http-request,request-headers,request-fields,http-response,response-fields']
+
+[[member-update-profile-error]]
+==== 에러 응답
+
+.`NICKNAME_ALREADY_EXISTS`
+[%collapsible]
+====
+include::{snippets}/member/update-profile/NICKNAME_ALREADY_EXISTS/http-response.adoc[]
+====
+
+.`MEMBER_NICKNAME_TOO_LONG`
+[%collapsible]
+====
+include::{snippets}/member/update-profile/MEMBER_NICKNAME_TOO_LONG/http-response.adoc[]
+====
+
+[[member-update-profile-multipart]]
+=== 프로필 수정 (이미지 업로드)
+
+닉네임과 프로필 이미지 파일을 함께 수정합니다.
+
+*Request Parts (multipart/form-data)*
+
+*request (application/json, 선택)*
+
+[source,json]
+----
+{
+  "nickname": "새닉네임"
+}
+----
+
+[cols="1,1,1,3", options="header"]
+|===
+|필드 |타입 |필수 |설명
+
+|nickname
+|string
+|X
+|새로운 닉네임 (최대 10자, 한글/영문/숫자만 허용)
+|===
+
+*profileImage (multipart/form-data, 선택)*
+
+업로드할 프로필 이미지 파일. 전달하면 업로드된 이미지 URL로 프로필 이미지가 변경됩니다.
+
+JSON(application/json)으로 요청하면 기존과 동일하게 profileImage URL 문자열로 수정할 수 있습니다.
+
+operation::member/update-profile-multipart/200[snippets='http-request,request-headers,request-parts,request-part-request-fields,http-response,response-fields']
+
+[[member-setup-profile]]
+=== 프로필 설정
+
+회원가입 후 아이디와 닉네임을 설정합니다.
+
+operation::member/setup-profile/200[snippets='http-request,request-headers,request-fields,http-response,response-fields']
+
+[[member-setup-profile-error]]
+==== 에러 응답
+
+.`MEMBER_ID_ALREADY_EXISTS`
+[%collapsible]
+====
+include::{snippets}/member/setup-profile/MEMBER_ID_ALREADY_EXISTS/http-response.adoc[]
+====
+
+[[member-change-member-id]]
+=== 아이디 변경
+
+회원 아이디(memberId)를 변경합니다. 중복되지 않은 아이디로 자유롭게 변경할 수 있습니다.
+
+operation::member/change-member-id/200[snippets='http-request,request-headers,request-fields,http-response,response-fields']
+
+[[member-change-member-id-error]]
+==== 에러 응답
+
+.`MEMBER_ID_ALREADY_EXISTS`
+[%collapsible]
+====
+include::{snippets}/member/change-member-id/MEMBER_ID_ALREADY_EXISTS/http-response.adoc[]
+====
+
+[[member-withdraw]]
+=== 회원 탈퇴
+
+회원 탈퇴를 진행합니다. 작성한 콘텐츠(피드, 댓글 등)는 유지되며 작성자가 '탈퇴한 회원\'으로 표시됩니다.
+
+operation::member/withdraw/204[snippets='http-request,request-headers,http-response']
+
+[[member-check-id]]
+=== 아이디 중복 확인
+
+사용하려는 아이디의 중복 여부를 확인합니다.
+
+operation::member/check-id/200[snippets='http-request,request-fields,http-response,response-fields']
+
+[[member-check-id-ALREADY_EXISTS]]
+==== 이미 사용 중인 아이디
+
+이미 사용 중인 아이디인 경우 `available` 값이 ``false``로 반환됩니다.
+
+include::{snippets}/member/check-id/ALREADY_EXISTS/http-response.adoc[]

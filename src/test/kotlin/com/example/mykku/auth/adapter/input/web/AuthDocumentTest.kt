@@ -11,7 +11,6 @@ import com.example.mykku.auth.exception.AuthErrorCode
 import com.example.mykku.auth.exception.AuthException
 import com.example.mykku.docs.ApiRequestConfig
 import com.example.mykku.docs.RestDocumentationResponse
-import com.example.mykku.docs.Tag
 import com.example.mykku.member.domain.vo.SocialProvider
 import io.restassured.http.ContentType
 import org.junit.jupiter.api.DisplayName
@@ -29,9 +28,6 @@ class AuthDocumentTest : BaseDocumentTest() {
     inner class MobileLogin {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.AUTH_API,
-            summary = "모바일 소셜 로그인",
-            description = "모바일 앱에서 OAuth 제공자(Google, Kakao, Apple, Naver)를 통해 로그인합니다.",
             requestBodyFields = listOf(
                 fieldWithPath("provider").type(JsonFieldType.STRING)
                     .description("OAuth 제공자 (GOOGLE, KAKAO, APPLE, NAVER)"),
@@ -183,9 +179,6 @@ class AuthDocumentTest : BaseDocumentTest() {
     inner class RefreshToken {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.AUTH_API,
-            summary = "액세스 토큰 갱신",
-            description = "리프레시 토큰을 사용하여 새로운 액세스 토큰을 발급받습니다.",
             requestBodyFields = listOf(
                 fieldWithPath("refreshToken").type(JsonFieldType.STRING)
                     .description("리프레시 토큰")
@@ -266,9 +259,6 @@ class AuthDocumentTest : BaseDocumentTest() {
     inner class Logout {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.AUTH_API,
-            summary = "로그아웃",
-            description = "로그아웃하고 해당 기기의 FCM 토큰을 삭제합니다. 클라이언트는 저장된 액세스/리프레시 토큰을 폐기해야 합니다.",
             requestBodyFields = listOf(
                 fieldWithPath("deviceId").type(JsonFieldType.STRING)
                     .description("FCM 토큰을 삭제할 기기 식별자")

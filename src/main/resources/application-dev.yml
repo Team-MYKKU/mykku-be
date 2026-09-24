@@ -81,14 +81,6 @@ admin:
 firebase:
   service-account-key-path: ${secret.firebase.service_account_key_path}
 
-springdoc:
-  swagger-ui:
-    path: /docs/swagger
-    url: /docs/openapi3.yaml
-    disable-swagger-default-url: true
-    filter: true
-    persist-authorization: true
-
 management:
   endpoints:
     web:

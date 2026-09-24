@@ -3,7 +3,6 @@ package com.example.mykku.like.adapter.input.web
 import com.example.mykku.BaseDocumentTest
 import com.example.mykku.docs.ApiRequestConfig
 import com.example.mykku.docs.RestDocumentationResponse
-import com.example.mykku.docs.Tag
 import com.example.mykku.like.application.dto.LikeBoardInfoResult
 import com.example.mykku.like.application.dto.LikeBoardResult
 import com.example.mykku.like.application.dto.LikeDailyMessageCommentResult
@@ -31,9 +30,6 @@ class LikeDocumentTest : BaseDocumentTest() {
     inner class GetLikedBoards {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.LIKE_API,
-            summary = "즐겨찾기한 게시판 목록 조회",
-            description = "사용자가 즐겨찾기한 게시판 목록을 조회합니다.",
             queryParameters = listOf(
                 parameterWithName("page").description("페이지 번호 (기본값: 0)").optional(),
                 parameterWithName("size").description("페이지 크기 (기본값: 20)").optional()
@@ -109,9 +105,6 @@ class LikeDocumentTest : BaseDocumentTest() {
     inner class LikeBoard {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.LIKE_API,
-            summary = "게시판 즐겨찾기",
-            description = "게시판을 즐겨찾기에 추가합니다.",
             pathParameters = listOf(
                 parameterWithName("boardId").description("즐겨찾기할 게시판 ID")
             ),
@@ -175,9 +168,6 @@ class LikeDocumentTest : BaseDocumentTest() {
     inner class UnlikeBoard {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.LIKE_API,
-            summary = "게시판 즐겨찾기 취소",
-            description = "게시판 즐겨찾기를 취소합니다.",
             pathParameters = listOf(
                 parameterWithName("boardId").description("즐겨찾기 취소할 게시판 ID")
             ),
@@ -237,9 +227,6 @@ class LikeDocumentTest : BaseDocumentTest() {
     inner class LikeFeed {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.LIKE_API,
-            summary = "피드 좋아요",
-            description = "피드에 좋아요를 누릅니다.",
             pathParameters = listOf(
                 parameterWithName("feedId").description("좋아요할 피드 ID")
             ),
@@ -303,9 +290,6 @@ class LikeDocumentTest : BaseDocumentTest() {
     inner class UnlikeFeed {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.LIKE_API,
-            summary = "피드 좋아요 취소",
-            description = "피드 좋아요를 취소합니다.",
             pathParameters = listOf(
                 parameterWithName("feedId").description("좋아요 취소할 피드 ID")
             ),
@@ -365,9 +349,6 @@ class LikeDocumentTest : BaseDocumentTest() {
     inner class LikeFeedComment {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.LIKE_API,
-            summary = "댓글 좋아요",
-            description = "댓글에 좋아요를 누릅니다.",
             pathParameters = listOf(
                 parameterWithName("feedCommentId").description("좋아요할 댓글 ID")
             ),
@@ -431,9 +412,6 @@ class LikeDocumentTest : BaseDocumentTest() {
     inner class UnlikeFeedComment {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.LIKE_API,
-            summary = "댓글 좋아요 취소",
-            description = "댓글 좋아요를 취소합니다.",
             pathParameters = listOf(
                 parameterWithName("feedCommentId").description("좋아요 취소할 댓글 ID")
             ),
@@ -493,9 +471,6 @@ class LikeDocumentTest : BaseDocumentTest() {
     inner class LikeDailyMessageComment {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.LIKE_API,
-            summary = "하루 덕담 댓글 좋아요",
-            description = "하루 덕담 댓글에 좋아요를 누릅니다.",
             pathParameters = listOf(
                 parameterWithName("id").description("좋아요할 하루 덕담 댓글 ID")
             ),
@@ -561,9 +536,6 @@ class LikeDocumentTest : BaseDocumentTest() {
     inner class UnlikeDailyMessageComment {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.LIKE_API,
-            summary = "하루 덕담 댓글 좋아요 취소",
-            description = "하루 덕담 댓글 좋아요를 취소합니다.",
             pathParameters = listOf(
                 parameterWithName("id").description("좋아요 취소할 하루 덕담 댓글 ID")
             ),

@@ -3,7 +3,6 @@ package com.example.mykku.event.adapter.input.web
 import com.example.mykku.BaseDocumentTest
 import com.example.mykku.docs.ApiRequestConfig
 import com.example.mykku.docs.RestDocumentationResponse
-import com.example.mykku.docs.Tag
 import com.example.mykku.event.application.dto.EventWinnerAnnouncementResult
 import com.example.mykku.event.application.dto.EventWinnerResult
 import com.example.mykku.event.application.dto.EventWinnersResult
@@ -31,9 +30,6 @@ class EventWinnerDocumentTest : BaseDocumentTest() {
     inner class GetEventWinners {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.EVENT_WINNER_API,
-            summary = "이벤트 당첨자 목록 조회",
-            description = "특정 이벤트의 당첨자 목록을 조회합니다.",
             pathParameters = listOf(
                 parameterWithName("eventId").description("이벤트 ID")
             )
@@ -118,9 +114,6 @@ class EventWinnerDocumentTest : BaseDocumentTest() {
     inner class GetEventWinnerAnnouncement {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.EVENT_WINNER_API,
-            summary = "당첨자 발표 공지 조회",
-            description = "특정 이벤트의 당첨자 발표 공지글(제목/본문/발표일)을 조회합니다.",
             pathParameters = listOf(
                 parameterWithName("eventId").description("이벤트 ID")
             )
@@ -189,9 +182,6 @@ class EventWinnerDocumentTest : BaseDocumentTest() {
     inner class GetMyWinnerStatus {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.EVENT_WINNER_API,
-            summary = "내 당첨 여부 조회",
-            description = "특정 이벤트에서 인증된 사용자의 당첨 여부를 조회합니다.",
             pathParameters = listOf(
                 parameterWithName("eventId").description("이벤트 ID")
             ),
@@ -254,9 +244,6 @@ class EventWinnerDocumentTest : BaseDocumentTest() {
     inner class GetMyAwardEvents {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.EVENT_WINNER_API,
-            summary = "내 당첨 이벤트 목록 조회",
-            description = "인증된 사용자가 당첨된 이벤트 목록을 페이지네이션으로 조회합니다.",
             queryParameters = listOf(
                 parameterWithName("page").description("페이지 번호 (0부터 시작)").optional(),
                 parameterWithName("size").description("페이지 크기 (기본 20)").optional()

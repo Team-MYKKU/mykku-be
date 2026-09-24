@@ -1,0 +1,50 @@
+[[auth-mobile-login]]
+=== 모바일 소셜 로그인
+
+모바일 앱에서 OAuth 제공자(Google, Kakao, Apple, Naver)를 통해 로그인합니다.
+
+operation::auth/mobile-login/200[snippets='http-request,request-fields,http-response,response-fields']
+
+[[auth-mobile-login-error]]
+==== 에러 응답
+
+.`OAUTH_INVALID_TOKEN`
+[%collapsible]
+====
+include::{snippets}/auth/mobile-login/OAUTH_INVALID_TOKEN/http-response.adoc[]
+====
+
+.`OAUTH_USER_INFO_FAILED`
+[%collapsible]
+====
+include::{snippets}/auth/mobile-login/OAUTH_USER_INFO_FAILED/http-response.adoc[]
+====
+
+.`OAUTH_EXTERNAL_SERVICE_ERROR`
+[%collapsible]
+====
+include::{snippets}/auth/mobile-login/OAUTH_EXTERNAL_SERVICE_ERROR/http-response.adoc[]
+====
+
+[[auth-refresh]]
+=== 액세스 토큰 갱신
+
+리프레시 토큰을 사용하여 새로운 액세스 토큰을 발급받습니다.
+
+operation::auth/refresh/200[snippets='http-request,request-fields,http-response,response-fields']
+
+[[auth-refresh-error]]
+==== 에러 응답
+
+.`INVALID_TOKEN`
+[%collapsible]
+====
+include::{snippets}/auth/refresh/INVALID_TOKEN/http-response.adoc[]
+====
+
+[[auth-logout]]
+=== 로그아웃
+
+로그아웃하고 해당 기기의 FCM 토큰을 삭제합니다. 클라이언트는 저장된 액세스/리프레시 토큰을 폐기해야 합니다.
+
+operation::auth/logout/200[snippets='http-request,request-headers,request-fields,http-response,response-fields']

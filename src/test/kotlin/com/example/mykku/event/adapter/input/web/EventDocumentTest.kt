@@ -3,7 +3,6 @@ package com.example.mykku.event.adapter.input.web
 import com.example.mykku.BaseDocumentTest
 import com.example.mykku.docs.ApiRequestConfig
 import com.example.mykku.docs.RestDocumentationResponse
-import com.example.mykku.docs.Tag
 import com.example.mykku.event.application.dto.EventDetailResult
 import com.example.mykku.event.application.dto.EventImageResult
 import com.example.mykku.event.application.dto.EventListResult
@@ -30,9 +29,6 @@ class EventDocumentTest : BaseDocumentTest() {
     inner class GetEventList {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.EVENT_API,
-            summary = "이벤트 목록 조회",
-            description = "이벤트 목록을 조회합니다. 상태와 정렬 방식으로 필터링할 수 있습니다.",
             queryParameters = listOf(
                 parameterWithName("status").description("이벤트 상태 (ACTIVE, EXPIRED, ALL) 기본값: ACTIVE").optional(),
                 parameterWithName("sortType").description("정렬 방식 (LATEST, OLDEST, POPULAR) 기본값: LATEST")
@@ -124,9 +120,6 @@ class EventDocumentTest : BaseDocumentTest() {
     inner class GetEventDetail {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.EVENT_API,
-            summary = "이벤트 상세 조회",
-            description = "특정 이벤트의 상세 정보를 조회합니다.",
             pathParameters = listOf(
                 parameterWithName("eventId").description("이벤트 ID")
             ),

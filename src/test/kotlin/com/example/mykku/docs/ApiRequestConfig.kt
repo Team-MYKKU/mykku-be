@@ -6,9 +6,6 @@ import org.springframework.restdocs.request.ParameterDescriptor
 import org.springframework.restdocs.request.RequestPartDescriptor
 
 data class ApiRequestConfig(
-    val tag: Tag,
-    val summary: String,
-    val description: String,
     val pathParameters: List<ParameterDescriptor> = emptyList(),
     val queryParameters: List<ParameterDescriptor> = emptyList(),
     val requestBodyFields: List<FieldDescriptor> = emptyList(),

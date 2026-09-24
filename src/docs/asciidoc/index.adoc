@@ -1,0 +1,217 @@
+= MyKKU API 문서
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toc-title: 목차
+:toclevels: 2
+:sectlinks:
+:sectanchors:
+:operation-http-request-title: 요청
+:operation-request-headers-title: 요청 헤더
+:operation-path-parameters-title: 경로 파라미터
+:operation-query-parameters-title: 쿼리 파라미터
+:operation-request-fields-title: 요청 필드
+:operation-request-parts-title: 요청 파트
+:operation-request-part-request-fields-title: request 파트 필드
+:operation-http-response-title: 응답
+:operation-response-headers-title: 응답 헤더
+:operation-response-fields-title: 응답 필드
+
+[[overview]]
+== 개요
+
+[[overview-host]]
+=== 서버
+
+[cols="1,3"]
+|===
+|환경|주소
+
+|개발
+|`https://api.dev.mykku.kr`
+|===
+
+[[overview-authentication]]
+=== 인증
+
+인증이 필요한 API는 `Authorization` 헤더에 JWT 액세스 토큰을 담아 요청합니다.
+
+[source,http]
+----
+Authorization: Bearer {accessToken}
+----
+
+[[overview-response]]
+=== 공통 응답 구조
+
+모든 성공 응답은 다음 구조를 가집니다.
+
+[source,json]
+----
+{
+  "message": "응답 메시지",
+  "data": { }
+}
+----
+
+[[overview-error-response]]
+=== 에러 응답 구조
+
+모든 에러 응답은 다음 구조를 가집니다. 각 API의 **에러 응답** 항목에서 발생 가능한 에러를 확인할 수 있습니다.
+
+[source,json]
+----
+{
+  "code": "에러 코드",
+  "message": "에러 메시지"
+}
+----
+
+[[overview-http-status]]
+=== HTTP 상태 코드
+
+|===
+|상태 코드|설명
+
+|`200 OK`
+|요청 성공
+
+|`201 Created`
+|리소스 생성 성공
+
+|`204 No Content`
+|요청 성공 (응답 본문 없음)
+
+|`400 Bad Request`
+|잘못된 요청
+
+|`401 Unauthorized`
+|인증 실패
+
+|`403 Forbidden`
+|권한 없음
+
+|`404 Not Found`
+|리소스를 찾을 수 없음
+
+|`409 Conflict`
+|리소스 충돌
+
+|`429 Too Many Requests`
+|요청 횟수 초과
+
+|`500 Internal Server Error`
+|서버 오류
+|===
+
+[[auth-api]]
+== 인증 API
+
+include::api/auth.adoc[]
+
+[[email-auth-api]]
+== 이메일 인증 API
+
+include::api/email-auth.adoc[]
+
+[[member-api]]
+== 회원 API
+
+include::api/member.adoc[]
+
+include::api/member-feed.adoc[]
+
+include::api/member-contest.adoc[]
+
+include::api/member-event.adoc[]
+
+[[event-api]]
+== 이벤트 API
+
+include::api/event.adoc[]
+
+[[event-winner-api]]
+== 이벤트 당첨자 API
+
+include::api/event-winner.adoc[]
+
+[[contest-api]]
+== 콘테스트 API
+
+include::api/contest.adoc[]
+
+[[contest-winner-api]]
+== 콘테스트 수상작 API
+
+include::api/contest-winner.adoc[]
+
+[[feed-api]]
+== 피드 API
+
+include::api/feed.adoc[]
+
+[[feed-comment-api]]
+== 피드 댓글 API
+
+include::api/feed-comment.adoc[]
+
+[[board-api]]
+== 보드 API
+
+include::api/board.adoc[]
+
+[[daily-message-api]]
+== 데일리 메시지 API
+
+include::api/daily-message.adoc[]
+
+[[daily-message-comment-api]]
+== 데일리 메시지 댓글 API
+
+include::api/daily-message-comment.adoc[]
+
+[[fan-note-api]]
+== 덕질노트 API
+
+include::api/fan-note.adoc[]
+
+[[like-api]]
+== 좋아요 API
+
+include::api/like.adoc[]
+
+[[preference-api]]
+== 취향 API
+
+include::api/preference.adoc[]
+
+[[fcm-token-api]]
+== FCM 토큰 API
+
+include::api/fcm-token.adoc[]
+
+[[notification-api]]
+== 알림 API
+
+include::api/notification.adoc[]
+
+[[notification-setting-api]]
+== 알림 설정 API
+
+include::api/notification-setting.adoc[]
+
+[[role-api]]
+== 칭호 API
+
+include::api/role.adoc[]
+
+[[block-api]]
+== 차단 API
+
+include::api/block.adoc[]
+
+[[report-api]]
+== 신고 API
+
+include::api/report.adoc[]

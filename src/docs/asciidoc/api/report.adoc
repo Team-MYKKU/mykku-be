@@ -1,0 +1,28 @@
+[[report-create]]
+=== 콘텐츠 신고
+
+게시글 또는 댓글을 신고합니다. 같은 대상은 한 번만 신고할 수 있고, 자신의 콘텐츠는 신고할 수 없습니다.
+
+operation::report/create/201[snippets='http-request,request-headers,request-fields,http-response,response-fields']
+
+[[report-create-error]]
+==== 에러 응답
+
+.`CANNOT_REPORT_OWN_CONTENT`
+[%collapsible]
+====
+include::{snippets}/report/create/CANNOT_REPORT_OWN_CONTENT/http-response.adoc[]
+====
+
+.`ALREADY_REPORTED`
+[%collapsible]
+====
+include::{snippets}/report/create/ALREADY_REPORTED/http-response.adoc[]
+====
+
+[[report-reasons]]
+=== 신고 사유 목록 조회
+
+신고 시 선택할 수 있는 사유 목록을 조회합니다. 인증이 필요하지 않습니다.
+
+operation::report/reasons/200[snippets='http-request,http-response,response-fields']

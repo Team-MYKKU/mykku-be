@@ -2,7 +2,6 @@ package com.example.mykku.notification.adapter.input.web
 
 import com.example.mykku.BaseDocumentTest
 import com.example.mykku.docs.ApiRequestConfig
-import com.example.mykku.docs.Tag
 import com.example.mykku.notification.application.dto.NotificationSettingResult
 import com.example.mykku.notification.domain.vo.NotificationType
 import io.restassured.http.ContentType
@@ -21,9 +20,6 @@ class NotificationSettingDocumentTest : BaseDocumentTest() {
     inner class GetNotificationSettingList {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.NOTIFICATION_SETTING_API,
-            summary = "알림 설정 목록 조회",
-            description = "알림 설정 목록을 조회합니다.",
             headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
@@ -74,9 +70,6 @@ class NotificationSettingDocumentTest : BaseDocumentTest() {
     inner class UpdateNotificationSetting {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.NOTIFICATION_SETTING_API,
-            summary = "알림 설정 변경",
-            description = "알림 설정을 변경합니다.",
             requestBodyFields = listOf(
                 fieldWithPath("notificationType").type(JsonFieldType.STRING)
                     .description("변경할 알림 타입 (FEED_LIKE, FEED_COMMENT)"),

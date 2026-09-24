@@ -3,7 +3,6 @@ package com.example.mykku.board.adapter.input.web
 import com.example.mykku.BaseDocumentTest
 import com.example.mykku.board.application.dto.BoardResult
 import com.example.mykku.docs.ApiRequestConfig
-import com.example.mykku.docs.Tag
 import com.example.mykku.feed.adapter.input.web.dto.AuthorResponse
 import com.example.mykku.feed.adapter.input.web.dto.CommentPreviewResponse
 import com.example.mykku.feed.adapter.input.web.dto.FeedImageResponse
@@ -38,11 +37,7 @@ class BoardDocumentTest : BaseDocumentTest() {
     @DisplayName("게시판 목록 조회")
     inner class GetBoards {
 
-        private val apiConfig = ApiRequestConfig(
-            tag = Tag.BOARD_API,
-            summary = "게시판 목록 조회",
-            description = "전체 게시판 목록을 조회합니다."
-        )
+        private val apiConfig = ApiRequestConfig()
 
         @Test
         fun `성공`() {
@@ -82,9 +77,6 @@ class BoardDocumentTest : BaseDocumentTest() {
     inner class GetFeedsByBoard {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.BOARD_API,
-            summary = "보드별 피드 목록 조회",
-            description = "특정 게시판의 피드 목록을 조회합니다.",
             pathParameters = listOf(
                 parameterWithName("boardId").description("조회할 게시판의 ID")
             ),
@@ -211,9 +203,6 @@ class BoardDocumentTest : BaseDocumentTest() {
     inner class GetPopularFeedsByBoard {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.BOARD_API,
-            summary = "보드별 인기 피드 목록 조회",
-            description = "특정 게시판의 인기 피드 목록(최근 7일, 좋아요 순 상위 3개)을 조회합니다.",
             pathParameters = listOf(
                 parameterWithName("boardId").description("조회할 게시판의 ID")
             )

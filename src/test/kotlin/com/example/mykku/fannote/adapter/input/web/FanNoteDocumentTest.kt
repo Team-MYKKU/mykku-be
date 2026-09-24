@@ -3,7 +3,6 @@ package com.example.mykku.fannote.adapter.input.web
 import com.example.mykku.BaseDocumentTest
 import com.example.mykku.docs.ApiRequestConfig
 import com.example.mykku.docs.RestDocumentationResponse
-import com.example.mykku.docs.Tag
 import com.example.mykku.fannote.application.dto.FanNoteDetailResult
 import com.example.mykku.fannote.application.dto.FanNoteListResult
 import com.example.mykku.fannote.application.dto.FanNotePageResult
@@ -31,9 +30,6 @@ class FanNoteDocumentTest : BaseDocumentTest() {
     inner class GetFanNoteList {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.FAN_NOTE_API,
-            summary = "덕질노트 목록 조회",
-            description = "덕질노트 목록을 페이지네이션으로 조회합니다.",
             queryParameters = listOf(
                 parameterWithName("page").description("페이지 번호 (0부터 시작, 기본값: 0)").optional(),
                 parameterWithName("size").description("페이지 크기 (기본값: 20)").optional()
@@ -125,9 +121,6 @@ class FanNoteDocumentTest : BaseDocumentTest() {
     inner class GetFanNoteDetail {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.FAN_NOTE_API,
-            summary = "덕질노트 상세 조회",
-            description = "덕질노트의 상세 정보를 조회합니다.",
             pathParameters = listOf(
                 parameterWithName("fanNoteId").description("조회할 덕질노트 ID")
             )

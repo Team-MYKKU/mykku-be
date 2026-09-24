@@ -1,0 +1,50 @@
+[[preference-genre-update]]
+=== 장르 취향 저장
+
+장르 취향을 저장합니다.
+
+operation::preference/genre-update/200[snippets='http-request,request-headers,request-fields,http-response,response-fields']
+
+[[preference-genre-update-error]]
+==== 에러 응답
+
+.`EMPTY_PREFERENCE_LIST`
+[%collapsible]
+====
+include::{snippets}/preference/genre-update/EMPTY_PREFERENCE_LIST/http-response.adoc[]
+====
+
+[[preference-genre-get]]
+=== 장르 취향 조회
+
+장르 취향을 조회합니다.
+
+operation::preference/genre-get/200[snippets='http-request,request-headers,http-response,response-fields']
+
+[[preference-goods-update]]
+=== 굿즈 취향 저장
+
+굿즈 취향을 저장합니다.
+
+operation::preference/goods-update/200[snippets='http-request,request-headers,request-fields,http-response,response-fields']
+
+[[preference-goods-get]]
+=== 굿즈 취향 조회
+
+굿즈 취향을 조회합니다.
+
+operation::preference/goods-get/200[snippets='http-request,request-headers,http-response,response-fields']
+
+[[preference-mood-update]]
+=== 분위기 취향 저장
+
+분위기 취향을 저장합니다.
+
+operation::preference/mood-update/200[snippets='http-request,request-headers,request-fields,http-response,response-fields']
+
+[[preference-mood-get]]
+=== 분위기 취향 조회
+
+분위기 취향을 조회합니다.
+
+operation::preference/mood-get/200[snippets='http-request,request-headers,http-response,response-fields']

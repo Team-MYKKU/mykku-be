@@ -1,6 +1,5 @@
 package com.example.mykku.docs
 
-import com.epages.restdocs.apispec.ResourceSnippetParametersBuilder
 import org.springframework.restdocs.cookies.CookieDescriptor
 import org.springframework.restdocs.cookies.CookieDocumentation.requestCookies
 import org.springframework.restdocs.headers.HeaderDescriptor
@@ -17,23 +16,7 @@ import org.springframework.restdocs.snippet.Snippet
 
 class RestDocumentationRequest {
 
-    private val resourceBuilder = ResourceSnippetParametersBuilder()
     private val snippets = mutableListOf<Snippet>()
-
-    fun tag(tag: Tag): RestDocumentationRequest {
-        resourceBuilder.tag(tag.displayName)
-        return this
-    }
-
-    fun summary(summary: String): RestDocumentationRequest {
-        resourceBuilder.summary(summary)
-        return this
-    }
-
-    fun description(description: String): RestDocumentationRequest {
-        resourceBuilder.description(description)
-        return this
-    }
 
     fun pathParameter(vararg descriptors: ParameterDescriptor): RestDocumentationRequest {
         snippets.add(pathParameters(*descriptors))
@@ -47,7 +30,6 @@ class RestDocumentationRequest {
 
     fun requestHeader(vararg descriptors: HeaderDescriptor): RestDocumentationRequest {
         snippets.add(requestHeaders(*descriptors))
-        resourceBuilder.requestHeaders(*descriptors)
         return this
     }
 
@@ -70,8 +52,6 @@ class RestDocumentationRequest {
         snippets.add(requestPartFields(partName, *descriptors))
         return this
     }
-
-    fun getResourceBuilder(): ResourceSnippetParametersBuilder = resourceBuilder
 
     fun getSnippets(): List<Snippet> = snippets.toList()
 }

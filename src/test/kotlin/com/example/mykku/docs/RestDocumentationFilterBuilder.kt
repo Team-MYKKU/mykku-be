@@ -1,12 +1,10 @@
 package com.example.mykku.docs
 
-import com.epages.restdocs.apispec.ResourceSnippetParametersBuilder
-import com.epages.restdocs.apispec.RestAssuredRestDocumentationWrapper.document
-import java.util.function.Function
 import org.springframework.http.HttpHeaders
 import org.springframework.restdocs.operation.preprocess.OperationRequestPreprocessor
 import org.springframework.restdocs.operation.preprocess.OperationResponsePreprocessor
 import org.springframework.restdocs.operation.preprocess.Preprocessors
+import org.springframework.restdocs.restassured.RestAssuredRestDocumentation.document
 import org.springframework.restdocs.restassured.RestDocumentationFilter
 import org.springframework.restdocs.snippet.Snippet
 
@@ -15,11 +13,9 @@ class RestDocumentationFilterBuilder(
     identifier: String
 ) {
     private val identifier: String = "$identifierPrefix/$identifier"
-    private var resourceBuilder = ResourceSnippetParametersBuilder()
     private val snippets = mutableListOf<Snippet>()
 
     fun request(request: RestDocumentationRequest): RestDocumentationFilterBuilder {
-        resourceBuilder = request.getResourceBuilder()
         snippets.addAll(request.getSnippets())
         return this
     }
@@ -32,10 +28,8 @@ class RestDocumentationFilterBuilder(
     fun build(): RestDocumentationFilter {
         return document(
             identifier,
-            resourceBuilder,
             REQUEST_PREPROCESSOR,
             RESPONSE_PREPROCESSOR,
-            Function.identity(),
             *snippets.toTypedArray()
         )
     }
@@ -61,6 +55,8 @@ class RestDocumentationFilterBuilder(
                 .remove("Pragma")
                 .remove("Expires")
                 .remove("X-Frame-Options")
+                .remove("X-Request-ID")
+                .remove("Keep-Alive")
         )
     }
 }
