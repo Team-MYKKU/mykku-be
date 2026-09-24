@@ -3,6 +3,8 @@ package com.example.mykku.member.application.port.output
 import com.example.mykku.member.domain.entity.Member
 import com.example.mykku.member.domain.vo.MemberPk
 import com.example.mykku.member.domain.vo.SocialProvider
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 
 interface MemberRepository {
     fun save(member: Member): Member
@@ -18,4 +20,5 @@ interface MemberRepository {
     fun existsByMemberIdExcludingId(memberId: String, id: MemberPk): Boolean
     fun findByMemberId(memberId: String): Member?
     fun deleteById(id: MemberPk)
+    fun search(keyword: String?, pageable: Pageable): Page<Member>
 }

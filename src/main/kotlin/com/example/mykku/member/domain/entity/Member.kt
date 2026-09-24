@@ -22,6 +22,9 @@ class Member private constructor(
     val isProfileComplete: Boolean
         get() = memberId != null && nickname != null
 
+    val hasPlaceholderEmail: Boolean
+        get() = socialId != null && provider?.placeholderEmail(socialId) == email
+
     fun requireProfileCompleted() {
         if (!isProfileComplete) {
             throw MemberException.profileNotCompleted()

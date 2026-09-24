@@ -21,3 +21,9 @@ data class SetupProfileCommand(
 data class ChangeMemberIdCommand(
     val memberId: String
 )
+
+data class SearchMembersQuery(
+    val keyword: String?,
+    val page: Int,
+    val size: Int
+)

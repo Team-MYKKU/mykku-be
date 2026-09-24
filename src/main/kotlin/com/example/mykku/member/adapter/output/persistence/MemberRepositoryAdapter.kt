@@ -6,6 +6,8 @@ import com.example.mykku.member.domain.entity.Member
 import com.example.mykku.member.domain.vo.MemberPk
 import com.example.mykku.member.domain.vo.SocialProvider
 import com.example.mykku.role.adapter.output.persistence.repository.RoleJpaRepository
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Repository
 
@@ -76,6 +78,21 @@ class MemberRepositoryAdapter(
 
     override fun findByMemberId(memberId: String): Member? {
         return memberJpaRepository.findByMemberId(memberId)?.toDomain()
+    }
+
+    override fun search(keyword: String?, pageable: Pageable): Page<Member> {
+        val trimmed = keyword?.trim()
+        val page = if (trimmed.isNullOrEmpty()) {
+            memberJpaRepository.findAllByOrderByCreatedAtDescIdDesc(pageable)
+        } else {
+            memberJpaRepository.findByMemberIdContainingOrNicknameContainingOrEmailContainingOrderByCreatedAtDescIdDesc(
+                trimmed,
+                trimmed,
+                trimmed,
+                pageable
+            )
+        }
+        return page.map { it.toDomain() }
     }
 
     override fun deleteById(id: MemberPk) {
