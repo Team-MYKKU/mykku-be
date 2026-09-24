@@ -107,7 +107,7 @@ Authorization: Bearer {accessToken}
 
 * 값은 `Bearer` 와 공백 한 칸으로 시작해야 합니다(대소문자 구분). 형식이 다르면 토큰이 없는 것으로 처리됩니다.
 * `Authorization` 헤더에는 액세스 토큰만 넣습니다. 리프레시 토큰을 넣으면 유효하지 않은 토큰으로 처리됩니다.
-* 인증 선택 API는 다음과 같습니다: <<board-feeds>>, <<board-popular-feeds>>, <<feed-detail>>, <<feed-comments>>, <<daily-message-detail>>, <<daily-message-comment-list>>, <<fan-note-detail>>. 만료된 토큰을 보내도 에러 없이 비로그인 응답이 오므로, 로그인 상태라면 유효한 토큰을 보내세요.
+* 인증 선택 API는 다음과 같습니다: <<board-feeds>>, <<board-popular-feeds>>, <<feed-detail>>, <<feed-comments>>, <<daily-message-detail>>, <<daily-message-comment-list>>, <<fan-note-detail>>, <<search-feeds>>, <<search-board-feeds>>. 만료된 토큰을 보내도 에러 없이 비로그인 응답이 오므로, 로그인 상태라면 유효한 토큰을 보내세요.
 
 [[overview-unauthorized]]
 ==== 인증 실패 (401 AU201)
@@ -253,7 +253,7 @@ include::{snippets}/common/UNAUTHORIZED/http-response.adoc[]
 |`currentPage` 형식 (피드)
 |`feeds`
 |`currentPage`(현재 페이지), `size`, `totalElements`, `totalPages`, `hasNext`, `hasPrevious`
-|게시판별 피드 목록, 내가 쓴 피드 목록, 내 수상 피드 목록
+|게시판별 피드 목록, 내가 쓴 피드 목록, 내 수상 피드 목록, 게시판 안 피드 검색
 
 |`currentPage` 형식 (댓글)
 |`comments`
@@ -510,6 +510,11 @@ include::api/feed-comment.adoc[]
 == 게시판 API
 
 include::api/board.adoc[]
+
+[[search-api]]
+== 검색 API
+
+include::api/search-feed.adoc[]
 
 [[daily-message-api]]
 == 하루 덕담 API

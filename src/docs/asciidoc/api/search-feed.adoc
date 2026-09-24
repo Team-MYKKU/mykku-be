@@ -1,0 +1,72 @@
+[[search-feeds]]
+=== 게시판별 피드 검색
+
+검색어가 제목이나 본문에 들어간 피드를 게시판별로 묶어서 조회합니다. 검색 결과 첫 화면용이며, 매칭된 피드가 1건 이상인 모든 게시판이 그룹으로 옵니다.
+
+* *인증 선택*: 로그인 없이도 호출할 수 있습니다. `Authorization` 헤더에 유효한 액세스 토큰을 보내면 로그인 회원 기준으로 차단 필터가 적용되고, 헤더가 없거나 만료·유효하지 않은 토큰은 401 없이 비로그인으로 처리됩니다.
+* *검색어 규칙*: 서버는 `keyword` 의 앞뒤 공백·줄바꿈을 지우고 소문자로 바꾼 값으로 검색합니다. 정규화 후 1~50자(UTF-16 코드 유닛 기준이라 대부분의 이모지는 1개가 2자 이상)여야 합니다. 제목(`title`) 또는 본문(`content`)에 검색어가 부분 문자열로 들어 있으면 매칭되며, 대소문자만 무시하고 나머지는 글자 그대로 비교합니다(예: `é` 와 `è` 는 다른 글자). 중간 공백도 검색어의 일부라 `아이브 컴백` 으로 `아이브컴백` 은 찾지 못합니다.
+* `keyword` 파라미터 자체가 없으면 400 `C105`, 값이 비었거나 공백만 있으면 400 `FD109` 입니다.
+* *로그인 요청*: 내가 차단했거나 나를 차단한 회원의 피드와 제목·본문에 내가 등록한 차단 키워드가 포함된 피드가 제외됩니다. 탈퇴한 회원의 피드는 제외되지 않습니다.
+* *비로그인 요청*: 차단 필터가 적용되지 않습니다.
+* *차단 필터와 개수*: 차단 필터는 개수를 세기 전에 적용됩니다. 그래서 `totalCount` 와 `hasMore` 는 차단된 피드를 뺀 정확한 값입니다.
+* *그룹 순서*: 매칭 수(`totalCount`)가 많은 게시판부터, 같으면 가장 최근 매칭 피드가 더 최신인 게시판부터, 그래도 같으면 `boardId` 오름차순입니다. 서버가 준 순서를 그대로 쓰세요.
+* *미리보기*: 그룹마다 최신순(작성 일시 내림차순, 같으면 피드 ID 내림차순)으로 최대 3건입니다. `hasMore` 가 `true` 이면 <<search-board-feeds,게시판 안 피드 검색>>을 같은 검색어로 호출해 나머지를 가져오세요.
+
+operation::search/feeds/200[snippets='http-request,request-headers,query-parameters,http-response,response-fields']
+
+[[search-feeds-empty]]
+==== 검색 결과 없음
+
+매칭된 피드가 없으면(로그인 요청에서 모두 차단된 경우 포함) `boards` 가 빈 배열(`+[]+`)입니다.
+
+include::{snippets}/search/feeds/empty/http-response.adoc[]
+
+[[search-feeds-error]]
+==== 에러 응답
+
+.`SEARCH_KEYWORD_EMPTY` · 400 · FD109 — 앞뒤 공백을 지운 뒤 검색어가 빈 문자열
+[%collapsible]
+====
+include::{snippets}/search/feeds/SEARCH_KEYWORD_EMPTY/http-response.adoc[]
+====
+
+.`SEARCH_KEYWORD_TOO_LONG` · 400 · FD110 — 앞뒤 공백을 지운 뒤 50자 초과
+[%collapsible]
+====
+include::{snippets}/search/feeds/SEARCH_KEYWORD_TOO_LONG/http-response.adoc[]
+====
+
+[[search-board-feeds]]
+=== 게시판 안 피드 검색
+
+한 게시판 안에서 검색어가 제목이나 본문에 들어간 피드를 최신순으로 페이지 단위로 조회합니다. <<search-feeds,게시판별 피드 검색>>의 "더보기"용입니다.
+
+* *인증 선택*: 로그인 없이도 호출할 수 있습니다. 헤더가 없거나 만료·유효하지 않은 토큰은 401 없이 비로그인으로 처리됩니다.
+* *검색어 규칙*: <<search-feeds,게시판별 피드 검색>>과 같습니다. `keyword` 파라미터 자체가 없으면 400 `C105`, 값이 비었거나 공백만 있으면 400 `FD109` 입니다.
+* *검사 순서*: 검색어(400 `FD109` · `FD110`) → 게시판 존재 여부(404 `BO001`)입니다. 따라서 없는 게시판에 빈 검색어를 보내면 `FD109` 가 반환됩니다.
+* *차단 필터*: 로그인 요청에만 적용되며 규칙은 <<search-feeds,게시판별 피드 검색>>과 같습니다.
+* *차단 필터와 페이징*: 차단 필터는 페이지를 자르기 전에 적용됩니다. 그래서 `feeds` 는 마지막 페이지가 아니면 항상 `size` 개이고, `totalElements` · `totalPages` · `hasNext` 는 차단된 피드를 뺀 정확한 값입니다. 마지막 페이지를 넘는 `page` 를 요청하면 `feeds` 는 빈 배열이며 `totalElements` · `totalPages` 는 실제 값입니다.
+* *정렬*: 작성 일시 내림차순, 같으면 피드 ID 내림차순으로 고정됩니다. 정렬 파라미터는 없습니다.
+
+operation::search/board-feeds/200[snippets='http-request,request-headers,path-parameters,query-parameters,http-response,response-fields']
+
+[[search-board-feeds-error]]
+==== 에러 응답
+
+.`SEARCH_KEYWORD_EMPTY` · 400 · FD109 — 앞뒤 공백을 지운 뒤 검색어가 빈 문자열
+[%collapsible]
+====
+include::{snippets}/search/board-feeds/SEARCH_KEYWORD_EMPTY/http-response.adoc[]
+====
+
+.`SEARCH_KEYWORD_TOO_LONG` · 400 · FD110 — 앞뒤 공백을 지운 뒤 50자 초과
+[%collapsible]
+====
+include::{snippets}/search/board-feeds/SEARCH_KEYWORD_TOO_LONG/http-response.adoc[]
+====
+
+.`BOARD_NOT_FOUND` · 404 · BO001 — `boardId` 에 해당하는 게시판이 없음
+[%collapsible]
+====
+include::{snippets}/search/board-feeds/BOARD_NOT_FOUND/http-response.adoc[]
+====

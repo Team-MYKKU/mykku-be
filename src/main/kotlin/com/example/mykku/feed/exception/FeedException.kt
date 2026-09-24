@@ -32,5 +32,9 @@ class FeedException(
         fun tagInvalidFormat(): FeedException = FeedException(FeedErrorCode.TAG_INVALID_FORMAT)
 
         fun imageInvalidDimensions(): FeedException = FeedException(FeedErrorCode.IMAGE_INVALID_DIMENSIONS)
+
+        fun searchKeywordEmpty(): FeedException = FeedException(FeedErrorCode.SEARCH_KEYWORD_EMPTY)
+
+        fun searchKeywordTooLong(): FeedException = FeedException(FeedErrorCode.SEARCH_KEYWORD_TOO_LONG)
     }
 }

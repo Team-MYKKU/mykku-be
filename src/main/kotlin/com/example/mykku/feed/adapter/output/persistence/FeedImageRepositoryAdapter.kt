@@ -32,6 +32,12 @@ class FeedImageRepositoryAdapter(
         return feedImageJpaRepository.findByFeedIn(feeds).map { it.toDomain() }
     }
 
+    override fun findThumbnailUrlsByFeedIds(feedIds: List<FeedId>): Map<FeedId, String> {
+        if (feedIds.isEmpty()) return emptyMap()
+        return feedImageJpaRepository.findThumbnailsByFeedIdIn(feedIds.map { it.value })
+            .associate { FeedId.of(it.getFeedId()) to it.getUrl() }
+    }
+
     override fun findAllByIdInAndFeedId(ids: List<Long>, feedId: FeedId): List<FeedImage> {
         if (ids.isEmpty()) return emptyList()
         val feed = feedJpaRepository.findById(feedId.value).orElse(null) ?: return emptyList()

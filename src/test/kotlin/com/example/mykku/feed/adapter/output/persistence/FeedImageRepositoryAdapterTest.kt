@@ -188,6 +188,78 @@ class FeedImageRepositoryAdapterTest : BaseRepositoryTest() {
     }
 
     @Nested
+    @DisplayName("findThumbnailUrlsByFeedIds 메서드")
+    inner class FindThumbnailUrlsByFeedIds {
+
+        @Test
+        @DisplayName("피드마다 id가 가장 작은 이미지의 URL을 썸네일로 반환한다")
+        fun `썸네일 조회 - id가 가장 작은 이미지`() {
+            val feed2 = saveFeed("테스트 피드 2")
+            val feedId1 = FeedId.of(feed.id!!)
+            val feedId2 = FeedId.of(feed2.id!!)
+            saveImage(feedId1, "http://example.com/feed1-first.jpg")
+            saveImage(feedId2, "http://example.com/feed2-first.jpg")
+            saveImage(feedId1, "http://example.com/feed1-second.jpg")
+            saveImage(feedId2, "http://example.com/feed2-second.jpg")
+
+            val thumbnails = feedImageRepository.findThumbnailUrlsByFeedIds(listOf(feedId1, feedId2))
+
+            assertThat(thumbnails).containsExactlyInAnyOrderEntriesOf(
+                mapOf(
+                    feedId1 to "http://example.com/feed1-first.jpg",
+                    feedId2 to "http://example.com/feed2-first.jpg"
+                )
+            )
+        }
+
+        @Test
+        @DisplayName("이미지가 없는 피드는 결과에 포함되지 않는다")
+        fun `썸네일 조회 - 이미지 없는 피드 제외`() {
+            val feedWithoutImage = saveFeed("이미지 없는 피드")
+            val feedId = FeedId.of(feed.id!!)
+            saveImage(feedId, "http://example.com/image.jpg")
+
+            val thumbnails = feedImageRepository.findThumbnailUrlsByFeedIds(
+                listOf(feedId, FeedId.of(feedWithoutImage.id!!))
+            )
+
+            assertThat(thumbnails).containsExactlyEntriesOf(mapOf(feedId to "http://example.com/image.jpg"))
+        }
+
+        @Test
+        @DisplayName("요청하지 않은 피드의 이미지는 포함되지 않는다")
+        fun `썸네일 조회 - 요청하지 않은 피드 제외`() {
+            val otherFeed = saveFeed("다른 피드")
+            saveImage(FeedId.of(otherFeed.id!!), "http://example.com/other.jpg")
+
+            val thumbnails = feedImageRepository.findThumbnailUrlsByFeedIds(listOf(FeedId.of(feed.id!!)))
+
+            assertThat(thumbnails).isEmpty()
+        }
+
+        @Test
+        @DisplayName("빈 피드 ID 목록으로 조회하면 빈 맵을 반환한다")
+        fun `썸네일 조회 - 빈 목록`() {
+            val thumbnails = feedImageRepository.findThumbnailUrlsByFeedIds(emptyList())
+
+            assertThat(thumbnails).isEmpty()
+        }
+
+        private fun saveFeed(title: String): FeedJpaEntity {
+            return feedJpaRepository.save(
+                FeedJpaEntity(title = title, content = "테스트 내용", board = board, member = member)
+            )
+        }
+
+        private fun saveImage(feedId: FeedId, url: String) {
+            feedImageRepository.saveAll(
+                listOf(FeedImage.create(url = url, width = 800, height = 600, feedId = feedId)),
+                feedId
+            )
+        }
+    }
+
+    @Nested
     @DisplayName("findAllByIdInAndFeedId 메서드")
     inner class FindAllByIdInAndFeedId {
 

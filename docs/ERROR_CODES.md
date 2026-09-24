@@ -196,6 +196,8 @@
 | FD106 | TAG_TITLE_TOO_LONG | 400 | 태그는 20자 이하여야 합니다 |
 | FD107 | TAG_INVALID_FORMAT | 400 | 태그는 한글, 영문, 숫자만 사용할 수 있습니다 |
 | FD108 | IMAGE_INVALID_DIMENSIONS | 400 | 이미지 크기가 유효하지 않습니다 |
+| FD109 | SEARCH_KEYWORD_EMPTY | 400 | 검색어를 입력해주세요 |
+| FD110 | SEARCH_KEYWORD_TOO_LONG | 400 | 검색어는 50자 이하여야 합니다 |
 | FD201 | FEED_FORBIDDEN_ACCESS | 403 | 피드에 접근할 권한이 없습니다 |
 | FD202 | FEED_COMMENT_FORBIDDEN_ACCESS | 403 | 피드 댓글에 접근할 권한이 없습니다 |
 
