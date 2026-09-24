@@ -1,5 +1,9 @@
 package com.example.mykku.common.exception
 
+import ch.qos.logback.classic.Level
+import ch.qos.logback.classic.Logger
+import ch.qos.logback.classic.spi.ILoggingEvent
+import ch.qos.logback.core.read.ListAppender
 import com.example.mykku.BaseControllerTest
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
@@ -7,6 +11,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import org.slf4j.LoggerFactory
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
@@ -175,5 +180,27 @@ class GlobalExceptionHandlingTest : BaseControllerTest() {
 
     companion object {
         private const val OVERSIZED_IMAGE_BYTES = 2 * 1024 * 1024
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 경로 요청은 WARN 레벨로 스택트레이스 없이 기록한다")
+    fun `존재하지 않는 경로 요청은 WARN 레벨로 스택트레이스 없이 기록한다`() {
+        val logger = LoggerFactory.getLogger(BaseExceptionHandler::class.java) as Logger
+        val appender = ListAppender<ILoggingEvent>().apply { start() }
+        logger.addAppender(appender)
+
+        try {
+            RestAssured.given()
+                .`when`()
+                .get("/api/v1/not-exist-endpoint")
+                .then()
+                .statusCode(404)
+
+            val event = appender.list.single { it.formattedMessage.contains("NoResourceFoundException") }
+            assertThat(event.level).isEqualTo(Level.WARN)
+            assertThat(event.throwableProxy).isNull()
+        } finally {
+            logger.detachAppender(appender)
+        }
     }
 }

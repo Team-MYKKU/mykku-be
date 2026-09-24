@@ -41,7 +41,7 @@ class MemberArgumentResolver(
         val token = extractToken(request)
             ?: return handleNullableParameter(parameter)
 
-        if (!jwtTokenProvider.validateToken(token)) {
+        if (!jwtTokenProvider.validateToken(token) || !jwtTokenProvider.isAccessToken(token)) {
             return handleNullableParameter(parameter)
         }
 

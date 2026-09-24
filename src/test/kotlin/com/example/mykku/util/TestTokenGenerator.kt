@@ -18,6 +18,7 @@ object TestTokenGenerator {
         return Jwts.builder()
             .subject(memberPk.toString())
             .claim("email", email)
+            .claim("tokenType", "access")
             .issuedAt(now)
             .expiration(expiryDate)
             .signWith(secretKey)

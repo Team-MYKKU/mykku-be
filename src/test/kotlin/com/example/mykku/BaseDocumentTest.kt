@@ -438,6 +438,7 @@ abstract class BaseDocumentTest {
         )
 
         doReturn(true).`when`(jwtTokenProvider).validateToken(TEST_ACCESS_TOKEN)
+        doReturn(true).`when`(jwtTokenProvider).isAccessToken(TEST_ACCESS_TOKEN)
         doReturn(testMember.id).`when`(jwtTokenProvider).getMemberIdFromToken(TEST_ACCESS_TOKEN)
     }
 
