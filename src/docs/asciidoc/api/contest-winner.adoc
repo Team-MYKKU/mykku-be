@@ -7,6 +7,7 @@
 * 수상자가 1명도 없는 콘테스트는 빠집니다. 해당하는 콘테스트가 없으면 `contests` 는 빈 배열입니다.
 * 페이지네이션 없이 전체 목록을 한 번에 반환합니다.
 * 콘테스트 정렬 순서는 보장되지 않습니다. 정렬이 필요하면 클라이언트에서 `expiredAt` 등으로 정렬합니다.
+* 수상 피드에 이미지가 없으면 `feedImageUrl` 에 콘테스트 썸네일 URL이 내려갑니다.
 * 각 콘테스트의 `winners[]` 는 `winnerRank` 오름차순(1위 → 3위)이며 1~3개입니다. 수상 피드가 삭제되면 그 수상 기록도 함께 삭제되므로 순위가 비어 있을 수 있습니다(예: 1위와 3위만 존재).
 
 operation::contest-winner/list/200[snippets='http-request,http-response,response-fields']
@@ -92,8 +93,8 @@ include::{snippets}/contest-winner/my-status/WINNER_NOT_ANNOUNCED/http-response.
 인증된 사용자가 수상한 콘테스트 목록을 페이지네이션으로 조회합니다.
 
 * *인증 필요*: 토큰이 없거나 유효하지 않으면(만료 포함) 401 `AU201` (<<overview-error-response,공통 에러>> 참고)
-* 수상 기록 1건당 1항목입니다. 한 콘테스트에서 여러 피드로 수상했다면 같은 `contestId` 가 여러 번 나올 수 있습니다.
-* *정렬*: 수상자 선정 시각 최신순으로 고정됩니다. 정렬 파라미터는 없습니다.
+* 수상 기록 1건당 1항목입니다. 한 회원은 한 콘테스트에서 한 번만 수상할 수 있으므로 같은 `contestId` 가 반복되지 않습니다.
+* *정렬*: 수상자 선정 시각 최신순으로 고정됩니다(재선정 때 유지된 수상은 처음 선정된 시각 기준). 정렬 파라미터는 없습니다.
 * 수상 이력이 없으면 `content` 는 빈 배열입니다.
 * *페이징*: `page` 0 이상, `size` 1~1000. `page` 가 음수면 400 `C103`, `size` 가 범위를 벗어나면 400 `C104`, 숫자가 아니면 400 `C106` (<<overview-error-response,공통 에러>> 참고)
 * 이 API 고유의 에러 응답은 없습니다 (인증·페이징 공통 에러만 발생).
@@ -116,11 +117,11 @@ operation::contest-winner/my-award-feeds/200[snippets='http-request,request-head
 [[contest-winner-my-awards-preview]]
 === 내 수상 미리보기 조회
 
-인증된 사용자의 수상 이력 중 최근(수상자 선정 시각 최신순) 최대 3건의 콘테스트 ID와 썸네일을 조회합니다.
+인증된 사용자의 수상 이력 중 최근(수상자 선정 시각 최신순, 재선정 때 유지된 수상은 처음 선정된 시각 기준) 최대 3건의 콘테스트 ID와 썸네일을 조회합니다.
 
 * *인증 필요*: 토큰이 없거나 유효하지 않으면(만료 포함) 401 `AU201` (<<overview-error-response,공통 에러>> 참고)
 * 수상 이력이 3건보다 적으면 그 수만큼, 없으면 빈 배열을 반환합니다.
-* 수상 기록 단위로 3건을 자르므로, 한 콘테스트에서 여러 번 수상했다면 같은 `contestId` 가 여러 번 포함될 수 있습니다.
+* 한 회원은 한 콘테스트에서 한 번만 수상할 수 있으므로 같은 `contestId` 는 한 번만 포함됩니다.
 * `thumbnailUrl` 은 콘테스트 썸네일이며 수상 피드 이미지가 아닙니다.
 * 이 API 고유의 에러 응답은 없습니다 (인증 공통 에러만 발생).
 
@@ -133,6 +134,7 @@ operation::contest-winner/my-awards-preview/200[snippets='http-request,request-h
 
 * *인증 필요*: 토큰이 없거나 유효하지 않으면(만료 포함) 401 `AU201` (<<overview-error-response,공통 에러>> 참고)
 * 여러 번 호출할 수 있으며, 호출할 때마다 기존 소감을 덮어씁니다. 콘테스트 상태나 기간 제한은 없습니다.
+* 관리자가 수상자를 다시 선정해도 계속 수상자인 회원은 `winnerId` 와 소감이 그대로 유지됩니다. 수상자에서 빠진 회원의 수상 기록은 삭제되므로 그 `winnerId` 로 요청하면 404 `CONTEST_WINNER_NOT_FOUND` 입니다.
 * `winnerId` 는 회원 ID가 아니라 수상 기록 ID입니다. <<contest-winner-my-status,내 수상 여부 조회>>의 `data.winnerId` 또는 <<contest-winner-detail,수상작 상세 조회>>의 `winners[].winnerId` 값을 사용합니다.
 * `acceptanceSpeech` 가 비었거나 공백만 있거나 1000자를 넘으면 400 `C101` 이며, `message` 에 사유(`수상 소감은 필수입니다` 또는 `수상 소감은 1000자 이하여야 합니다`)가 담깁니다. 필드가 없거나 JSON 형식이 잘못된 경우도 400 `C101` 입니다 (공통 에러 참고). 빈 값으로 소감을 지울 수는 없습니다.
 * 존재하지 않는 `winnerId` 면 404 `CONTEST_WINNER_NOT_FOUND`, 요청한 회원이 수상자 본인이 아니면 403 `NOT_WINNER_OWNER` 를 반환합니다.

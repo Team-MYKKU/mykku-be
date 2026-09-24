@@ -276,4 +276,49 @@ class ContestTagTest {
             contestId = ContestId(1L)
         )
     }
+
+    @Nested
+    @DisplayName("normalizeAndValidate 메서드")
+    inner class NormalizeAndValidate {
+
+        @Test
+        @DisplayName("앞뒤 공백을 지우고 빈 값과 중복을 뺀 뒤 입력 순서를 유지한다")
+        fun `태그 정규화 - trim, 빈 값 제거, 순서 유지 중복 제거`() {
+            val result = ContestTag.normalizeAndValidate(listOf(" 팬아트", "", "일러스트", "팬아트 "))
+
+            assertThat(result).containsExactly("팬아트", "일러스트")
+        }
+
+        @Test
+        @DisplayName("정규화 후 태그가 없으면 CONTEST_TAG_REQUIRED 예외가 발생한다")
+        fun `태그 정규화 - 태그 없음`() {
+            val exception = assertThrows<ContestException> {
+                ContestTag.normalizeAndValidate(listOf(" ", ""))
+            }
+
+            assertThat(exception.errorCode).isEqualTo(ContestErrorCode.CONTEST_TAG_REQUIRED)
+        }
+
+        @Test
+        @DisplayName("태그가 최대 개수를 넘으면 CONTEST_TAG_LIMIT_EXCEEDED 예외가 발생한다")
+        fun `태그 정규화 - 개수 초과`() {
+            val titles = (1..8).map { "태그$it" }
+
+            val exception = assertThrows<ContestException> {
+                ContestTag.normalizeAndValidate(titles)
+            }
+
+            assertThat(exception.errorCode).isEqualTo(ContestErrorCode.CONTEST_TAG_LIMIT_EXCEEDED)
+        }
+
+        @Test
+        @DisplayName("형식이 잘못된 태그가 있으면 TAG_INVALID_FORMAT 예외가 발생한다")
+        fun `태그 정규화 - 형식 오류`() {
+            val exception = assertThrows<ContestException> {
+                ContestTag.normalizeAndValidate(listOf("#팬아트"))
+            }
+
+            assertThat(exception.errorCode).isEqualTo(ContestErrorCode.TAG_INVALID_FORMAT)
+        }
+    }
 }

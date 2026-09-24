@@ -47,6 +47,18 @@ class ContestTag private constructor(
             )
         }
 
+        fun normalizeAndValidate(titles: List<String>): List<String> {
+            val normalized = titles.map { it.trim() }.filter { it.isNotEmpty() }.distinct()
+            if (normalized.isEmpty()) {
+                throw ContestException.contestTagRequired()
+            }
+            if (normalized.size > Contest.TAG_MAX_COUNT) {
+                throw ContestException.contestTagLimitExceeded()
+            }
+            normalized.forEach { validateTitle(it) }
+            return normalized
+        }
+
         private fun validateTitle(title: String) {
             if (title.length > TITLE_MAX_LENGTH) {
                 throw ContestException.tagTitleTooLong()

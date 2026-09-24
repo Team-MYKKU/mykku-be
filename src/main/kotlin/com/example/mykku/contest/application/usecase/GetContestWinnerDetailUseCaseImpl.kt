@@ -76,9 +76,9 @@ class GetContestWinnerDetailUseCaseImpl(
             awardTitle = winner.awardTitle,
             feedId = participation.feedId,
             feedTitle = feed?.title ?: "",
-            feedImageUrl = feedImageUrl,
+            feedImageUrl = feedImageUrl ?: "",
             authorNickname = member?.nickname ?: "",
-            authorProfileImage = member?.profileImage,
+            authorProfileImage = member?.profileImage ?: "",
             description = winner.description,
             acceptanceSpeech = winner.acceptanceSpeech
         )

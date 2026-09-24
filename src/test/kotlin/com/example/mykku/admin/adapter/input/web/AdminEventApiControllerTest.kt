@@ -11,6 +11,7 @@ import com.example.mykku.event.domain.vo.EventStatusType
 import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
+import org.hamcrest.Matchers.containsInAnyOrder
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.notNullValue
 import org.junit.jupiter.api.DisplayName
@@ -90,6 +91,31 @@ class AdminEventApiControllerTest : BaseControllerTest() {
             .body("message", equalTo("당첨자가 성공적으로 선정되었습니다."))
             .body("data.eventId", equalTo(event.id!!.toInt()))
             .body("data.winners", notNullValue())
+    }
+
+    @Test
+    @DisplayName("당첨자 선정 - 기존 당첨자를 일부 유지한 채 다시 선정할 수 있다")
+    fun `setWinners - 기존 당첨자를 포함해 재선정한다`() {
+        val adminSessionId = getAdminSessionId()
+        val memberA = createAndSaveMember(memberId = "memberA", email = "a@example.com", socialId = "a1")
+        val memberB = createAndSaveMember(memberId = "memberB", email = "b@example.com", socialId = "b1")
+        val memberC = createAndSaveMember(memberId = "memberC", email = "c@example.com", socialId = "c1")
+        val event = createAndSaveEvent(expiredAt = LocalDateTime.now().minusDays(1))
+        val participationA = createAndSaveParticipation(memberA, event)
+        val participationB = createAndSaveParticipation(memberB, event)
+        val participationC = createAndSaveParticipation(memberC, event)
+
+        selectEventWinners(adminSessionId, event.id!!, listOf(participationA.id!!, participationB.id!!))
+
+        RestAssured.given()
+            .sessionId(adminSessionId)
+            .contentType(ContentType.JSON)
+            .body(mapOf("participationIds" to listOf(participationA.id, participationC.id)))
+            .`when`()
+            .post("/admin/api/v1/events/{eventId}/winners", event.id)
+            .then()
+            .statusCode(200)
+            .body("data.winners.memberId", containsInAnyOrder("memberA", "memberC"))
     }
 
     @Test
@@ -219,6 +245,17 @@ class AdminEventApiControllerTest : BaseControllerTest() {
             thumbnailUrl = "https://example.com/thumbnail.jpg"
         )
         return eventJpaRepository.save(event)
+    }
+
+    private fun selectEventWinners(adminSessionId: String, eventId: Long, participationIds: List<Long>) {
+        RestAssured.given()
+            .sessionId(adminSessionId)
+            .contentType(ContentType.JSON)
+            .body(mapOf("participationIds" to participationIds))
+            .`when`()
+            .post("/admin/api/v1/events/{eventId}/winners", eventId)
+            .then()
+            .statusCode(200)
     }
 
     private fun createAndSaveParticipation(

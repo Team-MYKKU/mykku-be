@@ -235,7 +235,7 @@ data class ContestWinnerPreviewResponse(
 data class WinnerThumbnailResponse(
     val winnerId: Long,
     val winnerRank: Int,
-    val feedImageUrl: String?
+    val feedImageUrl: String
 ) {
     companion object {
         fun from(result: WinnerThumbnailResult): WinnerThumbnailResponse {
@@ -270,9 +270,9 @@ data class WinnerDetailResponse(
     val awardTitle: String?,
     val feedId: Long,
     val feedTitle: String,
-    val feedImageUrl: String?,
+    val feedImageUrl: String,
     val authorNickname: String,
-    val authorProfileImage: String?,
+    val authorProfileImage: String,
     val description: String,
     val acceptanceSpeech: String
 ) {

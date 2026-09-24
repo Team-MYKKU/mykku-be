@@ -40,6 +40,13 @@ class ContestException(
 
         fun winnerNotAnnounced(): ContestException = ContestException(ContestErrorCode.WINNER_NOT_ANNOUNCED)
 
+        fun contestTagRequired(): ContestException = ContestException(ContestErrorCode.CONTEST_TAG_REQUIRED)
+
+        fun duplicateWinnerParticipation(): ContestException =
+            ContestException(ContestErrorCode.DUPLICATE_WINNER_PARTICIPATION)
+
+        fun duplicateWinnerMember(): ContestException = ContestException(ContestErrorCode.DUPLICATE_WINNER_MEMBER)
+
         fun winnerAnnouncementNotFound(): ContestException = ContestException(ContestErrorCode.WINNER_ANNOUNCEMENT_NOT_FOUND)
     }
 }

@@ -26,6 +26,9 @@ enum class ContestErrorCode(
     PARTICIPATION_NOT_BELONG_TO_CONTEST("CN109", HttpStatus.BAD_REQUEST, "해당 참여작은 이 콘테스트에 속하지 않습니다"),
     CONTEST_NOT_EXPIRED("CN110", HttpStatus.BAD_REQUEST, "종료되지 않은 콘테스트입니다"),
     WINNER_NOT_ANNOUNCED("CN111", HttpStatus.BAD_REQUEST, "아직 수상자가 발표되지 않았습니다"),
+    CONTEST_TAG_REQUIRED("CN113", HttpStatus.BAD_REQUEST, "콘테스트 태그는 1개 이상이어야 합니다"),
+    DUPLICATE_WINNER_PARTICIPATION("CN114", HttpStatus.BAD_REQUEST, "같은 참여작을 중복해서 선정할 수 없습니다"),
+    DUPLICATE_WINNER_MEMBER("CN115", HttpStatus.BAD_REQUEST, "한 회원은 한 콘테스트에서 한 번만 수상할 수 있습니다"),
 
     NOT_WINNER_OWNER("CN201", HttpStatus.FORBIDDEN, "수상 소감을 수정할 권한이 없습니다"),
 

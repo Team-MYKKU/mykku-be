@@ -14,8 +14,10 @@ import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
+import org.hibernate.annotations.DynamicUpdate
 
 @Entity
+@DynamicUpdate
 @Table(name = "contest_winner")
 class ContestWinnerJpaEntity(
     @Id

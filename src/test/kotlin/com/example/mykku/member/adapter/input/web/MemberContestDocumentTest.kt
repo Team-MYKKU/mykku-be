@@ -103,14 +103,14 @@ class MemberContestDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.content[].winnerStatus").type(JsonFieldType.STRING)
                                 .description(
                                     "피드가 아닌 콘테스트 단위의 수상 상태 " +
-                                        "(WON:이 콘테스트에서 본인 참여 피드 중 하나 이상이 수상작으로 선정됨, " +
+                                        "(WON: 이 콘테스트에서 본인 참여 피드 하나가 수상작으로 선정됨, " +
                                         "LOST: 수상자 선정이 끝났지만 본인 피드는 모두 미수상, " +
                                         "PENDING: 아직 수상자 선정 전)"
                                 ),
                             fieldWithPath("data.content[].winnerRank").type(JsonFieldType.NUMBER)
                                 .description(
                                     "수상 순위 (1~3, 1이 최고 순위). winnerStatus가 WON일 때만 값이 있고 LOST·PENDING이면 null. " +
-                                        "같은 콘테스트에서 본인 피드가 여러 개 수상한 경우 그중 하나의 순위만 반환됨"
+                                        "한 회원은 한 콘테스트에서 한 번만 수상할 수 있음"
                                 )
                                 .optional(),
                             fieldWithPath("data.page").type(JsonFieldType.NUMBER).description("현재 페이지 번호"),

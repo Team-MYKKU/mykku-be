@@ -66,7 +66,7 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
                             WinnerThumbnailResult(
                                 winnerId = 3L,
                                 winnerRank = 3,
-                                feedImageUrl = null
+                                feedImageUrl = "https://example.com/contest-thumbnail1.jpg"
                             )
                         )
                     ),
@@ -115,7 +115,7 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.contests[].winners[].winnerRank").type(JsonFieldType.NUMBER)
                                 .description(WINNER_RANK_DESCRIPTION),
                             fieldWithPath("data.contests[].winners[].feedImageUrl").type(JsonFieldType.STRING)
-                                .description(FEED_IMAGE_URL_DESCRIPTION).optional()
+                                .description("수상 피드의 첫 번째 이미지 URL (이미지가 없는 피드면 콘테스트 썸네일 URL)")
                         )
                 )
                 .build()
@@ -166,7 +166,7 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
                         feedTitle = "2등 작품",
                         feedImageUrl = "https://example.com/image2.jpg",
                         authorNickname = "user2",
-                        authorProfileImage = null,
+                        authorProfileImage = "",
                         description = "2등 수상 설명",
                         acceptanceSpeech = ""
                     )
@@ -195,15 +195,14 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.winners[].feedId").type(JsonFieldType.NUMBER).description("피드 ID"),
                             fieldWithPath("data.winners[].feedTitle").type(JsonFieldType.STRING).description("피드 제목"),
                             fieldWithPath("data.winners[].feedImageUrl").type(JsonFieldType.STRING)
-                                .description(FEED_IMAGE_URL_DESCRIPTION).optional(),
+                                .description("수상 피드의 첫 번째 이미지 URL (이미지가 없는 피드면 빈 문자열(\"\"))"),
                             fieldWithPath("data.winners[].authorNickname").type(JsonFieldType.STRING)
                                 .description("작성자 닉네임 (탈퇴한 회원이면 빈 문자열(\"\"))"),
                             fieldWithPath("data.winners[].authorProfileImage").type(JsonFieldType.STRING)
                                 .description(
-                                    "작성자 프로필 이미지 URL (탈퇴한 회원이면 null, " +
+                                    "작성자 프로필 이미지 URL (탈퇴한 회원이거나 " +
                                         "프로필 이미지를 설정하지 않았으면 빈 문자열(\"\"))"
-                                )
-                                .optional(),
+                                ),
                             fieldWithPath("data.winners[].description").type(JsonFieldType.STRING)
                                 .description("관리자가 입력한 수상 설명 (입력하지 않았으면 빈 문자열(\"\"))"),
                             fieldWithPath("data.winners[].acceptanceSpeech").type(JsonFieldType.STRING)
@@ -487,8 +486,8 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
                             fieldWithPath("data.content[]").type(JsonFieldType.ARRAY)
                                 .description(
-                                    "수상 콘테스트 목록 (수상 기록 1건당 1항목, 수상자 선정 시각 최신순, " +
-                                        "수상 이력이 없으면 빈 배열)"
+                                    "수상 콘테스트 목록 (수상 기록 1건당 1항목, 수상자 선정 시각 최신순" +
+                                        "(재선정 때 유지된 수상은 처음 선정된 시각 기준), 수상 이력이 없으면 빈 배열)"
                                 ),
                             fieldWithPath("data.content[].contestId").type(JsonFieldType.NUMBER).description("콘테스트 ID"),
                             fieldWithPath("data.content[].contestTitle").type(JsonFieldType.STRING).description("콘테스트 제목"),
@@ -677,7 +676,7 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data[]").type(JsonFieldType.ARRAY)
                                 .description(
                                     "미리보기 목록 (수상자 선정 시각 최신순 최대 3건, 수상 이력이 없으면 빈 배열. " +
-                                        "같은 contestId가 여러 번 포함될 수 있음)"
+                                        "한 회원은 한 콘테스트에서 한 번만 수상하므로 contestId는 중복되지 않음)"
                                 ),
                             fieldWithPath("data[].contestId").type(JsonFieldType.NUMBER).description("콘테스트 ID"),
                             fieldWithPath("data[].thumbnailUrl").type(JsonFieldType.STRING)

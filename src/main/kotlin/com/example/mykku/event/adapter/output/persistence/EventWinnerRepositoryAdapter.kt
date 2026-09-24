@@ -78,5 +78,6 @@ class EventWinnerRepositoryAdapter(
         val eventJpaEntity = eventJpaRepository.findById(eventId.value).orElse(null)
             ?: return
         eventWinnerJpaRepository.deleteAllByEvent(eventJpaEntity)
+        eventWinnerJpaRepository.flush()
     }
 }

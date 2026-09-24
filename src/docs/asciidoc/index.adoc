@@ -191,7 +191,7 @@ include::{snippets}/common/UNAUTHORIZED/http-response.adoc[]
 |`memberId`, `memberName`, `role`, `profileImage` 가 각각 `null`
 
 |수상작 상세
-|`authorNickname` 이 `+""+`, `authorProfileImage` 가 `null`
+|`authorNickname`, `authorProfileImage` 가 각각 `+""+`
 
 |이벤트 당첨자 목록
 |`memberId`, `nickname` 이 `null`, `profileImage` 가 `+""+`

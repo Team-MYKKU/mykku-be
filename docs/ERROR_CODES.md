@@ -132,6 +132,9 @@
 | CN109 | PARTICIPATION_NOT_BELONG_TO_CONTEST | 400 | 해당 참여작은 이 콘테스트에 속하지 않습니다 |
 | CN110 | CONTEST_NOT_EXPIRED | 400 | 종료되지 않은 콘테스트입니다 |
 | CN111 | WINNER_NOT_ANNOUNCED | 400 | 아직 수상자가 발표되지 않았습니다 |
+| CN113 | CONTEST_TAG_REQUIRED | 400 | 콘테스트 태그는 1개 이상이어야 합니다 |
+| CN114 | DUPLICATE_WINNER_PARTICIPATION | 400 | 같은 참여작을 중복해서 선정할 수 없습니다 |
+| CN115 | DUPLICATE_WINNER_MEMBER | 400 | 한 회원은 한 콘테스트에서 한 번만 수상할 수 있습니다 |
 | CN201 | NOT_WINNER_OWNER | 403 | 수상 소감을 수정할 권한이 없습니다 |
 | CN301 | ALREADY_PARTICIPATED_WITH_FEED | 409 | 이 피드로 이미 참여한 콘테스트입니다 |
 

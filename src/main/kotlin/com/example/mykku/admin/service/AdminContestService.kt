@@ -9,10 +9,12 @@ import com.example.mykku.contest.application.dto.PagedContestsResult
 import com.example.mykku.contest.application.port.input.CreateContestUseCase
 import com.example.mykku.contest.application.port.input.ListContestsUseCase
 import com.example.mykku.contest.domain.entity.Contest
+import com.example.mykku.contest.domain.entity.ContestTag
 import com.example.mykku.contest.domain.vo.ContestListFilter
 import com.example.mykku.contest.domain.vo.ContestSortType
 import com.example.mykku.contest.exception.ContestException
 import com.example.mykku.image.ImageUploadService
+import com.example.mykku.image.dto.EntityImagesUploadResult
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
@@ -28,6 +30,7 @@ class AdminContestService(
     @Transactional
     fun create(request: ContestCreateRequest): CreateContestResponse {
         validateImageCount(request.images)
+        val tags = ContestTag.normalizeAndValidate(request.tags ?: emptyList())
 
         val uploadResult = imageUploadService.uploadEntityImages(
             request.thumbnailImage,
@@ -35,7 +38,16 @@ class AdminContestService(
             "contest-images"
         )
 
-        val command = CreateContestCommand(
+        val result = createContestUseCase.execute(toCommand(request, uploadResult, tags))
+        return CreateContestResponse.from(result)
+    }
+
+    private fun toCommand(
+        request: ContestCreateRequest,
+        uploadResult: EntityImagesUploadResult,
+        tags: List<String>
+    ): CreateContestCommand {
+        return CreateContestCommand(
             title = request.title,
             description = request.description,
             startedAt = request.startedAt,
@@ -44,11 +56,8 @@ class AdminContestService(
             images = uploadResult.imageUrls.mapIndexed { index, url ->
                 ContestImageCommand(url = url, orderIndex = index)
             },
-            tags = request.tags?.map { it.trim() }?.filter { it.isNotBlank() } ?: emptyList()
+            tags = tags
         )
-
-        val result = createContestUseCase.execute(command)
-        return CreateContestResponse.from(result)
     }
 
     private fun validateImageCount(images: List<MultipartFile>?) {

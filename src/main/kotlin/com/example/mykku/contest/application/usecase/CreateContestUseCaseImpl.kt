@@ -24,7 +24,7 @@ class CreateContestUseCaseImpl(
     @Transactional
     override fun execute(command: CreateContestCommand): CreateContestResult {
         validateImages(command)
-        val normalizedTags = normalizeAndValidateTags(command.tags)
+        val normalizedTags = ContestTag.normalizeAndValidate(command.tags)
 
         val contest = createAndSaveContest(command)
         val images = createAndSaveImages(command, contest)
@@ -37,20 +37,6 @@ class CreateContestUseCaseImpl(
         if (command.images.size > Contest.IMAGE_MAX_COUNT) {
             throw ContestException.contestImageLimitExceeded()
         }
-    }
-
-    private fun normalizeAndValidateTags(tagTitles: List<String>): List<String> {
-        val normalizedTags = tagTitles.asSequence()
-            .map { it.trim() }
-            .filter { it.isNotBlank() }
-            .distinct()
-            .toList()
-
-        if (normalizedTags.size > Contest.TAG_MAX_COUNT) {
-            throw ContestException.contestTagLimitExceeded()
-        }
-
-        return normalizedTags
     }
 
     private fun createAndSaveContest(command: CreateContestCommand): Contest {

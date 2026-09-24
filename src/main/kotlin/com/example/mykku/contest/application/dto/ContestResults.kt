@@ -105,7 +105,7 @@ data class ContestWinnerPreviewResult(
 data class WinnerThumbnailResult(
     val winnerId: Long,
     val winnerRank: Int,
-    val feedImageUrl: String?
+    val feedImageUrl: String
 )
 
 data class ContestWinnerDetailResult(
@@ -120,9 +120,9 @@ data class WinnerDetailResult(
     val awardTitle: String?,
     val feedId: Long,
     val feedTitle: String,
-    val feedImageUrl: String?,
+    val feedImageUrl: String,
     val authorNickname: String,
-    val authorProfileImage: String?,
+    val authorProfileImage: String,
     val description: String,
     val acceptanceSpeech: String
 )
