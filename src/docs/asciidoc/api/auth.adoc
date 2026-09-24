@@ -1,50 +1,103 @@
 [[auth-mobile-login]]
 === 모바일 소셜 로그인
 
-모바일 앱에서 OAuth 제공자(Google, Kakao, Apple, Naver)를 통해 로그인합니다.
+모바일 앱에서 소셜 제공자(GOOGLE, KAKAO, APPLE, NAVER) SDK로 받은 토큰으로 로그인하고, 서비스용 JWT(액세스 토큰, 리프레시 토큰)를 발급받습니다.
+
+* *인증 헤더 불필요*
+* *provider별 필수 토큰*: GOOGLE, KAKAO, NAVER는 `accessToken` (GOOGLE도 ID 토큰이 아닌 OAuth 액세스 토큰), APPLE은 `idToken` (Sign in with Apple의 identityToken). 필요한 토큰이 없거나 빈 문자열이면 400 `C101` (<<overview-error-response,공통 에러>> 참고). 나머지 토큰 필드는 보내도 사용되지 않습니다.
+* *자동 회원가입*: 해당 제공자 계정으로 가입된 회원이 없으면 이 요청에서 바로 가입되고 `isExistingUser` 가 false로 옵니다. 신규 가입 시 '첫 만남' 칭호가 비동기로 지급되므로 응답 직후에는 아직 반영되지 않았을 수 있습니다.
+* *계정 식별*: 회원은 제공자와 소셜 계정 ID의 조합으로 구분합니다. 이메일이 같아도 제공자가 다르면 별도 계정이며, 탈퇴한 뒤 같은 소셜 계정으로 로그인하면 새 계정으로 가입됩니다.
+* *화면 분기*: `isProfileComplete` 가 false이면 <<member-setup-profile,프로필 설정>> (`POST /api/v1/members/setup-profile`)으로 아이디와 닉네임을 설정해야 합니다. 기존 가입자라도 프로필 설정을 마치지 않았으면 false이므로 분기는 `isExistingUser` 가 아니라 `isProfileComplete` 로 판단하세요. 프로필 설정 전에는 `member.memberId`, `member.nickname` 이 null입니다.
+* `member.profileImage` 는 null이 아니라 빈 문자열(`""`)로 이미지 없음을 나타냅니다.
+* `accessTokenExpiresIn`, `refreshTokenExpiresIn` 은 만료 시각이 아니라 발급 시점부터의 유효 기간(ms)입니다.
 
 operation::auth/mobile-login/200[snippets='http-request,request-fields,http-response,response-fields']
+
+[[auth-mobile-login-new-user]]
+==== 신규 가입자 응답 예시
+
+APPLE 계정으로 처음 로그인한 경우의 예시입니다. `isExistingUser`, `isProfileComplete` 가 모두 false이고, `member.memberId`, `member.nickname` 은 null, `member.profileImage` 는 빈 문자열입니다. Apple이 이메일을 주지 않아 임시 이메일이 들어간 경우입니다.
+
+.APPLE 신규 가입 요청·응답
+[%collapsible]
+====
+include::{snippets}/auth/mobile-login/NEW_USER/http-request.adoc[]
+
+include::{snippets}/auth/mobile-login/NEW_USER/http-response.adoc[]
+====
 
 [[auth-mobile-login-error]]
 ==== 에러 응답
 
-.`OAUTH_INVALID_TOKEN`
+.`OAUTH_INVALID_TOKEN` · 401 · AU203 — GOOGLE, KAKAO, NAVER가 accessToken을 거부(401)한 경우(만료·폐기·잘못된 토큰), APPLE idToken이 점(.)으로 구분된 세 부분이 아니거나 헤더에 kid가 없거나 발급자(iss)가 Apple이 아닌 경우
 [%collapsible]
 ====
 include::{snippets}/auth/mobile-login/OAUTH_INVALID_TOKEN/http-response.adoc[]
 ====
 
-.`OAUTH_USER_INFO_FAILED`
+.`OAUTH_ACCESS_DENIED` · 403 · AU204 — GOOGLE, KAKAO, NAVER가 사용자 정보 요청을 거부(403)한 경우
+[%collapsible]
+====
+include::{snippets}/auth/mobile-login/OAUTH_ACCESS_DENIED/http-response.adoc[]
+====
+
+.`OAUTH_USER_INFO_FAILED` · 400 · AU101 — GOOGLE, KAKAO, NAVER가 401·403 외의 4xx를 반환했거나 응답 본문이 비어 있는 경우, NAVER `resultcode` 가 `00` 이 아닌 경우, APPLE idToken 서명 검증 실패·만료, 연결 실패·타임아웃 등 그 밖의 처리 오류
 [%collapsible]
 ====
 include::{snippets}/auth/mobile-login/OAUTH_USER_INFO_FAILED/http-response.adoc[]
 ====
 
-.`OAUTH_EXTERNAL_SERVICE_ERROR`
+.`OAUTH_SERVER_ERROR` · 503 · AU402 — 소셜 제공자 서버 오류(5xx), APPLE 공개키 조회 실패 또는 idToken의 kid와 일치하는 Apple 공개키가 없는 경우
 [%collapsible]
 ====
-include::{snippets}/auth/mobile-login/OAUTH_EXTERNAL_SERVICE_ERROR/http-response.adoc[]
+include::{snippets}/auth/mobile-login/OAUTH_SERVER_ERROR/http-response.adoc[]
+====
+
+.`MOBILE_LOGIN_NOT_SUPPORTED` · 400 · AU102 — provider에 EMAIL을 보낸 경우 (이메일 계정은 <<email-auth-login,이메일 로그인>> 사용)
+[%collapsible]
+====
+include::{snippets}/auth/mobile-login/MOBILE_LOGIN_NOT_SUPPORTED/http-response.adoc[]
 ====
 
 [[auth-refresh]]
 === 액세스 토큰 갱신
 
-리프레시 토큰을 사용하여 새로운 액세스 토큰을 발급받습니다.
+리프레시 토큰으로 새 액세스 토큰과 새 리프레시 토큰을 발급받습니다.
+
+* *인증 헤더 불필요*: 요청 body의 `refreshToken` 만 사용합니다.
+* *호출 시점*: 다른 API가 401 `AU201` 을 반환하면(액세스 토큰 만료 포함) 저장된 리프레시 토큰으로 이 API를 호출해 토큰을 갱신한 뒤 원래 요청을 다시 보냅니다(<<overview-token,토큰 발급과 갱신>> 참고).
+* *리프레시 토큰 재발급(슬라이딩)*: 호출할 때마다 리프레시 토큰도 새로 발급되고 유효 기간이 그 시점부터 다시 시작됩니다. 응답의 `refreshToken` 으로 저장값을 교체하세요.
+* 서버는 발급한 토큰을 저장하지 않으므로 이전 리프레시 토큰은 폐기되지 않고 원래 만료 시각까지 유효합니다.
+* 액세스 토큰 유효 기간 필드명은 로그인 응답(`accessTokenExpiresIn`)과 달리 `expiresIn` 입니다. 값의 의미(발급 시점부터의 유효 기간, ms)는 같습니다.
+* *갱신 실패*: 401 (만료·위조·형식 오류 토큰이거나 액세스 토큰을 보낸 경우), 404 `MB001` (탈퇴 등으로 회원이 없는 경우). 두 경우 모두 저장된 토큰을 지우고 다시 로그인해야 합니다.
+* `refreshToken` 필드가 없거나 null이면 400 `C101` (<<overview-error-response,공통 에러>> 참고)
 
 operation::auth/refresh/200[snippets='http-request,request-fields,http-response,response-fields']
 
 [[auth-refresh-error]]
 ==== 에러 응답
 
-.`INVALID_TOKEN`
+.`INVALID_TOKEN` · 401 · AU202 — refreshToken이 만료·위조되었거나 형식이 잘못된 경우, 또는 액세스 토큰을 보낸 경우
 [%collapsible]
 ====
 include::{snippets}/auth/refresh/INVALID_TOKEN/http-response.adoc[]
 ====
 
+.`MEMBER_NOT_FOUND` · 404 · MB001 — 토큰의 회원이 탈퇴 등으로 존재하지 않는 경우
+[%collapsible]
+====
+include::{snippets}/auth/refresh/MEMBER_NOT_FOUND/http-response.adoc[]
+====
+
 [[auth-logout]]
 === 로그아웃
 
-로그아웃하고 해당 기기의 FCM 토큰을 삭제합니다. 클라이언트는 저장된 액세스/리프레시 토큰을 폐기해야 합니다.
+로그아웃하고 이 기기의 FCM 토큰을 삭제합니다.
+
+* *인증 필요*: 토큰이 없거나 유효하지 않으면(만료 포함) 401 `AU201` (<<overview-unauthorized,인증 실패>> 참고). 이때는 FCM 토큰이 삭제되지 않으므로, 액세스 토큰이 만료됐으면 <<auth-refresh,토큰을 갱신>>한 뒤 호출하세요.
+* *삭제 대상*: 로그인 회원의 FCM 토큰 중 `deviceId` 가 일치하는 것만 삭제합니다. `deviceId` 는 <<fcm-token-register,FCM 토큰 등록>> 때 보낸 값과 같아야 합니다. 일치하는 토큰이 없어도 200을 반환하므로 여러 번 호출해도 결과가 같습니다.
+* `deviceId` 가 없거나 빈 문자열이면 400 `C101` (<<overview-error-response,공통 에러>> 참고)
+* *JWT 미폐기*: 서버는 액세스 토큰과 리프레시 토큰을 폐기하지 않으므로 기존 토큰은 만료될 때까지 유효합니다. 클라이언트가 저장된 액세스 토큰과 리프레시 토큰을 반드시 지워야 합니다.
+* 응답 `data` 는 항상 빈 객체(`{}`)입니다.
 
 operation::auth/logout/200[snippets='http-request,request-headers,request-fields,http-response,response-fields']

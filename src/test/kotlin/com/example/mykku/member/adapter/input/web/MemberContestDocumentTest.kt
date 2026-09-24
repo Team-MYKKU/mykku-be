@@ -25,8 +25,8 @@ class MemberContestDocumentTest : BaseDocumentTest() {
 
         private val apiConfig = ApiRequestConfig(
             queryParameters = listOf(
-                parameterWithName("page").description("페이지 번호 (0부터 시작, 기본값: 0)").optional(),
-                parameterWithName("size").description("페이지 크기 (기본값: 20)").optional()
+                parameterWithName("page").description("페이지 번호 (0부터 시작, 0 이상, 기본값: 0)").optional(),
+                parameterWithName("size").description("페이지 크기 (1~1000, 기본값: 20)").optional()
             ),
             headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
@@ -76,21 +76,50 @@ class MemberContestDocumentTest : BaseDocumentTest() {
                         .responseBodyField(
                             fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
                             fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
-                            fieldWithPath("data.content[]").type(JsonFieldType.ARRAY).description("콘테스트 목록"),
+                            fieldWithPath("data.content[]").type(JsonFieldType.ARRAY)
+                                .description("참여한 콘테스트 목록 (참여 시각 최신순, 참여 피드 1건당 1항목)"),
                             fieldWithPath("data.content[].id").type(JsonFieldType.NUMBER).description("콘테스트 ID"),
                             fieldWithPath("data.content[].title").type(JsonFieldType.STRING).description("콘테스트 제목"),
-                            fieldWithPath("data.content[].startedAt").type(JsonFieldType.STRING).description("시작일"),
-                            fieldWithPath("data.content[].expiredAt").type(JsonFieldType.STRING).description("만료일"),
-                            fieldWithPath("data.content[].status").type(JsonFieldType.STRING).description("콘테스트 상태 (ACTIVE, EXPIRED)"),
+                            fieldWithPath("data.content[].startedAt").type(JsonFieldType.STRING)
+                                .description("콘테스트 시작 일시 (yyyy-MM-dd'T'HH:mm:ss, KST, 오프셋 없음)"),
+                            fieldWithPath("data.content[].expiredAt").type(JsonFieldType.STRING)
+                                .description(
+                                    "콘테스트 마감 일시 (yyyy-MM-dd'T'HH:mm:ss, KST, 오프셋 없음). " +
+                                        "이 시각 이후(이 시각 포함)에 작성한 피드는 참여로 인정되지 않음"
+                                ),
+                            fieldWithPath("data.content[].status").type(JsonFieldType.STRING)
+                                .description(
+                                    "콘테스트에 저장된 상태 (ACTIVE: 수상자 선정 전(생성 시 기본값), " +
+                                        "WINNER_SELECTED: 수상자 선정 완료). " +
+                                        "EXPIRED(마감)·WINNER_SELECTING(수상자 선정 중)도 enum에 있지만 " +
+                                        "이 값으로 바꾸는 API가 없어 일반적으로 오지 않음. " +
+                                        "expiredAt이 지나도 자동으로 바뀌지 않으므로 마감 여부는 expiredAt으로 판단. " +
+                                        "조회 필터 전용 값인 ALL은 반환되지 않음"
+                                ),
                             fieldWithPath("data.content[].thumbnailUrl").type(JsonFieldType.STRING)
-                                .description("썸네일 이미지 URL").optional(),
-                            fieldWithPath("data.content[].tags[]").type(JsonFieldType.ARRAY).description("태그 목록"),
+                                .description("콘테스트 썸네일 이미지 URL (항상 존재)"),
+                            fieldWithPath("data.content[].tags[]").type(JsonFieldType.ARRAY)
+                                .description(
+                                    "콘테스트 참여 조건 태그 목록 ('#' 없이 한글·영문·숫자만, 태그당 1~20자, 중복 없음, 최대 7개). " +
+                                        "피드 태그가 이 태그를 모두(대소문자까지 정확히 일치) 포함해야 참여로 인정됨. 순서 보장 없음"
+                                ),
                             fieldWithPath("data.content[].winnerStatus").type(JsonFieldType.STRING)
-                                .description("수상 상태 (WON: 수상, LOST: 낙선, PENDING: 발표 전)"),
-                            fieldWithPath("data.content[].winnerRank").type(JsonFieldType.NUMBER).description("수상 순위").optional(),
+                                .description(
+                                    "피드가 아닌 콘테스트 단위의 수상 상태 " +
+                                        "(WON:이 콘테스트에서 본인 참여 피드 중 하나 이상이 수상작으로 선정됨, " +
+                                        "LOST: status가 WINNER_SELECTED이지만 본인 피드는 모두 미수상, " +
+                                        "PENDING: status가 WINNER_SELECTED가 아니어서 아직 수상자 선정 전)"
+                                ),
+                            fieldWithPath("data.content[].winnerRank").type(JsonFieldType.NUMBER)
+                                .description(
+                                    "수상 순위 (1~3, 1이 최고 순위). winnerStatus가 WON일 때만 값이 있고 LOST·PENDING이면 null. " +
+                                        "같은 콘테스트에서 본인 피드가 여러 개 수상한 경우 그중 하나의 순위만 반환됨"
+                                )
+                                .optional(),
                             fieldWithPath("data.page").type(JsonFieldType.NUMBER).description("현재 페이지 번호"),
                             fieldWithPath("data.size").type(JsonFieldType.NUMBER).description("페이지 크기"),
-                            fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER).description("전체 요소 수"),
+                            fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER)
+                                .description("전체 요소 수 (참여 기록 수 기준)"),
                             fieldWithPath("data.totalPages").type(JsonFieldType.NUMBER).description("전체 페이지 수"),
                             fieldWithPath("data.isLast").type(JsonFieldType.BOOLEAN).description("마지막 페이지 여부")
                         )

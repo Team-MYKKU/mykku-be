@@ -3,19 +3,34 @@
 
 덕질노트 목록을 페이지네이션으로 조회합니다.
 
+* *인증 불필요*: `Authorization` 헤더 없이 호출하며, 헤더를 보내도 응답은 같습니다.
+* *정렬*: 제작일(`productionDate`) 최신순(내림차순)으로 고정됩니다. 정렬 파라미터는 없으며, 제작일이 같은 덕질노트끼리의 순서는 보장되지 않습니다.
+* *페이징*: `page` 0 이상, `size` 1~1000 (<<overview-pagination,페이지네이션>> 참고). 범위를 벗어나면 400 `C103`(page) / `C104`(size), 숫자가 아니면 400 `C106` (<<overview-common-errors,공통 에러>> 참고)
+* 마지막 페이지를 넘는 `page` 를 요청하면 에러 없이 `data.content` 가 빈 배열로 반환됩니다. 다음 페이지가 있는지는 `data.last` 로 판단하세요(`data.number`, `data.totalPages` 도 함께 제공됩니다).
+* `data.content[].content` 는 요약이 아니라 상세 조회와 같은 본문 전체이며 길이 제한이 없습니다. 목록 카드에 표시할 때는 클라이언트에서 말줄임 처리가 필요합니다.
+* `subtitle`, `content` 는 값이 없으면 `null` 또는 빈 문자열 `+""+` 로 내려올 수 있고, `coverImageUrl` 은 표지가 등록되지 않았으면 `null` 입니다. 키는 항상 포함됩니다.
+
 operation::fan-note/list/200[snippets='http-request,query-parameters,http-response,response-fields']
 
 [[fan-note-detail]]
 === 덕질노트 상세 조회
 
-덕질노트의 상세 정보를 조회합니다.
+덕질노트의 상세 정보(본문, 페이지 이미지 목록)를 조회합니다.
 
-operation::fan-note/detail/200[snippets='http-request,path-parameters,http-response,response-fields']
+* *선택 인증*: `Authorization` 헤더 없이도 호출할 수 있고, 응답 내용은 로그인 여부와 관계없이 같습니다. 토큰이 없거나 만료·위조 등으로 유효하지 않아도 401 없이 비로그인으로 처리됩니다.
+* *칭호 집계*: 유효한 토큰으로 조회에 성공하면 호출할 때마다 덕질노트 조회 횟수가 1회 쌓입니다. 같은 덕질노트를 다시 조회해도 매번 쌓이며, 비로그인 조회와 에러 응답은 집계되지 않습니다. 누적 1 / 15 / 30회에 칭호 '초보 오타쿠' / '중수 오타쿠' / '고수 오타쿠' 가 자동으로 부여됩니다.
+* 미리 불러오기(프리패치)나 화면 재진입으로 호출해도 조회로 집계되므로, 사용자가 실제로 덕질노트를 열람할 때 호출하세요.
+* 조회 횟수 집계와 칭호 부여는 요청 처리(트랜잭션 커밋) 후 비동기로 이루어지므로 이 API 응답에는 칭호 정보가 없습니다. 새로 받은 칭호는 <<role-new-roles,새로 획득한 칭호 조회>> 로 확인합니다.
+* `pages` 는 `pageNumber` 오름차순(1부터 연속)으로 정렬되어 있고 표지 이미지(`coverImageUrl`)는 포함되지 않습니다. 등록된 페이지가 없으면 빈 배열입니다.
+* `subtitle`, `content` 는 값이 없으면 `null` 또는 빈 문자열 `+""+`, `coverImageUrl` 은 표지 미등록 시 `null` 입니다. 키는 항상 포함됩니다.
+* `fanNoteId` 는 숫자 ID입니다. 숫자가 아니면 400 `C106` (<<overview-common-errors,공통 에러>> 참고)
+
+operation::fan-note/detail/200[snippets='http-request,request-headers,path-parameters,http-response,response-fields']
 
 [[fan-note-detail-error]]
 ==== 에러 응답
 
-.`FAN_NOTE_NOT_FOUND`
+.`FAN_NOTE_NOT_FOUND` · 404 · FN001 — 존재하지 않는 덕질노트 ID
 [%collapsible]
 ====
 include::{snippets}/fan-note/detail/FAN_NOTE_NOT_FOUND/http-response.adoc[]

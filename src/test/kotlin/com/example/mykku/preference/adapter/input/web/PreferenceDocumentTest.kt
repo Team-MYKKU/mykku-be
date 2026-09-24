@@ -9,8 +9,6 @@ import com.example.mykku.preference.application.dto.MoodPreferenceResult
 import com.example.mykku.preference.domain.vo.GenreType
 import com.example.mykku.preference.domain.vo.GoodsType
 import com.example.mykku.preference.domain.vo.MoodType
-import com.example.mykku.preference.exception.PreferenceErrorCode
-import com.example.mykku.preference.exception.PreferenceException
 import io.restassured.http.ContentType
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -19,6 +17,7 @@ import org.mockito.Mockito.doNothing
 import org.mockito.Mockito.doThrow
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
 
@@ -31,7 +30,11 @@ class PreferenceDocumentTest : BaseDocumentTest() {
         private val apiConfig = ApiRequestConfig(
             requestBodyFields = listOf(
                 fieldWithPath("genreTypes").type(JsonFieldType.ARRAY)
-                    .description("장르 취향 목록 (${GenreType.entries.joinToString { it.name }})")
+                    .description(
+                        "최종 선택된 장르 취향 전체 목록. 저장된 장르 취향을 이 목록으로 전체 교체하며 빈 배열이면 모두 삭제. " +
+                            "대소문자 구분, 같은 값 중복이나 현재 저장된 값 포함 시 409 C302 " +
+                            "(${GenreType.entries.joinToString { "${it.name}: ${it.displayName}" }})"
+                    )
             ),
             headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
@@ -50,7 +53,8 @@ class PreferenceDocumentTest : BaseDocumentTest() {
                     response()
                         .responseBodyField(
                             fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터").optional()
+                            fieldWithPath("data").type(JsonFieldType.OBJECT)
+                                .description("항상 빈 객체({}). 저장 결과는 조회 API로 확인")
                         )
                 )
                 .build()
@@ -66,15 +70,15 @@ class PreferenceDocumentTest : BaseDocumentTest() {
         }
 
         @Test
-        fun `빈 목록`() {
+        fun `현재 저장된 값이 포함되었거나 같은 값이 중복된 경우`() {
             val request = UpdateGenrePreferenceRequest(
-                genreTypes = emptyList()
+                genreTypes = listOf(GenreType.KPOP, GenreType.BAND_ROCK)
             )
 
-            doThrow(PreferenceException(PreferenceErrorCode.EMPTY_PREFERENCE_LIST))
+            doThrow(DataIntegrityViolationException("uk_genre_preference_member_type"))
                 .`when`(updateGenrePreferenceUseCase).updateGenrePreferences(any())
 
-            val documentFilter = document("preference/genre-update", "EMPTY_PREFERENCE_LIST")
+            val documentFilter = document("preference/genre-update", "DATA_INTEGRITY_VIOLATION")
                 .request(request().applyConfig(apiConfig))
                 .response(RestDocumentationResponse.ERROR_RESPONSE)
                 .build()
@@ -86,7 +90,7 @@ class PreferenceDocumentTest : BaseDocumentTest() {
                 .`when`()
                 .post("/api/v1/preferences/genre")
                 .then()
-                .statusCode(400)
+                .statusCode(409)
         }
     }
 
@@ -113,7 +117,10 @@ class PreferenceDocumentTest : BaseDocumentTest() {
                             fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
                             fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
                             fieldWithPath("data.genreTypes").type(JsonFieldType.ARRAY)
-                                .description("장르 취향 목록 (${GenreType.entries.joinToString { it.name }})")
+                                .description(
+                                    "저장된 장르 취향 목록. 없으면 빈 배열, 순서 보장 안 됨 " +
+                                        "(${GenreType.entries.joinToString { "${it.name}: ${it.displayName}" }})"
+                                )
                         )
                 )
                 .build()
@@ -135,7 +142,11 @@ class PreferenceDocumentTest : BaseDocumentTest() {
         private val apiConfig = ApiRequestConfig(
             requestBodyFields = listOf(
                 fieldWithPath("goodsTypes").type(JsonFieldType.ARRAY)
-                    .description("굿즈 취향 목록 (${GoodsType.entries.joinToString { it.name }})")
+                    .description(
+                        "최종 선택된 굿즈 취향 전체 목록. 저장된 굿즈 취향을 이 목록으로 전체 교체하며 빈 배열이면 모두 삭제. " +
+                            "대소문자 구분, 같은 값 중복이나 현재 저장된 값 포함 시 409 C302 " +
+                            "(${GoodsType.entries.joinToString { "${it.name}: ${it.displayName}" }})"
+                    )
             ),
             headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
@@ -154,7 +165,8 @@ class PreferenceDocumentTest : BaseDocumentTest() {
                     response()
                         .responseBodyField(
                             fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터").optional()
+                            fieldWithPath("data").type(JsonFieldType.OBJECT)
+                                .description("항상 빈 객체({}). 저장 결과는 조회 API로 확인")
                         )
                 )
                 .build()
@@ -167,6 +179,30 @@ class PreferenceDocumentTest : BaseDocumentTest() {
                 .post("/api/v1/preferences/goods")
                 .then()
                 .statusCode(200)
+        }
+
+        @Test
+        fun `현재 저장된 값이 포함되었거나 같은 값이 중복된 경우`() {
+            val request = UpdateGoodsPreferenceRequest(
+                goodsTypes = listOf(GoodsType.ITABAG, GoodsType.PHOTOCARD_HOLDER)
+            )
+
+            doThrow(DataIntegrityViolationException("uk_goods_preference_member_type"))
+                .`when`(updateGoodsPreferenceUseCase).updateGoodsPreferences(any())
+
+            val documentFilter = document("preference/goods-update", "DATA_INTEGRITY_VIOLATION")
+                .request(request().applyConfig(apiConfig))
+                .response(RestDocumentationResponse.ERROR_RESPONSE)
+                .build()
+
+            given(documentFilter)
+                .headers(AUTH_HEADER)
+                .contentType(ContentType.JSON)
+                .body(objectMapper.writeValueAsString(request))
+                .`when`()
+                .post("/api/v1/preferences/goods")
+                .then()
+                .statusCode(409)
         }
     }
 
@@ -193,7 +229,10 @@ class PreferenceDocumentTest : BaseDocumentTest() {
                             fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
                             fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
                             fieldWithPath("data.goodsTypes").type(JsonFieldType.ARRAY)
-                                .description("굿즈 취향 목록 (${GoodsType.entries.joinToString { it.name }})")
+                                .description(
+                                    "저장된 굿즈 취향 목록. 없으면 빈 배열, 순서 보장 안 됨 " +
+                                        "(${GoodsType.entries.joinToString { "${it.name}: ${it.displayName}" }})"
+                                )
                         )
                 )
                 .build()
@@ -215,7 +254,11 @@ class PreferenceDocumentTest : BaseDocumentTest() {
         private val apiConfig = ApiRequestConfig(
             requestBodyFields = listOf(
                 fieldWithPath("moodTypes").type(JsonFieldType.ARRAY)
-                    .description("분위기 취향 목록 (${MoodType.entries.joinToString { it.name }})")
+                    .description(
+                        "최종 선택된 분위기 취향 전체 목록. 저장된 분위기 취향을 이 목록으로 전체 교체하며 빈 배열이면 모두 삭제. " +
+                            "대소문자 구분, 같은 값 중복이나 현재 저장된 값 포함 시 409 C302 " +
+                            "(${MoodType.entries.joinToString { "${it.name}: ${it.displayName}" }})"
+                    )
             ),
             headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
@@ -234,7 +277,8 @@ class PreferenceDocumentTest : BaseDocumentTest() {
                     response()
                         .responseBodyField(
                             fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터").optional()
+                            fieldWithPath("data").type(JsonFieldType.OBJECT)
+                                .description("항상 빈 객체({}). 저장 결과는 조회 API로 확인")
                         )
                 )
                 .build()
@@ -247,6 +291,30 @@ class PreferenceDocumentTest : BaseDocumentTest() {
                 .post("/api/v1/preferences/mood")
                 .then()
                 .statusCode(200)
+        }
+
+        @Test
+        fun `현재 저장된 값이 포함되었거나 같은 값이 중복된 경우`() {
+            val request = UpdateMoodPreferenceRequest(
+                moodTypes = listOf(MoodType.COZY, MoodType.FRESH)
+            )
+
+            doThrow(DataIntegrityViolationException("uk_mood_preference_member_type"))
+                .`when`(updateMoodPreferenceUseCase).updateMoodPreferences(any())
+
+            val documentFilter = document("preference/mood-update", "DATA_INTEGRITY_VIOLATION")
+                .request(request().applyConfig(apiConfig))
+                .response(RestDocumentationResponse.ERROR_RESPONSE)
+                .build()
+
+            given(documentFilter)
+                .headers(AUTH_HEADER)
+                .contentType(ContentType.JSON)
+                .body(objectMapper.writeValueAsString(request))
+                .`when`()
+                .post("/api/v1/preferences/mood")
+                .then()
+                .statusCode(409)
         }
     }
 
@@ -273,7 +341,10 @@ class PreferenceDocumentTest : BaseDocumentTest() {
                             fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
                             fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
                             fieldWithPath("data.moodTypes").type(JsonFieldType.ARRAY)
-                                .description("분위기 취향 목록 (${MoodType.entries.joinToString { it.name }})")
+                                .description(
+                                    "저장된 분위기 취향 목록. 없으면 빈 배열, 순서 보장 안 됨 " +
+                                        "(${MoodType.entries.joinToString { "${it.name}: ${it.displayName}" }})"
+                                )
                         )
                 )
                 .build()

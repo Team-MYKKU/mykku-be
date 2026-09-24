@@ -378,6 +378,12 @@ abstract class BaseDocumentTest {
         val AUTH_HEADER_DESCRIPTOR: List<HeaderDescriptor> = listOf(
             headerWithName(HttpHeaders.AUTHORIZATION).description("Bearer {JWT 액세스 토큰}")
         )
+
+        val OPTIONAL_AUTH_HEADER_DESCRIPTOR: List<HeaderDescriptor> = listOf(
+            headerWithName(HttpHeaders.AUTHORIZATION)
+                .description("Bearer {JWT 액세스 토큰} (선택). 보내면 로그인 회원 기준으로 응답이 계산되고, 없거나 유효하지 않은 토큰은 401 없이 비로그인으로 처리됨")
+                .optional()
+        )
     }
 
     protected val objectMapper: ObjectMapper = jacksonObjectMapper().apply {

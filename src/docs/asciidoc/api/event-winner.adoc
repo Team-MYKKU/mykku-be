@@ -3,12 +3,26 @@
 
 특정 이벤트의 당첨자 목록을 조회합니다.
 
+* *인증 불필요*: 비회원도 호출할 수 있으며, `Authorization` 헤더를 보내도 무시됩니다.
+* 이 API는 이벤트 상태를 검사하지 않습니다. 당첨자가 아직 선정되지 않은 이벤트는 에러 없이 `winners` 가 빈 배열(`[]`)로 반환됩니다(<<event-winner-list-empty>>). 당첨자는 선정할 때 최소 1명 이상 지정되므로, 빈 배열은 아직 당첨자가 선정되지 않았다는 뜻입니다.
+* 발표 여부는 <<event-detail,이벤트 상세 조회>>의 `status` 가 `WINNER_SELECTED` 인지로 판단합니다.
+* *정렬*: 당첨자 목록의 순서는 보장되지 않습니다. 필요하면 클라이언트에서 정렬하세요.
+* 탈퇴한 당첨자도 목록에서 빠지지 않고 `memberId`/`nickname` 이 `null`, `profileImage` 가 빈 문자열(`+""+`)인 항목으로 내려옵니다. 프로필(아이디/닉네임) 설정을 마치지 않은 당첨자도 `memberId`/`nickname` 이 `null` 이고, 프로필 이미지가 없는 당첨자는 `profileImage` 가 빈 문자열입니다. 대체 표시(기본 프로필 이미지 등)가 필요합니다.
+* `winnerId` 는 회원 ID가 아닌 당첨 기록 ID입니다. 관리자가 당첨자를 다시 지정하면 기존 기록이 삭제되고 새 ID가 발급되므로 영구 키로 저장하지 마세요.
+
 operation::event-winner/list/200[snippets='http-request,path-parameters,http-response,response-fields']
+
+[[event-winner-list-empty]]
+==== 빈 목록
+
+당첨자가 아직 선정되지 않은 이벤트는 빈 `winners` 배열을 반환합니다.
+
+include::{snippets}/event-winner/list/empty/http-response.adoc[]
 
 [[event-winner-list-error]]
 ==== 에러 응답
 
-.`EVENT_NOT_FOUND`
+.`EVENT_NOT_FOUND` · 404 · EV001 — 존재하지 않는 이벤트 ID
 [%collapsible]
 ====
 include::{snippets}/event-winner/list/EVENT_NOT_FOUND/http-response.adoc[]
@@ -19,12 +33,23 @@ include::{snippets}/event-winner/list/EVENT_NOT_FOUND/http-response.adoc[]
 
 특정 이벤트의 당첨자 발표 공지글(제목/본문/발표일)을 조회합니다.
 
+* *인증 불필요*: 비회원도 호출할 수 있으며, `Authorization` 헤더를 보내도 무시됩니다.
+* 공지는 당첨자 선정과 별개로 관리자가 등록·수정합니다. 따라서 당첨자가 선정되었어도 공지가 등록되지 않았으면 `WINNER_ANNOUNCEMENT_NOT_FOUND`(404)가 반환되고, 당첨자 선정 전이라도 공지가 등록되어 있으면 조회됩니다. 공지 유무로 발표 여부를 판단하지 말고 <<event-detail,이벤트 상세 조회>>의 `status` 를 사용하세요.
+* `announcedAt` 은 관리자가 입력한 표시용 발표일입니다. 서버는 이 날짜로 노출을 제한하지 않으므로 오늘 이후 날짜여도 공지가 그대로 반환됩니다.
+* `content` 는 관리자가 입력한 문자열을 가공 없이 반환합니다(HTML/마크다운 변환 없음). 줄바꿈은 `+\n+` 문자로 포함되므로 줄바꿈을 유지해 표시하세요.
+
 operation::event-winner/announcement/200[snippets='http-request,path-parameters,http-response,response-fields']
 
 [[event-winner-announcement-error]]
 ==== 에러 응답
 
-.`WINNER_ANNOUNCEMENT_NOT_FOUND`
+.`EVENT_NOT_FOUND` · 404 · EV001 — 존재하지 않는 이벤트 ID
+[%collapsible]
+====
+include::{snippets}/event-winner/announcement/EVENT_NOT_FOUND/http-response.adoc[]
+====
+
+.`WINNER_ANNOUNCEMENT_NOT_FOUND` · 404 · EV404 — 이벤트는 있지만 발표 공지가 아직 등록되지 않음
 [%collapsible]
 ====
 include::{snippets}/event-winner/announcement/WINNER_ANNOUNCEMENT_NOT_FOUND/http-response.adoc[]
@@ -33,14 +58,32 @@ include::{snippets}/event-winner/announcement/WINNER_ANNOUNCEMENT_NOT_FOUND/http
 [[event-winner-my-status]]
 === 내 당첨 여부 조회
 
-특정 이벤트에서 인증된 사용자의 당첨 여부를 조회합니다.
+특정 이벤트에서 로그인한 사용자의 당첨 여부를 조회합니다.
+
+* *인증 필요*: 토큰이 없거나 유효하지 않으면(만료 포함) 401 `AU201` (<<overview-error-response,공통 에러>> 참고)
+* 당첨자가 발표된 이벤트(<<event-detail,이벤트 상세 조회>>의 `status` 가 `WINNER_SELECTED`)에서만 조회할 수 있습니다. 발표 전(`ACTIVE`: 진행 중, `EXPIRED`: 종료 후 당첨자 선정 대기)에는 `WINNER_NOT_ANNOUNCED`(400)가 반환되며, 이는 '당첨자 발표 전' 상태로 표시하면 됩니다.
+* 발표된 이벤트라면 해당 이벤트에 참여하지 않은 사용자도 에러 없이 `isWinner=false`, `winnerId=null` 로 응답합니다(<<event-winner-my-status-not-winner>>).
+* `winnerId` 는 <<event-winner-list,이벤트 당첨자 목록 조회>>의 `winners[].winnerId` 와 같은 값이라 목록에서 내 항목을 찾을 때 사용할 수 있습니다.
 
 operation::event-winner/my-status/200[snippets='http-request,request-headers,path-parameters,http-response,response-fields']
+
+[[event-winner-my-status-not-winner]]
+==== 미당첨 응답
+
+당첨되지 않았거나 이벤트에 참여하지 않은 경우의 응답입니다.
+
+include::{snippets}/event-winner/my-status/not-winner/http-response.adoc[]
 
 [[event-winner-my-status-error]]
 ==== 에러 응답
 
-.`WINNER_NOT_ANNOUNCED`
+.`EVENT_NOT_FOUND` · 404 · EV001 — 존재하지 않는 이벤트 ID
+[%collapsible]
+====
+include::{snippets}/event-winner/my-status/EVENT_NOT_FOUND/http-response.adoc[]
+====
+
+.`WINNER_NOT_ANNOUNCED` · 400 · EV403 — 당첨자가 아직 발표되지 않은 이벤트 (상태가 `WINNER_SELECTED` 가 아님)
 [%collapsible]
 ====
 include::{snippets}/event-winner/my-status/WINNER_NOT_ANNOUNCED/http-response.adoc[]
@@ -49,6 +92,12 @@ include::{snippets}/event-winner/my-status/WINNER_NOT_ANNOUNCED/http-response.ad
 [[event-winner-my-awards]]
 === 내 당첨 이벤트 목록 조회
 
-인증된 사용자가 당첨된 이벤트 목록을 페이지네이션으로 조회합니다.
+로그인한 사용자가 당첨된 이벤트 목록을 페이지네이션으로 조회합니다.
+
+* *인증 필요*: 토큰이 없거나 유효하지 않으면(만료 포함) 401 `AU201` (<<overview-error-response,공통 에러>> 참고)
+* *정렬*: 당첨자로 지정된 시각의 최신순으로 고정됩니다. 정렬 파라미터는 없습니다. 관리자가 당첨자를 다시 지정하면 지정 시각이 갱신되어 순서가 바뀔 수 있습니다.
+* 당첨된 이벤트가 없으면 `content` 가 빈 배열로 반환됩니다.
+* *페이징*: `page` 0 이상, `size` 1~1000. `page` 가 음수면 400 `C103`, `size` 가 범위를 벗어나면 400 `C104`, 숫자가 아니면 400 `C106` (<<overview-error-response,공통 에러>> 참고)
+* `size` 는 요청한 페이지 크기입니다. 이번 페이지의 실제 항목 수는 `content` 길이로 확인하세요.
 
 operation::event-winner/my-awards/200[snippets='http-request,request-headers,query-parameters,http-response,response-fields']

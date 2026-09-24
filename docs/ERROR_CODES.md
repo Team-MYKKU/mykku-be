@@ -2,7 +2,7 @@
 
 ## 에러 응답 형식
 
-모든 에러는 다음과 같은 구조를 가집니다:
+모든 에러는 다음과 같은 구조를 가집니다. 클라이언트 분기는 `message`가 아니라 `code`로 하세요.
 
 ```json
 {
@@ -43,16 +43,20 @@
 - 400-499: INTERNAL_SERVER_ERROR/SERVICE_UNAVAILABLE (서버 오류)
 - 500-599: TOO_MANY_REQUESTS (요청 제한)
 
+번호 대역과 HTTP 상태가 다른 코드도 있습니다. 공통(C) 코드는 이 체계를 따르지 않고(예: C201은 404, C202는 405), 도메인 코드 중에서는 EV302·EV404가 404, EV303·EV401~EV403이 400입니다. HTTP 상태는 각 표의 값을 기준으로 하세요.
+
+정의되어 있지만 현재 어떤 API도 반환하지 않는 코드도 있습니다(예: C102, AU401, EM501).
+
 ---
 
 ## Common (C)
 
 | 코드 | 이름 | HTTP 상태 | 메시지 |
 |------|------|-----------|--------|
-| C101 | INVALID_INPUT | 400 | 입력값이 올바르지 않습니다 |
+| C101 | INVALID_INPUT | 400 | 입력값이 올바르지 않습니다 (입력값 검증 실패 시에는 필드별 검증 메시지를 ", "로 이어 붙인 값으로 바뀝니다) |
 | C102 | INVALID_SORT_DIRECTION | 400 | 잘못된 정렬 방향입니다. 'asc' 또는 'desc'를 사용해주세요 |
 | C103 | INVALID_PAGE_NUMBER | 400 | 페이지 번호는 0 이상이어야 합니다 |
-| C104 | INVALID_PAGE_SIZE | 400 | 페이지 크기는 1 이상 100 이하여야 합니다 |
+| C104 | INVALID_PAGE_SIZE | 400 | 페이지 크기는 1 이상 1000 이하여야 합니다 |
 | C105 | MISSING_REQUEST_PARAMETER | 400 | 필수 요청 값이 누락되었습니다 |
 | C106 | INVALID_PARAMETER_TYPE | 400 | 요청 값의 형식이 올바르지 않습니다 |
 | C107 | INVALID_MULTIPART_REQUEST | 400 | multipart 요청 형식이 올바르지 않습니다 |
@@ -117,8 +121,9 @@
 | CN001 | CONTEST_NOT_FOUND | 404 | 콘테스트를 찾을 수 없습니다 |
 | CN002 | CONTEST_WINNER_NOT_FOUND | 404 | 콘테스트 수상자를 찾을 수 없습니다 |
 | CN003 | PARTICIPATION_NOT_FOUND | 404 | 콘테스트 참여 정보를 찾을 수 없습니다 |
+| CN004 | WINNER_ANNOUNCEMENT_NOT_FOUND | 404 | 콘테스트 수상자 발표 공지를 찾을 수 없습니다 |
 | CN101 | CONTEST_IMAGE_LIMIT_EXCEEDED | 400 | 콘테스트 이미지는 10개 이하여야 합니다 |
-| CN102 | CONTEST_TAG_LIMIT_EXCEEDED | 400 | 콘테스트 태그는 5개 이하여야 합니다 |
+| CN102 | CONTEST_TAG_LIMIT_EXCEEDED | 400 | 콘테스트 태그는 7개 이하여야 합니다 |
 | CN103 | INVALID_CONTEST_STATUS | 400 | 콘테스트 상태는 'ACTIVE', 'EXPIRED', 'ALL' 중 하나여야 합니다 |
 | CN104 | TAG_TITLE_TOO_LONG | 400 | 태그는 20자 이하여야 합니다 |
 | CN105 | TAG_INVALID_FORMAT | 400 | 태그는 한글, 영문, 숫자만 사용할 수 있습니다 |
@@ -137,8 +142,9 @@
 |------|------|-----------|--------|
 | DM001 | DAILY_MESSAGE_NOT_FOUND | 404 | 일상 메시지를 찾을 수 없습니다 |
 | DM002 | DAILY_MESSAGE_COMMENT_NOT_FOUND | 404 | 일상 메시지 댓글을 찾을 수 없습니다 |
-| DM101 | DAILY_MESSAGE_CONTENT_TOO_LONG | 400 | 일상 메시지 내용은 1000자 이하여야 합니다 |
-| DM102 | DAILY_MESSAGE_COMMENT_CONTENT_TOO_LONG | 400 | 일상 메시지 댓글은 300자 이하여야 합니다 |
+| DM101 | DAILY_MESSAGE_CONTENT_TOO_LONG | 400 | 일상 메시지 내용은 42자 이하여야 합니다 |
+| DM102 | DAILY_MESSAGE_COMMENT_CONTENT_TOO_LONG | 400 | 일상 메시지 댓글은 1000자 이하여야 합니다 |
+| DM103 | REPLY_DEPTH_EXCEEDED | 400 | 답글에는 답글을 작성할 수 없습니다 |
 | DM201 | COMMENT_FORBIDDEN_ACCESS | 403 | 댓글에 접근할 권한이 없습니다 |
 | DM301 | DAILY_MESSAGE_DATE_ALREADY_EXISTS | 409 | 해당 날짜의 일상 메시지가 이미 존재합니다 |
 
@@ -160,7 +166,14 @@
 | EV001 | EVENT_NOT_FOUND | 404 | 이벤트를 찾을 수 없습니다 |
 | EV101 | EVENT_IMAGE_LIMIT_EXCEEDED | 400 | 이벤트 이미지는 최대 10개까지 등록할 수 있습니다 |
 | EV102 | EVENT_NOT_ACTIVE | 400 | 진행 중인 이벤트가 아닙니다 |
+| EV103 | EVENT_NOT_EXPIRED | 400 | 아직 종료되지 않은 이벤트입니다 |
 | EV301 | ALREADY_PARTICIPATED | 409 | 이미 참여한 이벤트입니다 |
+| EV302 | EVENT_PARTICIPATION_NOT_FOUND | 404 | 이벤트 참여 정보를 찾을 수 없습니다 |
+| EV303 | PARTICIPATION_NOT_BELONG_TO_EVENT | 400 | 해당 이벤트의 참여 정보가 아닙니다 |
+| EV401 | EMPTY_WINNERS | 400 | 당첨자 목록은 비어있을 수 없습니다 |
+| EV402 | DUPLICATE_WINNER | 400 | 중복된 당첨자가 있습니다 |
+| EV403 | WINNER_NOT_ANNOUNCED | 400 | 아직 당첨자가 발표되지 않았습니다 |
+| EV404 | WINNER_ANNOUNCEMENT_NOT_FOUND | 404 | 이벤트 당첨자 발표 공지를 찾을 수 없습니다 |
 
 ## FanNote (FN)
 
@@ -175,11 +188,11 @@
 |------|------|-----------|--------|
 | FD001 | FEED_NOT_FOUND | 404 | 피드를 찾을 수 없습니다 |
 | FD002 | FEED_COMMENT_NOT_FOUND | 404 | 피드 댓글을 찾을 수 없습니다 |
-| FD101 | FEED_CONTENT_TOO_LONG | 400 | 피드 내용은 2200자 이하여야 합니다 |
+| FD101 | FEED_CONTENT_TOO_LONG | 400 | 피드 내용은 1000자 이하여야 합니다 |
 | FD102 | FEED_IMAGE_LIMIT_EXCEEDED | 400 | 피드 이미지는 10개 이하여야 합니다 |
 | FD103 | FEED_IMAGE_NOT_FOUND | 400 | 삭제할 이미지를 찾을 수 없습니다 |
-| FD104 | FEED_TAG_LIMIT_EXCEEDED | 400 | 피드 태그는 5개 이하여야 합니다 |
-| FD105 | FEED_COMMENT_CONTENT_TOO_LONG | 400 | 피드 댓글은 300자 이하여야 합니다 |
+| FD104 | FEED_TAG_LIMIT_EXCEEDED | 400 | 피드 태그는 7개 이하여야 합니다 |
+| FD105 | FEED_COMMENT_CONTENT_TOO_LONG | 400 | 피드 댓글은 1000자 이하여야 합니다 |
 | FD106 | TAG_TITLE_TOO_LONG | 400 | 태그는 20자 이하여야 합니다 |
 | FD107 | TAG_INVALID_FORMAT | 400 | 태그는 한글, 영문, 숫자만 사용할 수 있습니다 |
 | FD108 | IMAGE_INVALID_DIMENSIONS | 400 | 이미지 크기가 유효하지 않습니다 |
@@ -216,10 +229,10 @@
 | 코드 | 이름 | HTTP 상태 | 메시지 |
 |------|------|-----------|--------|
 | MB001 | MEMBER_NOT_FOUND | 404 | 회원을 찾을 수 없습니다 |
-| MB101 | MEMBER_NICKNAME_TOO_LONG | 400 | 닉네임은 8자 이하여야 합니다 |
+| MB101 | MEMBER_NICKNAME_TOO_LONG | 400 | 닉네임은 10자 이하여야 합니다 |
 | MB102 | MEMBER_NICKNAME_INVALID_FORMAT | 400 | 닉네임은 한글, 영문, 숫자만 사용할 수 있습니다 |
 | MB103 | INVALID_CURRENT_PASSWORD | 400 | 현재 비밀번호가 일치하지 않습니다 |
-| MB104 | MEMBER_ID_TOO_LONG | 400 | 아이디는 20자 이하여야 합니다 |
+| MB104 | MEMBER_ID_TOO_LONG | 400 | 아이디는 16자 이하여야 합니다 |
 | MB105 | MEMBER_ID_INVALID_FORMAT | 400 | 아이디는 영문과 숫자만 사용할 수 있습니다 |
 | MB106 | MEMBER_ID_EMPTY | 400 | 아이디를 입력해주세요 |
 | MB201 | PROFILE_NOT_COMPLETED | 403 | 아이디와 닉네임을 설정한 후에 이용할 수 있습니다 |
@@ -255,12 +268,10 @@
 | RL002 | MEMBER_ROLE_NOT_FOUND | 404 | 보유하지 않은 칭호입니다 |
 | RL101 | ROLE_NAME_DUPLICATE | 400 | 이미 존재하는 칭호 이름입니다 |
 | RL102 | ROLE_IN_USE | 400 | 사용 중인 칭호는 삭제할 수 없습니다 |
-| RL105 | ROLE_NAME_IS_AWARD_CONDITION_KEY | 400 | 자동 획득 조건이 걸린 칭호는 이름을 변경하거나 삭제할 수 없습니다 |
 | RL103 | MEMBER_ROLE_ALREADY_EXISTS | 400 | 이미 보유한 칭호입니다 |
 | RL104 | REPRESENTATIVE_ROLE_REQUIRED | 400 | 대표 칭호는 필수입니다 |
+| RL105 | ROLE_NAME_IS_AWARD_CONDITION_KEY | 400 | 자동 획득 조건이 걸린 칭호는 이름을 변경하거나 삭제할 수 없습니다 |
 | RL201 | MEMBER_ROLE_UNAUTHORIZED | 403 | 해당 칭호에 접근할 권한이 없습니다 |
-
----
 
 ## Report (RP)
 
@@ -275,10 +286,14 @@
 | RP301 | ALREADY_REPORTED | 409 | 이미 신고한 콘텐츠입니다 |
 | RP302 | REPORT_ALREADY_PROCESSED | 409 | 이미 처리된 신고입니다 |
 
+---
+
 ## API 엔드포인트
 
-실시간으로 에러 코드 목록을 조회하려면 다음 API를 사용하세요:
+이 문서의 기준은 각 도메인의 `*ErrorCode` enum입니다. 서버에 배포된 에러 코드 목록은 다음 API로 조회할 수 있으며, 사용법은 API 문서의 "에러 코드 API" 절에 있습니다. 공통 에러의 발생 조건은 API 문서 개요의 "공통 에러" 절을 참고하세요.
 
-- `GET /api/error-codes` - 전체 에러 코드 조회
-- `GET /api/error-codes/domains` - 도메인 목록 조회
-- `GET /api/error-codes/{domain}` - 특정 도메인의 에러 코드 조회
+- `GET /api/error-codes` - 전체 에러 코드 조회 (code 오름차순)
+- `GET /api/error-codes/domains` - 도메인 키 목록 조회 (예: `dailyMessage`, `fanNote`)
+- `GET /api/error-codes/{domain}` - 특정 도메인의 에러 코드 조회 (없는 도메인 키는 빈 목록)
+
+신고(RP) 코드는 현재 위 API 응답에 포함되어 있지 않습니다.

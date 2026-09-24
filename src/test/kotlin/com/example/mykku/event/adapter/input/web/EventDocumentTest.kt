@@ -30,11 +30,22 @@ class EventDocumentTest : BaseDocumentTest() {
 
         private val apiConfig = ApiRequestConfig(
             queryParameters = listOf(
-                parameterWithName("status").description("이벤트 상태 (ACTIVE, EXPIRED, ALL) 기본값: ACTIVE").optional(),
-                parameterWithName("sortType").description("정렬 방식 (LATEST, OLDEST, POPULAR) 기본값: LATEST")
+                parameterWithName("status")
+                    .description(
+                        "조회할 이벤트 상태 (ACTIVE: 종료 일시 전 이벤트(시작 전 포함), " +
+                            "EXPIRED: 종료된 이벤트(당첨자 발표 완료 포함), ALL: 전체). " +
+                            "기본값: ACTIVE, 대문자만 허용. WINNER_SELECTING, WINNER_SELECTED는 ALL과 동일하게 처리됨"
+                    )
                     .optional(),
-                parameterWithName("page").description("페이지 번호 (0부터 시작, 기본값: 0)").optional(),
-                parameterWithName("size").description("페이지 크기 (기본값: 20)").optional()
+                parameterWithName("sortType")
+                    .description(
+                        "정렬 방식, status=ACTIVE일 때만 적용 (LATEST: 등록일시 최신순, OLDEST: 등록일시 오래된순, " +
+                            "POPULAR: 현재 LATEST와 동일). 기본값: LATEST, 대문자만 허용. " +
+                            "EXPIRED, ALL은 sortType과 관계없이 등록일시 최신순"
+                    )
+                    .optional(),
+                parameterWithName("page").description("페이지 번호 (0부터 시작, 0 이상, 기본값: 0)").optional(),
+                parameterWithName("size").description("페이지 크기 (1~1000, 기본값: 20)").optional()
             ),
             headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
@@ -82,19 +93,33 @@ class EventDocumentTest : BaseDocumentTest() {
                         .responseBodyField(
                             fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
                             fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
-                            fieldWithPath("data.content[]").type(JsonFieldType.ARRAY).description("이벤트 목록"),
+                            fieldWithPath("data.content[]").type(JsonFieldType.ARRAY)
+                                .description("이벤트 목록 (결과가 없으면 빈 배열)"),
                             fieldWithPath("data.content[].id").type(JsonFieldType.NUMBER).description("이벤트 ID"),
                             fieldWithPath("data.content[].title").type(JsonFieldType.STRING).description("이벤트 제목"),
                             fieldWithPath("data.content[].subTitle").type(JsonFieldType.STRING)
-                                .description("이벤트 부제목").optional(),
+                                .description("이벤트 부제목 (미입력 시 null 또는 빈 문자열)").optional(),
                             fieldWithPath("data.content[].description").type(JsonFieldType.STRING)
-                                .description("이벤트 설명").optional(),
-                            fieldWithPath("data.content[].expiredAt").type(JsonFieldType.STRING).description("만료일"),
+                                .description("이벤트 설명 (미입력 시 null 또는 빈 문자열)").optional(),
+                            fieldWithPath("data.content[].expiredAt").type(JsonFieldType.STRING)
+                                .description(
+                                    "이벤트 종료 일시 (ISO-8601, KST, 오프셋 없음, 예: 2025-12-31T23:59:59). " +
+                                        "이 시각부터 EXPIRED"
+                                ),
                             fieldWithPath("data.content[].thumbnailUrl").type(JsonFieldType.STRING)
                                 .description("썸네일 이미지 URL"),
-                            fieldWithPath("data.content[].status").type(JsonFieldType.STRING).description("이벤트 상태"),
-                            fieldWithPath("data.content[].startedAt").type(JsonFieldType.STRING).description("시작일"),
-                            fieldWithPath("data.page").type(JsonFieldType.NUMBER).description("현재 페이지 번호"),
+                            fieldWithPath("data.content[].status").type(JsonFieldType.STRING)
+                                .description(
+                                    "이벤트 상태, 조회 시점 기준으로 계산 (ACTIVE: 종료 일시 전(시작 전 포함), " +
+                                        "EXPIRED: 종료됨·당첨자 발표 전, WINNER_SELECTED: 종료 후 당첨자 발표 완료). " +
+                                        "WINNER_SELECTING, ALL은 응답에 오지 않음"
+                                ),
+                            fieldWithPath("data.content[].startedAt").type(JsonFieldType.STRING)
+                                .description(
+                                    "이벤트 시작 일시 (ISO-8601, KST, 오프셋 없음, 예: 2025-01-01T00:00:00). " +
+                                        "시작 전이어도 종료 전이면 ACTIVE"
+                                ),
+                            fieldWithPath("data.page").type(JsonFieldType.NUMBER).description("현재 페이지 번호 (0부터 시작)"),
                             fieldWithPath("data.size").type(JsonFieldType.NUMBER).description("페이지 크기"),
                             fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER).description("전체 요소 수"),
                             fieldWithPath("data.totalPages").type(JsonFieldType.NUMBER).description("전체 페이지 수"),
@@ -121,7 +146,7 @@ class EventDocumentTest : BaseDocumentTest() {
 
         private val apiConfig = ApiRequestConfig(
             pathParameters = listOf(
-                parameterWithName("eventId").description("이벤트 ID")
+                parameterWithName("eventId").description("이벤트 ID (존재하지 않거나 0 이하이면 404 EVENT_NOT_FOUND)")
             ),
             headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
@@ -136,13 +161,13 @@ class EventDocumentTest : BaseDocumentTest() {
                 description = "이벤트 상세 설명입니다.",
                 startedAt = LocalDateTime.of(2025, 1, 1, 0, 0, 0),
                 expiredAt = LocalDateTime.of(2025, 12, 31, 23, 59, 59),
-                status = EventStatusType.ACTIVE,
+                status = EventStatusType.WINNER_SELECTED,
                 thumbnailUrl = "https://example.com/thumbnail.jpg",
                 images = listOf(
                     EventImageResult(url = "https://example.com/image1.jpg", orderIndex = 0),
                     EventImageResult(url = "https://example.com/image2.jpg", orderIndex = 1)
                 ),
-                createdAt = LocalDateTime.now(),
+                createdAt = LocalDateTime.of(2024, 12, 20, 10, 30, 15, 123456000),
                 isWinner = true
             )
 
@@ -157,19 +182,46 @@ class EventDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
                             fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("이벤트 ID"),
                             fieldWithPath("data.title").type(JsonFieldType.STRING).description("이벤트 제목"),
-                            fieldWithPath("data.subTitle").type(JsonFieldType.STRING).description("이벤트 부제목")
+                            fieldWithPath("data.subTitle").type(JsonFieldType.STRING)
+                                .description("이벤트 부제목 (미입력 시 null 또는 빈 문자열)")
                                 .optional(),
-                            fieldWithPath("data.description").type(JsonFieldType.STRING).description("이벤트 설명")
+                            fieldWithPath("data.description").type(JsonFieldType.STRING)
+                                .description("이벤트 설명 (미입력 시 null 또는 빈 문자열)")
                                 .optional(),
-                            fieldWithPath("data.expiredAt").type(JsonFieldType.STRING).description("만료일"),
-                            fieldWithPath("data.images[]").type(JsonFieldType.ARRAY).description("이벤트 이미지 목록"),
+                            fieldWithPath("data.expiredAt").type(JsonFieldType.STRING)
+                                .description(
+                                    "이벤트 종료 일시 (ISO-8601, KST, 오프셋 없음, 예: 2025-12-31T23:59:59). " +
+                                        "이 시각부터 EXPIRED"
+                                ),
+                            fieldWithPath("data.images[]").type(JsonFieldType.ARRAY)
+                                .description(
+                                    "이벤트 본문 이미지 목록 (0~10개, 없으면 빈 배열, orderIndex 오름차순 정렬됨). " +
+                                        "썸네일(thumbnailUrl)은 포함되지 않음"
+                                ),
                             fieldWithPath("data.images[].url").type(JsonFieldType.STRING).description("이미지 URL"),
-                            fieldWithPath("data.images[].orderIndex").type(JsonFieldType.NUMBER).description("이미지 순서"),
-                            fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("생성일시"),
-                            fieldWithPath("data.startedAt").type(JsonFieldType.STRING).description("시작일"),
-                            fieldWithPath("data.status").type(JsonFieldType.STRING).description("이벤트 상태"),
+                            fieldWithPath("data.images[].orderIndex").type(JsonFieldType.NUMBER)
+                                .description("이미지 노출 순서 (0부터 시작)"),
+                            fieldWithPath("data.createdAt").type(JsonFieldType.STRING)
+                                .description(
+                                    "이벤트 등록 일시 (ISO-8601, KST, 오프셋 없음). " +
+                                        "소수점 이하 초(최대 6자리)가 붙을 수 있음"
+                                ),
+                            fieldWithPath("data.startedAt").type(JsonFieldType.STRING)
+                                .description("이벤트 시작 일시 (ISO-8601, KST, 오프셋 없음, 예: 2025-01-01T00:00:00)"),
+                            fieldWithPath("data.status").type(JsonFieldType.STRING)
+                                .description(
+                                    "이벤트 상태, 조회 시점 기준으로 계산 (ACTIVE: 종료 일시 전(시작 전 포함), " +
+                                        "EXPIRED: 종료됨·당첨자 발표 전, WINNER_SELECTED: 종료 후 당첨자 발표 완료). " +
+                                        "WINNER_SELECTING, ALL은 응답에 오지 않음. " +
+                                        "WINNER_SELECTED 전에는 내 당첨 여부 조회 API가 WINNER_NOT_ANNOUNCED를 반환"
+                                ),
                             fieldWithPath("data.thumbnailUrl").type(JsonFieldType.STRING).description("썸네일 이미지 URL"),
-                            fieldWithPath("data.isWinner").type(JsonFieldType.BOOLEAN).description("현재 사용자의 당첨 여부")
+                            fieldWithPath("data.isWinner").type(JsonFieldType.BOOLEAN)
+                                .description(
+                                    "로그인 사용자의 당첨 여부 (true: 당첨자로 선정됨, false: 미당첨 또는 아직 발표 전). " +
+                                        "발표 전에는 항상 false이므로 status가 WINNER_SELECTED인지 함께 확인. " +
+                                        "참여 여부와는 무관"
+                                )
                         )
                 )
                 .build()

@@ -16,6 +16,7 @@ import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
 import org.springframework.restdocs.request.RequestDocumentation.parameterWithName
@@ -29,14 +30,15 @@ class NotificationDocumentTest : BaseDocumentTest() {
 
         private val apiConfig = ApiRequestConfig(
             queryParameters = listOf(
-                parameterWithName("page").description("페이지 번호 (0부터 시작, 기본값: 0)").optional(),
-                parameterWithName("size").description("페이지 크기 (기본값: 20)").optional()
+                parameterWithName("page").description("페이지 번호 (0부터 시작, 0 이상, 기본값: 0)").optional(),
+                parameterWithName("size").description("페이지 크기 (1~1000, 기본값: 20)").optional()
             ),
             headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
         fun `성공`() {
+            val createdAt = LocalDateTime.of(2026, 9, 24, 14, 17, 57)
             val notifications = listOf(
                 NotificationResult(
                     id = 1L,
@@ -44,26 +46,27 @@ class NotificationDocumentTest : BaseDocumentTest() {
                     senderId = 100L,
                     senderNickname = "홍길동",
                     senderProfileImage = "https://example.com/profile.jpg",
-                    content = "홍길동님이 회원님의 피드를 좋아합니다",
+                    content = "홍길동님이 회원님의 피드를 좋아합니다.",
                     isRead = false,
                     relatedResourceId = 123L,
                     relatedResourceType = "FEED",
-                    createdAt = LocalDateTime.now()
+                    createdAt = createdAt
                 ),
                 NotificationResult(
                     id = 2L,
                     type = NotificationType.FEED_COMMENT,
                     senderId = 200L,
                     senderNickname = "김철수",
-                    senderProfileImage = null,
-                    content = "김철수님이 회원님의 피드에 댓글을 남겼습니다",
+                    senderProfileImage = "",
+                    content = "김철수님이 회원님의 피드에 댓글을 남겼습니다: 사진 너무 예뻐요!",
                     isRead = true,
                     relatedResourceId = 123L,
                     relatedResourceType = "FEED",
-                    createdAt = LocalDateTime.now().minusDays(1)
+                    createdAt = createdAt.minusDays(1)
                 )
             )
-            val page = PageImpl(notifications, PageRequest.of(0, 20), 2)
+            val pageable = PageRequest.of(0, 20, Sort.by(Sort.Direction.DESC, "createdAt"))
+            val page = PageImpl(notifications, pageable, 2)
 
             `when`(getNotificationsUseCase.getNotifications(any())).thenReturn(page)
 
@@ -74,30 +77,66 @@ class NotificationDocumentTest : BaseDocumentTest() {
                         .responseBodyField(
                             fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
                             fieldWithPath("data").type(JsonFieldType.OBJECT).description("페이지 응답 데이터"),
-                            fieldWithPath("data.content[]").type(JsonFieldType.ARRAY).description("알림 목록"),
-                            fieldWithPath("data.content[].id").type(JsonFieldType.NUMBER).description("알림 ID"),
-                            fieldWithPath("data.content[].type").type(JsonFieldType.STRING).description("알림 타입"),
-                            fieldWithPath("data.content[].senderId").type(JsonFieldType.STRING).description("발신자 ID")
-                                .optional(),
-                            fieldWithPath("data.content[].senderNickname").type(JsonFieldType.STRING).description("발신자 닉네임")
+                            fieldWithPath("data.content[]").type(JsonFieldType.ARRAY)
+                                .description("알림 목록 (읽음·안 읽음 모두 포함, 생성 일시 최신순)"),
+                            fieldWithPath("data.content[].id").type(JsonFieldType.NUMBER)
+                                .description("알림 ID (읽음 처리·삭제 API의 notificationId)"),
+                            fieldWithPath("data.content[].type").type(JsonFieldType.STRING)
+                                .description(
+                                    "알림 타입 (" +
+                                        NotificationType.entries.joinToString { "${it.name}: ${it.description}" } +
+                                        "). 생성 조건은 '알림 생성 규칙' 참고. " +
+                                        "타입이 추가될 수 있으니 모르는 값은 기본 알림으로 처리하세요"
+                                ),
+                            fieldWithPath("data.content[].senderNickname").type(JsonFieldType.STRING)
+                                .description("발신자 닉네임 (조회 시점의 현재 닉네임). 발신자가 탈퇴했으면 null")
                                 .optional(),
                             fieldWithPath("data.content[].senderProfileImage").type(JsonFieldType.STRING)
-                                .description("발신자 프로필 이미지").optional(),
-                            fieldWithPath("data.content[].content").type(JsonFieldType.STRING).description("알림 내용"),
-                            fieldWithPath("data.content[].isRead").type(JsonFieldType.BOOLEAN).description("읽음 여부"),
+                                .description(
+                                    "발신자 프로필 이미지 URL (조회 시점 기준). 발신자가 탈퇴했으면 null, " +
+                                        "프로필 이미지가 없으면 빈 문자열(\"\")이므로 두 경우 모두 기본 이미지로 표시"
+                                )
+                                .optional(),
+                            fieldWithPath("data.content[].content").type(JsonFieldType.STRING)
+                                .description(
+                                    "알림 표시 문구 (서버가 만든 완성 문장, 최대 500자). " +
+                                        "FEED_LIKE: '{닉네임}님이 회원님의 피드를 좋아합니다.', " +
+                                        "FEED_COMMENT: '{닉네임}님이 회원님의 피드에 댓글을 남겼습니다: {댓글 내용}' " +
+                                        "(FEED_COMMENT는 전체가 500자를 넘으면 댓글 내용을 잘라 끝에 '...'를 붙임). " +
+                                        "닉네임은 알림 생성 시점 값이라 senderNickname과 다를 수 있음"
+                                ),
+                            fieldWithPath("data.content[].isRead").type(JsonFieldType.BOOLEAN)
+                                .description("읽음 여부 (true: 읽음, false: 안 읽음)"),
                             fieldWithPath("data.content[].relatedResourceId").type(JsonFieldType.NUMBER)
-                                .description("관련 리소스 ID").optional(),
+                                .description(
+                                    "관련 리소스 ID. relatedResourceType이 FEED이면 피드 ID이며, " +
+                                        "FEED_COMMENT도 댓글 ID가 아니라 댓글이 달린 피드 ID. " +
+                                        "피드 상세 조회(GET /api/v1/feeds/{feedId}) 이동에 사용. " +
+                                        "피드가 삭제돼도 알림은 남아 있어 상세 조회가 404일 수 있음. " +
+                                        "현재 타입은 항상 값이 있으며, 이동 대상이 없는 알림이면 null"
+                                )
+                                .optional(),
                             fieldWithPath("data.content[].relatedResourceType").type(JsonFieldType.STRING)
-                                .description("관련 리소스 타입").optional(),
-                            fieldWithPath("data.content[].createdAt").type(JsonFieldType.STRING).description("알림 생성 일시"),
+                                .description(
+                                    "관련 리소스 타입 (FEED: 피드). enum이 아닌 문자열이며 " +
+                                        "현재 FEED_LIKE, FEED_COMMENT 모두 FEED. " +
+                                        "이동 대상이 없는 알림이면 null이며, 모르는 값이 오면 이동 없이 처리하세요"
+                                )
+                                .optional(),
+                            fieldWithPath("data.content[].createdAt").type(JsonFieldType.STRING)
+                                .description("알림 생성 일시 (KST, ISO-8601, 오프셋 없음). 초 단위로 저장되어 소수초 없음"),
                             fieldWithPath("data.pageable").type(JsonFieldType.OBJECT).description("페이징 정보"),
-                            fieldWithPath("data.pageable.pageNumber").type(JsonFieldType.NUMBER).description("현재 페이지 번호"),
+                            fieldWithPath("data.pageable.pageNumber").type(JsonFieldType.NUMBER)
+                                .description("현재 페이지 번호"),
                             fieldWithPath("data.pageable.pageSize").type(JsonFieldType.NUMBER).description("페이지 크기"),
-                            fieldWithPath("data.pageable.sort").type(JsonFieldType.OBJECT).description("정렬 정보"),
+                            fieldWithPath("data.pageable.sort").type(JsonFieldType.OBJECT)
+                                .description("정렬 정보 (항상 createdAt DESC)"),
                             fieldWithPath("data.pageable.sort.empty").type(JsonFieldType.BOOLEAN)
                                 .description("정렬 정보 비어있음 여부"),
-                            fieldWithPath("data.pageable.sort.sorted").type(JsonFieldType.BOOLEAN).description("정렬 여부"),
-                            fieldWithPath("data.pageable.sort.unsorted").type(JsonFieldType.BOOLEAN).description("비정렬 여부"),
+                            fieldWithPath("data.pageable.sort.sorted").type(JsonFieldType.BOOLEAN)
+                                .description("정렬 여부"),
+                            fieldWithPath("data.pageable.sort.unsorted").type(JsonFieldType.BOOLEAN)
+                                .description("비정렬 여부"),
                             fieldWithPath("data.pageable.offset").type(JsonFieldType.NUMBER).description("오프셋"),
                             fieldWithPath("data.pageable.paged").type(JsonFieldType.BOOLEAN).description("페이징 여부"),
                             fieldWithPath("data.pageable.unpaged").type(JsonFieldType.BOOLEAN).description("비페이징 여부"),
@@ -106,12 +145,14 @@ class NotificationDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER).description("전체 요소 수"),
                             fieldWithPath("data.size").type(JsonFieldType.NUMBER).description("페이지 크기"),
                             fieldWithPath("data.number").type(JsonFieldType.NUMBER).description("현재 페이지 번호"),
-                            fieldWithPath("data.sort").type(JsonFieldType.OBJECT).description("정렬 정보"),
+                            fieldWithPath("data.sort").type(JsonFieldType.OBJECT)
+                                .description("정렬 정보 (항상 createdAt DESC)"),
                             fieldWithPath("data.sort.empty").type(JsonFieldType.BOOLEAN).description("정렬 정보 비어있음 여부"),
                             fieldWithPath("data.sort.sorted").type(JsonFieldType.BOOLEAN).description("정렬 여부"),
                             fieldWithPath("data.sort.unsorted").type(JsonFieldType.BOOLEAN).description("비정렬 여부"),
                             fieldWithPath("data.first").type(JsonFieldType.BOOLEAN).description("첫 페이지 여부"),
-                            fieldWithPath("data.numberOfElements").type(JsonFieldType.NUMBER).description("현재 페이지 요소 수"),
+                            fieldWithPath("data.numberOfElements").type(JsonFieldType.NUMBER)
+                                .description("현재 페이지 요소 수"),
                             fieldWithPath("data.empty").type(JsonFieldType.BOOLEAN).description("비어있음 여부")
                         )
                 )
@@ -135,14 +176,15 @@ class NotificationDocumentTest : BaseDocumentTest() {
 
         private val apiConfig = ApiRequestConfig(
             queryParameters = listOf(
-                parameterWithName("page").description("페이지 번호 (0부터 시작, 기본값: 0)").optional(),
-                parameterWithName("size").description("페이지 크기 (기본값: 20)").optional()
+                parameterWithName("page").description("페이지 번호 (0부터 시작, 0 이상, 기본값: 0)").optional(),
+                parameterWithName("size").description("페이지 크기 (1~1000, 기본값: 20)").optional()
             ),
             headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
         @Test
         fun `성공`() {
+            val createdAt = LocalDateTime.of(2026, 9, 24, 14, 17, 57)
             val notifications = listOf(
                 NotificationResult(
                     id = 1L,
@@ -150,26 +192,27 @@ class NotificationDocumentTest : BaseDocumentTest() {
                     senderId = 100L,
                     senderNickname = "홍길동",
                     senderProfileImage = "https://example.com/profile.jpg",
-                    content = "홍길동님이 회원님의 피드를 좋아합니다",
+                    content = "홍길동님이 회원님의 피드를 좋아합니다.",
                     isRead = false,
                     relatedResourceId = 123L,
                     relatedResourceType = "FEED",
-                    createdAt = LocalDateTime.now()
+                    createdAt = createdAt
                 ),
                 NotificationResult(
                     id = 2L,
                     type = NotificationType.FEED_COMMENT,
                     senderId = 200L,
                     senderNickname = "김철수",
-                    senderProfileImage = null,
-                    content = "김철수님이 회원님의 피드에 댓글을 남겼습니다",
+                    senderProfileImage = "",
+                    content = "김철수님이 회원님의 피드에 댓글을 남겼습니다: 사진 너무 예뻐요!",
                     isRead = false,
                     relatedResourceId = 124L,
                     relatedResourceType = "FEED",
-                    createdAt = LocalDateTime.now().minusHours(1)
+                    createdAt = createdAt.minusHours(1)
                 )
             )
-            val page = PageImpl(notifications, PageRequest.of(0, 20), 2)
+            val pageable = PageRequest.of(0, 20, Sort.by(Sort.Direction.DESC, "createdAt"))
+            val page = PageImpl(notifications, pageable, 2)
 
             `when`(getNotificationsUseCase.getUnreadNotifications(any())).thenReturn(page)
 
@@ -180,44 +223,83 @@ class NotificationDocumentTest : BaseDocumentTest() {
                         .responseBodyField(
                             fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
                             fieldWithPath("data").type(JsonFieldType.OBJECT).description("페이지 응답 데이터"),
-                            fieldWithPath("data.content[]").type(JsonFieldType.ARRAY).description("읽지 않은 알림 목록"),
-                            fieldWithPath("data.content[].id").type(JsonFieldType.NUMBER).description("알림 ID"),
-                            fieldWithPath("data.content[].type").type(JsonFieldType.STRING).description("알림 타입"),
-                            fieldWithPath("data.content[].senderId").type(JsonFieldType.STRING).description("발신자 ID")
-                                .optional(),
-                            fieldWithPath("data.content[].senderNickname").type(JsonFieldType.STRING).description("발신자 닉네임")
+                            fieldWithPath("data.content[]").type(JsonFieldType.ARRAY)
+                                .description("읽지 않은 알림 목록 (생성 일시 최신순)"),
+                            fieldWithPath("data.content[].id").type(JsonFieldType.NUMBER)
+                                .description("알림 ID (읽음 처리·삭제 API의 notificationId)"),
+                            fieldWithPath("data.content[].type").type(JsonFieldType.STRING)
+                                .description(
+                                    "알림 타입 (" +
+                                        NotificationType.entries.joinToString { "${it.name}: ${it.description}" } +
+                                        "). 생성 조건은 '알림 생성 규칙' 참고. " +
+                                        "타입이 추가될 수 있으니 모르는 값은 기본 알림으로 처리하세요"
+                                ),
+                            fieldWithPath("data.content[].senderNickname").type(JsonFieldType.STRING)
+                                .description("발신자 닉네임 (조회 시점의 현재 닉네임). 발신자가 탈퇴했으면 null")
                                 .optional(),
                             fieldWithPath("data.content[].senderProfileImage").type(JsonFieldType.STRING)
-                                .description("발신자 프로필 이미지").optional(),
-                            fieldWithPath("data.content[].content").type(JsonFieldType.STRING).description("알림 내용"),
-                            fieldWithPath("data.content[].isRead").type(JsonFieldType.BOOLEAN).description("읽음 여부"),
+                                .description(
+                                    "발신자 프로필 이미지 URL (조회 시점 기준). 발신자가 탈퇴했으면 null, " +
+                                        "프로필 이미지가 없으면 빈 문자열(\"\")이므로 두 경우 모두 기본 이미지로 표시"
+                                )
+                                .optional(),
+                            fieldWithPath("data.content[].content").type(JsonFieldType.STRING)
+                                .description(
+                                    "알림 표시 문구 (서버가 만든 완성 문장, 최대 500자). " +
+                                        "FEED_LIKE: '{닉네임}님이 회원님의 피드를 좋아합니다.', " +
+                                        "FEED_COMMENT: '{닉네임}님이 회원님의 피드에 댓글을 남겼습니다: {댓글 내용}' " +
+                                        "(FEED_COMMENT는 전체가 500자를 넘으면 댓글 내용을 잘라 끝에 '...'를 붙임). " +
+                                        "닉네임은 알림 생성 시점 값이라 senderNickname과 다를 수 있음"
+                                ),
+                            fieldWithPath("data.content[].isRead").type(JsonFieldType.BOOLEAN)
+                                .description("읽음 여부 (이 API에서는 항상 false)"),
                             fieldWithPath("data.content[].relatedResourceId").type(JsonFieldType.NUMBER)
-                                .description("관련 리소스 ID").optional(),
+                                .description(
+                                    "관련 리소스 ID. relatedResourceType이 FEED이면 피드 ID이며, " +
+                                        "FEED_COMMENT도 댓글 ID가 아니라 댓글이 달린 피드 ID. " +
+                                        "피드 상세 조회(GET /api/v1/feeds/{feedId}) 이동에 사용. " +
+                                        "피드가 삭제돼도 알림은 남아 있어 상세 조회가 404일 수 있음. " +
+                                        "현재 타입은 항상 값이 있으며, 이동 대상이 없는 알림이면 null"
+                                )
+                                .optional(),
                             fieldWithPath("data.content[].relatedResourceType").type(JsonFieldType.STRING)
-                                .description("관련 리소스 타입").optional(),
-                            fieldWithPath("data.content[].createdAt").type(JsonFieldType.STRING).description("알림 생성 일시"),
+                                .description(
+                                    "관련 리소스 타입 (FEED: 피드). enum이 아닌 문자열이며 " +
+                                        "현재 FEED_LIKE, FEED_COMMENT 모두 FEED. " +
+                                        "이동 대상이 없는 알림이면 null이며, 모르는 값이 오면 이동 없이 처리하세요"
+                                )
+                                .optional(),
+                            fieldWithPath("data.content[].createdAt").type(JsonFieldType.STRING)
+                                .description("알림 생성 일시 (KST, ISO-8601, 오프셋 없음). 초 단위로 저장되어 소수초 없음"),
                             fieldWithPath("data.pageable").type(JsonFieldType.OBJECT).description("페이징 정보"),
-                            fieldWithPath("data.pageable.pageNumber").type(JsonFieldType.NUMBER).description("현재 페이지 번호"),
+                            fieldWithPath("data.pageable.pageNumber").type(JsonFieldType.NUMBER)
+                                .description("현재 페이지 번호"),
                             fieldWithPath("data.pageable.pageSize").type(JsonFieldType.NUMBER).description("페이지 크기"),
-                            fieldWithPath("data.pageable.sort").type(JsonFieldType.OBJECT).description("정렬 정보"),
+                            fieldWithPath("data.pageable.sort").type(JsonFieldType.OBJECT)
+                                .description("정렬 정보 (항상 createdAt DESC)"),
                             fieldWithPath("data.pageable.sort.empty").type(JsonFieldType.BOOLEAN)
                                 .description("정렬 정보 비어있음 여부"),
-                            fieldWithPath("data.pageable.sort.sorted").type(JsonFieldType.BOOLEAN).description("정렬 여부"),
-                            fieldWithPath("data.pageable.sort.unsorted").type(JsonFieldType.BOOLEAN).description("비정렬 여부"),
+                            fieldWithPath("data.pageable.sort.sorted").type(JsonFieldType.BOOLEAN)
+                                .description("정렬 여부"),
+                            fieldWithPath("data.pageable.sort.unsorted").type(JsonFieldType.BOOLEAN)
+                                .description("비정렬 여부"),
                             fieldWithPath("data.pageable.offset").type(JsonFieldType.NUMBER).description("오프셋"),
                             fieldWithPath("data.pageable.paged").type(JsonFieldType.BOOLEAN).description("페이징 여부"),
                             fieldWithPath("data.pageable.unpaged").type(JsonFieldType.BOOLEAN).description("비페이징 여부"),
                             fieldWithPath("data.last").type(JsonFieldType.BOOLEAN).description("마지막 페이지 여부"),
                             fieldWithPath("data.totalPages").type(JsonFieldType.NUMBER).description("전체 페이지 수"),
-                            fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER).description("전체 요소 수"),
+                            fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER)
+                                .description("전체 요소 수 (조회 시점의 읽지 않은 알림 수)"),
                             fieldWithPath("data.size").type(JsonFieldType.NUMBER).description("페이지 크기"),
                             fieldWithPath("data.number").type(JsonFieldType.NUMBER).description("현재 페이지 번호"),
-                            fieldWithPath("data.sort").type(JsonFieldType.OBJECT).description("정렬 정보"),
+                            fieldWithPath("data.sort").type(JsonFieldType.OBJECT)
+                                .description("정렬 정보 (항상 createdAt DESC)"),
                             fieldWithPath("data.sort.empty").type(JsonFieldType.BOOLEAN).description("정렬 정보 비어있음 여부"),
                             fieldWithPath("data.sort.sorted").type(JsonFieldType.BOOLEAN).description("정렬 여부"),
                             fieldWithPath("data.sort.unsorted").type(JsonFieldType.BOOLEAN).description("비정렬 여부"),
                             fieldWithPath("data.first").type(JsonFieldType.BOOLEAN).description("첫 페이지 여부"),
-                            fieldWithPath("data.numberOfElements").type(JsonFieldType.NUMBER).description("현재 페이지 요소 수"),
+                            fieldWithPath("data.numberOfElements").type(JsonFieldType.NUMBER)
+                                .description("현재 페이지 요소 수"),
                             fieldWithPath("data.empty").type(JsonFieldType.BOOLEAN).description("비어있음 여부")
                         )
                 )
@@ -253,7 +335,8 @@ class NotificationDocumentTest : BaseDocumentTest() {
                     response()
                         .responseBodyField(
                             fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-                            fieldWithPath("data").type(JsonFieldType.NUMBER).description("읽지 않은 알림 개수")
+                            fieldWithPath("data").type(JsonFieldType.NUMBER)
+                                .description("읽지 않은 알림 개수 (로그인한 회원이 받은 모든 타입의 알림 중 isRead=false인 수, 없으면 0)")
                         )
                 )
                 .build()
@@ -274,7 +357,7 @@ class NotificationDocumentTest : BaseDocumentTest() {
 
         private val apiConfig = ApiRequestConfig(
             pathParameters = listOf(
-                parameterWithName("notificationId").description("읽음 처리할 알림 ID")
+                parameterWithName("notificationId").description("읽음 처리할 알림 ID (알림 목록의 id)")
             ),
             headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
@@ -289,7 +372,7 @@ class NotificationDocumentTest : BaseDocumentTest() {
                     response()
                         .responseBodyField(
                             fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터").optional()
+                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("항상 빈 객체({})이며 사용하지 않습니다")
                         )
                 )
                 .build()
@@ -301,6 +384,48 @@ class NotificationDocumentTest : BaseDocumentTest() {
                 .patch("/api/v1/notifications/{notificationId}/read", notificationId)
                 .then()
                 .statusCode(200)
+        }
+
+        @Test
+        fun `알림을 찾을 수 없음`() {
+            val notificationId = 999L
+
+            doThrow(NotificationException(NotificationErrorCode.NOTIFICATION_NOT_FOUND))
+                .`when`(markNotificationReadUseCase).markAsRead(any())
+
+            val documentFilter = document("notification/mark-read", "NOTIFICATION_NOT_FOUND")
+                .request(request().applyConfig(apiConfig))
+                .response(RestDocumentationResponse.ERROR_RESPONSE)
+                .build()
+
+            given(documentFilter)
+                .headers(AUTH_HEADER)
+                .contentType(ContentType.JSON)
+                .`when`()
+                .patch("/api/v1/notifications/{notificationId}/read", notificationId)
+                .then()
+                .statusCode(404)
+        }
+
+        @Test
+        fun `권한 없음`() {
+            val notificationId = 1L
+
+            doThrow(NotificationException(NotificationErrorCode.NOTIFICATION_NOT_AUTHORIZED))
+                .`when`(markNotificationReadUseCase).markAsRead(any())
+
+            val documentFilter = document("notification/mark-read", "NOTIFICATION_NOT_AUTHORIZED")
+                .request(request().applyConfig(apiConfig))
+                .response(RestDocumentationResponse.ERROR_RESPONSE)
+                .build()
+
+            given(documentFilter)
+                .headers(AUTH_HEADER)
+                .contentType(ContentType.JSON)
+                .`when`()
+                .patch("/api/v1/notifications/{notificationId}/read", notificationId)
+                .then()
+                .statusCode(403)
         }
     }
 
@@ -320,7 +445,8 @@ class NotificationDocumentTest : BaseDocumentTest() {
                     response()
                         .responseBodyField(
                             fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터").optional()
+                            fieldWithPath("data").type(JsonFieldType.OBJECT)
+                                .description("항상 빈 객체({})이며 사용하지 않습니다. 처리한 알림 개수는 반환하지 않음")
                         )
                 )
                 .build()
@@ -341,7 +467,7 @@ class NotificationDocumentTest : BaseDocumentTest() {
 
         private val apiConfig = ApiRequestConfig(
             pathParameters = listOf(
-                parameterWithName("notificationId").description("삭제할 알림 ID")
+                parameterWithName("notificationId").description("삭제할 알림 ID (알림 목록의 id)")
             ),
             headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
@@ -356,7 +482,7 @@ class NotificationDocumentTest : BaseDocumentTest() {
                     response()
                         .responseBodyField(
                             fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터").optional()
+                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("항상 빈 객체({})이며 사용하지 않습니다")
                         )
                 )
                 .build()

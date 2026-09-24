@@ -371,7 +371,10 @@ src/main/kotlin/com/example/mykku/
   - 진입점: `src/docs/asciidoc/index.adoc` (`==` 그룹 헤딩과 문서 속성 담당), API 본문은 `src/docs/asciidoc/api/<도메인>.adoc` partial
   - API 제목·설명은 테스트가 아니라 partial의 `===` 섹션에 작성
   - 성공 케이스: `operation::<prefix>/<status>[snippets='...']` (실제 생성된 스니펫만 나열)
-  - 에러 케이스: `==== 에러 응답` 아래 `include::{snippets}/<prefix>/<ERROR_CODE>/http-response.adoc[]`
+  - 에러 케이스: `==== 에러 응답` 아래 `include::{snippets}/<prefix>/<ERROR_CODE>/http-response.adoc[]`, 블록 제목은 ``.`ERROR_CODE` · HTTP상태 · 코드 — 발생 조건`` 형식
+  - 공통 에러(AU201, C101, C103/C104, C106, C402)는 `index.adoc`의 공통 에러 섹션에서만 다루고 API별로 반복하지 않음
+  - ENUM 필드는 모든 허용/반환 값과 의미를 `설명 (VALUE: 의미, ...)` 형식으로 기재 (라벨 프로퍼티가 있으면 `entries.joinToString`으로 생성)
+  - null이 될 수 있는 응답 필드는 `.optional()` + null 조건 기재, 선택 인증 API는 `OPTIONAL_AUTH_HEADER_DESCRIPTOR` 사용
   - 없는 스니펫/파일을 참조하면 `asciidoctor` 태스크가 실패함 (`./gradlew asciidoctor`로 확인, 결과: `build/docs/asciidoc/index.html`, 배포 경로: `/docs/index.html`)
 - **참고**: Admin API (`/admin/**`)는 Document 테스트 작성하지 않음
 
