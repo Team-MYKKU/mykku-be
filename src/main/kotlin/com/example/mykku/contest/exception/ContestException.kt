@@ -19,7 +19,6 @@ class ContestException(
 
         fun tagInvalidFormat(): ContestException = ContestException(ContestErrorCode.TAG_INVALID_FORMAT)
 
-        fun invalidContestStatus(): ContestException = ContestException(ContestErrorCode.INVALID_CONTEST_STATUS)
 
         fun contestWinnerNotFound(): ContestException = ContestException(ContestErrorCode.CONTEST_WINNER_NOT_FOUND)
 

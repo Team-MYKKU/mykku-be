@@ -29,9 +29,20 @@ interface ContestJpaRepository : JpaRepository<ContestJpaEntity, Long> {
     )
     fun findActiveContestsByPopular(dateTime: LocalDateTime, pageable: Pageable): Page<ContestJpaEntity>
 
-    fun findByExpiredAtLessThanEqualOrderByCreatedAtDesc(dateTime: LocalDateTime, pageable: Pageable): Page<ContestJpaEntity>
+    fun findByExpiredAtLessThanEqualOrderByCreatedAtDesc(
+        dateTime: LocalDateTime,
+        pageable: Pageable
+    ): Page<ContestJpaEntity>
 
     fun findAllByOrderByCreatedAtDesc(pageable: Pageable): Page<ContestJpaEntity>
 
     fun findByStatus(status: ContestStatusType): List<ContestJpaEntity>
+
+    fun findByStatusOrderByCreatedAtDesc(status: ContestStatusType, pageable: Pageable): Page<ContestJpaEntity>
+
+    fun findByExpiredAtLessThanEqualAndStatusNotOrderByCreatedAtDesc(
+        dateTime: LocalDateTime,
+        status: ContestStatusType,
+        pageable: Pageable
+    ): Page<ContestJpaEntity>
 }

@@ -32,18 +32,16 @@ class ContestDocumentTest : BaseDocumentTest() {
                 parameterWithName("status")
                     .description(
                         "기간 필터 (ACTIVE: 마감 전(expiredAt > 현재 시각)이며 아직 시작하지 않은 공모전도 포함, " +
-                            "EXPIRED: 마감됨(expiredAt ≤ 현재 시각)이며 수상자 선정 여부와 무관, ALL: 전체, " +
-                            "WINNER_SELECTING: ACTIVE와 같은 결과, WINNER_SELECTED: EXPIRED와 같은 결과). " +
-                            "기본값: ACTIVE. 저장된 status가 아니라 expiredAt 기준으로 거름. " +
-                            "대문자 enum 이름 그대로 보내야 함 (대소문자 구분, 그 외 값은 400 C106)"
+                            "EXPIRED: 마감됨(expiredAt ≤ 현재 시각)이며 수상자 선정 여부와 무관, ALL: 전체). " +
+                            "기본값: ACTIVE. 대문자 enum 이름 그대로 보내야 함 " +
+                            "(대소문자 구분, WINNER_SELECTED 등 그 외 값은 400 C106)"
                     )
                     .optional(),
                 parameterWithName("sortType")
                     .description(
                         "정렬 방식 (LATEST: 등록일시(createdAt) 최신순, OLDEST: 등록일시 오래된순, " +
                             "POPULAR: 현재는 LATEST와 같은 순서). 기본값: LATEST. " +
-                            "status가 ACTIVE, WINNER_SELECTING일 때만 적용되며 " +
-                            "EXPIRED, WINNER_SELECTED, ALL은 항상 등록일시 최신순. " +
+                            "status가 ACTIVE일 때만 적용되며 EXPIRED, ALL은 항상 등록일시 최신순. " +
                             "대문자 enum 이름 그대로 보내야 함 (대소문자 구분, 그 외 값은 400 C106)"
                     )
                     .optional(),
@@ -105,9 +103,8 @@ class ContestDocumentTest : BaseDocumentTest() {
                                 ),
                             fieldWithPath("data.content[].status").type(JsonFieldType.STRING)
                                 .description(
-                                    "공모전 저장 상태 (ACTIVE: 수상자 선정 전, WINNER_SELECTED: 수상자 선정 완료). " +
-                                        "응답에 오는 값은 이 두 가지이며 " +
-                                        "expiredAt이 지나도 자동으로 바뀌지 않으므로 마감 여부는 expiredAt으로 판단"
+                                    "조회 시점 기준 공모전 상태 (ACTIVE: 마감 전, " +
+                                        "EXPIRED: 마감됨(수상자 선정 완료 포함)). 목록에는 이 두 값만 옴"
                                 ),
                             fieldWithPath("data.content[].startedAt").type(JsonFieldType.STRING)
                                 .description("공모전 시작 일시 (KST, ISO-8601, 오프셋 없음)"),
@@ -221,9 +218,8 @@ class ContestDocumentTest : BaseDocumentTest() {
                                 .description("공모전 시작 일시 (KST, ISO-8601, 오프셋 없음)"),
                             fieldWithPath("data.status").type(JsonFieldType.STRING)
                                 .description(
-                                    "공모전 저장 상태 (ACTIVE: 수상자 선정 전, WINNER_SELECTED: 수상자 선정 완료). " +
-                                        "응답에 오는 값은 이 두 가지이며 " +
-                                        "expiredAt이 지나도 자동으로 바뀌지 않으므로 마감 여부는 expiredAt으로 판단"
+                                    "조회 시점 기준 공모전 상태 (ACTIVE: 마감 전, EXPIRED: 마감됨·수상자 선정 전, " +
+                                        "WINNER_SELECTED: 수상자 선정 완료)"
                                 ),
                             fieldWithPath("data.thumbnailUrl").type(JsonFieldType.STRING)
                                 .description("썸네일 이미지 URL (images[]와 별도)")

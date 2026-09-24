@@ -2,6 +2,7 @@ package com.example.mykku.event.application.dto
 
 import com.example.mykku.event.domain.vo.EventStatusType
 import com.example.mykku.event.domain.vo.EventWinnerStatus
+import org.springframework.data.domain.Page
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -40,7 +41,20 @@ data class PagedEventsResult(
     val totalElements: Long,
     val totalPages: Int,
     val isLast: Boolean
-)
+) {
+    companion object {
+        fun <T> of(page: Page<T>, content: List<EventListResult>): PagedEventsResult {
+            return PagedEventsResult(
+                content = content,
+                page = page.number,
+                size = page.size,
+                totalElements = page.totalElements,
+                totalPages = page.totalPages,
+                isLast = page.isLast
+            )
+        }
+    }
+}
 
 data class EventDetailResult(
     val id: Long,

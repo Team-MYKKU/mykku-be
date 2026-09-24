@@ -21,23 +21,9 @@ class ListEventsUseCaseImpl(
         val pageable = PageableValidator.validateAndCreate(query.page, query.size)
         val now = LocalDateTime.now()
 
-        val eventPage = eventRepository.findWithPagination(
-            query.status,
-            query.sortType,
-            pageable,
-            now
-        )
-
+        val eventPage = eventRepository.findWithPagination(query.filter, query.sortType, pageable, now)
         val eventListResults = eventPage.content.map { toEventListResult(it, now) }
-
-        return PagedEventsResult(
-            content = eventListResults,
-            page = eventPage.number,
-            size = eventPage.size,
-            totalElements = eventPage.totalElements,
-            totalPages = eventPage.totalPages,
-            isLast = eventPage.isLast
-        )
+        return PagedEventsResult.of(eventPage, eventListResults)
     }
 
     private fun toEventListResult(event: Event, now: LocalDateTime): EventListResult {

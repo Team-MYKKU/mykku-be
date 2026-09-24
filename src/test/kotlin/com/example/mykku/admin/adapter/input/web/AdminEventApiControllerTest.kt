@@ -1,6 +1,7 @@
 package com.example.mykku.admin.adapter.input.web
 
 import com.example.mykku.BaseControllerTest
+import com.example.mykku.admin.exception.AdminErrorCode
 import com.example.mykku.common.exception.CommonErrorCode
 import com.example.mykku.event.adapter.output.persistence.entity.EventJpaEntity
 import com.example.mykku.event.adapter.output.persistence.entity.EventParticipationJpaEntity
@@ -106,7 +107,8 @@ class AdminEventApiControllerTest : BaseControllerTest() {
             .`when`()
             .post("/admin/api/v1/events/{eventId}/winners", event.id)
             .then()
-            .statusCode(302)
+            .statusCode(401)
+            .body("code", equalTo(AdminErrorCode.UNAUTHORIZED.code))
     }
 
     @Test
@@ -200,7 +202,8 @@ class AdminEventApiControllerTest : BaseControllerTest() {
             .`when`()
             .put("/admin/api/v1/events/{eventId}/winner-announcement", event.id)
             .then()
-            .statusCode(302)
+            .statusCode(401)
+            .body("code", equalTo(AdminErrorCode.UNAUTHORIZED.code))
     }
 
     private fun createAndSaveEvent(

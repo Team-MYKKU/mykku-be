@@ -22,6 +22,12 @@ class Contest private constructor(
         _status = status
     }
 
+    fun resolveStatus(now: LocalDateTime): ContestStatusType {
+        if (_status == ContestStatusType.WINNER_SELECTED) return ContestStatusType.WINNER_SELECTED
+        if (!expiredAt.isAfter(now)) return ContestStatusType.EXPIRED
+        return ContestStatusType.ACTIVE
+    }
+
     companion object {
         const val IMAGE_MAX_COUNT = 10
         const val TAG_MAX_COUNT = 7

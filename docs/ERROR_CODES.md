@@ -124,7 +124,6 @@
 | CN004 | WINNER_ANNOUNCEMENT_NOT_FOUND | 404 | 콘테스트 수상자 발표 공지를 찾을 수 없습니다 |
 | CN101 | CONTEST_IMAGE_LIMIT_EXCEEDED | 400 | 콘테스트 이미지는 10개 이하여야 합니다 |
 | CN102 | CONTEST_TAG_LIMIT_EXCEEDED | 400 | 콘테스트 태그는 7개 이하여야 합니다 |
-| CN103 | INVALID_CONTEST_STATUS | 400 | 콘테스트 상태는 'ACTIVE', 'EXPIRED', 'ALL' 중 하나여야 합니다 |
 | CN104 | TAG_TITLE_TOO_LONG | 400 | 태그는 20자 이하여야 합니다 |
 | CN105 | TAG_INVALID_FORMAT | 400 | 태그는 한글, 영문, 숫자만 사용할 수 있습니다 |
 | CN106 | INVALID_WINNER_RANK | 400 | 수상 순위는 1, 2, 3 중 하나여야 합니다 |

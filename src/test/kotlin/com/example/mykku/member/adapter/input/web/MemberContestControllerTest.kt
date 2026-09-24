@@ -180,6 +180,7 @@ class MemberContestControllerTest : BaseControllerTest() {
             .get("/api/v1/members/me/contests")
         .then()
             .statusCode(200)
+            .body("data.content[0].status", equalTo("EXPIRED"))
             .body("data.content[0].winnerStatus", equalTo("WON"))
             .body("data.content[0].winnerRank", equalTo(1))
     }
@@ -215,7 +216,43 @@ class MemberContestControllerTest : BaseControllerTest() {
             .get("/api/v1/members/me/contests")
         .then()
             .statusCode(200)
+            .body("data.content[0].status", equalTo("EXPIRED"))
             .body("data.content[0].winnerStatus", equalTo("LOST"))
+    }
+
+    @Test
+    @DisplayName("내가 참여한 콘테스트 목록 조회 - 마감됐지만 발표 전이면 status는 EXPIRED, winnerStatus는 PENDING이다")
+    fun `getMyParticipatedContests - 마감 후 발표 전이면 EXPIRED와 PENDING이다`() {
+        val member = createAndSaveMember()
+        val board = createAndSaveBoard()
+        val authHeader = getBearerToken(member.id)
+
+        val contest = contestJpaRepository.save(
+            ContestJpaEntity(
+                title = "마감된 콘테스트",
+                startedAt = LocalDateTime.now().minusDays(7),
+                expiredAt = LocalDateTime.now().minusDays(1),
+                status = ContestStatusType.ACTIVE,
+                thumbnailUrl = "https://example.com/thumbnail.jpg"
+            )
+        )
+        val feed = feedJpaRepository.save(
+            FeedJpaEntity(title = "참여작", content = "내용", board = board, member = member)
+        )
+        contestParticipationJpaRepository.save(
+            ContestParticipationJpaEntity(member = member, contest = contest, feed = feed)
+        )
+
+        RestAssured.given()
+            .header("Authorization", authHeader)
+            .queryParam("page", 0)
+            .queryParam("size", 20)
+        .`when`()
+            .get("/api/v1/members/me/contests")
+        .then()
+            .statusCode(200)
+            .body("data.content[0].status", equalTo("EXPIRED"))
+            .body("data.content[0].winnerStatus", equalTo("PENDING"))
     }
 
     @Test

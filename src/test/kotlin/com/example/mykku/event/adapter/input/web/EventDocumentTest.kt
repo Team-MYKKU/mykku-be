@@ -34,7 +34,7 @@ class EventDocumentTest : BaseDocumentTest() {
                     .description(
                         "조회할 이벤트 상태 (ACTIVE: 종료 일시 전 이벤트(시작 전 포함), " +
                             "EXPIRED: 종료된 이벤트(당첨자 발표 완료 포함), ALL: 전체). " +
-                            "기본값: ACTIVE, 대문자만 허용. WINNER_SELECTING, WINNER_SELECTED는 ALL과 동일하게 처리됨"
+                            "기본값: ACTIVE, 대문자만 허용. WINNER_SELECTED 등 그 외 값은 400 C106"
                     )
                     .optional(),
                 parameterWithName("sortType")

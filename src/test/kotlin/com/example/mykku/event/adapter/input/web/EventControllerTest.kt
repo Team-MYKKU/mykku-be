@@ -1,6 +1,7 @@
 package com.example.mykku.event.adapter.input.web
 
 import com.example.mykku.BaseControllerTest
+import com.example.mykku.common.exception.CommonErrorCode
 import com.example.mykku.event.adapter.output.persistence.entity.EventJpaEntity
 import com.example.mykku.event.adapter.output.persistence.repository.EventJpaRepository
 import com.example.mykku.event.domain.vo.EventStatusType
@@ -91,6 +92,22 @@ class EventControllerTest : BaseControllerTest() {
             .body("data.title", equalTo("상세 조회 테스트 이벤트"))
             .body("data.subTitle", equalTo("테스트 부제목"))
             .body("data.description", equalTo("테스트 이벤트 설명"))
+    }
+
+    @Test
+    @DisplayName("이벤트 목록 조회 - ACTIVE, EXPIRED, ALL 이외의 status는 400을 반환한다")
+    fun `getEvents - WINNER_SELECTED 필터는 400을 반환한다`() {
+        val member = createAndSaveMember()
+        val authHeader = getBearerToken(member.id)
+
+        RestAssured.given()
+            .header("Authorization", authHeader)
+            .param("status", "WINNER_SELECTED")
+            .`when`()
+            .get("/api/v1/events")
+            .then()
+            .statusCode(400)
+            .body("code", equalTo(CommonErrorCode.INVALID_PARAMETER_TYPE.code))
     }
 
     @Test

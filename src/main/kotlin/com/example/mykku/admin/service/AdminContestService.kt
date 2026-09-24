@@ -9,8 +9,8 @@ import com.example.mykku.contest.application.dto.PagedContestsResult
 import com.example.mykku.contest.application.port.input.CreateContestUseCase
 import com.example.mykku.contest.application.port.input.ListContestsUseCase
 import com.example.mykku.contest.domain.entity.Contest
+import com.example.mykku.contest.domain.vo.ContestListFilter
 import com.example.mykku.contest.domain.vo.ContestSortType
-import com.example.mykku.contest.domain.vo.ContestStatusType
 import com.example.mykku.contest.exception.ContestException
 import com.example.mykku.image.ImageUploadService
 import org.springframework.stereotype.Service
@@ -57,9 +57,9 @@ class AdminContestService(
         }
     }
 
-    fun findAll(page: Int, size: Int, status: ContestStatusType): PagedContestsResult {
+    fun findAll(page: Int, size: Int, filter: ContestListFilter): PagedContestsResult {
         val query = ContestListQuery(
-            status = status,
+            filter = filter,
             sortType = ContestSortType.LATEST,
             page = page,
             size = size

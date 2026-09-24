@@ -6,7 +6,7 @@ import com.example.mykku.contest.application.dto.ContestListQuery
 import com.example.mykku.contest.application.port.input.GetContestUseCase
 import com.example.mykku.contest.application.port.input.ListContestsUseCase
 import com.example.mykku.contest.domain.vo.ContestSortType
-import com.example.mykku.contest.domain.vo.ContestStatusType
+import com.example.mykku.contest.domain.vo.ContestStatusFilter
 import com.example.mykku.member.domain.entity.Member
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -24,14 +24,14 @@ class ContestController(
 
     @GetMapping
     fun getContests(
-        @RequestParam(defaultValue = "ACTIVE") status: ContestStatusType,
+        @RequestParam(defaultValue = "ACTIVE") status: ContestStatusFilter,
         @RequestParam(defaultValue = "LATEST") sortType: ContestSortType,
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "20") size: Int,
         @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<PagedContestsResponse>> {
         val query = ContestListQuery(
-            status = status,
+            filter = status.listFilter,
             sortType = sortType,
             page = page,
             size = size

@@ -8,7 +8,7 @@
 ** `ACTIVE`: 종료 일시(`expiredAt`)가 현재 시각보다 뒤인 이벤트. 시작 일시(`startedAt`) 전인 이벤트도 포함됩니다.
 ** `EXPIRED`: 종료 일시가 현재 시각과 같거나 지난 이벤트. 당첨자 발표가 끝난 이벤트(응답 ``status``가 `WINNER_SELECTED`)도 포함됩니다.
 ** `ALL`: 전체 이벤트
-** `WINNER_SELECTING`, ``WINNER_SELECTED``를 보내면 ``ALL``과 같이 전체 이벤트를 반환합니다.
+** 그 밖의 값(`WINNER_SELECTED` 등)은 400 `C106` 입니다.
 * 정렬 (``sortType``은 ``status=ACTIVE``일 때만 적용)
 ** `LATEST` (기본값): 등록일시 최신순
 ** `OLDEST`: 등록일시 오래된순

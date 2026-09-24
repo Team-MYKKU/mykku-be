@@ -1,6 +1,7 @@
 package com.example.mykku.event.adapter.output.persistence.repository
 
 import com.example.mykku.event.adapter.output.persistence.entity.EventJpaEntity
+import com.example.mykku.event.domain.vo.EventStatusType
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
@@ -26,7 +27,18 @@ interface EventJpaRepository : JpaRepository<EventJpaEntity, Long> {
     )
     fun findActiveEventsByPopular(dateTime: LocalDateTime, pageable: Pageable): Page<EventJpaEntity>
 
-    fun findByExpiredAtLessThanEqualOrderByCreatedAtDesc(dateTime: LocalDateTime, pageable: Pageable): Page<EventJpaEntity>
+    fun findByExpiredAtLessThanEqualOrderByCreatedAtDesc(
+        dateTime: LocalDateTime,
+        pageable: Pageable
+    ): Page<EventJpaEntity>
 
     fun findAllByOrderByCreatedAtDesc(pageable: Pageable): Page<EventJpaEntity>
+
+    fun findByStatusOrderByCreatedAtDesc(status: EventStatusType, pageable: Pageable): Page<EventJpaEntity>
+
+    fun findByExpiredAtLessThanEqualAndStatusNotOrderByCreatedAtDesc(
+        dateTime: LocalDateTime,
+        status: EventStatusType,
+        pageable: Pageable
+    ): Page<EventJpaEntity>
 }

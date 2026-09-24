@@ -1,7 +1,7 @@
 package com.example.mykku.admin.controller
 
 import com.example.mykku.admin.service.AdminContestService
-import com.example.mykku.contest.domain.vo.ContestStatusType
+import com.example.mykku.contest.domain.vo.ContestListFilter
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.GetMapping
@@ -18,7 +18,7 @@ class AdminContestViewController(
     fun listPage(
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "20") size: Int,
-        @RequestParam(defaultValue = "ALL") status: ContestStatusType,
+        @RequestParam(defaultValue = "ALL") status: ContestListFilter,
         model: Model
     ): String {
         val contests = adminContestService.findAll(page, size, status)

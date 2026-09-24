@@ -1,5 +1,10 @@
 server:
   shutdown: graceful
+  servlet:
+    session:
+      cookie:
+        same-site: lax
+        secure: true
 
 spring:
   config:

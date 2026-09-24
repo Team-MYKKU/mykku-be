@@ -50,7 +50,7 @@ class MemberContestDocumentTest : BaseDocumentTest() {
                     title = "두 번째 콘테스트",
                     startedAt = LocalDateTime.of(2025, 1, 1, 0, 0, 0),
                     expiredAt = LocalDateTime.of(2025, 11, 30, 23, 59, 59),
-                    status = ContestStatusType.ACTIVE,
+                    status = ContestStatusType.EXPIRED,
                     thumbnailUrl = "https://example.com/thumbnail2.jpg",
                     tags = listOf("기획"),
                     winnerStatus = ContestWinnerStatus.PENDING,
@@ -89,12 +89,9 @@ class MemberContestDocumentTest : BaseDocumentTest() {
                                 ),
                             fieldWithPath("data.content[].status").type(JsonFieldType.STRING)
                                 .description(
-                                    "콘테스트에 저장된 상태 (ACTIVE: 수상자 선정 전(생성 시 기본값), " +
-                                        "WINNER_SELECTED: 수상자 선정 완료). " +
-                                        "EXPIRED(마감)·WINNER_SELECTING(수상자 선정 중)도 enum에 있지만 " +
-                                        "이 값으로 바꾸는 API가 없어 일반적으로 오지 않음. " +
-                                        "expiredAt이 지나도 자동으로 바뀌지 않으므로 마감 여부는 expiredAt으로 판단. " +
-                                        "조회 필터 전용 값인 ALL은 반환되지 않음"
+                                    "조회 시점 기준 콘테스트 상태 (ACTIVE: 마감 전, " +
+                                        "EXPIRED: 마감됨(수상자 선정 완료 포함)). 이 두 값만 옴. " +
+                                        "수상자 선정 여부는 winnerStatus로 판단"
                                 ),
                             fieldWithPath("data.content[].thumbnailUrl").type(JsonFieldType.STRING)
                                 .description("콘테스트 썸네일 이미지 URL (항상 존재)"),
@@ -107,8 +104,8 @@ class MemberContestDocumentTest : BaseDocumentTest() {
                                 .description(
                                     "피드가 아닌 콘테스트 단위의 수상 상태 " +
                                         "(WON:이 콘테스트에서 본인 참여 피드 중 하나 이상이 수상작으로 선정됨, " +
-                                        "LOST: status가 WINNER_SELECTED이지만 본인 피드는 모두 미수상, " +
-                                        "PENDING: status가 WINNER_SELECTED가 아니어서 아직 수상자 선정 전)"
+                                        "LOST: 수상자 선정이 끝났지만 본인 피드는 모두 미수상, " +
+                                        "PENDING: 아직 수상자 선정 전)"
                                 ),
                             fieldWithPath("data.content[].winnerRank").type(JsonFieldType.NUMBER)
                                 .description(

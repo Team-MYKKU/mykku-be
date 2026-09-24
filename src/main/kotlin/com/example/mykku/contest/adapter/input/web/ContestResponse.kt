@@ -78,13 +78,15 @@ data class ContestListResponse(
     val winnerRank: Int?
 ) {
     companion object {
+        private val WINNER_STATUSES = setOf(ContestStatusType.WINNER_SELECTING, ContestStatusType.WINNER_SELECTED)
+
         fun from(result: ContestListResult): ContestListResponse {
             return ContestListResponse(
                 id = result.id,
                 title = result.title,
                 startedAt = result.startedAt,
                 expiredAt = result.expiredAt,
-                status = result.status,
+                status = if (result.status in WINNER_STATUSES) ContestStatusType.EXPIRED else result.status,
                 thumbnailUrl = result.thumbnailUrl,
                 tags = result.tags,
                 winnerStatus = result.winnerStatus,

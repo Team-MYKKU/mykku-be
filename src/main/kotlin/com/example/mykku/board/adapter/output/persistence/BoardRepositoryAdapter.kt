@@ -12,7 +12,13 @@ class BoardRepositoryAdapter(
 ) : BoardRepository {
 
     override fun save(board: Board): Board {
-        val entity = BoardJpaEntity.fromDomain(board)
+        val entity = if (board.id.value == 0L) {
+            BoardJpaEntity.fromDomain(board)
+        } else {
+            boardJpaRepository.findById(board.id.value)
+                .map { it.apply { updateFromDomain(board) } }
+                .orElseGet { BoardJpaEntity.fromDomain(board) }
+        }
         return boardJpaRepository.save(entity).toDomain()
     }
 

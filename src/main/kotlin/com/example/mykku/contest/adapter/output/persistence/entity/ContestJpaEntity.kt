@@ -55,6 +55,15 @@ class ContestJpaEntity(
         )
     }
 
+    fun updateFromDomain(contest: Contest) {
+        this.title = contest.title
+        this.description = contest.description
+        this.startedAt = contest.startedAt
+        this.expiredAt = contest.expiredAt
+        this.status = contest.status
+        this.thumbnailUrl = contest.thumbnailUrl
+    }
+
     companion object {
         const val IMAGE_MAX_COUNT = 10
         const val TAG_MAX_COUNT = 7

@@ -1,6 +1,7 @@
 package com.example.mykku.admin.adapter.input.web
 
 import com.example.mykku.BaseControllerTest
+import com.example.mykku.admin.exception.AdminErrorCode
 import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import com.example.mykku.report.adapter.input.web.ProcessReportRequest
 import com.example.mykku.report.adapter.output.persistence.entity.ReportJpaEntity
@@ -190,6 +191,7 @@ class AdminReportApiControllerTest : BaseControllerTest() {
             .`when`()
             .get("/admin/api/v1/reports")
             .then()
-            .statusCode(302)
+            .statusCode(401)
+            .body("code", equalTo(AdminErrorCode.UNAUTHORIZED.code))
     }
 }

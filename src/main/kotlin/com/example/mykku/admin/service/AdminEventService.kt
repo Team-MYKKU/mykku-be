@@ -10,8 +10,8 @@ import com.example.mykku.event.application.port.input.CreateEventUseCase
 import com.example.mykku.event.application.port.input.ListEventsUseCase
 import com.example.mykku.event.domain.entity.Event
 import com.example.mykku.event.exception.EventException
+import com.example.mykku.event.domain.vo.EventListFilter
 import com.example.mykku.event.domain.vo.EventSortType
-import com.example.mykku.event.domain.vo.EventStatusType
 import com.example.mykku.image.ImageUploadService
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -57,9 +57,9 @@ class AdminEventService(
         }
     }
 
-    fun findAll(page: Int, size: Int, status: EventStatusType): PagedEventsResult {
+    fun findAll(page: Int, size: Int, filter: EventListFilter): PagedEventsResult {
         val query = EventListQuery(
-            status = status,
+            filter = filter,
             sortType = EventSortType.LATEST,
             page = page,
             size = size

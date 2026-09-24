@@ -6,6 +6,7 @@ import com.example.mykku.event.adapter.output.persistence.repository.EventJpaRep
 import com.example.mykku.event.application.port.output.EventRepository
 import com.example.mykku.event.domain.entity.Event
 import com.example.mykku.event.domain.vo.EventId
+import com.example.mykku.event.domain.vo.EventListFilter
 import com.example.mykku.event.domain.vo.EventSortType
 import com.example.mykku.event.domain.vo.EventStatusType
 import org.assertj.core.api.Assertions.assertThat
@@ -57,6 +58,22 @@ class EventRepositoryAdapterTest : BaseRepositoryTest() {
             val savedEvent = eventRepository.save(event)
 
             assertThat(savedEvent.description).isNull()
+        }
+
+        @Test
+        @DisplayName("기존 이벤트를 업데이트하면 createdAt이 보존되고 행이 추가되지 않는다")
+        fun `이벤트 업데이트 - createdAt 보존`() {
+            val saved = eventRepository.save(createEvent())
+            eventJpaRepository.flush()
+            Thread.sleep(5)
+            saved.updateStatus(EventStatusType.WINNER_SELECTED)
+
+            val updated = eventRepository.save(saved)
+
+            assertThat(updated.id).isEqualTo(saved.id)
+            assertThat(updated.status).isEqualTo(EventStatusType.WINNER_SELECTED)
+            assertThat(updated.createdAt).isEqualTo(saved.createdAt)
+            assertThat(eventJpaRepository.count()).isEqualTo(1)
         }
     }
 
@@ -150,7 +167,7 @@ class EventRepositoryAdapterTest : BaseRepositoryTest() {
                 val pageable = PageRequest.of(0, 10)
 
                 val page = eventRepository.findWithPagination(
-                    status = EventStatusType.ACTIVE,
+                    filter = EventListFilter.ACTIVE,
                     sortType = EventSortType.LATEST,
                     pageable = pageable,
                     currentTime = now
@@ -170,7 +187,7 @@ class EventRepositoryAdapterTest : BaseRepositoryTest() {
                 val pageable = PageRequest.of(0, 10)
 
                 val page = eventRepository.findWithPagination(
-                    status = EventStatusType.ACTIVE,
+                    filter = EventListFilter.ACTIVE,
                     sortType = EventSortType.OLDEST,
                     pageable = pageable,
                     currentTime = now
@@ -190,7 +207,7 @@ class EventRepositoryAdapterTest : BaseRepositoryTest() {
                 val pageable = PageRequest.of(0, 10)
 
                 val page = eventRepository.findWithPagination(
-                    status = EventStatusType.ACTIVE,
+                    filter = EventListFilter.ACTIVE,
                     sortType = EventSortType.POPULAR,
                     pageable = pageable,
                     currentTime = now
@@ -214,7 +231,7 @@ class EventRepositoryAdapterTest : BaseRepositoryTest() {
                 val pageable = PageRequest.of(0, 10)
 
                 val page = eventRepository.findWithPagination(
-                    status = EventStatusType.EXPIRED,
+                    filter = EventListFilter.EXPIRED,
                     sortType = EventSortType.LATEST,
                     pageable = pageable,
                     currentTime = now
@@ -238,13 +255,59 @@ class EventRepositoryAdapterTest : BaseRepositoryTest() {
                 val pageable = PageRequest.of(0, 10)
 
                 val page = eventRepository.findWithPagination(
-                    status = EventStatusType.ALL,
+                    filter = EventListFilter.ALL,
                     sortType = EventSortType.LATEST,
                     pageable = pageable,
                     currentTime = now
                 )
 
                 assertThat(page.content).hasSize(2)
+            }
+        }
+
+        @Nested
+        @DisplayName("WINNER_SELECTED 상태 조회")
+        inner class WinnerSelectedStatus {
+
+            @Test
+            @DisplayName("저장 상태가 WINNER_SELECTED인 이벤트만 조회한다")
+            fun `수상자 선정 완료 이벤트만 조회`() {
+                val now = LocalDateTime.now()
+                val selected = eventRepository.save(createEventWithExpiredAt(now.minusDays(1)))
+                selected.updateStatus(EventStatusType.WINNER_SELECTED)
+                eventRepository.save(selected)
+                eventRepository.save(createEventWithExpiredAt(now.minusDays(1)))
+
+                val page = eventRepository.findWithPagination(
+                    filter = EventListFilter.WINNER_SELECTED,
+                    sortType = EventSortType.LATEST,
+                    pageable = PageRequest.of(0, 10),
+                    currentTime = now
+                )
+
+                assertThat(page.content).hasSize(1)
+                assertThat(page.content[0].id).isEqualTo(selected.id)
+            }
+
+            @Test
+            @DisplayName("PENDING_SELECTION은 만료됐고 당첨자를 선정하지 않은 이벤트만 조회한다")
+            fun `당첨자 선정 대기 이벤트만 조회`() {
+                val now = LocalDateTime.now()
+                val selected = eventRepository.save(createEventWithExpiredAt(now.minusDays(1)))
+                selected.updateStatus(EventStatusType.WINNER_SELECTED)
+                eventRepository.save(selected)
+                val pending = eventRepository.save(createEventWithExpiredAt(now.minusDays(1)))
+                eventRepository.save(createEventWithExpiredAt(now.plusDays(7)))
+
+                val page = eventRepository.findWithPagination(
+                    filter = EventListFilter.PENDING_SELECTION,
+                    sortType = EventSortType.LATEST,
+                    pageable = PageRequest.of(0, 10),
+                    currentTime = now
+                )
+
+                assertThat(page.content).hasSize(1)
+                assertThat(page.content[0].id).isEqualTo(pending.id)
             }
         }
 
@@ -262,7 +325,7 @@ class EventRepositoryAdapterTest : BaseRepositoryTest() {
                 val pageable = PageRequest.of(0, 3)
 
                 val page = eventRepository.findWithPagination(
-                    status = EventStatusType.ALL,
+                    filter = EventListFilter.ALL,
                     sortType = EventSortType.LATEST,
                     pageable = pageable,
                     currentTime = now
@@ -283,7 +346,7 @@ class EventRepositoryAdapterTest : BaseRepositoryTest() {
                 val pageable = PageRequest.of(1, 3)
 
                 val page = eventRepository.findWithPagination(
-                    status = EventStatusType.ALL,
+                    filter = EventListFilter.ALL,
                     sortType = EventSortType.LATEST,
                     pageable = pageable,
                     currentTime = now

@@ -2,6 +2,7 @@ package com.example.mykku.contest.application.dto
 
 import com.example.mykku.contest.domain.vo.ContestStatusType
 import com.example.mykku.contest.domain.vo.ContestWinnerStatus
+import org.springframework.data.domain.Page
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -41,7 +42,20 @@ data class PagedContestsResult(
     val totalElements: Long,
     val totalPages: Int,
     val isLast: Boolean
-)
+) {
+    companion object {
+        fun <T> of(page: Page<T>, content: List<ContestListResult>): PagedContestsResult {
+            return PagedContestsResult(
+                content = content,
+                page = page.number,
+                size = page.size,
+                totalElements = page.totalElements,
+                totalPages = page.totalPages,
+                isLast = page.isLast
+            )
+        }
+    }
+}
 
 data class ContestDetailResult(
     val id: Long,

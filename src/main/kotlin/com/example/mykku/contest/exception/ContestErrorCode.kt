@@ -18,7 +18,6 @@ enum class ContestErrorCode(
 
     CONTEST_IMAGE_LIMIT_EXCEEDED("CN101", HttpStatus.BAD_REQUEST, "콘테스트 이미지는 ${Contest.IMAGE_MAX_COUNT}개 이하여야 합니다"),
     CONTEST_TAG_LIMIT_EXCEEDED("CN102", HttpStatus.BAD_REQUEST, "콘테스트 태그는 ${Contest.TAG_MAX_COUNT}개 이하여야 합니다"),
-    INVALID_CONTEST_STATUS("CN103", HttpStatus.BAD_REQUEST, "콘테스트 상태는 'ACTIVE', 'EXPIRED', 'ALL' 중 하나여야 합니다"),
     TAG_TITLE_TOO_LONG("CN104", HttpStatus.BAD_REQUEST, "태그는 ${ContestTag.TITLE_MAX_LENGTH}자 이하여야 합니다"),
     TAG_INVALID_FORMAT("CN105", HttpStatus.BAD_REQUEST, "태그는 한글, 영문, 숫자만 사용할 수 있습니다"),
     INVALID_WINNER_RANK("CN106", HttpStatus.BAD_REQUEST, "수상 순위는 1, 2, 3 중 하나여야 합니다"),

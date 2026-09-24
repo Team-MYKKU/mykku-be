@@ -1,8 +1,8 @@
 package com.example.mykku.admin.controller
 
 import com.example.mykku.admin.config.AdminInterceptor
-import com.example.mykku.admin.exception.AdminException
 import jakarta.servlet.http.HttpServletRequest
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.GetMapping
@@ -16,6 +16,8 @@ class AdminViewController(
     private val adminInterceptor: AdminInterceptor
 ) {
 
+    private val logger = LoggerFactory.getLogger(AdminViewController::class.java)
+
     @GetMapping("/login")
     fun loginPage(model: Model): String {
         model.addAttribute("title", "로그인")
@@ -27,9 +29,9 @@ class AdminViewController(
         @RequestParam token: String,
         request: HttpServletRequest
     ): String {
-        val authenticated = adminInterceptor.authenticate(token, request)
-        if (!authenticated) {
-            throw AdminException.invalidToken()
+        if (!adminInterceptor.authenticate(token, request)) {
+            logger.warn("Admin login failed: remoteAddr={}", request.remoteAddr)
+            return "redirect:/admin/login?error"
         }
         return "redirect:/admin"
     }

@@ -68,6 +68,9 @@ allOpen {
 tasks.withType<Test> {
     useJUnitPlatform()
     outputs.dir("build/generated-snippets")
+    inputs.files(fileTree("mykku-be-config/templates"))
+        .withPropertyName("adminTemplates")
+        .withPathSensitivity(PathSensitivity.RELATIVE)
 
     jvmArgs(
         "-XX:+UseParallelGC",

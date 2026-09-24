@@ -1,6 +1,7 @@
 package com.example.mykku.admin.adapter.input.web
 
 import com.example.mykku.BaseControllerTest
+import com.example.mykku.admin.exception.AdminErrorCode
 import com.example.mykku.contest.adapter.output.persistence.entity.ContestJpaEntity
 import com.example.mykku.contest.adapter.output.persistence.entity.ContestParticipationJpaEntity
 import com.example.mykku.contest.adapter.output.persistence.repository.ContestJpaRepository
@@ -88,7 +89,8 @@ class AdminContestApiControllerTest : BaseControllerTest() {
             .`when`()
             .post("/admin/api/v1/contests/{contestId}/winners", contest.id)
             .then()
-            .statusCode(302)
+            .statusCode(401)
+            .body("code", equalTo(AdminErrorCode.UNAUTHORIZED.code))
     }
 
     @Test
@@ -211,7 +213,8 @@ class AdminContestApiControllerTest : BaseControllerTest() {
             .`when`()
             .put("/admin/api/v1/contests/{contestId}/winner-announcement", contest.id)
             .then()
-            .statusCode(302)
+            .statusCode(401)
+            .body("code", equalTo(AdminErrorCode.UNAUTHORIZED.code))
     }
 
     private fun createAndSaveContest(

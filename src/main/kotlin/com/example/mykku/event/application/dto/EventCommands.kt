@@ -1,7 +1,7 @@
 package com.example.mykku.event.application.dto
 
+import com.example.mykku.event.domain.vo.EventListFilter
 import com.example.mykku.event.domain.vo.EventSortType
-import com.example.mykku.event.domain.vo.EventStatusType
 import org.springframework.data.domain.Pageable
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -22,7 +22,7 @@ data class EventImageCommand(
 )
 
 data class EventListQuery(
-    val status: EventStatusType,
+    val filter: EventListFilter,
     val sortType: EventSortType,
     val page: Int,
     val size: Int

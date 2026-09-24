@@ -57,6 +57,28 @@ class BoardRepositoryAdapterTest : BaseRepositoryTest() {
             assertThat(savedBoard1.title).isEqualTo("게시판1")
             assertThat(savedBoard2.title).isEqualTo("게시판2")
         }
+
+        @Test
+        @DisplayName("기존 게시판을 저장하면 제목이 갱신되고 createdAt이 보존된다")
+        fun saveExistingBoardUpdatesInPlace() {
+            val saved = boardRepository.save(createTestBoard(title = "원본"))
+            boardJpaRepository.flush()
+            Thread.sleep(5)
+            val changed = Board.reconstitute(
+                id = saved.id,
+                title = "변경됨",
+                logo = saved.logo,
+                createdAt = saved.createdAt,
+                updatedAt = saved.updatedAt
+            )
+
+            val updated = boardRepository.save(changed)
+
+            assertThat(updated.id).isEqualTo(saved.id)
+            assertThat(updated.title).isEqualTo("변경됨")
+            assertThat(updated.createdAt).isEqualTo(saved.createdAt)
+            assertThat(boardJpaRepository.count()).isEqualTo(1)
+        }
     }
 
     @Nested

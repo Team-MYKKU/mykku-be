@@ -1,7 +1,7 @@
 package com.example.mykku.admin.controller
 
 import com.example.mykku.admin.service.AdminEventService
-import com.example.mykku.event.domain.vo.EventStatusType
+import com.example.mykku.event.domain.vo.EventListFilter
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.GetMapping
@@ -18,7 +18,7 @@ class AdminEventViewController(
     fun listPage(
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "20") size: Int,
-        @RequestParam(defaultValue = "ALL") status: EventStatusType,
+        @RequestParam(defaultValue = "ALL") status: EventListFilter,
         model: Model
     ): String {
         val events = adminEventService.findAll(page, size, status)
