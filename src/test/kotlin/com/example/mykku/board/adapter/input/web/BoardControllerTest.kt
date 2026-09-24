@@ -2,6 +2,7 @@ package com.example.mykku.board.adapter.input.web
 
 import com.example.mykku.BaseControllerTest
 import com.example.mykku.board.adapter.output.persistence.entity.BoardJpaEntity
+import com.example.mykku.board.exception.BoardErrorCode
 import com.example.mykku.feed.adapter.output.persistence.FeedCommentJpaRepository
 import com.example.mykku.feed.adapter.output.persistence.FeedJpaRepository
 import com.example.mykku.feed.adapter.output.persistence.entity.FeedCommentJpaEntity
@@ -317,5 +318,27 @@ class BoardControllerTest : BaseControllerTest() {
                 profileImage = ""
             )
         )
+    }
+
+    @Test
+    @DisplayName("보드별 피드 목록 조회 - 존재하지 않는 게시판이면 404")
+    fun `getFeedsByBoard - 존재하지 않는 게시판이면 404를 반환한다`() {
+        RestAssured.given()
+            .`when`()
+            .get("/api/v1/boards/{boardId}/feeds", 999999L)
+            .then()
+            .statusCode(404)
+            .body("code", equalTo(BoardErrorCode.BOARD_NOT_FOUND.code))
+    }
+
+    @Test
+    @DisplayName("보드별 인기 피드 목록 조회 - 존재하지 않는 게시판이면 404")
+    fun `getPopularFeedsByBoard - 존재하지 않는 게시판이면 404를 반환한다`() {
+        RestAssured.given()
+            .`when`()
+            .get("/api/v1/boards/{boardId}/feeds/popular", 999999L)
+            .then()
+            .statusCode(404)
+            .body("code", equalTo(BoardErrorCode.BOARD_NOT_FOUND.code))
     }
 }

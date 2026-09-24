@@ -18,6 +18,15 @@ operation::board/list/200[snippets='http-request,http-response,response-fields']
 
 operation::board/feeds/200[snippets='http-request,request-headers,path-parameters,query-parameters,http-response,response-fields']
 
+[[board-feeds-error]]
+==== 에러 응답
+
+.`BOARD_NOT_FOUND` · 404 · BO001 — 존재하지 않는 게시판 ID
+[%collapsible]
+====
+include::{snippets}/board/feeds/BOARD_NOT_FOUND/http-response.adoc[]
+====
+
 [[board-popular-feeds]]
 === 보드별 인기 피드 목록 조회
 
@@ -30,3 +39,12 @@ operation::board/feeds/200[snippets='http-request,request-headers,path-parameter
 * `boardId` 에 숫자가 아닌 값을 보내면 400 `C106` 이 반환됩니다 (<<overview-error-response,공통 에러>> 참고).
 
 operation::board/popular-feeds/200[snippets='http-request,request-headers,path-parameters,http-response,response-fields']
+
+[[board-popular-feeds-error]]
+==== 에러 응답
+
+.`BOARD_NOT_FOUND` · 404 · BO001 — 존재하지 않는 게시판 ID
+[%collapsible]
+====
+include::{snippets}/board/popular-feeds/BOARD_NOT_FOUND/http-response.adoc[]
+====

@@ -32,14 +32,14 @@ class GetReportsService(
     }
 
     private fun resolveMemberIds(reports: List<Report>): Map<Long, String?> {
-        val memberPks = reports.map { it.reporterId } + reports.mapNotNull { it.targetMemberId }
+        val memberPks = reports.mapNotNull { it.reporterId } + reports.mapNotNull { it.targetMemberId }
         return reportMemberIdResolver.resolve(memberPks)
     }
 
     private fun toResult(report: Report, memberIds: Map<Long, String?>): ReportResult {
         return ReportResult.from(
             report = report,
-            reporterMemberId = memberIds[report.reporterId],
+            reporterMemberId = report.reporterId?.let { memberIds[it] },
             targetMemberId = report.targetMemberId?.let { memberIds[it] }
         )
     }

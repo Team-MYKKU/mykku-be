@@ -2,7 +2,9 @@ package com.example.mykku.board.adapter.input.web
 
 import com.example.mykku.BaseDocumentTest
 import com.example.mykku.board.application.dto.BoardResult
+import com.example.mykku.board.exception.BoardException
 import com.example.mykku.docs.ApiRequestConfig
+import com.example.mykku.docs.RestDocumentationResponse
 import com.example.mykku.feed.adapter.input.web.dto.AuthorResponse
 import com.example.mykku.feed.adapter.input.web.dto.CommentPreviewResponse
 import com.example.mykku.feed.adapter.input.web.dto.FeedImageResponse
@@ -223,6 +225,24 @@ class BoardDocumentTest : BaseDocumentTest() {
                 .then()
                 .statusCode(200)
         }
+
+        @Test
+        fun `존재하지 않는 게시판`() {
+            `when`(listFeedsUseCase.execute(any())).thenThrow(BoardException.boardNotFound())
+
+            val documentFilter = document("board/feeds", "BOARD_NOT_FOUND")
+                .request(request().applyConfig(apiConfig))
+                .response(RestDocumentationResponse.ERROR_RESPONSE)
+                .build()
+
+            given(documentFilter)
+                .headers(AUTH_HEADER)
+                .contentType(ContentType.JSON)
+                .`when`()
+                .get("/api/v1/boards/{boardId}/feeds", 999L)
+                .then()
+                .statusCode(404)
+        }
     }
 
     @Nested
@@ -278,6 +298,24 @@ class BoardDocumentTest : BaseDocumentTest() {
                 .get("/api/v1/boards/{boardId}/feeds/popular", boardId)
                 .then()
                 .statusCode(200)
+        }
+
+        @Test
+        fun `존재하지 않는 게시판`() {
+            `when`(getPopularFeedsUseCase.execute(any())).thenThrow(BoardException.boardNotFound())
+
+            val documentFilter = document("board/popular-feeds", "BOARD_NOT_FOUND")
+                .request(request().applyConfig(apiConfig))
+                .response(RestDocumentationResponse.ERROR_RESPONSE)
+                .build()
+
+            given(documentFilter)
+                .headers(AUTH_HEADER)
+                .contentType(ContentType.JSON)
+                .`when`()
+                .get("/api/v1/boards/{boardId}/feeds/popular", 999L)
+                .then()
+                .statusCode(404)
         }
     }
 }
