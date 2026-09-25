@@ -2,6 +2,7 @@ package com.example.mykku.contest.application.dto
 
 import com.example.mykku.contest.domain.vo.ContestStatusType
 import com.example.mykku.contest.domain.vo.ContestWinnerStatus
+import org.springframework.data.domain.Page
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -41,7 +42,20 @@ data class PagedContestsResult(
     val totalElements: Long,
     val totalPages: Int,
     val isLast: Boolean
-)
+) {
+    companion object {
+        fun <T> of(page: Page<T>, content: List<ContestListResult>): PagedContestsResult {
+            return PagedContestsResult(
+                content = content,
+                page = page.number,
+                size = page.size,
+                totalElements = page.totalElements,
+                totalPages = page.totalPages,
+                isLast = page.isLast
+            )
+        }
+    }
+}
 
 data class ContestDetailResult(
     val id: Long,
@@ -76,6 +90,66 @@ data class WinnerInfoResult(
     val authorNickname: String
 )
 
+data class ContestParticipantsResult(
+    val contest: ContestParticipantsHeaderResult,
+    val currentWinners: List<CurrentContestWinnerResult>,
+    val participants: PagedContestParticipantsResult
+)
+
+data class ContestParticipantsHeaderResult(
+    val id: Long,
+    val title: String,
+    val startedAt: LocalDateTime,
+    val expiredAt: LocalDateTime,
+    val status: ContestStatusType,
+    val tags: List<String>,
+    val winnerSelectable: Boolean
+)
+
+data class CurrentContestWinnerResult(
+    val participationId: Long,
+    val winnerRank: Int,
+    val awardTitle: String?,
+    val description: String,
+    val feedTitle: String,
+    val authorMemberId: String?
+)
+
+data class ContestParticipantResult(
+    val participationId: Long,
+    val feedId: Long,
+    val feedTitle: String,
+    val imageUrl: String?,
+    val authorMemberId: String?,
+    val authorNickname: String?,
+    val authorWithdrawn: Boolean,
+    val likeCount: Int,
+    val participatedAt: LocalDateTime,
+    val participatedBeforeStart: Boolean
+)
+
+data class PagedContestParticipantsResult(
+    val content: List<ContestParticipantResult>,
+    val page: Int,
+    val size: Int,
+    val totalElements: Long,
+    val totalPages: Int,
+    val isLast: Boolean
+) {
+    companion object {
+        fun <T> of(page: Page<T>, content: List<ContestParticipantResult>): PagedContestParticipantsResult {
+            return PagedContestParticipantsResult(
+                content = content,
+                page = page.number,
+                size = page.size,
+                totalElements = page.totalElements,
+                totalPages = page.totalPages,
+                isLast = page.isLast
+            )
+        }
+    }
+}
+
 data class ContestWinnersListResult(
     val contests: List<ContestWinnerPreviewResult>
 )
@@ -91,7 +165,7 @@ data class ContestWinnerPreviewResult(
 data class WinnerThumbnailResult(
     val winnerId: Long,
     val winnerRank: Int,
-    val feedImageUrl: String?
+    val feedImageUrl: String
 )
 
 data class ContestWinnerDetailResult(
@@ -106,9 +180,9 @@ data class WinnerDetailResult(
     val awardTitle: String?,
     val feedId: Long,
     val feedTitle: String,
-    val feedImageUrl: String?,
+    val feedImageUrl: String,
     val authorNickname: String,
-    val authorProfileImage: String?,
+    val authorProfileImage: String,
     val description: String,
     val acceptanceSpeech: String
 )
@@ -156,4 +230,21 @@ data class PagedMyAwardsResult(
 data class MyAwardPreviewResult(
     val contestId: Long,
     val thumbnailUrl: String
+)
+
+data class ContestDeletionSummaryResult(
+    val participationCount: Int,
+    val winnerCount: Int
+)
+
+data class ContestEditResult(
+    val id: Long,
+    val title: String,
+    val description: String?,
+    val startedAt: LocalDateTime,
+    val expiredAt: LocalDateTime,
+    val status: ContestStatusType,
+    val thumbnailUrl: String,
+    val imageUrls: List<String>,
+    val tags: List<String>
 )

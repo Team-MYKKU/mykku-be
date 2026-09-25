@@ -35,7 +35,7 @@ class BaseExceptionHandler {
     fun handleMethodArgumentNotValidException(
         exception: MethodArgumentNotValidException
     ): ResponseEntity<ErrorResponse> {
-        ExceptionLoggingSupport.logException(logger, exception)
+        ExceptionLoggingSupport.logException(logger, exception, CommonErrorCode.INVALID_INPUT.status)
 
         val errorMessage = exception.bindingResult.fieldErrors
             .joinToString(", ") { it.defaultMessage ?: CommonErrorCode.INVALID_INPUT.message }
@@ -50,12 +50,7 @@ class BaseExceptionHandler {
     fun handleHttpMessageNotReadableException(
         exception: HttpMessageNotReadableException
     ): ResponseEntity<ErrorResponse> {
-        ExceptionLoggingSupport.logException(logger, exception)
-
-        return ResponseEntity
-            .status(HttpStatus.BAD_REQUEST)
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(ErrorResponse(CommonErrorCode.INVALID_INPUT.code, CommonErrorCode.INVALID_INPUT.message))
+        return handle(exception, CommonErrorCode.INVALID_INPUT)
     }
 
     @ExceptionHandler(BaseException::class)
@@ -70,61 +65,47 @@ class BaseExceptionHandler {
 
     @ExceptionHandler(NoResourceFoundException::class, NoHandlerFoundException::class)
     fun handleEndpointNotFoundException(exception: Exception): ResponseEntity<ErrorResponse> {
-        ExceptionLoggingSupport.logException(logger, exception)
-
-        return errorResponseOf(CommonErrorCode.ENDPOINT_NOT_FOUND)
+        return handle(exception, CommonErrorCode.ENDPOINT_NOT_FOUND)
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException::class)
     fun handleMethodNotAllowedException(
         exception: HttpRequestMethodNotSupportedException
     ): ResponseEntity<ErrorResponse> {
-        ExceptionLoggingSupport.logException(logger, exception)
-
-        return errorResponseOf(CommonErrorCode.METHOD_NOT_ALLOWED)
+        return handle(exception, CommonErrorCode.METHOD_NOT_ALLOWED)
     }
 
     @ExceptionHandler(HttpMediaTypeNotSupportedException::class)
     fun handleUnsupportedMediaTypeException(
         exception: HttpMediaTypeNotSupportedException
     ): ResponseEntity<ErrorResponse> {
-        ExceptionLoggingSupport.logException(logger, exception)
-
-        return errorResponseOf(CommonErrorCode.UNSUPPORTED_MEDIA_TYPE)
+        return handle(exception, CommonErrorCode.UNSUPPORTED_MEDIA_TYPE)
     }
 
     @ExceptionHandler(HttpMediaTypeNotAcceptableException::class)
     fun handleNotAcceptableException(
         exception: HttpMediaTypeNotAcceptableException
     ): ResponseEntity<ErrorResponse> {
-        ExceptionLoggingSupport.logException(logger, exception)
-
-        return errorResponseOf(CommonErrorCode.NOT_ACCEPTABLE)
+        return handle(exception, CommonErrorCode.NOT_ACCEPTABLE)
     }
 
     @ExceptionHandler(MaxUploadSizeExceededException::class)
     fun handleMaxUploadSizeExceededException(
         exception: MaxUploadSizeExceededException
     ): ResponseEntity<ErrorResponse> {
-        ExceptionLoggingSupport.logException(logger, exception)
-
-        return errorResponseOf(CommonErrorCode.PAYLOAD_TOO_LARGE)
+        return handle(exception, CommonErrorCode.PAYLOAD_TOO_LARGE)
     }
 
     @ExceptionHandler(MultipartException::class)
     fun handleMultipartException(exception: MultipartException): ResponseEntity<ErrorResponse> {
-        ExceptionLoggingSupport.logException(logger, exception)
-
-        return errorResponseOf(CommonErrorCode.INVALID_MULTIPART_REQUEST)
+        return handle(exception, CommonErrorCode.INVALID_MULTIPART_REQUEST)
     }
 
     @ExceptionHandler(DataIntegrityViolationException::class)
     fun handleDataIntegrityViolationException(
         exception: DataIntegrityViolationException
     ): ResponseEntity<ErrorResponse> {
-        ExceptionLoggingSupport.logException(logger, exception)
-
-        return errorResponseOf(CommonErrorCode.DATA_INTEGRITY_VIOLATION)
+        return handle(exception, CommonErrorCode.DATA_INTEGRITY_VIOLATION)
     }
 
     @ExceptionHandler(
@@ -132,39 +113,35 @@ class BaseExceptionHandler {
         MissingServletRequestPartException::class
     )
     fun handleMissingRequestValueException(exception: Exception): ResponseEntity<ErrorResponse> {
-        ExceptionLoggingSupport.logException(logger, exception)
-
-        return errorResponseOf(CommonErrorCode.MISSING_REQUEST_PARAMETER)
+        return handle(exception, CommonErrorCode.MISSING_REQUEST_PARAMETER)
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException::class)
     fun handleParameterTypeMismatchException(
         exception: MethodArgumentTypeMismatchException
     ): ResponseEntity<ErrorResponse> {
-        ExceptionLoggingSupport.logException(logger, exception)
-
-        return errorResponseOf(CommonErrorCode.INVALID_PARAMETER_TYPE)
+        return handle(exception, CommonErrorCode.INVALID_PARAMETER_TYPE)
     }
 
     @ExceptionHandler(PessimisticLockingFailureException::class, QueryTimeoutException::class)
     fun handleLockConflictException(exception: Exception): ResponseEntity<ErrorResponse> {
-        ExceptionLoggingSupport.logException(logger, exception)
-
-        return errorResponseOf(CommonErrorCode.RESOURCE_LOCK_CONFLICT)
+        return handle(exception, CommonErrorCode.RESOURCE_LOCK_CONFLICT)
     }
 
     @ExceptionHandler(RedisException::class)
     fun handleRedisException(exception: RedisException): ResponseEntity<ErrorResponse> {
-        ExceptionLoggingSupport.logException(logger, exception)
-
-        return errorResponseOf(CommonErrorCode.REDIS_CONNECTION_FAILURE)
+        return handle(exception, CommonErrorCode.REDIS_CONNECTION_FAILURE)
     }
 
     @ExceptionHandler(Exception::class)
     fun handleException(exception: Exception): ResponseEntity<ErrorResponse> {
-        ExceptionLoggingSupport.logException(logger, exception)
+        return handle(exception, CommonErrorCode.INTERNAL_SERVER_ERROR)
+    }
 
-        return errorResponseOf(CommonErrorCode.INTERNAL_SERVER_ERROR)
+    private fun handle(exception: Exception, errorCode: CommonErrorCode): ResponseEntity<ErrorResponse> {
+        ExceptionLoggingSupport.logException(logger, exception, errorCode.status)
+
+        return errorResponseOf(errorCode)
     }
 
     private fun errorResponseOf(errorCode: CommonErrorCode): ResponseEntity<ErrorResponse> {

@@ -55,6 +55,8 @@ import com.example.mykku.feed.application.port.input.GetFeedDetailUseCase
 import com.example.mykku.feed.application.port.input.GetPopularFeedsUseCase
 import com.example.mykku.feed.application.port.input.GetMyFeedsUseCase
 import com.example.mykku.feed.application.port.input.ListFeedsUseCase
+import com.example.mykku.feed.application.port.input.SearchBoardFeedsUseCase
+import com.example.mykku.feed.application.port.input.SearchFeedsUseCase
 import com.example.mykku.feed.application.port.input.UpdateFeedCommentUseCase
 import com.example.mykku.feed.application.port.input.UpdateFeedUseCase
 import com.example.mykku.like.application.port.input.LikeBoardUseCase
@@ -356,6 +358,12 @@ abstract class BaseDocumentTest {
     protected lateinit var getPopularFeedsUseCase: GetPopularFeedsUseCase
 
     @MockitoBean
+    protected lateinit var searchFeedsUseCase: SearchFeedsUseCase
+
+    @MockitoBean
+    protected lateinit var searchBoardFeedsUseCase: SearchBoardFeedsUseCase
+
+    @MockitoBean
     protected lateinit var createFeedCommentUseCase: CreateFeedCommentUseCase
 
     @MockitoBean
@@ -377,6 +385,12 @@ abstract class BaseDocumentTest {
 
         val AUTH_HEADER_DESCRIPTOR: List<HeaderDescriptor> = listOf(
             headerWithName(HttpHeaders.AUTHORIZATION).description("Bearer {JWT 액세스 토큰}")
+        )
+
+        val OPTIONAL_AUTH_HEADER_DESCRIPTOR: List<HeaderDescriptor> = listOf(
+            headerWithName(HttpHeaders.AUTHORIZATION)
+                .description("Bearer {JWT 액세스 토큰} (선택). 보내면 로그인 회원 기준으로 응답이 계산되고, 없거나 유효하지 않은 토큰은 401 없이 비로그인으로 처리됨")
+                .optional()
         )
     }
 
@@ -438,6 +452,7 @@ abstract class BaseDocumentTest {
         )
 
         doReturn(true).`when`(jwtTokenProvider).validateToken(TEST_ACCESS_TOKEN)
+        doReturn(true).`when`(jwtTokenProvider).isAccessToken(TEST_ACCESS_TOKEN)
         doReturn(testMember.id).`when`(jwtTokenProvider).getMemberIdFromToken(TEST_ACCESS_TOKEN)
     }
 
@@ -446,9 +461,6 @@ abstract class BaseDocumentTest {
     protected fun response(): RestDocumentationResponse = RestDocumentationResponse()
 
     protected fun RestDocumentationRequest.applyConfig(config: ApiRequestConfig): RestDocumentationRequest {
-        tag(config.tag)
-        summary(config.summary)
-        description(config.description)
         if (config.pathParameters.isNotEmpty()) {
             pathParameter(*config.pathParameters.toTypedArray())
         }

@@ -15,6 +15,7 @@ import com.example.mykku.like.exception.LikeErrorCode
 import com.example.mykku.member.exception.MemberErrorCode
 import com.example.mykku.notification.exception.NotificationErrorCode
 import com.example.mykku.preference.exception.PreferenceErrorCode
+import com.example.mykku.report.exception.ReportErrorCode
 import com.example.mykku.role.exception.RoleErrorCode
 
 object ErrorCodeRegistry {
@@ -36,6 +37,7 @@ object ErrorCodeRegistry {
         "member" to MemberErrorCode.entries,
         "notification" to NotificationErrorCode.entries,
         "preference" to PreferenceErrorCode.entries,
+        "report" to ReportErrorCode.entries,
         "role" to RoleErrorCode.entries
     )
 

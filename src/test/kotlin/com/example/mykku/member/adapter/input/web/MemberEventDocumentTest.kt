@@ -2,7 +2,6 @@ package com.example.mykku.member.adapter.input.web
 
 import com.example.mykku.BaseDocumentTest
 import com.example.mykku.docs.ApiRequestConfig
-import com.example.mykku.docs.Tag
 import com.example.mykku.event.application.dto.MyParticipatedEventResult
 import com.example.mykku.event.application.dto.PagedMyParticipatedEventsResult
 import com.example.mykku.event.domain.vo.EventStatusType
@@ -25,12 +24,9 @@ class MemberEventDocumentTest : BaseDocumentTest() {
     inner class GetMyParticipatedEvents {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.MEMBER_API,
-            summary = "내가 참여한 이벤트 목록 조회",
-            description = "현재 로그인한 회원이 참여한 이벤트 목록을 조회합니다. 각 이벤트의 당첨 여부를 포함합니다.",
             queryParameters = listOf(
-                parameterWithName("page").description("페이지 번호 (0부터 시작, 기본값: 0)").optional(),
-                parameterWithName("size").description("페이지 크기 (기본값: 20)").optional()
+                parameterWithName("page").description("페이지 번호 (0부터 시작, 0 이상, 기본값: 0)").optional(),
+                parameterWithName("size").description("페이지 크기 (1~1000, 기본값: 20)").optional()
             ),
             headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
@@ -50,8 +46,8 @@ class MemberEventDocumentTest : BaseDocumentTest() {
                 MyParticipatedEventResult(
                     id = 2L,
                     title = "두 번째 이벤트",
-                    startedAt = LocalDateTime.of(2025, 1, 1, 0, 0, 0),
-                    expiredAt = LocalDateTime.of(2025, 11, 30, 23, 59, 59),
+                    startedAt = LocalDateTime.of(2030, 1, 1, 0, 0, 0),
+                    expiredAt = LocalDateTime.of(2030, 11, 30, 23, 59, 59),
                     status = EventStatusType.ACTIVE,
                     thumbnailUrl = "https://example.com/thumbnail2.jpg",
                     winnerStatus = EventWinnerStatus.PENDING
@@ -79,13 +75,31 @@ class MemberEventDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.content[]").type(JsonFieldType.ARRAY).description("이벤트 목록"),
                             fieldWithPath("data.content[].id").type(JsonFieldType.NUMBER).description("이벤트 ID"),
                             fieldWithPath("data.content[].title").type(JsonFieldType.STRING).description("이벤트 제목"),
-                            fieldWithPath("data.content[].startedAt").type(JsonFieldType.STRING).description("시작일"),
-                            fieldWithPath("data.content[].expiredAt").type(JsonFieldType.STRING).description("만료일"),
-                            fieldWithPath("data.content[].status").type(JsonFieldType.STRING).description("이벤트 상태"),
+                            fieldWithPath("data.content[].startedAt").type(JsonFieldType.STRING)
+                                .description("이벤트 시작 일시 (yyyy-MM-dd'T'HH:mm:ss, KST, 오프셋 없음)"),
+                            fieldWithPath("data.content[].expiredAt").type(JsonFieldType.STRING)
+                                .description(
+                                    "이벤트 마감 일시 (yyyy-MM-dd'T'HH:mm:ss, KST, 오프셋 없음). " +
+                                        "이 시각부터 status가 EXPIRED로 바뀜 (당첨자 선정 전까지)"
+                                ),
+                            fieldWithPath("data.content[].status").type(JsonFieldType.STRING)
+                                .description(
+                                    "이벤트 상태 (ACTIVE: 마감 전으로 현재 시각이 expiredAt 이전, " +
+                                        "startedAt 이전인 시작 전 이벤트도 ACTIVE, " +
+                                        "EXPIRED: 현재 시각이 expiredAt 이후(같은 시각 포함)이고 아직 당첨자 미선정, " +
+                                        "WINNER_SELECTED: 당첨자 선정 완료). " +
+                                        "이 API에서는 WINNER_SELECTING, ALL은 반환되지 않음"
+                                ),
                             fieldWithPath("data.content[].thumbnailUrl").type(JsonFieldType.STRING)
-                                .description("썸네일 이미지 URL").optional(),
+                                .description("이벤트 썸네일 이미지 URL (항상 존재)"),
                             fieldWithPath("data.content[].winnerStatus").type(JsonFieldType.STRING)
-                                .description("당첨 상태 (WON: 당첨, LOST: 낙첨, PENDING: 발표 전)"),
+                                .description(
+                                    "당첨 상태 (WON: 본인이 당첨자로 선정됨, " +
+                                        "LOST: 당첨자 선정이 끝났지만 본인은 미당첨, " +
+                                        "PENDING: 아직 당첨자가 선정되지 않음). " +
+                                        "status가 WINNER_SELECTED일 때만 WON 또는 LOST이며 " +
+                                        "ACTIVE·EXPIRED이면 항상 PENDING. 당첨자 발표 공지글 게시 여부와는 무관"
+                                ),
                             fieldWithPath("data.page").type(JsonFieldType.NUMBER).description("현재 페이지 번호"),
                             fieldWithPath("data.size").type(JsonFieldType.NUMBER).description("페이지 크기"),
                             fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER).description("전체 요소 수"),

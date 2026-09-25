@@ -63,7 +63,7 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x gradlew
 
-      - name: Build with Gradle (includes tests and OpenAPI generation)
+      - name: Build with Gradle (includes tests and API docs generation)
         run: ./gradlew clean build --info
 
       - name: Prepare JAR for Docker

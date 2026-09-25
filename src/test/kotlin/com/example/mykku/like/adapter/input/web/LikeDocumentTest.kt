@@ -1,9 +1,11 @@
 package com.example.mykku.like.adapter.input.web
 
 import com.example.mykku.BaseDocumentTest
+import com.example.mykku.board.exception.BoardException
+import com.example.mykku.dailymessage.exception.DailyMessageException
 import com.example.mykku.docs.ApiRequestConfig
 import com.example.mykku.docs.RestDocumentationResponse
-import com.example.mykku.docs.Tag
+import com.example.mykku.feed.exception.FeedException
 import com.example.mykku.like.application.dto.LikeBoardInfoResult
 import com.example.mykku.like.application.dto.LikeBoardResult
 import com.example.mykku.like.application.dto.LikeDailyMessageCommentResult
@@ -18,8 +20,10 @@ import org.junit.jupiter.api.Test
 import org.mockito.Mockito.doNothing
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
 import org.springframework.restdocs.request.RequestDocumentation.parameterWithName
@@ -31,12 +35,9 @@ class LikeDocumentTest : BaseDocumentTest() {
     inner class GetLikedBoards {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.LIKE_API,
-            summary = "즐겨찾기한 게시판 목록 조회",
-            description = "사용자가 즐겨찾기한 게시판 목록을 조회합니다.",
             queryParameters = listOf(
-                parameterWithName("page").description("페이지 번호 (기본값: 0)").optional(),
-                parameterWithName("size").description("페이지 크기 (기본값: 20)").optional()
+                parameterWithName("page").description("페이지 번호 (0부터 시작, 0 이상, 기본값: 0)").optional(),
+                parameterWithName("size").description("페이지 크기 (1 이상 1000 이하, 기본값: 20)").optional()
             ),
             headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
@@ -47,7 +48,7 @@ class LikeDocumentTest : BaseDocumentTest() {
                 LikeBoardInfoResult(id = 1L, title = "자유게시판", logo = "https://example.com/logo1.png"),
                 LikeBoardInfoResult(id = 2L, title = "질문게시판", logo = "https://example.com/logo2.png")
             )
-            val pageable = PageRequest.of(0, 20)
+            val pageable = PageRequest.of(0, 20, Sort.by(Sort.Direction.DESC, "createdAt"))
             val page = PageImpl(likedBoards, pageable, 2)
 
             `when`(likeBoardUseCase.getLikedBoards(any())).thenReturn(page)
@@ -58,31 +59,39 @@ class LikeDocumentTest : BaseDocumentTest() {
                     response()
                         .responseBodyField(
                             fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-                            fieldWithPath("data.content[]").type(JsonFieldType.ARRAY).description("즐겨찾기한 게시판 목록"),
-                            fieldWithPath("data.content[].id").type(JsonFieldType.NUMBER).description("게시판 ID"),
+                            fieldWithPath("data.content[]").type(JsonFieldType.ARRAY)
+                                .description("즐겨찾기한 게시판 목록 (즐겨찾기한 시각 최신순)"),
+                            fieldWithPath("data.content[].id").type(JsonFieldType.NUMBER)
+                                .description("즐겨찾기 레코드 ID (게시판 ID 아님)"),
                             fieldWithPath("data.content[].title").type(JsonFieldType.STRING).description("게시판 제목"),
                             fieldWithPath("data.content[].logo").type(JsonFieldType.STRING).description("게시판 로고 URL"),
                             fieldWithPath("data.pageable").type(JsonFieldType.OBJECT).description("페이지 정보"),
                             fieldWithPath("data.pageable.pageNumber").type(JsonFieldType.NUMBER)
-                                .description("현재 페이지 번호"),
+                                .description("현재 페이지 번호 (0부터 시작)"),
                             fieldWithPath("data.pageable.pageSize").type(JsonFieldType.NUMBER).description("페이지 크기"),
-                            fieldWithPath("data.pageable.sort").type(JsonFieldType.OBJECT).description("정렬 정보"),
+                            fieldWithPath("data.pageable.sort").type(JsonFieldType.OBJECT)
+                                .description("정렬 정보 (항상 createdAt 내림차순)"),
                             fieldWithPath("data.pageable.sort.empty").type(JsonFieldType.BOOLEAN)
-                                .description("정렬 정보 비어있음"),
-                            fieldWithPath("data.pageable.sort.sorted").type(JsonFieldType.BOOLEAN).description("정렬됨"),
+                                .description("정렬 조건이 없는지 여부 (항상 false)"),
+                            fieldWithPath("data.pageable.sort.sorted").type(JsonFieldType.BOOLEAN)
+                                .description("정렬 적용 여부 (항상 true)"),
                             fieldWithPath("data.pageable.sort.unsorted").type(JsonFieldType.BOOLEAN)
-                                .description("정렬되지 않음"),
+                                .description("정렬 미적용 여부 (항상 false)"),
                             fieldWithPath("data.pageable.offset").type(JsonFieldType.NUMBER).description("오프셋"),
                             fieldWithPath("data.pageable.paged").type(JsonFieldType.BOOLEAN).description("페이지네이션 여부"),
                             fieldWithPath("data.pageable.unpaged").type(JsonFieldType.BOOLEAN).description("페이지네이션 아님"),
                             fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER).description("전체 요소 수"),
                             fieldWithPath("data.totalPages").type(JsonFieldType.NUMBER).description("전체 페이지 수"),
                             fieldWithPath("data.size").type(JsonFieldType.NUMBER).description("페이지 크기"),
-                            fieldWithPath("data.number").type(JsonFieldType.NUMBER).description("현재 페이지 번호"),
-                            fieldWithPath("data.sort").type(JsonFieldType.OBJECT).description("정렬 정보"),
-                            fieldWithPath("data.sort.empty").type(JsonFieldType.BOOLEAN).description("정렬 정보 비어있음"),
-                            fieldWithPath("data.sort.sorted").type(JsonFieldType.BOOLEAN).description("정렬됨"),
-                            fieldWithPath("data.sort.unsorted").type(JsonFieldType.BOOLEAN).description("정렬되지 않음"),
+                            fieldWithPath("data.number").type(JsonFieldType.NUMBER).description("현재 페이지 번호 (0부터 시작)"),
+                            fieldWithPath("data.sort").type(JsonFieldType.OBJECT)
+                                .description("정렬 정보 (항상 createdAt 내림차순)"),
+                            fieldWithPath("data.sort.empty").type(JsonFieldType.BOOLEAN)
+                                .description("정렬 조건이 없는지 여부 (항상 false)"),
+                            fieldWithPath("data.sort.sorted").type(JsonFieldType.BOOLEAN)
+                                .description("정렬 적용 여부 (항상 true)"),
+                            fieldWithPath("data.sort.unsorted").type(JsonFieldType.BOOLEAN)
+                                .description("정렬 미적용 여부 (항상 false)"),
                             fieldWithPath("data.first").type(JsonFieldType.BOOLEAN).description("첫 페이지 여부"),
                             fieldWithPath("data.last").type(JsonFieldType.BOOLEAN).description("마지막 페이지 여부"),
                             fieldWithPath("data.numberOfElements").type(JsonFieldType.NUMBER)
@@ -109,9 +118,6 @@ class LikeDocumentTest : BaseDocumentTest() {
     inner class LikeBoard {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.LIKE_API,
-            summary = "게시판 즐겨찾기",
-            description = "게시판을 즐겨찾기에 추가합니다.",
             pathParameters = listOf(
                 parameterWithName("boardId").description("즐겨찾기할 게시판 ID")
             ),
@@ -131,10 +137,13 @@ class LikeDocumentTest : BaseDocumentTest() {
                     response()
                         .responseBodyField(
                             fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("좋아요 정보"),
-                            fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("좋아요 ID"),
-                            fieldWithPath("data.memberId").type(JsonFieldType.STRING).description("회원 ID"),
-                            fieldWithPath("data.boardId").type(JsonFieldType.NUMBER).description("게시판 ID")
+                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("생성된 즐겨찾기 정보"),
+                            fieldWithPath("data.id").type(JsonFieldType.NUMBER)
+                                .description("생성된 즐겨찾기 레코드 ID (게시판 ID 아님). 즐겨찾기 취소는 boardId로 요청"),
+                            fieldWithPath("data.memberId").type(JsonFieldType.STRING)
+                                .description("즐겨찾기한 회원(요청자 본인)의 아이디 (회원이 설정한 문자열 ID, DB PK 아님). 프로필 설정 전이면 null")
+                                .optional(),
+                            fieldWithPath("data.boardId").type(JsonFieldType.NUMBER).description("즐겨찾기한 게시판 ID")
                         )
                 )
                 .build()
@@ -168,6 +177,48 @@ class LikeDocumentTest : BaseDocumentTest() {
                 .then()
                 .statusCode(400)
         }
+
+        @Test
+        fun `존재하지 않는 게시판`() {
+            val boardId = 999L
+
+            `when`(likeBoardUseCase.likeBoard(any()))
+                .thenThrow(BoardException.boardNotFound())
+
+            val documentFilter = document("like/board-create", "BOARD_NOT_FOUND")
+                .request(request().applyConfig(apiConfig))
+                .response(RestDocumentationResponse.ERROR_RESPONSE)
+                .build()
+
+            given(documentFilter)
+                .headers(AUTH_HEADER)
+                .contentType(ContentType.JSON)
+                .`when`()
+                .post("/api/v1/likes/boards/{boardId}", boardId)
+                .then()
+                .statusCode(404)
+        }
+
+        @Test
+        fun `동시 중복 요청으로 저장이 거부된 경우`() {
+            val boardId = 1L
+
+            `when`(likeBoardUseCase.likeBoard(any()))
+                .thenThrow(DataIntegrityViolationException("Duplicate entry"))
+
+            val documentFilter = document("like/board-create", "DATA_INTEGRITY_VIOLATION")
+                .request(request().applyConfig(apiConfig))
+                .response(RestDocumentationResponse.ERROR_RESPONSE)
+                .build()
+
+            given(documentFilter)
+                .headers(AUTH_HEADER)
+                .contentType(ContentType.JSON)
+                .`when`()
+                .post("/api/v1/likes/boards/{boardId}", boardId)
+                .then()
+                .statusCode(409)
+        }
     }
 
     @Nested
@@ -175,9 +226,6 @@ class LikeDocumentTest : BaseDocumentTest() {
     inner class UnlikeBoard {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.LIKE_API,
-            summary = "게시판 즐겨찾기 취소",
-            description = "게시판 즐겨찾기를 취소합니다.",
             pathParameters = listOf(
                 parameterWithName("boardId").description("즐겨찾기 취소할 게시판 ID")
             ),
@@ -196,7 +244,7 @@ class LikeDocumentTest : BaseDocumentTest() {
                     response()
                         .responseBodyField(
                             fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터").optional()
+                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("항상 빈 객체({})")
                         )
                 )
                 .build()
@@ -237,9 +285,6 @@ class LikeDocumentTest : BaseDocumentTest() {
     inner class LikeFeed {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.LIKE_API,
-            summary = "피드 좋아요",
-            description = "피드에 좋아요를 누릅니다.",
             pathParameters = listOf(
                 parameterWithName("feedId").description("좋아요할 피드 ID")
             ),
@@ -259,10 +304,13 @@ class LikeDocumentTest : BaseDocumentTest() {
                     response()
                         .responseBodyField(
                             fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("좋아요 정보"),
-                            fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("좋아요 ID"),
-                            fieldWithPath("data.memberId").type(JsonFieldType.STRING).description("회원 ID"),
-                            fieldWithPath("data.feedId").type(JsonFieldType.NUMBER).description("피드 ID")
+                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("생성된 좋아요 정보"),
+                            fieldWithPath("data.id").type(JsonFieldType.NUMBER)
+                                .description("생성된 좋아요 레코드 ID (피드 ID 아님). 좋아요 취소는 feedId로 요청"),
+                            fieldWithPath("data.memberId").type(JsonFieldType.STRING)
+                                .description("좋아요한 회원(요청자 본인)의 아이디 (회원이 설정한 문자열 ID, DB PK 아님). 프로필 설정 전이면 null")
+                                .optional(),
+                            fieldWithPath("data.feedId").type(JsonFieldType.NUMBER).description("좋아요한 피드 ID")
                         )
                 )
                 .build()
@@ -296,6 +344,48 @@ class LikeDocumentTest : BaseDocumentTest() {
                 .then()
                 .statusCode(400)
         }
+
+        @Test
+        fun `존재하지 않는 피드`() {
+            val feedId = 999L
+
+            `when`(likeFeedUseCase.likeFeed(any()))
+                .thenThrow(FeedException.feedNotFound())
+
+            val documentFilter = document("like/feed-create", "FEED_NOT_FOUND")
+                .request(request().applyConfig(apiConfig))
+                .response(RestDocumentationResponse.ERROR_RESPONSE)
+                .build()
+
+            given(documentFilter)
+                .headers(AUTH_HEADER)
+                .contentType(ContentType.JSON)
+                .`when`()
+                .post("/api/v1/likes/feeds/{feedId}", feedId)
+                .then()
+                .statusCode(404)
+        }
+
+        @Test
+        fun `동시 중복 요청으로 저장이 거부된 경우`() {
+            val feedId = 10L
+
+            `when`(likeFeedUseCase.likeFeed(any()))
+                .thenThrow(DataIntegrityViolationException("Duplicate entry"))
+
+            val documentFilter = document("like/feed-create", "DATA_INTEGRITY_VIOLATION")
+                .request(request().applyConfig(apiConfig))
+                .response(RestDocumentationResponse.ERROR_RESPONSE)
+                .build()
+
+            given(documentFilter)
+                .headers(AUTH_HEADER)
+                .contentType(ContentType.JSON)
+                .`when`()
+                .post("/api/v1/likes/feeds/{feedId}", feedId)
+                .then()
+                .statusCode(409)
+        }
     }
 
     @Nested
@@ -303,9 +393,6 @@ class LikeDocumentTest : BaseDocumentTest() {
     inner class UnlikeFeed {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.LIKE_API,
-            summary = "피드 좋아요 취소",
-            description = "피드 좋아요를 취소합니다.",
             pathParameters = listOf(
                 parameterWithName("feedId").description("좋아요 취소할 피드 ID")
             ),
@@ -324,7 +411,7 @@ class LikeDocumentTest : BaseDocumentTest() {
                     response()
                         .responseBodyField(
                             fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터").optional()
+                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("항상 빈 객체({})")
                         )
                 )
                 .build()
@@ -361,15 +448,12 @@ class LikeDocumentTest : BaseDocumentTest() {
     }
 
     @Nested
-    @DisplayName("댓글 좋아요")
+    @DisplayName("피드 댓글 좋아요")
     inner class LikeFeedComment {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.LIKE_API,
-            summary = "댓글 좋아요",
-            description = "댓글에 좋아요를 누릅니다.",
             pathParameters = listOf(
-                parameterWithName("feedCommentId").description("좋아요할 댓글 ID")
+                parameterWithName("feedCommentId").description("좋아요할 피드 댓글 ID (답글 ID도 가능)")
             ),
             headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
@@ -387,10 +471,14 @@ class LikeDocumentTest : BaseDocumentTest() {
                     response()
                         .responseBodyField(
                             fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("좋아요 정보"),
-                            fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("좋아요 ID"),
-                            fieldWithPath("data.memberId").type(JsonFieldType.STRING).description("회원 ID"),
-                            fieldWithPath("data.feedCommentId").type(JsonFieldType.NUMBER).description("댓글 ID")
+                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("생성된 좋아요 정보"),
+                            fieldWithPath("data.id").type(JsonFieldType.NUMBER)
+                                .description("생성된 좋아요 레코드 ID (댓글 ID 아님). 좋아요 취소는 feedCommentId로 요청"),
+                            fieldWithPath("data.memberId").type(JsonFieldType.STRING)
+                                .description("좋아요한 회원(요청자 본인)의 아이디 (회원이 설정한 문자열 ID, DB PK 아님). 프로필 설정 전이면 null")
+                                .optional(),
+                            fieldWithPath("data.feedCommentId").type(JsonFieldType.NUMBER)
+                                .description("좋아요한 피드 댓글(답글) ID")
                         )
                 )
                 .build()
@@ -424,18 +512,57 @@ class LikeDocumentTest : BaseDocumentTest() {
                 .then()
                 .statusCode(400)
         }
+
+        @Test
+        fun `존재하지 않는 피드 댓글`() {
+            val feedCommentId = 999L
+
+            `when`(likeFeedCommentUseCase.likeFeedComment(any()))
+                .thenThrow(FeedException.feedCommentNotFound())
+
+            val documentFilter = document("like/comment-create", "FEED_COMMENT_NOT_FOUND")
+                .request(request().applyConfig(apiConfig))
+                .response(RestDocumentationResponse.ERROR_RESPONSE)
+                .build()
+
+            given(documentFilter)
+                .headers(AUTH_HEADER)
+                .contentType(ContentType.JSON)
+                .`when`()
+                .post("/api/v1/likes/feed-comments/{feedCommentId}", feedCommentId)
+                .then()
+                .statusCode(404)
+        }
+
+        @Test
+        fun `동시 중복 요청으로 저장이 거부된 경우`() {
+            val feedCommentId = 20L
+
+            `when`(likeFeedCommentUseCase.likeFeedComment(any()))
+                .thenThrow(DataIntegrityViolationException("Duplicate entry"))
+
+            val documentFilter = document("like/comment-create", "DATA_INTEGRITY_VIOLATION")
+                .request(request().applyConfig(apiConfig))
+                .response(RestDocumentationResponse.ERROR_RESPONSE)
+                .build()
+
+            given(documentFilter)
+                .headers(AUTH_HEADER)
+                .contentType(ContentType.JSON)
+                .`when`()
+                .post("/api/v1/likes/feed-comments/{feedCommentId}", feedCommentId)
+                .then()
+                .statusCode(409)
+        }
     }
 
     @Nested
-    @DisplayName("댓글 좋아요 취소")
+    @DisplayName("피드 댓글 좋아요 취소")
     inner class UnlikeFeedComment {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.LIKE_API,
-            summary = "댓글 좋아요 취소",
-            description = "댓글 좋아요를 취소합니다.",
             pathParameters = listOf(
-                parameterWithName("feedCommentId").description("좋아요 취소할 댓글 ID")
+                parameterWithName("feedCommentId").description("좋아요 취소할 피드 댓글 ID (답글 ID도 가능)")
             ),
             headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
@@ -452,7 +579,7 @@ class LikeDocumentTest : BaseDocumentTest() {
                     response()
                         .responseBodyField(
                             fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터").optional()
+                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("항상 빈 객체({})")
                         )
                 )
                 .build()
@@ -493,11 +620,8 @@ class LikeDocumentTest : BaseDocumentTest() {
     inner class LikeDailyMessageComment {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.LIKE_API,
-            summary = "하루 덕담 댓글 좋아요",
-            description = "하루 덕담 댓글에 좋아요를 누릅니다.",
             pathParameters = listOf(
-                parameterWithName("id").description("좋아요할 하루 덕담 댓글 ID")
+                parameterWithName("dailyMessageCommentId").description("좋아요할 하루 덕담 댓글 ID (답글 ID도 가능)")
             ),
             headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
@@ -505,7 +629,11 @@ class LikeDocumentTest : BaseDocumentTest() {
         @Test
         fun `성공`() {
             val dailyMessageCommentId = 30L
-            val response = LikeDailyMessageCommentResult(id = 1L, memberId = testMember.id, dailyMessageCommentId = dailyMessageCommentId)
+            val response = LikeDailyMessageCommentResult(
+                id = 1L,
+                memberId = testMember.id,
+                dailyMessageCommentId = dailyMessageCommentId
+            )
 
             `when`(likeDailyMessageCommentUseCase.likeDailyMessageComment(any())).thenReturn(response)
 
@@ -515,11 +643,14 @@ class LikeDocumentTest : BaseDocumentTest() {
                     response()
                         .responseBodyField(
                             fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("좋아요 정보"),
-                            fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("좋아요 ID"),
-                            fieldWithPath("data.memberId").type(JsonFieldType.STRING).description("회원 ID"),
+                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("생성된 좋아요 정보"),
+                            fieldWithPath("data.id").type(JsonFieldType.NUMBER)
+                                .description("생성된 좋아요 레코드 ID (댓글 ID 아님). 좋아요 취소는 dailyMessageCommentId로 요청"),
+                            fieldWithPath("data.memberId").type(JsonFieldType.STRING)
+                                .description("좋아요한 회원(요청자 본인)의 아이디 (회원이 설정한 문자열 ID, DB PK 아님). 프로필 설정 전이면 null")
+                                .optional(),
                             fieldWithPath("data.dailyMessageCommentId").type(JsonFieldType.NUMBER)
-                                .description("하루 덕담 댓글 ID")
+                                .description("좋아요한 하루 덕담 댓글(답글) ID")
                         )
                 )
                 .build()
@@ -528,7 +659,7 @@ class LikeDocumentTest : BaseDocumentTest() {
                 .headers(AUTH_HEADER)
                 .contentType(ContentType.JSON)
                 .`when`()
-                .post("/api/v1/likes/daily-message-comments/{id}", dailyMessageCommentId)
+                .post("/api/v1/likes/daily-message-comments/{dailyMessageCommentId}", dailyMessageCommentId)
                 .then()
                 .statusCode(200)
         }
@@ -550,9 +681,53 @@ class LikeDocumentTest : BaseDocumentTest() {
                 .headers(AUTH_HEADER)
                 .contentType(ContentType.JSON)
                 .`when`()
-                .post("/api/v1/likes/daily-message-comments/{id}", dailyMessageCommentId)
+                .post("/api/v1/likes/daily-message-comments/{dailyMessageCommentId}", dailyMessageCommentId)
                 .then()
                 .statusCode(400)
+        }
+
+        @Test
+        fun `존재하지 않는 하루 덕담 댓글`() {
+            val dailyMessageCommentId = 999L
+
+            `when`(likeDailyMessageCommentUseCase.likeDailyMessageComment(any()))
+                .thenThrow(DailyMessageException.dailyMessageCommentNotFound())
+
+            val documentFilter =
+                document("like/daily-message-comment-create", "DAILY_MESSAGE_COMMENT_NOT_FOUND")
+                    .request(request().applyConfig(apiConfig))
+                    .response(RestDocumentationResponse.ERROR_RESPONSE)
+                    .build()
+
+            given(documentFilter)
+                .headers(AUTH_HEADER)
+                .contentType(ContentType.JSON)
+                .`when`()
+                .post("/api/v1/likes/daily-message-comments/{dailyMessageCommentId}", dailyMessageCommentId)
+                .then()
+                .statusCode(404)
+        }
+
+        @Test
+        fun `동시 중복 요청으로 저장이 거부된 경우`() {
+            val dailyMessageCommentId = 30L
+
+            `when`(likeDailyMessageCommentUseCase.likeDailyMessageComment(any()))
+                .thenThrow(DataIntegrityViolationException("Duplicate entry"))
+
+            val documentFilter =
+                document("like/daily-message-comment-create", "DATA_INTEGRITY_VIOLATION")
+                    .request(request().applyConfig(apiConfig))
+                    .response(RestDocumentationResponse.ERROR_RESPONSE)
+                    .build()
+
+            given(documentFilter)
+                .headers(AUTH_HEADER)
+                .contentType(ContentType.JSON)
+                .`when`()
+                .post("/api/v1/likes/daily-message-comments/{dailyMessageCommentId}", dailyMessageCommentId)
+                .then()
+                .statusCode(409)
         }
     }
 
@@ -561,11 +736,9 @@ class LikeDocumentTest : BaseDocumentTest() {
     inner class UnlikeDailyMessageComment {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.LIKE_API,
-            summary = "하루 덕담 댓글 좋아요 취소",
-            description = "하루 덕담 댓글 좋아요를 취소합니다.",
             pathParameters = listOf(
-                parameterWithName("id").description("좋아요 취소할 하루 덕담 댓글 ID")
+                parameterWithName("dailyMessageCommentId")
+                    .description("좋아요 취소할 하루 덕담 댓글 ID (답글 ID도 가능)")
             ),
             headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
@@ -582,7 +755,7 @@ class LikeDocumentTest : BaseDocumentTest() {
                     response()
                         .responseBodyField(
                             fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터").optional()
+                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("항상 빈 객체({})")
                         )
                 )
                 .build()
@@ -591,7 +764,7 @@ class LikeDocumentTest : BaseDocumentTest() {
                 .headers(AUTH_HEADER)
                 .contentType(ContentType.JSON)
                 .`when`()
-                .delete("/api/v1/likes/daily-message-comments/{id}", dailyMessageCommentId)
+                .delete("/api/v1/likes/daily-message-comments/{dailyMessageCommentId}", dailyMessageCommentId)
                 .then()
                 .statusCode(200)
         }
@@ -603,16 +776,17 @@ class LikeDocumentTest : BaseDocumentTest() {
             `when`(likeDailyMessageCommentUseCase.unlikeDailyMessageComment(any()))
                 .thenThrow(LikeException(LikeErrorCode.LIKE_DAILY_MESSAGE_COMMENT_NOT_FOUND))
 
-            val documentFilter = document("like/daily-message-comment-delete", "LIKE_DAILY_MESSAGE_COMMENT_NOT_FOUND")
-                .request(request().applyConfig(apiConfig))
-                .response(RestDocumentationResponse.ERROR_RESPONSE)
-                .build()
+            val documentFilter =
+                document("like/daily-message-comment-delete", "LIKE_DAILY_MESSAGE_COMMENT_NOT_FOUND")
+                    .request(request().applyConfig(apiConfig))
+                    .response(RestDocumentationResponse.ERROR_RESPONSE)
+                    .build()
 
             given(documentFilter)
                 .headers(AUTH_HEADER)
                 .contentType(ContentType.JSON)
                 .`when`()
-                .delete("/api/v1/likes/daily-message-comments/{id}", dailyMessageCommentId)
+                .delete("/api/v1/likes/daily-message-comments/{dailyMessageCommentId}", dailyMessageCommentId)
                 .then()
                 .statusCode(404)
         }

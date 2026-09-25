@@ -62,6 +62,43 @@ class ContestWinnerControllerTest : BaseControllerTest() {
     }
 
     @Test
+    @DisplayName("수상작 목록 조회 - 이미지가 없는 수상 피드는 콘테스트 썸네일을 feedImageUrl로 준다")
+    fun `getContestsWithWinners - 피드 이미지가 없으면 콘테스트 썸네일을 준다`() {
+        val member = createAndSaveMember()
+        val contest = createAndSaveContest(status = ContestStatusType.WINNER_SELECTED)
+        val participation = createAndSaveParticipation(member, contest, createAndSaveFeed(member, createAndSaveBoard()))
+        createAndSaveWinner(contest, participation, winnerRank = 1)
+
+        RestAssured.given()
+            .`when`()
+            .get("/api/v1/contests/winners")
+            .then()
+            .statusCode(200)
+            .body("data.contests[0].winners[0].feedImageUrl", equalTo("https://example.com/thumbnail.jpg"))
+    }
+
+    @Test
+    @DisplayName("수상작 상세 조회 - 피드 이미지가 없고 작성자가 탈퇴했으면 빈 문자열을 준다")
+    fun `getContestWinnerDetail - 이미지 없음과 탈퇴 작성자는 빈 문자열이다`() {
+        val member = createAndSaveMember()
+        val contest = createAndSaveContest(status = ContestStatusType.WINNER_SELECTED)
+        val feed = createAndSaveFeed(member, createAndSaveBoard())
+        val participation = contestParticipationJpaRepository.save(
+            ContestParticipationJpaEntity(member = null, contest = contest, feed = feed)
+        )
+        createAndSaveWinner(contest, participation, winnerRank = 1)
+
+        RestAssured.given()
+            .`when`()
+            .get("/api/v1/contests/{contestId}/winners", contest.id)
+            .then()
+            .statusCode(200)
+            .body("data.winners[0].feedImageUrl", equalTo(""))
+            .body("data.winners[0].authorProfileImage", equalTo(""))
+            .body("data.winners[0].authorNickname", equalTo(""))
+    }
+
+    @Test
     @DisplayName("수상작 상세 조회 - 정상 케이스")
     fun `getContestWinnerDetail - 정상적으로 수상작 상세를 조회한다`() {
         val member = createAndSaveMember()

@@ -1,12 +1,13 @@
 package com.example.mykku.event.adapter.input.web
 
-import com.example.mykku.event.application.dto.EventWinnerInfoResult
+import com.example.mykku.event.application.dto.EventWinnerEntryResult
 import com.example.mykku.event.application.dto.EventWinnerResult
 import com.example.mykku.event.application.dto.EventWinnersResult
 import com.example.mykku.event.application.dto.MyAwardEventResult
 import com.example.mykku.event.application.dto.MyEventWinnerStatusResult
 import com.example.mykku.event.application.dto.PagedMyAwardEventsResult
 import com.example.mykku.event.application.dto.SetEventWinnersResult
+import com.example.mykku.event.domain.vo.EventWinnerEntryStatus
 import java.time.LocalDateTime
 
 data class EventWinnersResponse(
@@ -102,30 +103,42 @@ data class PagedMyAwardEventsResponse(
 data class SetEventWinnersResponse(
     val eventId: Long,
     val eventTitle: String,
-    val winners: List<EventWinnerInfoResponse>
+    val dryRun: Boolean,
+    val entries: List<EventWinnerEntryResponse>,
+    val addedCount: Int,
+    val keptCount: Int,
+    val removedCount: Int,
+    val withdrawnKeptCount: Int
 ) {
     companion object {
         fun from(result: SetEventWinnersResult): SetEventWinnersResponse {
             return SetEventWinnersResponse(
                 eventId = result.eventId,
                 eventTitle = result.eventTitle,
-                winners = result.winners.map { EventWinnerInfoResponse.from(it) }
+                dryRun = result.dryRun,
+                entries = result.entries.map { EventWinnerEntryResponse.from(it) },
+                addedCount = result.addedCount,
+                keptCount = result.keptCount,
+                removedCount = result.removedCount,
+                withdrawnKeptCount = result.withdrawnKeptCount
             )
         }
     }
 }
 
-data class EventWinnerInfoResponse(
-    val winnerId: Long,
+data class EventWinnerEntryResponse(
+    val input: String,
     val memberId: String?,
-    val nickname: String?
+    val nickname: String?,
+    val result: EventWinnerEntryStatus
 ) {
     companion object {
-        fun from(result: EventWinnerInfoResult): EventWinnerInfoResponse {
-            return EventWinnerInfoResponse(
-                winnerId = result.winnerId,
+        fun from(result: EventWinnerEntryResult): EventWinnerEntryResponse {
+            return EventWinnerEntryResponse(
+                input = result.input,
                 memberId = result.memberId,
-                nickname = result.nickname
+                nickname = result.nickname,
+                result = result.result
             )
         }
     }

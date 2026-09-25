@@ -19,7 +19,6 @@ class ContestException(
 
         fun tagInvalidFormat(): ContestException = ContestException(ContestErrorCode.TAG_INVALID_FORMAT)
 
-        fun invalidContestStatus(): ContestException = ContestException(ContestErrorCode.INVALID_CONTEST_STATUS)
 
         fun contestWinnerNotFound(): ContestException = ContestException(ContestErrorCode.CONTEST_WINNER_NOT_FOUND)
 
@@ -40,6 +39,20 @@ class ContestException(
         fun contestNotExpired(): ContestException = ContestException(ContestErrorCode.CONTEST_NOT_EXPIRED)
 
         fun winnerNotAnnounced(): ContestException = ContestException(ContestErrorCode.WINNER_NOT_ANNOUNCED)
+
+        fun contestTagRequired(): ContestException = ContestException(ContestErrorCode.CONTEST_TAG_REQUIRED)
+
+        fun invalidKeepImageUrls(): ContestException = ContestException(ContestErrorCode.INVALID_KEEP_IMAGE_URLS)
+
+        fun periodOrTagsLockedAfterWinnerSelected(): ContestException =
+            ContestException(ContestErrorCode.PERIOD_OR_TAGS_LOCKED_AFTER_WINNER_SELECTED)
+
+        fun invalidContestPeriod(): ContestException = ContestException(ContestErrorCode.INVALID_CONTEST_PERIOD)
+
+        fun duplicateWinnerParticipation(): ContestException =
+            ContestException(ContestErrorCode.DUPLICATE_WINNER_PARTICIPATION)
+
+        fun duplicateWinnerMember(): ContestException = ContestException(ContestErrorCode.DUPLICATE_WINNER_MEMBER)
 
         fun winnerAnnouncementNotFound(): ContestException = ContestException(ContestErrorCode.WINNER_ANNOUNCEMENT_NOT_FOUND)
     }

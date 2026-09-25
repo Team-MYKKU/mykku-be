@@ -1,6 +1,7 @@
 package com.example.mykku.admin.adapter.input.web
 
 import com.example.mykku.BaseControllerTest
+import com.example.mykku.admin.exception.AdminErrorCode
 import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import com.example.mykku.report.adapter.input.web.ProcessReportRequest
 import com.example.mykku.report.adapter.output.persistence.entity.ReportJpaEntity
@@ -11,8 +12,10 @@ import com.example.mykku.report.domain.vo.ReportTargetType
 import com.example.mykku.report.exception.ReportErrorCode
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
+import org.assertj.core.api.Assertions.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.notNullValue
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -84,6 +87,38 @@ class AdminReportApiControllerTest : BaseControllerTest() {
             .body("data.totalElements", equalTo(2))
             .body("data.currentPage", equalTo(0))
             .body("data.reports.size()", equalTo(2))
+    }
+
+    @Test
+    @DisplayName("신고자가 탈퇴해도 신고는 남고 목록 조회와 처리가 된다")
+    fun `신고자 탈퇴 - 신고가 보존된다`() {
+        val report = createReport(targetId = 1L)
+        memberJpaRepository.deleteById(reporter.id)
+        assertThat(reportJpaRepository.findById(report.id!!).get().reporterId).isNull()
+
+        RestAssured
+            .given()
+            .sessionId(adminSessionId)
+            .contentType(ContentType.JSON)
+            .`when`()
+            .get("/admin/api/v1/reports")
+            .then()
+            .statusCode(200)
+            .body("data.totalElements", equalTo(1))
+            .body("data.reports[0].reporterMemberId", nullValue())
+            .body("data.reports[0].targetMemberId", equalTo("author"))
+
+        RestAssured
+            .given()
+            .sessionId(adminSessionId)
+            .contentType(ContentType.JSON)
+            .body(ProcessReportRequest(status = ReportStatus.RESOLVED))
+            .`when`()
+            .patch("/admin/api/v1/reports/${report.id}")
+            .then()
+            .statusCode(200)
+            .body("data.status", equalTo(ReportStatus.RESOLVED.name))
+            .body("data.reporterMemberId", nullValue())
     }
 
     @Test
@@ -190,6 +225,7 @@ class AdminReportApiControllerTest : BaseControllerTest() {
             .`when`()
             .get("/admin/api/v1/reports")
             .then()
-            .statusCode(302)
+            .statusCode(401)
+            .body("code", equalTo(AdminErrorCode.UNAUTHORIZED.code))
     }
 }

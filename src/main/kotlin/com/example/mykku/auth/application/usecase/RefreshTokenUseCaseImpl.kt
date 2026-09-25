@@ -34,7 +34,7 @@ class RefreshTokenUseCaseImpl(
 
     private fun validateRefreshToken(refreshToken: String) {
         if (!tokenProvider.validateToken(refreshToken) || !tokenProvider.isRefreshToken(refreshToken)) {
-            throw AuthException.oauthInvalidToken()
+            throw AuthException.invalidToken()
         }
     }
 }

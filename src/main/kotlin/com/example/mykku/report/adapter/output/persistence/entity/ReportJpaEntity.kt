@@ -32,8 +32,8 @@ class ReportJpaEntity(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
 
-    @Column(name = "reporter_id", nullable = false)
-    val reporterId: Long,
+    @Column(name = "reporter_id", updatable = false)
+    val reporterId: Long?,
 
     @Enumerated(EnumType.STRING)
     @Column(name = "target_type", nullable = false, length = 20)
@@ -42,7 +42,7 @@ class ReportJpaEntity(
     @Column(name = "target_id", nullable = false)
     val targetId: Long,
 
-    @Column(name = "target_member_id")
+    @Column(name = "target_member_id", updatable = false)
     val targetMemberId: Long? = null,
 
     @Enumerated(EnumType.STRING)

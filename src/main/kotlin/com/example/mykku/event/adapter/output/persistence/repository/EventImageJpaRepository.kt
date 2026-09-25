@@ -8,4 +8,5 @@ import org.springframework.stereotype.Repository
 @Repository
 interface EventImageJpaRepository : JpaRepository<EventImageJpaEntity, Long> {
     fun findByEventIn(events: List<EventJpaEntity>): List<EventImageJpaEntity>
+    fun deleteAllByEvent(event: EventJpaEntity)
 }

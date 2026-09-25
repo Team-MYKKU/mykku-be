@@ -23,6 +23,20 @@ class ContestWinner private constructor(
         _acceptanceSpeech = speech
     }
 
+    fun reassign(winnerRank: Int, awardTitle: String?, description: String): ContestWinner {
+        return reconstitute(
+            id = id,
+            winnerRank = winnerRank,
+            awardTitle = awardTitle,
+            description = description,
+            acceptanceSpeech = _acceptanceSpeech,
+            contestId = contestId,
+            participationId = participationId,
+            createdAt = createdAt,
+            updatedAt = updatedAt
+        )
+    }
+
     companion object {
         fun create(
             winnerRank: Int,

@@ -2,6 +2,7 @@ package com.example.mykku.admin.adapter.input.web
 
 import com.example.mykku.BaseControllerTest
 import com.example.mykku.admin.dto.dailymessage.DailyMessageCreateRequest
+import com.example.mykku.admin.exception.AdminErrorCode
 import com.example.mykku.admin.service.AdminDailyMessageService
 import com.example.mykku.common.exception.CommonErrorCode
 import com.example.mykku.dailymessage.adapter.output.persistence.entity.DailyMessageJpaEntity
@@ -87,7 +88,8 @@ class AdminDailyMessageApiControllerTest : BaseControllerTest() {
             .`when`()
             .post("/admin/api/v1/dailymessages")
             .then()
-            .statusCode(302)
+            .statusCode(401)
+            .body("code", equalTo(AdminErrorCode.UNAUTHORIZED.code))
     }
 
     @Test
@@ -117,7 +119,8 @@ class AdminDailyMessageApiControllerTest : BaseControllerTest() {
             .`when`()
             .delete("/admin/api/v1/dailymessages/${dailyMessage.id}")
             .then()
-            .statusCode(302)
+            .statusCode(401)
+            .body("code", equalTo(AdminErrorCode.UNAUTHORIZED.code))
     }
 
     @Test

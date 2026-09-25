@@ -2,7 +2,6 @@ package com.example.mykku.member.adapter.input.web
 
 import com.example.mykku.BaseDocumentTest
 import com.example.mykku.docs.ApiRequestConfig
-import com.example.mykku.docs.Tag
 import com.example.mykku.feed.application.dto.AuthorResult
 import com.example.mykku.feed.application.dto.CommentPreviewResult
 import com.example.mykku.feed.application.dto.FeedImageResult
@@ -28,12 +27,9 @@ class MemberFeedDocumentTest : BaseDocumentTest() {
     inner class GetMyFeeds {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.MEMBER_API,
-            summary = "내가 쓴 피드 목록 조회",
-            description = "현재 로그인한 회원이 작성한 피드 목록을 조회합니다.",
             queryParameters = listOf(
-                parameterWithName("page").description("페이지 번호 (0부터 시작, 기본값: 0)").optional(),
-                parameterWithName("size").description("페이지 크기 (기본값: 20)").optional()
+                parameterWithName("page").description("페이지 번호 (0부터 시작, 0 이상 정수, 기본값: 0)").optional(),
+                parameterWithName("size").description("페이지 크기 (1~1000 정수, 기본값: 20)").optional()
             ),
             headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
@@ -86,10 +82,10 @@ class MemberFeedDocumentTest : BaseDocumentTest() {
                         ),
                         likeCount = 5,
                         isLiked = true,
-                        commentCount = 1,
+                        commentCount = 0,
                         comment = CommentPreviewResult(
                             profileImage = null,
-                            content = "멋져요!"
+                            content = ""
                         )
                     )
                 ),
@@ -110,38 +106,69 @@ class MemberFeedDocumentTest : BaseDocumentTest() {
                         .responseBodyField(
                             fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
                             fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
-                            fieldWithPath("data.feeds[]").type(JsonFieldType.ARRAY).description("피드 목록"),
+                            fieldWithPath("data.feeds[]").type(JsonFieldType.ARRAY)
+                                .description("피드 목록 (작성 일시 내림차순, 모든 게시판 포함)"),
                             fieldWithPath("data.feeds[].id").type(JsonFieldType.NUMBER).description("피드 ID"),
-                            fieldWithPath("data.feeds[].author").type(JsonFieldType.OBJECT).description("작성자 정보").optional(),
-                            fieldWithPath("data.feeds[].author.memberId").type(JsonFieldType.STRING).description("작성자 회원 ID").optional(),
-                            fieldWithPath("data.feeds[].author.nickname").type(JsonFieldType.STRING).description("작성자 닉네임").optional(),
-                            fieldWithPath("data.feeds[].author.profileImage").type(JsonFieldType.STRING).description("작성자 프로필 이미지").optional(),
-                            fieldWithPath("data.feeds[].author.role").type(JsonFieldType.OBJECT).description("작성자 역할").optional(),
-                            fieldWithPath("data.feeds[].author.role.id").type(JsonFieldType.NUMBER).description("역할 ID").optional(),
-                            fieldWithPath("data.feeds[].author.role.name").type(JsonFieldType.STRING).description("역할 이름").optional(),
-                            fieldWithPath("data.feeds[].author.role.description").type(JsonFieldType.STRING).description("역할 설명").optional(),
+                            fieldWithPath("data.feeds[].author").type(JsonFieldType.OBJECT)
+                                .description("작성자 정보 (이 API에서는 항상 로그인한 본인)"),
+                            fieldWithPath("data.feeds[].author.memberId").type(JsonFieldType.STRING)
+                                .description("작성자 회원 아이디 (사용자가 설정한 영문·숫자 문자열, 최대 16자. 내부 PK가 아니며 회원이 변경할 수 있음)"),
+                            fieldWithPath("data.feeds[].author.nickname").type(JsonFieldType.STRING)
+                                .description("작성자 닉네임"),
+                            fieldWithPath("data.feeds[].author.profileImage").type(JsonFieldType.STRING)
+                                .description("작성자 프로필 이미지 URL (null이 아니며, 프로필 이미지가 없으면 빈 문자열 \"\")"),
+                            fieldWithPath("data.feeds[].author.role").type(JsonFieldType.OBJECT)
+                                .description("작성자 대표 칭호 (대표 칭호가 없으면 null)").optional(),
+                            fieldWithPath("data.feeds[].author.role.id").type(JsonFieldType.NUMBER)
+                                .description("칭호 ID (보유 칭호 ID가 아닌 칭호 자체의 ID, role이 있으면 항상 존재)"),
+                            fieldWithPath("data.feeds[].author.role.name").type(JsonFieldType.STRING)
+                                .description("칭호 이름 (role이 있으면 항상 존재)"),
+                            fieldWithPath("data.feeds[].author.role.description").type(JsonFieldType.STRING)
+                                .description("칭호 설명 (설명이 없으면 null)").optional(),
                             fieldWithPath("data.feeds[].board").type(JsonFieldType.STRING).description("게시판 이름"),
-                            fieldWithPath("data.feeds[].createdAt").type(JsonFieldType.STRING).description("생성일시"),
+                            fieldWithPath("data.feeds[].createdAt").type(JsonFieldType.STRING)
+                                .description("작성 일시 (KST, ISO-8601)"),
                             fieldWithPath("data.feeds[].title").type(JsonFieldType.STRING).description("피드 제목"),
                             fieldWithPath("data.feeds[].content").type(JsonFieldType.STRING).description("피드 내용"),
-                            fieldWithPath("data.feeds[].images[]").type(JsonFieldType.ARRAY).description("이미지 목록"),
-                            fieldWithPath("data.feeds[].images[].id").type(JsonFieldType.NUMBER).description("이미지 ID").optional(),
-                            fieldWithPath("data.feeds[].images[].url").type(JsonFieldType.STRING).description("이미지 URL").optional(),
-                            fieldWithPath("data.feeds[].images[].width").type(JsonFieldType.NUMBER).description("이미지 너비").optional(),
-                            fieldWithPath("data.feeds[].images[].height").type(JsonFieldType.NUMBER).description("이미지 높이").optional(),
-                            fieldWithPath("data.feeds[].tags[]").type(JsonFieldType.ARRAY).description("태그 목록"),
-                            fieldWithPath("data.feeds[].tags[].title").type(JsonFieldType.STRING).description("태그 제목").optional(),
-                            fieldWithPath("data.feeds[].tags[].isContest").type(JsonFieldType.BOOLEAN).description("콘테스트 태그 여부").optional(),
+                            fieldWithPath("data.feeds[].images[]").type(JsonFieldType.ARRAY)
+                                .description("피드 이미지 목록 (이미지가 없으면 빈 배열 [])"),
+                            fieldWithPath("data.feeds[].images[].id").type(JsonFieldType.NUMBER).description("이미지 ID"),
+                            fieldWithPath("data.feeds[].images[].url").type(JsonFieldType.STRING)
+                                .description("이미지 URL"),
+                            fieldWithPath("data.feeds[].images[].width").type(JsonFieldType.NUMBER)
+                                .description("이미지 가로 크기 (px)"),
+                            fieldWithPath("data.feeds[].images[].height").type(JsonFieldType.NUMBER)
+                                .description("이미지 세로 크기 (px)"),
+                            fieldWithPath("data.feeds[].tags[]").type(JsonFieldType.ARRAY)
+                                .description("피드 태그 목록 (태그가 없으면 빈 배열 [])"),
+                            fieldWithPath("data.feeds[].tags[].title").type(JsonFieldType.STRING).description("태그 제목"),
+                            fieldWithPath("data.feeds[].tags[].isContest").type(JsonFieldType.BOOLEAN)
+                                .description(
+                                    "콘테스트 태그 여부 (true: 태그 제목이 콘테스트에 등록된 태그와 일치, " +
+                                        "콘테스트 진행·종료 여부와 무관 / false: 일반 태그)"
+                                ),
                             fieldWithPath("data.feeds[].likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
-                            fieldWithPath("data.feeds[].isLiked").type(JsonFieldType.BOOLEAN).description("좋아요 여부"),
-                            fieldWithPath("data.feeds[].commentCount").type(JsonFieldType.NUMBER).description("댓글 수"),
-                            fieldWithPath("data.feeds[].comment").type(JsonFieldType.OBJECT).description("첫 번째 댓글 미리보기"),
-                            fieldWithPath("data.feeds[].comment.profileImage").type(JsonFieldType.STRING).description("댓글 작성자 프로필").optional(),
-                            fieldWithPath("data.feeds[].comment.content").type(JsonFieldType.STRING).description("댓글 내용"),
-                            fieldWithPath("data.currentPage").type(JsonFieldType.NUMBER).description("현재 페이지"),
-                            fieldWithPath("data.totalPages").type(JsonFieldType.NUMBER).description("전체 페이지 수"),
-                            fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER).description("전체 항목 수"),
-                            fieldWithPath("data.size").type(JsonFieldType.NUMBER).description("페이지 크기"),
+                            fieldWithPath("data.feeds[].isLiked").type(JsonFieldType.BOOLEAN)
+                                .description("로그인한 회원(본인)의 좋아요 여부 (true: 좋아요 누름, false: 누르지 않음)"),
+                            fieldWithPath("data.feeds[].commentCount").type(JsonFieldType.NUMBER)
+                                .description("댓글 수 (대댓글 포함 전체 댓글 수)"),
+                            fieldWithPath("data.feeds[].comment").type(JsonFieldType.OBJECT)
+                                .description("첫 댓글 미리보기. 가장 먼저 작성된 최상위 댓글(대댓글 제외) 기준이며, 댓글이 없어도 객체는 항상 존재함"),
+                            fieldWithPath("data.feeds[].comment.profileImage").type(JsonFieldType.STRING)
+                                .description("첫 댓글 작성자 프로필 이미지 URL (미리보기가 비어 있으면 null, 작성자의 프로필 이미지가 없으면 빈 문자열 \"\")")
+                                .optional(),
+                            fieldWithPath("data.feeds[].comment.content").type(JsonFieldType.STRING)
+                                .description(
+                                    "첫 댓글 내용 (댓글이 없거나 첫 댓글 작성자가 탈퇴한 경우 빈 문자열 \"\". " +
+                                        "이때 commentCount가 1 이상일 수 있음)"
+                                ),
+                            fieldWithPath("data.currentPage").type(JsonFieldType.NUMBER)
+                                .description("현재 페이지 번호 (0부터 시작)"),
+                            fieldWithPath("data.totalPages").type(JsonFieldType.NUMBER)
+                                .description("전체 페이지 수 (작성한 피드가 없으면 0)"),
+                            fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER).description("전체 피드 수"),
+                            fieldWithPath("data.size").type(JsonFieldType.NUMBER)
+                                .description("요청한 페이지 크기 (이번 페이지의 실제 항목 수는 feeds 배열 길이)"),
                             fieldWithPath("data.hasNext").type(JsonFieldType.BOOLEAN).description("다음 페이지 존재 여부"),
                             fieldWithPath("data.hasPrevious").type(JsonFieldType.BOOLEAN).description("이전 페이지 존재 여부")
                         )
@@ -180,11 +207,14 @@ class MemberFeedDocumentTest : BaseDocumentTest() {
                         .responseBodyField(
                             fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
                             fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
-                            fieldWithPath("data.feeds[]").type(JsonFieldType.ARRAY).description("빈 피드 목록"),
-                            fieldWithPath("data.currentPage").type(JsonFieldType.NUMBER).description("현재 페이지"),
-                            fieldWithPath("data.totalPages").type(JsonFieldType.NUMBER).description("전체 페이지 수"),
-                            fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER).description("전체 항목 수"),
-                            fieldWithPath("data.size").type(JsonFieldType.NUMBER).description("페이지 크기"),
+                            fieldWithPath("data.feeds[]").type(JsonFieldType.ARRAY).description("빈 피드 목록 []"),
+                            fieldWithPath("data.currentPage").type(JsonFieldType.NUMBER)
+                                .description("현재 페이지 번호 (0부터 시작)"),
+                            fieldWithPath("data.totalPages").type(JsonFieldType.NUMBER)
+                                .description("전체 페이지 수 (작성한 피드가 없으면 0)"),
+                            fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER).description("전체 피드 수"),
+                            fieldWithPath("data.size").type(JsonFieldType.NUMBER)
+                                .description("요청한 페이지 크기 (이번 페이지의 실제 항목 수는 feeds 배열 길이)"),
                             fieldWithPath("data.hasNext").type(JsonFieldType.BOOLEAN).description("다음 페이지 존재 여부"),
                             fieldWithPath("data.hasPrevious").type(JsonFieldType.BOOLEAN).description("이전 페이지 존재 여부")
                         )

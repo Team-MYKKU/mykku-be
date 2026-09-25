@@ -32,6 +32,11 @@ class BoardJpaEntity(
         updatedAt = updatedAt
     )
 
+    fun updateFromDomain(board: Board) {
+        this.title = board.title
+        this.logo = board.logo
+    }
+
     companion object {
         fun fromDomain(board: Board): BoardJpaEntity = BoardJpaEntity(
             id = if (board.id.value == 0L) null else board.id.value,

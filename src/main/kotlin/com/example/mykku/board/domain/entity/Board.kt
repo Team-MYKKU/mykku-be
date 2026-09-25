@@ -5,11 +5,26 @@ import java.time.LocalDateTime
 
 class Board private constructor(
     val id: BoardId,
-    val title: String,
-    val logo: String,
+    title: String,
+    logo: String,
     val createdAt: LocalDateTime,
-    val updatedAt: LocalDateTime
+    updatedAt: LocalDateTime
 ) {
+    var title: String = title
+        private set
+
+    var logo: String = logo
+        private set
+
+    var updatedAt: LocalDateTime = updatedAt
+        private set
+
+    fun update(newTitle: String, newLogo: String?) {
+        title = newTitle
+        newLogo?.let { logo = it }
+        updatedAt = LocalDateTime.now()
+    }
+
     companion object {
         fun create(
             title: String,

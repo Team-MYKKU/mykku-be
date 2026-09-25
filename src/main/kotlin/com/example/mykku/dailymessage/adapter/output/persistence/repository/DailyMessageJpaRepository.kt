@@ -24,4 +24,5 @@ interface DailyMessageJpaRepository : JpaRepository<DailyMessageJpaEntity, Long>
         countQuery = "SELECT COUNT(dm) FROM DailyMessageJpaEntity dm WHERE dm.date <= :date"
     )
     fun findByDateBeforeOrEqual(@Param("date") date: LocalDate, pageable: Pageable): Page<DailyMessageJpaEntity>
+    fun findAllByDate(date: LocalDate): List<DailyMessageJpaEntity>
 }

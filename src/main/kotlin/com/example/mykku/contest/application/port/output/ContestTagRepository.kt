@@ -8,4 +8,5 @@ interface ContestTagRepository {
     fun saveAll(contestTags: List<ContestTag>): List<ContestTag>
     fun findByContestIds(contestIds: List<ContestId>): List<ContestTag>
     fun findAllByTitleIn(titles: Collection<String>): List<ContestTag>
+    fun deleteAllByContestId(contestId: ContestId)
 }

@@ -18,7 +18,6 @@ enum class ContestErrorCode(
 
     CONTEST_IMAGE_LIMIT_EXCEEDED("CN101", HttpStatus.BAD_REQUEST, "콘테스트 이미지는 ${Contest.IMAGE_MAX_COUNT}개 이하여야 합니다"),
     CONTEST_TAG_LIMIT_EXCEEDED("CN102", HttpStatus.BAD_REQUEST, "콘테스트 태그는 ${Contest.TAG_MAX_COUNT}개 이하여야 합니다"),
-    INVALID_CONTEST_STATUS("CN103", HttpStatus.BAD_REQUEST, "콘테스트 상태는 'ACTIVE', 'EXPIRED', 'ALL' 중 하나여야 합니다"),
     TAG_TITLE_TOO_LONG("CN104", HttpStatus.BAD_REQUEST, "태그는 ${ContestTag.TITLE_MAX_LENGTH}자 이하여야 합니다"),
     TAG_INVALID_FORMAT("CN105", HttpStatus.BAD_REQUEST, "태그는 한글, 영문, 숫자만 사용할 수 있습니다"),
     INVALID_WINNER_RANK("CN106", HttpStatus.BAD_REQUEST, "수상 순위는 1, 2, 3 중 하나여야 합니다"),
@@ -27,6 +26,16 @@ enum class ContestErrorCode(
     PARTICIPATION_NOT_BELONG_TO_CONTEST("CN109", HttpStatus.BAD_REQUEST, "해당 참여작은 이 콘테스트에 속하지 않습니다"),
     CONTEST_NOT_EXPIRED("CN110", HttpStatus.BAD_REQUEST, "종료되지 않은 콘테스트입니다"),
     WINNER_NOT_ANNOUNCED("CN111", HttpStatus.BAD_REQUEST, "아직 수상자가 발표되지 않았습니다"),
+    INVALID_KEEP_IMAGE_URLS("CN112", HttpStatus.BAD_REQUEST, "유지할 이미지 목록에 이 콘테스트의 이미지가 아니거나 중복된 주소가 있습니다"),
+    CONTEST_TAG_REQUIRED("CN113", HttpStatus.BAD_REQUEST, "콘테스트 태그는 1개 이상이어야 합니다"),
+    DUPLICATE_WINNER_PARTICIPATION("CN114", HttpStatus.BAD_REQUEST, "같은 참여작을 중복해서 선정할 수 없습니다"),
+    DUPLICATE_WINNER_MEMBER("CN115", HttpStatus.BAD_REQUEST, "한 회원은 한 콘테스트에서 한 번만 수상할 수 있습니다"),
+    PERIOD_OR_TAGS_LOCKED_AFTER_WINNER_SELECTED(
+        "CN116",
+        HttpStatus.BAD_REQUEST,
+        "수상자를 선정한 뒤에는 콘테스트 기간과 태그를 바꿀 수 없습니다"
+    ),
+    INVALID_CONTEST_PERIOD("CN117", HttpStatus.BAD_REQUEST, "콘테스트 시작일은 종료일보다 늦을 수 없습니다"),
 
     NOT_WINNER_OWNER("CN201", HttpStatus.FORBIDDEN, "수상 소감을 수정할 권한이 없습니다"),
 

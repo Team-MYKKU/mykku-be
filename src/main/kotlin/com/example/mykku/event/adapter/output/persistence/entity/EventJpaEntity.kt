@@ -59,6 +59,16 @@ class EventJpaEntity(
         )
     }
 
+    fun updateFromDomain(event: Event) {
+        this.title = event.title
+        this.subTitle = event.subTitle
+        this.description = event.description
+        this.startedAt = event.startedAt
+        this.expiredAt = event.expiredAt
+        this.status = event.status
+        this.thumbnailUrl = event.thumbnailUrl
+    }
+
     companion object {
         const val IMAGE_MAX_COUNT = 10
 

@@ -1,6 +1,7 @@
 package com.example.mykku.admin.adapter.input.web
 
 import com.example.mykku.BaseControllerTest
+import com.example.mykku.admin.exception.AdminErrorCode
 import com.example.mykku.fannote.adapter.output.persistence.entity.FanNoteJpaEntity
 import com.example.mykku.fannote.adapter.output.persistence.repository.FanNoteJpaRepository
 import io.restassured.RestAssured
@@ -87,7 +88,8 @@ class AdminFanNoteApiControllerTest : BaseControllerTest() {
             .`when`()
             .post("/admin/api/v1/fannotes")
             .then()
-            .statusCode(302)
+            .statusCode(401)
+            .body("code", equalTo(AdminErrorCode.UNAUTHORIZED.code))
     }
 
     @Test
@@ -116,7 +118,8 @@ class AdminFanNoteApiControllerTest : BaseControllerTest() {
             .`when`()
             .delete("/admin/api/v1/fannotes/${fanNote.id}")
             .then()
-            .statusCode(302)
+            .statusCode(401)
+            .body("code", equalTo(AdminErrorCode.UNAUTHORIZED.code))
     }
 
     @Test

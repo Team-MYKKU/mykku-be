@@ -90,6 +90,23 @@ class FeedCommentRepositoryAdapter(
 
     override fun deleteAllByFeedId(feedId: FeedId) {
         val feed = feedJpaRepository.findById(feedId.value).orElse(null) ?: return
-        feedCommentJpaRepository.deleteAllByFeed(feed)
+        val comments = feedCommentJpaRepository.findAllByFeed(feed)
+        feedCommentJpaRepository.deleteAll(sortRepliesFirst(comments))
+        feedCommentJpaRepository.flush()
+    }
+
+    private fun sortRepliesFirst(comments: List<FeedCommentJpaEntity>): List<FeedCommentJpaEntity> {
+        val parentIds = comments.associate { it.id to it.parentComment?.id }
+        return comments.sortedByDescending { depthOf(it.id, parentIds) }
+    }
+
+    private fun depthOf(commentId: Long?, parentIds: Map<Long?, Long?>): Int {
+        var depth = 0
+        var parentId = parentIds[commentId]
+        while (parentId != null && depth < parentIds.size) {
+            depth++
+            parentId = parentIds[parentId]
+        }
+        return depth
     }
 }

@@ -6,6 +6,7 @@ import com.example.mykku.contest.adapter.output.persistence.repository.ContestJp
 import com.example.mykku.contest.application.port.output.ContestRepository
 import com.example.mykku.contest.domain.entity.Contest
 import com.example.mykku.contest.domain.vo.ContestId
+import com.example.mykku.contest.domain.vo.ContestListFilter
 import com.example.mykku.contest.domain.vo.ContestSortType
 import com.example.mykku.contest.domain.vo.ContestStatusType
 import org.assertj.core.api.Assertions.assertThat
@@ -77,6 +78,23 @@ class ContestRepositoryAdapterTest : BaseRepositoryTest() {
 
             assertThat(updated.id).isEqualTo(contest.id)
             assertThat(updated.status).isEqualTo(ContestStatusType.WINNER_SELECTING)
+        }
+
+        @Test
+        @DisplayName("기존 콘테스트를 업데이트하면 createdAt이 보존되고 행이 추가되지 않는다")
+        fun updateKeepsCreatedAt() {
+            val savedEntity = createAndSaveContest(title = "원본 제목")
+            contestJpaRepository.flush()
+            val originalCreatedAt = savedEntity.createdAt
+            Thread.sleep(5)
+            val contest = savedEntity.toDomain()
+            contest.updateStatus(ContestStatusType.WINNER_SELECTED)
+
+            val updated = contestRepository.save(contest)
+
+            assertThat(updated.createdAt).isEqualTo(originalCreatedAt)
+            assertThat(updated.status).isEqualTo(ContestStatusType.WINNER_SELECTED)
+            assertThat(contestJpaRepository.count()).isEqualTo(1)
         }
     }
 
@@ -181,7 +199,7 @@ class ContestRepositoryAdapterTest : BaseRepositoryTest() {
             createAndSaveContest(title = "콘테스트3")
 
             val page = contestRepository.findWithPagination(
-                status = ContestStatusType.ALL,
+                filter = ContestListFilter.ALL,
                 sortType = ContestSortType.LATEST,
                 pageable = PageRequest.of(0, 10),
                 currentTime = LocalDateTime.now()
@@ -200,7 +218,7 @@ class ContestRepositoryAdapterTest : BaseRepositoryTest() {
             createAndSaveContest(title = "만료된 콘테스트", expiredAt = now.minusDays(1))
 
             val page = contestRepository.findWithPagination(
-                status = ContestStatusType.ACTIVE,
+                filter = ContestListFilter.ACTIVE,
                 sortType = ContestSortType.LATEST,
                 pageable = PageRequest.of(0, 10),
                 currentTime = now
@@ -217,7 +235,7 @@ class ContestRepositoryAdapterTest : BaseRepositoryTest() {
             createAndSaveContest(title = "콘테스트2", expiredAt = now.plusDays(7))
 
             val page = contestRepository.findWithPagination(
-                status = ContestStatusType.ACTIVE,
+                filter = ContestListFilter.ACTIVE,
                 sortType = ContestSortType.OLDEST,
                 pageable = PageRequest.of(0, 10),
                 currentTime = now
@@ -235,7 +253,7 @@ class ContestRepositoryAdapterTest : BaseRepositoryTest() {
             createAndSaveContest(title = "최근 콘테스트", expiredAt = now.plusDays(7))
 
             val page = contestRepository.findWithPagination(
-                status = ContestStatusType.ACTIVE,
+                filter = ContestListFilter.ACTIVE,
                 sortType = ContestSortType.POPULAR,
                 pageable = PageRequest.of(0, 10),
                 currentTime = now
@@ -253,7 +271,7 @@ class ContestRepositoryAdapterTest : BaseRepositoryTest() {
             createAndSaveContest(title = "진행중 콘테스트", expiredAt = now.plusDays(7))
 
             val page = contestRepository.findWithPagination(
-                status = ContestStatusType.EXPIRED,
+                filter = ContestListFilter.EXPIRED,
                 sortType = ContestSortType.LATEST,
                 pageable = PageRequest.of(0, 10),
                 currentTime = now
@@ -272,14 +290,14 @@ class ContestRepositoryAdapterTest : BaseRepositoryTest() {
             }
 
             val firstPage = contestRepository.findWithPagination(
-                status = ContestStatusType.ACTIVE,
+                filter = ContestListFilter.ACTIVE,
                 sortType = ContestSortType.LATEST,
                 pageable = PageRequest.of(0, 10),
                 currentTime = now
             )
 
             val secondPage = contestRepository.findWithPagination(
-                status = ContestStatusType.ACTIVE,
+                filter = ContestListFilter.ACTIVE,
                 sortType = ContestSortType.LATEST,
                 pageable = PageRequest.of(1, 10),
                 currentTime = now
@@ -288,6 +306,65 @@ class ContestRepositoryAdapterTest : BaseRepositoryTest() {
             assertThat(firstPage.content).hasSize(10)
             assertThat(secondPage.content).hasSize(5)
             assertThat(firstPage.totalElements).isEqualTo(15)
+        }
+
+        @Test
+        @DisplayName("WINNER_SELECTED 필터는 저장 상태가 WINNER_SELECTED인 콘테스트만 조회한다")
+        fun findWithPaginationWinnerSelected() {
+            val now = LocalDateTime.now()
+            val yesterday = now.minusDays(1)
+            createAndSaveContest(title = "선정 완료", expiredAt = yesterday, status = ContestStatusType.WINNER_SELECTED)
+            createAndSaveContest(title = "만료만 됨", expiredAt = yesterday, status = ContestStatusType.ACTIVE)
+            createAndSaveContest(title = "진행중", expiredAt = now.plusDays(7), status = ContestStatusType.ACTIVE)
+
+            val page = contestRepository.findWithPagination(
+                filter = ContestListFilter.WINNER_SELECTED,
+                sortType = ContestSortType.LATEST,
+                pageable = PageRequest.of(0, 10),
+                currentTime = now
+            )
+
+            assertThat(page.content).hasSize(1)
+            assertThat(page.content[0].title).isEqualTo("선정 완료")
+        }
+
+        @Test
+        @DisplayName("EXPIRED 필터는 저장 상태와 무관하게 만료된 콘테스트를 모두 조회한다")
+        fun findWithPaginationExpiredIncludesWinnerSelected() {
+            val now = LocalDateTime.now()
+            val yesterday = now.minusDays(1)
+            createAndSaveContest(title = "선정 완료", expiredAt = yesterday, status = ContestStatusType.WINNER_SELECTED)
+            createAndSaveContest(title = "만료만 됨", expiredAt = yesterday, status = ContestStatusType.ACTIVE)
+            createAndSaveContest(title = "진행중", expiredAt = now.plusDays(7), status = ContestStatusType.ACTIVE)
+
+            val page = contestRepository.findWithPagination(
+                filter = ContestListFilter.EXPIRED,
+                sortType = ContestSortType.LATEST,
+                pageable = PageRequest.of(0, 10),
+                currentTime = now
+            )
+
+            assertThat(page.content.map { it.title }).containsExactlyInAnyOrder("선정 완료", "만료만 됨")
+        }
+
+        @Test
+        @DisplayName("PENDING_SELECTION 필터는 만료됐고 수상자를 선정하지 않은 콘테스트만 조회한다")
+        fun findWithPaginationPendingSelection() {
+            val now = LocalDateTime.now()
+            val yesterday = now.minusDays(1)
+            createAndSaveContest(title = "선정 완료", expiredAt = yesterday, status = ContestStatusType.WINNER_SELECTED)
+            createAndSaveContest(title = "만료만 됨", expiredAt = yesterday, status = ContestStatusType.ACTIVE)
+            createAndSaveContest(title = "지금 만료", expiredAt = now, status = ContestStatusType.ACTIVE)
+            createAndSaveContest(title = "진행중", expiredAt = now.plusDays(7), status = ContestStatusType.ACTIVE)
+
+            val page = contestRepository.findWithPagination(
+                filter = ContestListFilter.PENDING_SELECTION,
+                sortType = ContestSortType.LATEST,
+                pageable = PageRequest.of(0, 10),
+                currentTime = now
+            )
+
+            assertThat(page.content.map { it.title }).containsExactlyInAnyOrder("만료만 됨", "지금 만료")
         }
     }
 }

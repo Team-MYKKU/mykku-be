@@ -62,4 +62,8 @@ class DailyMessageRepositoryAdapter(
     override fun deleteById(id: DailyMessageId) {
         dailyMessageJpaRepository.deleteById(id.value)
     }
+
+    override fun findAllByDate(date: LocalDate): List<DailyMessage> {
+        return dailyMessageJpaRepository.findAllByDate(date).map { it.toDomain() }
+    }
 }

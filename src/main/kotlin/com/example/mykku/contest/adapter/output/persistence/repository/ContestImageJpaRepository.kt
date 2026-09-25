@@ -8,4 +8,5 @@ import org.springframework.stereotype.Repository
 @Repository
 interface ContestImageJpaRepository : JpaRepository<ContestImageJpaEntity, Long> {
     fun findByContestIn(contests: List<ContestJpaEntity>): List<ContestImageJpaEntity>
+    fun deleteAllByContest(contest: ContestJpaEntity)
 }

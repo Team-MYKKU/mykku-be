@@ -27,7 +27,7 @@ class OAuthMemberExtractor {
                 ?: "",
             provider = SocialProvider.KAKAO,
             socialId = userInfo.id.toString(),
-            email = userInfo.kakaoAccount?.email ?: "kakao_${userInfo.id}@kakao.com"
+            email = userInfo.kakaoAccount?.email ?: fallbackEmail(SocialProvider.KAKAO, userInfo.id.toString())
         )
     }
 
@@ -36,7 +36,7 @@ class OAuthMemberExtractor {
             profileImage = "",
             provider = SocialProvider.APPLE,
             socialId = userInfo.sub,
-            email = userInfo.email ?: "apple_${userInfo.sub}@privaterelay.appleid.com"
+            email = userInfo.email ?: fallbackEmail(SocialProvider.APPLE, userInfo.sub)
         )
     }
 
@@ -45,7 +45,11 @@ class OAuthMemberExtractor {
             profileImage = userInfo.response.profileImage ?: "",
             provider = SocialProvider.NAVER,
             socialId = userInfo.response.id,
-            email = userInfo.response.email ?: "naver_${userInfo.response.id}@naver.com"
+            email = userInfo.response.email ?: fallbackEmail(SocialProvider.NAVER, userInfo.response.id)
         )
+    }
+
+    private fun fallbackEmail(provider: SocialProvider, socialId: String): String {
+        return requireNotNull(provider.placeholderEmail(socialId))
     }
 }

@@ -194,12 +194,64 @@ class ContestTest {
         }
     }
 
+    @Nested
+    @DisplayName("상태 계산")
+    inner class ResolveStatus {
+
+        @Test
+        @DisplayName("만료 시각이 남아있으면 ACTIVE다")
+        fun `상태 계산 - 진행 중`() {
+            val now = LocalDateTime.now()
+            val contest = createContest(expiredAt = now.plusDays(1))
+
+            assertThat(contest.resolveStatus(now)).isEqualTo(ContestStatusType.ACTIVE)
+        }
+
+        @Test
+        @DisplayName("만료 시각과 같은 시각이면 EXPIRED다")
+        fun `상태 계산 - 만료 경계`() {
+            val now = LocalDateTime.now()
+            val contest = createContest(expiredAt = now)
+
+            assertThat(contest.resolveStatus(now)).isEqualTo(ContestStatusType.EXPIRED)
+        }
+
+        @Test
+        @DisplayName("만료 시각이 지나면 EXPIRED다")
+        fun `상태 계산 - 만료`() {
+            val now = LocalDateTime.now()
+            val contest = createContest(expiredAt = now.minusDays(1))
+
+            assertThat(contest.resolveStatus(now)).isEqualTo(ContestStatusType.EXPIRED)
+        }
+
+        @Test
+        @DisplayName("수상자가 선정되면 만료 여부와 무관하게 WINNER_SELECTED를 유지한다")
+        fun `상태 계산 - 수상자 선정 완료`() {
+            val now = LocalDateTime.now()
+            val contest = createContest(expiredAt = now.minusDays(1))
+            contest.updateStatus(ContestStatusType.WINNER_SELECTED)
+
+            assertThat(contest.resolveStatus(now)).isEqualTo(ContestStatusType.WINNER_SELECTED)
+        }
+    }
+
     private fun createContest(): Contest {
         return Contest.create(
             title = "테스트 콘테스트",
             description = "콘테스트 설명",
             startedAt = LocalDateTime.now().plusDays(1),
             expiredAt = LocalDateTime.now().plusDays(7),
+            thumbnailUrl = "https://example.com/thumbnail.jpg"
+        )
+    }
+
+    private fun createContest(expiredAt: LocalDateTime): Contest {
+        return Contest.create(
+            title = "테스트 콘테스트",
+            description = "콘테스트 설명",
+            startedAt = LocalDateTime.now().minusDays(1),
+            expiredAt = expiredAt,
             thumbnailUrl = "https://example.com/thumbnail.jpg"
         )
     }

@@ -9,4 +9,5 @@ import org.springframework.stereotype.Repository
 interface ContestTagJpaRepository : JpaRepository<ContestTagJpaEntity, Long> {
     fun findAllByTitleIn(titles: Collection<String>): List<ContestTagJpaEntity>
     fun findByContestIn(contests: List<ContestJpaEntity>): List<ContestTagJpaEntity>
+    fun deleteAllByContest(contest: ContestJpaEntity)
 }

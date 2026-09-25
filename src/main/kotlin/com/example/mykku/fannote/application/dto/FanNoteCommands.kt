@@ -17,6 +17,8 @@ data class UpdateFanNoteCommand(
     val subtitle: String?,
     val content: String?,
     val productionDate: LocalDate,
-    val coverImageUrl: String?,
-    val pageImageUrls: List<String>
+    val newCoverImageUrl: String?,
+    val removeCoverImage: Boolean,
+    val keepPageImageUrls: List<String>,
+    val newPageImageUrls: List<String>
 )

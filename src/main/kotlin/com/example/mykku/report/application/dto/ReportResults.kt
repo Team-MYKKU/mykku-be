@@ -16,13 +16,19 @@ data class ReportResult(
     val status: String,
     val statusDescription: String,
     val processedAt: LocalDateTime?,
-    val createdAt: LocalDateTime
+    val createdAt: LocalDateTime,
+    val reporterNickname: String? = null,
+    val targetNickname: String? = null,
+    val reporterWithdrawn: Boolean = false,
+    val targetWithdrawn: Boolean = false
 ) {
     companion object {
         fun from(
             report: Report,
             reporterMemberId: String?,
-            targetMemberId: String?
+            targetMemberId: String?,
+            reporterNickname: String? = null,
+            targetNickname: String? = null
         ): ReportResult {
             return ReportResult(
                 id = report.id!!.value,
@@ -37,7 +43,11 @@ data class ReportResult(
                 status = report.status.name,
                 statusDescription = report.status.description,
                 processedAt = report.processedAt,
-                createdAt = report.createdAt
+                createdAt = report.createdAt,
+                reporterNickname = reporterNickname,
+                targetNickname = targetNickname,
+                reporterWithdrawn = report.reporterId == null,
+                targetWithdrawn = report.targetMemberId == null
             )
         }
     }
@@ -51,4 +61,45 @@ data class PagedReportsResult(
     val size: Int,
     val hasNext: Boolean,
     val hasPrevious: Boolean
+)
+
+data class ReportMemberSummary(
+    val memberId: String?,
+    val nickname: String?
+)
+
+data class ReportDetailResult(
+    val report: ReportResult,
+    val feed: ReportedFeedResult?,
+    val comment: ReportedCommentResult?,
+    val sameTargetReports: List<ReportResult>,
+    val targetMemberReportCount: Long
+) {
+    val targetDeleted: Boolean
+        get() = feed == null && comment == null
+}
+
+data class ReportedFeedResult(
+    val feedId: Long,
+    val title: String,
+    val content: String,
+    val imageUrls: List<String>,
+    val boardTitle: String?,
+    val contests: List<ReportedContestResult>
+) {
+    val bestWinnerRank: Int?
+        get() = contests.mapNotNull { it.winnerRank }.minOrNull()
+}
+
+data class ReportedContestResult(
+    val contestId: Long,
+    val contestTitle: String,
+    val winnerRank: Int?
+)
+
+data class ReportedCommentResult(
+    val commentId: Long,
+    val content: String,
+    val feedId: Long,
+    val feedTitle: String?
 )

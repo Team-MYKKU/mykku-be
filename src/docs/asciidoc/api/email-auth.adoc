@@ -1,0 +1,166 @@
+[[email-auth-send-code]]
+=== 인증 코드 발송
+
+입력한 이메일로 6자리 숫자 인증 코드를 발송합니다.
+
+* *인증 불필요*: 이메일 인증 API는 모두 로그인 없이 호출하며, `Authorization` 헤더를 보내도 사용하지 않습니다.
+* *유효시간*: 코드는 발송 시점부터 **3분** 동안 유효합니다.
+* *재발송*: 같은 이메일·purpose로 다시 요청하면 새 코드로 교체되고 유효시간도 3분으로 다시 시작합니다. 이전 코드를 입력하면 `INVALID_VERIFICATION_CODE` 가 반환됩니다.
+* *이메일 값 일치*: 코드는 요청한 `email` 문자열 그대로(대소문자 구분)와 `purpose` 조합별로 저장됩니다. 코드 발송·코드 검증·비밀번호 재설정에는 대소문자까지 똑같은 이메일을 보내야 하므로, 클라이언트에서 trim·소문자 변환한 값을 모든 단계에 똑같이 쓰는 것을 권장합니다. 앞뒤 공백이 포함되면 이메일 형식 검증에 실패합니다(400 `INVALID_INPUT`, <<overview-common-errors,공통 에러>> 참고).
+* *purpose=SIGNUP*: 같은 이메일로 가입된 회원(이메일·소셜 가입 모두 포함)이 있으면 코드를 보내지 않고 `EMAIL_ALREADY_EXISTS` 를 반환합니다.
+* *purpose=PASSWORD_RESET*: 가입 여부를 확인하지 않고 발송합니다. 가입되지 않은 이메일이면 이후 <<email-auth-reset-password,비밀번호 재설정>> 단계에서 `INVALID_EMAIL_OR_PASSWORD` 가 반환됩니다.
+* *호출 흐름*
+** 회원가입: 인증 코드 발송(`purpose=SIGNUP`) → <<email-auth-verify-code,인증 코드 검증>>(`purpose=SIGNUP`) → <<email-auth-signup,이메일 회원가입>>
+** 비밀번호 재설정: 인증 코드 발송(`purpose=PASSWORD_RESET`) → <<email-auth-reset-password,비밀번호 재설정>>. 재설정 API가 코드를 직접 검증하므로 인증 코드 검증 API를 먼저 호출하지 않습니다.
+* *공통 에러*: 요청 값 형식이 잘못되거나 필수 값이 없거나 `purpose` 가 정의되지 않은 값이면 400 `INVALID_INPUT`(C101)이 반환됩니다 (<<overview-common-errors,공통 에러>> 참고). 이메일 인증 API 전체에 동일하게 적용됩니다.
+
+operation::email-auth/send-code/200[snippets='http-request,request-fields,http-response,response-fields']
+
+[[email-auth-send-code-error]]
+==== 에러 응답
+
+.`EMAIL_ALREADY_EXISTS` · 409 · EM301 — `purpose=SIGNUP` 인데 같은 이메일로 가입된 회원이 있음 (이메일·소셜 가입 모두 포함). 로그인 또는 비밀번호 찾기로 안내
+[%collapsible]
+====
+include::{snippets}/email-auth/send-code/EMAIL_ALREADY_EXISTS/http-response.adoc[]
+====
+
+.`EMAIL_SEND_FAILED` · 500 · EM401 — 메일 서버 오류로 발송 실패. 이때도 새 코드로 교체되므로 이전에 받은 코드는 더 이상 쓸 수 없음. 잠시 후 다시 발송 요청
+[%collapsible]
+====
+include::{snippets}/email-auth/send-code/EMAIL_SEND_FAILED/http-response.adoc[]
+====
+
+.`TOO_MANY_REQUESTS` · 429 · EM501 — 요청 과다용으로 정의된 코드. 현재 서버에는 발송 횟수 제한이 없어 실제로는 반환되지 않음
+[%collapsible]
+====
+include::{snippets}/email-auth/send-code/TOO_MANY_REQUESTS/http-response.adoc[]
+====
+
+[[email-auth-verify-code]]
+=== 인증 코드 검증
+
+<<email-auth-send-code,인증 코드 발송>>으로 받은 코드를 검증합니다. 회원가입 흐름(`purpose=SIGNUP`)에서 사용합니다.
+
+* *요청 값*: `email` · `purpose` 는 코드 발송 때와 똑같은 값이어야 합니다(이메일은 대소문자 구분).
+* *성공 시*: 코드가 즉시 폐기됩니다. 같은 코드로 다시 검증하면 `VERIFICATION_CODE_EXPIRED` 가 반환됩니다.
+* *코드 불일치 시*: 코드는 유지되므로 유효시간(3분) 안에 다시 입력할 수 있습니다.
+* *비밀번호 재설정에는 사용하지 않음*: <<email-auth-reset-password,비밀번호 재설정>> API가 코드를 직접 검증합니다. 이 API를 `purpose=PASSWORD_RESET` 으로 먼저 호출하면 코드가 폐기되어 재설정 요청이 `VERIFICATION_CODE_EXPIRED` 로 실패합니다.
+
+operation::email-auth/verify-code/200[snippets='http-request,request-fields,http-response,response-fields']
+
+[[email-auth-verify-code-error]]
+==== 에러 응답
+
+.`INVALID_VERIFICATION_CODE` · 400 · EM102 — 입력한 코드가 일치하지 않음 (재발송 전의 이전 코드 포함). 코드는 유지되어 유효시간 안에 다시 입력 가능
+[%collapsible]
+====
+include::{snippets}/email-auth/verify-code/INVALID_VERIFICATION_CODE/http-response.adoc[]
+====
+
+.`VERIFICATION_CODE_EXPIRED` · 400 · EM101 — 해당 이메일·purpose로 유효한 코드가 없음 (발송 후 3분 경과, 발송 이력 없음, 이미 검증에 성공해 폐기됨, 발송 때와 다른 이메일 표기·purpose). 코드를 다시 발송해야 함
+[%collapsible]
+====
+include::{snippets}/email-auth/verify-code/VERIFICATION_CODE_EXPIRED/http-response.adoc[]
+====
+
+[[email-auth-signup]]
+=== 이메일 회원가입
+
+이메일과 비밀번호로 회원가입하고, 가입과 동시에 로그인 토큰을 발급합니다.
+
+* *호출 시점*: <<email-auth-verify-code,인증 코드 검증>>(`purpose=SIGNUP`)에 성공한 뒤 같은 이메일로 호출합니다.
+* *가입 직후 상태*: 프로필(아이디·닉네임)이 설정되지 않은 상태입니다. `member.memberId` · `member.nickname` 은 null, `member.profileImage` 는 빈 문자열, `isProfileComplete` 는 false이므로 <<member-setup-profile,프로필 설정>>으로 이동해야 합니다.
+* *칭호 지급*: 가입 시 '첫 만남' 칭호가 비동기로 지급되므로 응답 직후에는 아직 반영되지 않았을 수 있습니다.
+* *응답 구조*: <<email-auth-login,이메일 로그인>>과 같습니다. `isExistingUser` 는 항상 false입니다.
+
+operation::email-auth/signup/200[snippets='http-request,request-fields,http-response,response-fields']
+
+[[email-auth-signup-error]]
+==== 에러 응답
+
+.`EMAIL_ALREADY_EXISTS` · 409 · EM301 — 같은 이메일로 가입된 회원이 있음 (이메일·소셜 가입 모두 포함). 정상 흐름에서는 인증 코드 발송(`purpose=SIGNUP`) 단계에서 먼저 반환됨
+[%collapsible]
+====
+include::{snippets}/email-auth/signup/EMAIL_ALREADY_EXISTS/http-response.adoc[]
+====
+
+[[email-auth-login]]
+=== 이메일 로그인
+
+이메일과 비밀번호로 로그인합니다.
+
+* *임시 비밀번호*: <<email-auth-send-temporary-password,임시 비밀번호 발송>>으로 받은 비밀번호로도 로그인할 수 있습니다.
+* *프로필 미설정*: `isProfileComplete` 가 false면 <<member-setup-profile,프로필 설정>>으로 이동해야 합니다.
+* *401 처리*: 인증이 필요 없는 API이지만 로그인 실패는 401(`INVALID_EMAIL_OR_PASSWORD`, code `EM201`)로 반환됩니다. 토큰 만료(`AU201`)가 아니므로 <<overview-token,토큰 재발급>>을 시도하지 마세요. 401 상태만 보고 재발급·로그아웃하는 인터셉터라면 이 API는 제외해야 합니다.
+
+operation::email-auth/login/200[snippets='http-request,request-fields,http-response,response-fields']
+
+[[email-auth-login-error]]
+==== 에러 응답
+
+.`INVALID_EMAIL_OR_PASSWORD` · 401 · EM201 — 가입되지 않은 이메일, 비밀번호 불일치, 또는 소셜 로그인으로 가입해 비밀번호가 없는 계정 (세 경우를 구분하지 않음). 토큰 만료로 처리하지 않음
+[%collapsible]
+====
+include::{snippets}/email-auth/login/INVALID_EMAIL_OR_PASSWORD/http-response.adoc[]
+====
+
+[[email-auth-reset-password]]
+=== 비밀번호 재설정
+
+비밀번호 재설정용 인증 코드를 검증하고 비밀번호를 새 값으로 바꿉니다.
+
+* *호출 흐름*: <<email-auth-send-code,인증 코드 발송>>(`purpose=PASSWORD_RESET`)으로 받은 코드를 그대로 보냅니다. 이 API가 코드를 직접 검증하므로 <<email-auth-verify-code,인증 코드 검증>> API를 먼저 호출하지 않습니다. 먼저 호출하면 코드가 폐기되어 `VERIFICATION_CODE_EXPIRED` 가 반환됩니다.
+* *코드 폐기*: 코드가 일치하면 즉시 폐기됩니다. 그 뒤 가입되지 않은 이메일로 확인되어 `INVALID_EMAIL_OR_PASSWORD` 가 반환된 경우에도 같은 코드는 다시 쓸 수 없습니다.
+* *대상 계정*: 가입 방식과 관계없이 해당 이메일 회원의 비밀번호가 바뀝니다. 소셜 로그인으로 가입한 계정도 이후 새 비밀번호로 <<email-auth-login,이메일 로그인>>을 할 수 있습니다.
+* *401 처리*: 인증이 필요 없는 API이지만 가입되지 않은 이메일이면 401(`INVALID_EMAIL_OR_PASSWORD`, code `EM201`)이 반환됩니다. 토큰 만료(`AU201`)가 아니므로 401 상태만 보고 재발급·로그아웃하는 인터셉터라면 이 API는 제외해야 합니다.
+
+operation::email-auth/reset-password/200[snippets='http-request,request-fields,http-response,response-fields']
+
+[[email-auth-reset-password-error]]
+==== 에러 응답
+
+.`INVALID_VERIFICATION_CODE` · 400 · EM102 — 입력한 코드가 일치하지 않음 (재발송 전의 이전 코드 포함). 코드는 유지되어 유효시간 안에 다시 입력 가능
+[%collapsible]
+====
+include::{snippets}/email-auth/reset-password/INVALID_VERIFICATION_CODE/http-response.adoc[]
+====
+
+.`VERIFICATION_CODE_EXPIRED` · 400 · EM101 — 유효한 재설정 코드가 없음 (발송 후 3분 경과, 발송 이력 없음, 이미 사용됨, 인증 코드 검증 API로 먼저 폐기됨, 발송 때와 다른 이메일 표기, `purpose=SIGNUP` 으로 받은 코드). 코드를 다시 발송해야 함
+[%collapsible]
+====
+include::{snippets}/email-auth/reset-password/VERIFICATION_CODE_EXPIRED/http-response.adoc[]
+====
+
+.`INVALID_EMAIL_OR_PASSWORD` · 401 · EM201 — 가입되지 않은 이메일 (이때도 코드는 이미 폐기됨). 토큰 만료로 처리하지 않음
+[%collapsible]
+====
+include::{snippets}/email-auth/reset-password/INVALID_EMAIL_OR_PASSWORD/http-response.adoc[]
+====
+
+[[email-auth-send-temporary-password]]
+=== 임시 비밀번호 발송
+
+가입된 이메일로 임시 비밀번호를 발급해 메일로 보냅니다. 인증 코드는 필요하지 않습니다.
+
+* *비밀번호 변경*: 성공하면 별도 확인 절차 없이 기존 비밀번호가 임시 비밀번호(영문 대문자 2·소문자 4·숫자 2·특수문자 2, 총 10자)로 바뀌며, 이후 기존 비밀번호로는 로그인할 수 없습니다.
+* *발송 실패 시*: `EMAIL_SEND_FAILED` 가 반환되면 비밀번호 변경도 취소되어 기존 비밀번호가 유지됩니다.
+* *대상 계정*: 가입 방식과 관계없이 해당 이메일 회원이 대상입니다. 소셜 로그인으로 가입한 계정도 이후 임시 비밀번호로 <<email-auth-login,이메일 로그인>>을 할 수 있습니다.
+* *401 처리*: 인증이 필요 없는 API이지만 가입되지 않은 이메일이면 401(`INVALID_EMAIL_OR_PASSWORD`, code `EM201`)이 반환됩니다. 토큰 만료(`AU201`)가 아니므로 401 상태만 보고 재발급·로그아웃하는 인터셉터라면 이 API는 제외해야 합니다.
+
+operation::email-auth/send-temporary-password/200[snippets='http-request,request-fields,http-response,response-fields']
+
+[[email-auth-send-temporary-password-error]]
+==== 에러 응답
+
+.`INVALID_EMAIL_OR_PASSWORD` · 401 · EM201 — 가입되지 않은 이메일. 토큰 만료로 처리하지 않음
+[%collapsible]
+====
+include::{snippets}/email-auth/send-temporary-password/INVALID_EMAIL_OR_PASSWORD/http-response.adoc[]
+====
+
+.`EMAIL_SEND_FAILED` · 500 · EM401 — 메일 서버 오류로 발송 실패 (비밀번호는 바뀌지 않음). 잠시 후 다시 시도
+[%collapsible]
+====
+include::{snippets}/email-auth/send-temporary-password/EMAIL_SEND_FAILED/http-response.adoc[]
+====

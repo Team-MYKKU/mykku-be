@@ -1,0 +1,107 @@
+댓글과 답글은 아래 API로 작성·수정·삭제합니다. 댓글 목록(답글 포함) 조회는 피드 API의 <<feed-comments,피드 댓글 목록 조회>>를 참고하세요.
+
+[[feed-comment-create]]
+=== 피드 댓글 생성
+
+피드에 댓글을 작성합니다. 같은 API에 `parentCommentId` 를 함께 보내면 답글로 등록됩니다(<<feed-comment-reply-create>> 참고).
+
+* *인증 필요* (<<overview-error-response,공통 에러>> 참고)
+* *프로필 설정 필요*: 아이디(`memberId`)나 닉네임을 설정하지 않은 회원은 403 `MB201` 을 받습니다(<<member-setup-profile,프로필 설정>> 참고).
+* `content` 는 최대 1000자입니다. 길이는 UTF-16 코드 유닛 기준(JavaScript `String.length` 와 동일, 대부분의 이모지는 1개가 2자 이상)이며, 빈 문자열이나 공백만 있는 내용도 거부하지 않습니다.
+* 응답의 `author` 는 요청한 회원 본인이고 `likeCount` 는 항상 0입니다. 목록 조회 아이템과 달리 `isLiked`, `updatedAt`, `replies`, `replyCount` 는 포함되지 않습니다.
+* *칭호*: 댓글·답글 작성은 칭호 획득 조건(댓글 작성 수, 하루 덕담 댓글과 합산해 1·5·10회)에 반영됩니다. 칭호는 응답 이후 비동기로 부여되므로 작성 직후에는 아직 반영되지 않았을 수 있습니다. <<role-new-roles,새로 획득한 칭호 조회>> API로 신규 칭호를 확인하세요. 댓글을 삭제해도 누적 횟수는 줄지 않습니다.
+
+operation::feed-comment/create/200[snippets='http-request,request-headers,path-parameters,request-fields,http-response,response-fields']
+
+[[feed-comment-create-error]]
+==== 에러 응답
+
+.`PROFILE_NOT_COMPLETED` · 403 · MB201 — 아이디 또는 닉네임을 설정하지 않은 회원
+[%collapsible]
+====
+include::{snippets}/feed-comment/create/PROFILE_NOT_COMPLETED/http-response.adoc[]
+====
+
+.`FEED_NOT_FOUND` · 404 · FD001 — 존재하지 않는 피드 ID
+[%collapsible]
+====
+include::{snippets}/feed-comment/create/FEED_NOT_FOUND/http-response.adoc[]
+====
+
+.`FEED_COMMENT_CONTENT_TOO_LONG` · 400 · FD105 — `content` 가 1000자를 넘음
+[%collapsible]
+====
+include::{snippets}/feed-comment/create/FEED_COMMENT_CONTENT_TOO_LONG/http-response.adoc[]
+====
+
+[[feed-comment-reply-create]]
+=== 피드 답글 생성
+
+피드 댓글에 답글을 작성합니다. <<feed-comment-create>>와 같은 API(`+POST /api/v1/feeds/{feedId}/comments+`)이며, `parentCommentId` 에 부모 댓글 ID를 함께 보내면 답글로 등록됩니다.
+
+* 인증·프로필 설정 요구 사항, 내용 길이 제한, 칭호 반영, 에러 응답은 <<feed-comment-create-error,피드 댓글 생성>>과 같습니다.
+* `parentCommentId` 에는 같은 피드의 *최상위 댓글* ID를 보내세요. 답글은 한 단계만 지원합니다.
+* 서버는 부모 댓글을 검증하지 않습니다. 존재하지 않는 ID를 보내면 에러 없이 일반 댓글로 등록되고, 답글 ID를 보내면 목록 조회에 나타나지 않는 답글이 됩니다. 다른 피드의 댓글 ID를 보내면 에러 없이 등록되며, 그 답글은 부모 댓글이 속한 피드의 목록에 나타납니다.
+* 등록된 답글은 <<feed-comments,피드 댓글 목록 조회>> 응답의 `comments[].replies` 에 작성순(오래된 순)으로 포함됩니다.
+
+operation::feed-comment/reply-create/200[snippets='http-request,request-headers,path-parameters,request-fields,http-response,response-fields']
+
+[[feed-comment-update]]
+=== 피드 댓글 수정
+
+피드 댓글 또는 답글의 내용을 수정합니다. 답글도 같은 API에 답글 ID를 넣어 수정합니다.
+
+* *인증 필요* (<<overview-error-response,공통 에러>> 참고)
+* 작성자 본인만 수정할 수 있습니다. 작성자가 탈퇴한 댓글은 누구도 수정할 수 없습니다(403 `FD202`).
+* `content` 는 기존 내용을 통째로 교체하며, 길이 제한은 <<feed-comment-create>>와 같습니다(최대 1000자).
+* 응답의 `createdAt` 에는 최초 작성 일시가 아니라 수정 요청을 처리한 시각이 담깁니다. 저장된 작성 일시는 바뀌지 않고 <<feed-comments,피드 댓글 목록 조회>>에서는 최초 작성 일시로 내려오므로, 화면의 작성 일시는 기존 값을 유지하세요.
+* 응답의 `likeCount` 는 현재 좋아요 수입니다. 수정 일시(`updatedAt`)와 `isLiked` 는 포함되지 않습니다.
+
+operation::feed-comment/update/200[snippets='http-request,request-headers,path-parameters,request-fields,http-response,response-fields']
+
+[[feed-comment-update-error]]
+==== 에러 응답
+
+.`FEED_COMMENT_NOT_FOUND` · 404 · FD002 — 존재하지 않는 댓글 또는 답글 ID
+[%collapsible]
+====
+include::{snippets}/feed-comment/update/FEED_COMMENT_NOT_FOUND/http-response.adoc[]
+====
+
+.`FEED_COMMENT_FORBIDDEN_ACCESS` · 403 · FD202 — 본인이 작성하지 않은 댓글 또는 답글(작성자가 탈퇴한 댓글 포함)
+[%collapsible]
+====
+include::{snippets}/feed-comment/update/FEED_COMMENT_FORBIDDEN_ACCESS/http-response.adoc[]
+====
+
+.`FEED_COMMENT_CONTENT_TOO_LONG` · 400 · FD105 — `content` 가 1000자를 넘음
+[%collapsible]
+====
+include::{snippets}/feed-comment/update/FEED_COMMENT_CONTENT_TOO_LONG/http-response.adoc[]
+====
+
+[[feed-comment-delete]]
+=== 피드 댓글 삭제
+
+피드 댓글 또는 답글을 삭제합니다. 답글도 같은 API에 답글 ID를 넣어 삭제합니다.
+
+* *인증 필요* (<<overview-error-response,공통 에러>> 참고)
+* 작성자 본인만 삭제할 수 있습니다. 작성자가 탈퇴한 댓글은 누구도 삭제할 수 없습니다(403 `FD202`).
+* 응답의 `data` 는 항상 빈 객체(`{}`)입니다.
+
+operation::feed-comment/delete/200[snippets='http-request,request-headers,path-parameters,http-response,response-fields']
+
+[[feed-comment-delete-error]]
+==== 에러 응답
+
+.`FEED_COMMENT_NOT_FOUND` · 404 · FD002 — 존재하지 않는 댓글 또는 답글 ID
+[%collapsible]
+====
+include::{snippets}/feed-comment/delete/FEED_COMMENT_NOT_FOUND/http-response.adoc[]
+====
+
+.`FEED_COMMENT_FORBIDDEN_ACCESS` · 403 · FD202 — 본인이 작성하지 않은 댓글 또는 답글(작성자가 탈퇴한 댓글 포함)
+[%collapsible]
+====
+include::{snippets}/feed-comment/delete/FEED_COMMENT_FORBIDDEN_ACCESS/http-response.adoc[]
+====

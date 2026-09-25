@@ -7,6 +7,7 @@ import org.springframework.data.web.PageableDefault
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 
 @Controller
@@ -29,5 +30,11 @@ class AdminFanNoteViewController(
     @GetMapping("/create")
     fun createForm(model: Model): String {
         return "admin/fannote/create"
+    }
+
+    @GetMapping("/{id}/edit")
+    fun editForm(@PathVariable id: Long, model: Model): String {
+        model.addAttribute("fanNote", adminFanNoteService.findById(id))
+        return "admin/fannote/edit"
     }
 }

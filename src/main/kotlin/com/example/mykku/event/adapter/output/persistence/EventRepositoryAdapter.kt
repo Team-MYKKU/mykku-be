@@ -5,6 +5,7 @@ import com.example.mykku.event.adapter.output.persistence.repository.EventJpaRep
 import com.example.mykku.event.application.port.output.EventRepository
 import com.example.mykku.event.domain.entity.Event
 import com.example.mykku.event.domain.vo.EventId
+import com.example.mykku.event.domain.vo.EventListFilter
 import com.example.mykku.event.domain.vo.EventSortType
 import com.example.mykku.event.domain.vo.EventStatusType
 import org.springframework.data.domain.Page
@@ -18,7 +19,13 @@ class EventRepositoryAdapter(
 ) : EventRepository {
 
     override fun save(event: Event): Event {
-        val entity = EventJpaEntity.fromDomain(event)
+        val entity = if (event.id.value == 0L) {
+            EventJpaEntity.fromDomain(event)
+        } else {
+            eventJpaRepository.findById(event.id.value)
+                .map { it.apply { updateFromDomain(event) } }
+                .orElseGet { EventJpaEntity.fromDomain(event) }
+        }
         return eventJpaRepository.save(entity).toDomain()
     }
 
@@ -38,16 +45,20 @@ class EventRepositoryAdapter(
     }
 
     override fun findWithPagination(
-        status: EventStatusType,
+        filter: EventListFilter,
         sortType: EventSortType,
         pageable: Pageable,
         currentTime: LocalDateTime
     ): Page<Event> {
-        val page = when (status) {
-            EventStatusType.ACTIVE -> findActiveEvents(sortType, currentTime, pageable)
-            EventStatusType.EXPIRED -> eventJpaRepository.findByExpiredAtLessThanEqualOrderByCreatedAtDesc(currentTime, pageable)
-            EventStatusType.ALL -> eventJpaRepository.findAllByOrderByCreatedAtDesc(pageable)
-            else -> eventJpaRepository.findAllByOrderByCreatedAtDesc(pageable)
+        val page = when (filter) {
+            EventListFilter.ALL -> eventJpaRepository.findAllByOrderByCreatedAtDesc(pageable)
+            EventListFilter.ACTIVE -> findActiveEvents(sortType, currentTime, pageable)
+            EventListFilter.EXPIRED ->
+                eventJpaRepository.findByExpiredAtLessThanEqualOrderByCreatedAtDesc(currentTime, pageable)
+            EventListFilter.PENDING_SELECTION -> eventJpaRepository
+                .findByExpiredAtLessThanEqualAndStatusNotOrderByCreatedAtDesc(currentTime, WINNER_SELECTED, pageable)
+            EventListFilter.WINNER_SELECTED ->
+                eventJpaRepository.findByStatusOrderByCreatedAtDesc(WINNER_SELECTED, pageable)
         }
         return page.map { it.toDomain() }
     }
@@ -62,5 +73,13 @@ class EventRepositoryAdapter(
             EventSortType.OLDEST -> eventJpaRepository.findByExpiredAtAfterOrderByCreatedAtAsc(currentTime, pageable)
             EventSortType.POPULAR -> eventJpaRepository.findActiveEventsByPopular(currentTime, pageable)
         }
+    }
+
+    override fun deleteById(id: EventId) {
+        eventJpaRepository.deleteEventById(id.value)
+    }
+
+    companion object {
+        private val WINNER_SELECTED = EventStatusType.WINNER_SELECTED
     }
 }

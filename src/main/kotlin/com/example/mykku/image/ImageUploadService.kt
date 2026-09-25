@@ -1,5 +1,6 @@
 package com.example.mykku.image
 
+import com.example.mykku.image.dto.EntityImagesUpdateUploadResult
 import com.example.mykku.image.dto.EntityImagesUploadResult
 import com.example.mykku.image.dto.FanNoteImagesUploadResult
 import com.example.mykku.image.dto.ImageUploadResult
@@ -17,6 +18,17 @@ interface ImageUploadService {
         images: List<MultipartFile>?,
         pathPrefix: String
     ): EntityImagesUploadResult
+
+    fun uploadEntityImagesForUpdate(
+        thumbnailImage: MultipartFile?,
+        images: List<MultipartFile>?,
+        pathPrefix: String
+    ): EntityImagesUpdateUploadResult
+
+    fun uploadFanNoteImagesForUpdate(
+        coverImage: MultipartFile?,
+        pageImages: List<MultipartFile>?
+    ): FanNoteImagesUploadResult
 
     fun delete(url: String)
 }

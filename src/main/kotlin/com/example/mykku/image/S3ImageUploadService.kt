@@ -1,10 +1,17 @@
 package com.example.mykku.image
 
 import com.example.mykku.config.S3Properties
+import com.example.mykku.image.dto.EntityImagesUpdateUploadResult
 import com.example.mykku.image.dto.EntityImagesUploadResult
 import com.example.mykku.image.dto.FanNoteImagesUploadResult
 import com.example.mykku.image.dto.ImageUploadResult
 import com.example.mykku.image.exception.ImageException
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.stereotype.Service
+import org.springframework.web.multipart.MultipartFile
+import software.amazon.awssdk.core.sync.RequestBody
+import software.amazon.awssdk.services.s3.S3Client
+import software.amazon.awssdk.services.s3.model.PutObjectRequest
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
 import java.net.URI
@@ -13,12 +20,6 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.UUID
 import javax.imageio.ImageIO
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
-import org.springframework.stereotype.Service
-import org.springframework.web.multipart.MultipartFile
-import software.amazon.awssdk.core.sync.RequestBody
-import software.amazon.awssdk.services.s3.S3Client
-import software.amazon.awssdk.services.s3.model.PutObjectRequest
 
 @Service
 @ConditionalOnProperty(name = ["aws.s3.enabled"], havingValue = "true")
@@ -206,6 +207,48 @@ class S3ImageUploadService(
             "gif" -> "image/gif"
             "webp" -> "image/webp"
             else -> "application/octet-stream"
+        }
+    }
+
+    override fun uploadEntityImagesForUpdate(
+        thumbnailImage: MultipartFile?,
+        images: List<MultipartFile>?,
+        pathPrefix: String
+    ): EntityImagesUpdateUploadResult {
+        val folderName = createEntityFolder()
+        val uploaded = mutableListOf<String>()
+        return deleteUploadedOnFailure(uploaded) {
+            val thumbnailUrl = thumbnailImage?.takeIf { !it.isEmpty }
+                ?.let { uploadImageToS3(it, pathPrefix, folderName, "thumbnail").also(uploaded::add) }
+            val imageUrls = images.orEmpty().filterNot { it.isEmpty }.mapIndexed { index, file ->
+                uploadImageToS3(file, pathPrefix, folderName, "$index").also(uploaded::add)
+            }
+            EntityImagesUpdateUploadResult(thumbnailUrl, imageUrls)
+        }
+    }
+
+    override fun uploadFanNoteImagesForUpdate(
+        coverImage: MultipartFile?,
+        pageImages: List<MultipartFile>?
+    ): FanNoteImagesUploadResult {
+        val folderName = createFanNoteFolder()
+        val uploaded = mutableListOf<String>()
+        return deleteUploadedOnFailure(uploaded) {
+            val coverUrl = coverImage?.takeIf { !it.isEmpty }
+                ?.let { uploadFanNoteImageToS3(it, folderName, 0).also(uploaded::add) }
+            val pageUrls = pageImages.orEmpty().filterNot { it.isEmpty }.mapIndexed { index, file ->
+                uploadFanNoteImageToS3(file, folderName, index + 1).also(uploaded::add)
+            }
+            FanNoteImagesUploadResult(coverUrl, pageUrls)
+        }
+    }
+
+    private fun <T> deleteUploadedOnFailure(uploaded: List<String>, action: () -> T): T {
+        return try {
+            action()
+        } catch (e: Exception) {
+            uploaded.forEach { url -> runCatching { delete(url) } }
+            throw e
         }
     }
 

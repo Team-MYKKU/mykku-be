@@ -1,5 +1,6 @@
 package com.example.mykku.event.adapter.output.persistence
 
+import com.example.mykku.common.adapter.persistence.toCountMap
 import com.example.mykku.event.adapter.output.persistence.entity.EventParticipationJpaEntity
 import com.example.mykku.event.adapter.output.persistence.repository.EventJpaRepository
 import com.example.mykku.event.adapter.output.persistence.repository.EventParticipationJpaRepository
@@ -71,6 +72,19 @@ class EventParticipationRepositoryAdapter(
             .map { it.toDomain() }
     }
 
+    override fun findAllByEventId(eventId: EventId): List<EventParticipation> {
+        val eventJpaEntity = eventJpaRepository.findById(eventId.value).orElse(null)
+            ?: return emptyList()
+        return eventParticipationJpaRepository.findAllByEventOrderByIdAsc(eventJpaEntity)
+            .map { it.toDomain() }
+    }
+
+    override fun deleteAllByIdIn(ids: List<EventParticipationId>) {
+        if (ids.isEmpty()) return
+        eventParticipationJpaRepository.deleteAllByIdIn(ids.map { it.value })
+        eventParticipationJpaRepository.flush()
+    }
+
     override fun existsByMemberIdAndEventId(memberId: Long, eventId: EventId): Boolean {
         val memberJpaEntity = memberJpaRepository.findById(memberId).orElse(null)
             ?: return false
@@ -83,5 +97,10 @@ class EventParticipationRepositoryAdapter(
         val eventJpaEntity = eventJpaRepository.findById(eventId.value).orElse(null)
             ?: return 0L
         return eventParticipationJpaRepository.countByEvent(eventJpaEntity)
+    }
+
+    override fun countByEventIds(eventIds: List<EventId>): Map<Long, Int> {
+        if (eventIds.isEmpty()) return emptyMap()
+        return eventParticipationJpaRepository.countGroupedByEventIdIn(eventIds.map { it.value }).toCountMap()
     }
 }

@@ -2,7 +2,7 @@ package com.example.mykku.event.exception
 
 import com.example.mykku.common.exception.BaseDomainException
 
-class EventException(
+open class EventException(
     errorCode: EventErrorCode,
     additionalMessage: String? = null,
     cause: Throwable? = null
@@ -18,6 +18,10 @@ class EventException(
             EventException(EventErrorCode.EVENT_PARTICIPATION_NOT_FOUND)
         fun participationNotBelongToEvent(): EventException =
             EventException(EventErrorCode.PARTICIPATION_NOT_BELONG_TO_EVENT)
+        fun invalidKeepImageUrls(): EventException = EventException(EventErrorCode.INVALID_KEEP_IMAGE_URLS)
+        fun periodLockedAfterWinnerSelected(): EventException =
+            EventException(EventErrorCode.PERIOD_LOCKED_AFTER_WINNER_SELECTED)
+        fun invalidEventPeriod(): EventException = EventException(EventErrorCode.INVALID_EVENT_PERIOD)
         fun emptyWinners(): EventException = EventException(EventErrorCode.EMPTY_WINNERS)
         fun duplicateWinner(): EventException = EventException(EventErrorCode.DUPLICATE_WINNER)
         fun winnerNotAnnounced(): EventException = EventException(EventErrorCode.WINNER_NOT_ANNOUNCED)

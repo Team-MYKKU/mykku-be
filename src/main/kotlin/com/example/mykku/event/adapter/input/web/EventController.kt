@@ -6,7 +6,7 @@ import com.example.mykku.event.application.dto.EventListQuery
 import com.example.mykku.event.application.port.input.GetEventUseCase
 import com.example.mykku.event.application.port.input.ListEventsUseCase
 import com.example.mykku.event.domain.vo.EventSortType
-import com.example.mykku.event.domain.vo.EventStatusType
+import com.example.mykku.event.domain.vo.EventStatusFilter
 import com.example.mykku.member.domain.entity.Member
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -24,14 +24,14 @@ class EventController(
 
     @GetMapping
     fun getEvents(
-        @RequestParam(defaultValue = "ACTIVE") status: EventStatusType,
+        @RequestParam(defaultValue = "ACTIVE") status: EventStatusFilter,
         @RequestParam(defaultValue = "LATEST") sortType: EventSortType,
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "20") size: Int,
         @CurrentMember member: Member
     ): ResponseEntity<ApiResponse<PagedEventsResponse>> {
         val query = EventListQuery(
-            status = status,
+            filter = status.listFilter,
             sortType = sortType,
             page = page,
             size = size

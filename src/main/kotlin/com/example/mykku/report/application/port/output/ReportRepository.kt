@@ -17,4 +17,6 @@ interface ReportRepository {
         targetType: ReportTargetType,
         targetId: Long
     ): Boolean
+    fun findAllByTarget(targetType: ReportTargetType, targetId: Long): List<Report>
+    fun countByTargetMemberId(targetMemberId: Long): Long
 }

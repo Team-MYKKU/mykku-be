@@ -1,5 +1,6 @@
 package com.example.mykku.image
 
+import com.example.mykku.image.dto.EntityImagesUpdateUploadResult
 import com.example.mykku.image.dto.EntityImagesUploadResult
 import com.example.mykku.image.dto.FanNoteImagesUploadResult
 import com.example.mykku.image.dto.ImageUploadResult
@@ -35,6 +36,29 @@ class NoOpImageUploadService : ImageUploadService {
         throw ImageException.imageUploadServiceUnavailable()
     }
 
+    override fun uploadEntityImagesForUpdate(
+        thumbnailImage: MultipartFile?,
+        images: List<MultipartFile>?,
+        pathPrefix: String
+    ): EntityImagesUpdateUploadResult {
+        requireNoFiles(listOfNotNull(thumbnailImage) + images.orEmpty())
+        return EntityImagesUpdateUploadResult(null, emptyList())
+    }
+
+    override fun uploadFanNoteImagesForUpdate(
+        coverImage: MultipartFile?,
+        pageImages: List<MultipartFile>?
+    ): FanNoteImagesUploadResult {
+        requireNoFiles(listOfNotNull(coverImage) + pageImages.orEmpty())
+        return FanNoteImagesUploadResult(null, emptyList())
+    }
+
     override fun delete(url: String) {
+    }
+
+    private fun requireNoFiles(files: List<MultipartFile>) {
+        if (files.any { !it.isEmpty }) {
+            throw ImageException.imageUploadServiceUnavailable()
+        }
     }
 }

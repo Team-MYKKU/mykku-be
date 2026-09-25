@@ -3,6 +3,8 @@ package com.example.mykku.member.adapter.output.persistence
 import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import com.example.mykku.member.domain.vo.SocialProvider
 import com.example.mykku.role.adapter.output.persistence.entity.RoleJpaEntity
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
@@ -32,5 +34,13 @@ interface MemberJpaRepository : JpaRepository<MemberJpaEntity, Long> {
     fun existsByMemberId(memberId: String): Boolean
     fun existsByMemberIdAndIdNot(memberId: String, id: Long): Boolean
     fun findByMemberId(memberId: String): MemberJpaEntity?
+    fun findAllByMemberIdIn(memberIds: Collection<String>): List<MemberJpaEntity>
     fun findByProviderAndSocialId(provider: SocialProvider, socialId: String): MemberJpaEntity?
+    fun findAllByOrderByCreatedAtDescIdDesc(pageable: Pageable): Page<MemberJpaEntity>
+    fun findByMemberIdContainingOrNicknameContainingOrEmailContainingOrderByCreatedAtDescIdDesc(
+        memberId: String,
+        nickname: String,
+        email: String,
+        pageable: Pageable
+    ): Page<MemberJpaEntity>
 }

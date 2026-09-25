@@ -1,7 +1,8 @@
 package com.example.mykku.contest.application.dto
 
+import com.example.mykku.contest.domain.vo.ContestContent
+import com.example.mykku.contest.domain.vo.ContestListFilter
 import com.example.mykku.contest.domain.vo.ContestSortType
-import com.example.mykku.contest.domain.vo.ContestStatusType
 import org.springframework.data.domain.Pageable
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -22,8 +23,14 @@ data class ContestImageCommand(
 )
 
 data class ContestListQuery(
-    val status: ContestStatusType,
+    val filter: ContestListFilter,
     val sortType: ContestSortType,
+    val page: Int,
+    val size: Int
+)
+
+data class GetContestParticipantsQuery(
+    val contestId: Long,
     val page: Int,
     val size: Int
 )
@@ -70,4 +77,13 @@ data class UpsertContestWinnerAnnouncementCommand(
     val title: String,
     val content: String,
     val announcedAt: LocalDate
+)
+
+data class UpdateContestCommand(
+    val contestId: Long,
+    val content: ContestContent,
+    val thumbnailUrl: String?,
+    val keepImageUrls: List<String>,
+    val newImageUrls: List<String>,
+    val tags: List<String>
 )

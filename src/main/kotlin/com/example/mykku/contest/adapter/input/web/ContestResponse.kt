@@ -78,13 +78,15 @@ data class ContestListResponse(
     val winnerRank: Int?
 ) {
     companion object {
+        private val WINNER_STATUSES = setOf(ContestStatusType.WINNER_SELECTING, ContestStatusType.WINNER_SELECTED)
+
         fun from(result: ContestListResult): ContestListResponse {
             return ContestListResponse(
                 id = result.id,
                 title = result.title,
                 startedAt = result.startedAt,
                 expiredAt = result.expiredAt,
-                status = result.status,
+                status = if (result.status in WINNER_STATUSES) ContestStatusType.EXPIRED else result.status,
                 thumbnailUrl = result.thumbnailUrl,
                 tags = result.tags,
                 winnerStatus = result.winnerStatus,
@@ -233,7 +235,7 @@ data class ContestWinnerPreviewResponse(
 data class WinnerThumbnailResponse(
     val winnerId: Long,
     val winnerRank: Int,
-    val feedImageUrl: String?
+    val feedImageUrl: String
 ) {
     companion object {
         fun from(result: WinnerThumbnailResult): WinnerThumbnailResponse {
@@ -268,9 +270,9 @@ data class WinnerDetailResponse(
     val awardTitle: String?,
     val feedId: Long,
     val feedTitle: String,
-    val feedImageUrl: String?,
+    val feedImageUrl: String,
     val authorNickname: String,
-    val authorProfileImage: String?,
+    val authorProfileImage: String,
     val description: String,
     val acceptanceSpeech: String
 ) {

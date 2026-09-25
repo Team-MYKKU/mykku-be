@@ -50,4 +50,13 @@ class ReportRepositoryAdapter(
     ): Boolean {
         return reportJpaRepository.existsByReporterIdAndTargetTypeAndTargetId(reporterId, targetType, targetId)
     }
+
+    override fun findAllByTarget(targetType: ReportTargetType, targetId: Long): List<Report> {
+        return reportJpaRepository.findAllByTargetTypeAndTargetIdOrderByCreatedAtDescIdDesc(targetType, targetId)
+            .map { it.toDomain() }
+    }
+
+    override fun countByTargetMemberId(targetMemberId: Long): Long {
+        return reportJpaRepository.countByTargetMemberId(targetMemberId)
+    }
 }

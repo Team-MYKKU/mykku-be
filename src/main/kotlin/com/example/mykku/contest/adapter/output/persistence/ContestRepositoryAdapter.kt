@@ -5,6 +5,7 @@ import com.example.mykku.contest.adapter.output.persistence.repository.ContestJp
 import com.example.mykku.contest.application.port.output.ContestRepository
 import com.example.mykku.contest.domain.entity.Contest
 import com.example.mykku.contest.domain.vo.ContestId
+import com.example.mykku.contest.domain.vo.ContestListFilter
 import com.example.mykku.contest.domain.vo.ContestSortType
 import com.example.mykku.contest.domain.vo.ContestStatusType
 import org.springframework.data.domain.Page
@@ -18,7 +19,13 @@ class ContestRepositoryAdapter(
 ) : ContestRepository {
 
     override fun save(contest: Contest): Contest {
-        val jpaEntity = ContestJpaEntity.fromDomain(contest)
+        val jpaEntity = if (contest.id.value == 0L) {
+            ContestJpaEntity.fromDomain(contest)
+        } else {
+            contestJpaRepository.findById(contest.id.value)
+                .map { it.apply { updateFromDomain(contest) } }
+                .orElseGet { ContestJpaEntity.fromDomain(contest) }
+        }
         return contestJpaRepository.save(jpaEntity).toDomain()
     }
 
@@ -50,26 +57,43 @@ class ContestRepositoryAdapter(
     }
 
     override fun findWithPagination(
-        status: ContestStatusType,
+        filter: ContestListFilter,
         sortType: ContestSortType,
         pageable: Pageable,
         currentTime: LocalDateTime
     ): Page<Contest> {
-        val page = when (status) {
-            ContestStatusType.ALL -> {
-                contestJpaRepository.findAllByOrderByCreatedAtDesc(pageable)
-            }
-            ContestStatusType.ACTIVE, ContestStatusType.WINNER_SELECTING -> {
-                when (sortType) {
-                    ContestSortType.LATEST -> contestJpaRepository.findByExpiredAtAfterOrderByCreatedAtDesc(currentTime, pageable)
-                    ContestSortType.OLDEST -> contestJpaRepository.findByExpiredAtAfterOrderByCreatedAtAsc(currentTime, pageable)
-                    ContestSortType.POPULAR -> contestJpaRepository.findActiveContestsByPopular(currentTime, pageable)
-                }
-            }
-            ContestStatusType.EXPIRED, ContestStatusType.WINNER_SELECTED -> {
+        val page = when (filter) {
+            ContestListFilter.ALL -> contestJpaRepository.findAllByOrderByCreatedAtDesc(pageable)
+            ContestListFilter.ACTIVE -> findActiveContests(sortType, currentTime, pageable)
+            ContestListFilter.EXPIRED ->
                 contestJpaRepository.findByExpiredAtLessThanEqualOrderByCreatedAtDesc(currentTime, pageable)
-            }
+            ContestListFilter.PENDING_SELECTION -> contestJpaRepository
+                .findByExpiredAtLessThanEqualAndStatusNotOrderByCreatedAtDesc(currentTime, WINNER_SELECTED, pageable)
+            ContestListFilter.WINNER_SELECTED ->
+                contestJpaRepository.findByStatusOrderByCreatedAtDesc(WINNER_SELECTED, pageable)
         }
         return page.map { it.toDomain() }
+    }
+
+    private fun findActiveContests(
+        sortType: ContestSortType,
+        currentTime: LocalDateTime,
+        pageable: Pageable
+    ): Page<ContestJpaEntity> {
+        return when (sortType) {
+            ContestSortType.LATEST ->
+                contestJpaRepository.findByExpiredAtAfterOrderByCreatedAtDesc(currentTime, pageable)
+            ContestSortType.OLDEST ->
+                contestJpaRepository.findByExpiredAtAfterOrderByCreatedAtAsc(currentTime, pageable)
+            ContestSortType.POPULAR -> contestJpaRepository.findActiveContestsByPopular(currentTime, pageable)
+        }
+    }
+
+    override fun deleteById(id: ContestId) {
+        contestJpaRepository.deleteContestById(id.value)
+    }
+
+    companion object {
+        private val WINNER_SELECTED = ContestStatusType.WINNER_SELECTED
     }
 }

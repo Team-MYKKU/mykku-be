@@ -23,7 +23,6 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import com.example.mykku.docs.ApiRequestConfig
 import com.example.mykku.docs.RestDocumentationResponse
-import com.example.mykku.docs.Tag
 import com.example.mykku.contest.exception.ContestErrorCode
 import com.example.mykku.contest.exception.ContestException
 import io.restassured.http.ContentType
@@ -42,11 +41,7 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
     @DisplayName("수상작 목록 조회")
     inner class GetContestsWithWinners {
 
-        private val apiConfig = ApiRequestConfig(
-            tag = Tag.CONTEST_WINNER_API,
-            summary = "수상작 목록 조회",
-            description = "모든 콘테스트의 수상작 미리보기를 조회합니다."
-        )
+        private val apiConfig = ApiRequestConfig()
 
         @Test
         fun `성공`() {
@@ -71,7 +66,7 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
                             WinnerThumbnailResult(
                                 winnerId = 3L,
                                 winnerRank = 3,
-                                feedImageUrl = null
+                                feedImageUrl = "https://example.com/contest-thumbnail1.jpg"
                             )
                         )
                     ),
@@ -100,22 +95,27 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
                         .responseBodyField(
                             fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
                             fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
-                            fieldWithPath("data.contests[]").type(JsonFieldType.ARRAY).description("콘테스트 목록"),
+                            fieldWithPath("data.contests[]").type(JsonFieldType.ARRAY)
+                                .description(
+                                    "콘테스트 목록 (status가 WINNER_SELECTED이고 수상자가 1명 이상인 콘테스트만, " +
+                                        "순서 보장 없음, 해당 콘테스트가 없으면 빈 배열)"
+                                ),
                             fieldWithPath("data.contests[].contestId").type(JsonFieldType.NUMBER)
                                 .description("콘테스트 ID"),
                             fieldWithPath("data.contests[].contestTitle").type(JsonFieldType.STRING)
                                 .description("콘테스트 제목"),
                             fieldWithPath("data.contests[].startedAt").type(JsonFieldType.STRING)
-                                .description("콘테스트 시작일시"),
+                                .description("콘테스트 시작 일시 (KST, ISO-8601, 오프셋 없음)"),
                             fieldWithPath("data.contests[].expiredAt").type(JsonFieldType.STRING)
-                                .description("콘테스트 종료일시"),
-                            fieldWithPath("data.contests[].winners[]").type(JsonFieldType.ARRAY).description("수상자 목록"),
+                                .description("콘테스트 종료 일시 (KST, ISO-8601, 오프셋 없음)"),
+                            fieldWithPath("data.contests[].winners[]").type(JsonFieldType.ARRAY)
+                                .description("수상자 목록 (winnerRank 오름차순, 1~3개)"),
                             fieldWithPath("data.contests[].winners[].winnerId").type(JsonFieldType.NUMBER)
-                                .description("수상자 ID"),
+                                .description("수상 기록 ID (회원 ID가 아님. 수상 소감 등록 API의 winnerId로 사용)"),
                             fieldWithPath("data.contests[].winners[].winnerRank").type(JsonFieldType.NUMBER)
-                                .description("순위"),
+                                .description(WINNER_RANK_DESCRIPTION),
                             fieldWithPath("data.contests[].winners[].feedImageUrl").type(JsonFieldType.STRING)
-                                .description("피드 이미지 URL").optional()
+                                .description("수상 피드의 첫 번째 이미지 URL (이미지가 없는 피드면 콘테스트 썸네일 URL)")
                         )
                 )
                 .build()
@@ -134,9 +134,6 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
     inner class GetContestWinnerDetail {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.CONTEST_WINNER_API,
-            summary = "수상작 상세 조회",
-            description = "특정 콘테스트의 수상작 상세 정보를 조회합니다.",
             pathParameters = listOf(
                 parameterWithName("contestId").description("콘테스트 ID")
             )
@@ -169,7 +166,7 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
                         feedTitle = "2등 작품",
                         feedImageUrl = "https://example.com/image2.jpg",
                         authorNickname = "user2",
-                        authorProfileImage = null,
+                        authorProfileImage = "",
                         description = "2등 수상 설명",
                         acceptanceSpeech = ""
                     )
@@ -187,22 +184,29 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
                             fieldWithPath("data.contestId").type(JsonFieldType.NUMBER).description("콘테스트 ID"),
                             fieldWithPath("data.contestTitle").type(JsonFieldType.STRING).description("콘테스트 제목"),
-                            fieldWithPath("data.winners[]").type(JsonFieldType.ARRAY).description("수상자 목록"),
-                            fieldWithPath("data.winners[].winnerId").type(JsonFieldType.NUMBER).description("수상자 ID"),
-                            fieldWithPath("data.winners[].winnerRank").type(JsonFieldType.NUMBER).description("순위"),
+                            fieldWithPath("data.winners[]").type(JsonFieldType.ARRAY)
+                                .description("수상자 목록 (winnerRank 오름차순. 수상자가 아직 선정되지 않았으면 빈 배열)"),
+                            fieldWithPath("data.winners[].winnerId").type(JsonFieldType.NUMBER)
+                                .description("수상 기록 ID (회원 ID가 아님. 수상 소감 등록 API의 winnerId로 사용)"),
+                            fieldWithPath("data.winners[].winnerRank").type(JsonFieldType.NUMBER)
+                                .description(WINNER_RANK_DESCRIPTION),
                             fieldWithPath("data.winners[].awardTitle").type(JsonFieldType.STRING)
                                 .description("수상명 (예: 최우수상, 미입력 시 null)").optional(),
                             fieldWithPath("data.winners[].feedId").type(JsonFieldType.NUMBER).description("피드 ID"),
                             fieldWithPath("data.winners[].feedTitle").type(JsonFieldType.STRING).description("피드 제목"),
                             fieldWithPath("data.winners[].feedImageUrl").type(JsonFieldType.STRING)
-                                .description("피드 이미지 URL").optional(),
+                                .description("수상 피드의 첫 번째 이미지 URL (이미지가 없는 피드면 빈 문자열(\"\"))"),
                             fieldWithPath("data.winners[].authorNickname").type(JsonFieldType.STRING)
-                                .description("작성자 닉네임"),
+                                .description("작성자 닉네임 (탈퇴한 회원이면 빈 문자열(\"\"))"),
                             fieldWithPath("data.winners[].authorProfileImage").type(JsonFieldType.STRING)
-                                .description("작성자 프로필 이미지").optional(),
-                            fieldWithPath("data.winners[].description").type(JsonFieldType.STRING).description("수상 설명"),
+                                .description(
+                                    "작성자 프로필 이미지 URL (탈퇴한 회원이거나 " +
+                                        "프로필 이미지를 설정하지 않았으면 빈 문자열(\"\"))"
+                                ),
+                            fieldWithPath("data.winners[].description").type(JsonFieldType.STRING)
+                                .description("관리자가 입력한 수상 설명 (입력하지 않았으면 빈 문자열(\"\"))"),
                             fieldWithPath("data.winners[].acceptanceSpeech").type(JsonFieldType.STRING)
-                                .description("수상 소감")
+                                .description(ACCEPTANCE_SPEECH_DESCRIPTION)
                         )
                 )
                 .build()
@@ -241,9 +245,6 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
     inner class GetContestWinnerAnnouncement {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.CONTEST_WINNER_API,
-            summary = "수상자 발표 공지 조회",
-            description = "특정 콘테스트의 수상자 발표 공지글(제목/본문/발표일)을 조회합니다.",
             pathParameters = listOf(
                 parameterWithName("contestId").description("콘테스트 ID")
             )
@@ -272,8 +273,13 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.contestId").type(JsonFieldType.NUMBER).description("콘테스트 ID"),
                             fieldWithPath("data.contestTitle").type(JsonFieldType.STRING).description("콘테스트 제목"),
                             fieldWithPath("data.title").type(JsonFieldType.STRING).description("공지 제목"),
-                            fieldWithPath("data.content").type(JsonFieldType.STRING).description("공지 본문"),
-                            fieldWithPath("data.announcedAt").type(JsonFieldType.STRING).description("발표일 (yyyy-MM-dd)")
+                            fieldWithPath("data.content").type(JsonFieldType.STRING)
+                                .description(
+                                    "공지 본문 (줄바꿈 문자 \\n을 포함할 수 있는 일반 텍스트, HTML/마크다운 아님, " +
+                                        "별도 길이 제한 없음)"
+                                ),
+                            fieldWithPath("data.announcedAt").type(JsonFieldType.STRING)
+                                .description("표시용 발표일 (yyyy-MM-dd). 이 날짜 이전에도 공지는 조회됨")
                         )
                 )
                 .build()
@@ -284,6 +290,26 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
                 .get("/api/v1/contests/{contestId}/winner-announcement", contestId)
                 .then()
                 .statusCode(200)
+        }
+
+        @Test
+        fun `콘테스트 없음`() {
+            val contestId = 999L
+
+            `when`(getContestWinnerAnnouncementUseCase.execute(contestId))
+                .thenThrow(ContestException(ContestErrorCode.CONTEST_NOT_FOUND))
+
+            val documentFilter = document("contest-winner/announcement", "CONTEST_NOT_FOUND")
+                .request(request().applyConfig(apiConfig))
+                .response(RestDocumentationResponse.ERROR_RESPONSE)
+                .build()
+
+            given(documentFilter)
+                .contentType(ContentType.JSON)
+                .`when`()
+                .get("/api/v1/contests/{contestId}/winner-announcement", contestId)
+                .then()
+                .statusCode(404)
         }
 
         @Test
@@ -312,9 +338,6 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
     inner class GetMyWinnerStatus {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.CONTEST_WINNER_API,
-            summary = "내 수상 여부 조회",
-            description = "특정 콘테스트에서 인증된 사용자의 수상 여부를 조회합니다.",
             pathParameters = listOf(
                 parameterWithName("contestId").description("콘테스트 ID")
             ),
@@ -339,9 +362,17 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
                         .responseBodyField(
                             fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
                             fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
-                            fieldWithPath("data.isWinner").type(JsonFieldType.BOOLEAN).description("수상 여부"),
-                            fieldWithPath("data.winnerId").type(JsonFieldType.NUMBER).description("수상자 ID").optional(),
-                            fieldWithPath("data.winnerRank").type(JsonFieldType.NUMBER).description("수상 순위").optional()
+                            fieldWithPath("data.isWinner").type(JsonFieldType.BOOLEAN)
+                                .description("수상 여부 (true: 이 콘테스트에서 수상, false: 수상하지 않음)"),
+                            fieldWithPath("data.winnerId").type(JsonFieldType.NUMBER)
+                                .description(
+                                    "수상 기록 ID (회원 ID가 아님. isWinner=false이면 null. " +
+                                        "수상 소감 등록 API의 winnerId로 사용)"
+                                )
+                                .optional(),
+                            fieldWithPath("data.winnerRank").type(JsonFieldType.NUMBER)
+                                .description("수상 순위 (1~3, 1이 최고 순위. isWinner=false이면 null)")
+                                .optional()
                         )
                 )
                 .build()
@@ -403,12 +434,9 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
     inner class GetMyAwardContests {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.CONTEST_WINNER_API,
-            summary = "내 수상 콘테스트 목록 조회",
-            description = "인증된 사용자가 수상한 콘테스트 목록을 페이지네이션으로 조회합니다.",
             queryParameters = listOf(
-                parameterWithName("page").description("페이지 번호 (0부터 시작)").optional(),
-                parameterWithName("size").description("페이지 크기 (기본 20)").optional()
+                parameterWithName("page").description(PAGE_DESCRIPTION).optional(),
+                parameterWithName("size").description(SIZE_DESCRIPTION).optional()
             ),
             headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
@@ -456,17 +484,25 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
                         .responseBodyField(
                             fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
                             fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
-                            fieldWithPath("data.content[]").type(JsonFieldType.ARRAY).description("수상 콘테스트 목록"),
+                            fieldWithPath("data.content[]").type(JsonFieldType.ARRAY)
+                                .description(
+                                    "수상 콘테스트 목록 (수상 기록 1건당 1항목, 수상자 선정 시각 최신순" +
+                                        "(재선정 때 유지된 수상은 처음 선정된 시각 기준), 수상 이력이 없으면 빈 배열)"
+                                ),
                             fieldWithPath("data.content[].contestId").type(JsonFieldType.NUMBER).description("콘테스트 ID"),
                             fieldWithPath("data.content[].contestTitle").type(JsonFieldType.STRING).description("콘테스트 제목"),
-                            fieldWithPath("data.content[].thumbnailUrl").type(JsonFieldType.STRING).description("콘테스트 썸네일 URL"),
-                            fieldWithPath("data.content[].winnerRank").type(JsonFieldType.NUMBER).description("수상 순위"),
+                            fieldWithPath("data.content[].thumbnailUrl").type(JsonFieldType.STRING)
+                                .description("콘테스트 대표 썸네일 URL (수상 피드 이미지와 다름)"),
+                            fieldWithPath("data.content[].winnerRank").type(JsonFieldType.NUMBER)
+                                .description("수상 순위 (1, 2, 3 중 하나. 1이 최고 순위)"),
                             fieldWithPath("data.content[].awardTitle").type(JsonFieldType.STRING)
                                 .description("수상명 (예: 최우수상, 미입력 시 null)").optional(),
-                            fieldWithPath("data.content[].acceptanceSpeech").type(JsonFieldType.STRING).description("수상 소감"),
+                            fieldWithPath("data.content[].acceptanceSpeech").type(JsonFieldType.STRING)
+                                .description(ACCEPTANCE_SPEECH_DESCRIPTION),
                             fieldWithPath("data.content[].feedId").type(JsonFieldType.NUMBER).description("피드 ID"),
                             fieldWithPath("data.content[].feedTitle").type(JsonFieldType.STRING).description("피드 제목"),
-                            fieldWithPath("data.content[].feedImageUrl").type(JsonFieldType.STRING).description("피드 이미지 URL").optional(),
+                            fieldWithPath("data.content[].feedImageUrl").type(JsonFieldType.STRING)
+                                .description(FEED_IMAGE_URL_DESCRIPTION).optional(),
                             fieldWithPath("data.page").type(JsonFieldType.NUMBER).description("현재 페이지"),
                             fieldWithPath("data.size").type(JsonFieldType.NUMBER).description("페이지 크기"),
                             fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER).description("전체 항목 수"),
@@ -491,12 +527,9 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
     inner class GetMyAwardFeeds {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.CONTEST_WINNER_API,
-            summary = "내 수상 피드 목록 조회",
-            description = "인증된 사용자가 수상한 피드 목록을 페이지네이션으로 조회합니다.",
             queryParameters = listOf(
-                parameterWithName("page").description("페이지 번호 (0부터 시작)").optional(),
-                parameterWithName("size").description("페이지 크기 (기본 20)").optional()
+                parameterWithName("page").description(PAGE_DESCRIPTION).optional(),
+                parameterWithName("size").description(SIZE_DESCRIPTION).optional()
             ),
             headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
@@ -549,7 +582,11 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
                         .responseBodyField(
                             fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
                             fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
-                            fieldWithPath("data.feeds[]").type(JsonFieldType.ARRAY).description("피드 목록"),
+                            fieldWithPath("data.feeds[]").type(JsonFieldType.ARRAY)
+                                .description(
+                                    "수상한 피드 목록 (피드 작성일 최신순, 같은 피드는 한 번만 포함, " +
+                                        "수상 이력이 없으면 빈 배열)"
+                                ),
                             fieldWithPath("data.feeds[].id").type(JsonFieldType.NUMBER).description("피드 ID"),
                             fieldWithPath("data.feeds[].author").type(JsonFieldType.OBJECT).description("작성자 정보").optional(),
                             fieldWithPath("data.feeds[].author.memberId").type(JsonFieldType.STRING).description("작성자 회원 ID").optional(),
@@ -558,9 +595,11 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.feeds[].author.role").type(JsonFieldType.OBJECT).description("작성자 역할").optional(),
                             fieldWithPath("data.feeds[].author.role.id").type(JsonFieldType.NUMBER).description("역할 ID"),
                             fieldWithPath("data.feeds[].author.role.name").type(JsonFieldType.STRING).description("역할 이름"),
-                            fieldWithPath("data.feeds[].author.role.description").type(JsonFieldType.STRING).description("역할 설명"),
+                            fieldWithPath("data.feeds[].author.role.description").type(JsonFieldType.STRING)
+                                .description("역할 설명 (설명이 없는 역할이면 null)").optional(),
                             fieldWithPath("data.feeds[].board").type(JsonFieldType.STRING).description("게시판 이름"),
-                            fieldWithPath("data.feeds[].createdAt").type(JsonFieldType.STRING).description("생성일시"),
+                            fieldWithPath("data.feeds[].createdAt").type(JsonFieldType.STRING)
+                                .description("피드 작성 일시 (KST, ISO-8601, 오프셋 없음)"),
                             fieldWithPath("data.feeds[].title").type(JsonFieldType.STRING).description("피드 제목"),
                             fieldWithPath("data.feeds[].content").type(JsonFieldType.STRING).description("피드 내용"),
                             fieldWithPath("data.feeds[].images[]").type(JsonFieldType.ARRAY).description("이미지 목록"),
@@ -572,11 +611,24 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.feeds[].tags[].title").type(JsonFieldType.STRING).description("태그 제목"),
                             fieldWithPath("data.feeds[].tags[].isContest").type(JsonFieldType.BOOLEAN).description("콘테스트 태그 여부"),
                             fieldWithPath("data.feeds[].likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
-                            fieldWithPath("data.feeds[].isLiked").type(JsonFieldType.BOOLEAN).description("좋아요 여부"),
+                            fieldWithPath("data.feeds[].isLiked").type(JsonFieldType.BOOLEAN)
+                                .description("요청한 사용자가 이 피드에 좋아요를 눌렀는지 여부"),
                             fieldWithPath("data.feeds[].commentCount").type(JsonFieldType.NUMBER).description("댓글 수"),
-                            fieldWithPath("data.feeds[].comment").type(JsonFieldType.OBJECT).description("첫 번째 댓글 미리보기"),
-                            fieldWithPath("data.feeds[].comment.profileImage").type(JsonFieldType.STRING).description("댓글 작성자 프로필").optional(),
-                            fieldWithPath("data.feeds[].comment.content").type(JsonFieldType.STRING).description("댓글 내용"),
+                            fieldWithPath("data.feeds[].comment").type(JsonFieldType.OBJECT)
+                                .description(
+                                    "가장 먼저 작성된 최상위 댓글(대댓글 제외) 미리보기 (댓글이 없어도 객체는 항상 존재)"
+                                ),
+                            fieldWithPath("data.feeds[].comment.profileImage").type(JsonFieldType.STRING)
+                                .description(
+                                    "미리보기 댓글 작성자 프로필 이미지 URL (댓글이 없거나 첫 댓글 작성자가 탈퇴했으면 null, " +
+                                        "작성자가 프로필 이미지를 설정하지 않았으면 빈 문자열(\"\"))"
+                                )
+                                .optional(),
+                            fieldWithPath("data.feeds[].comment.content").type(JsonFieldType.STRING)
+                                .description(
+                                    "댓글 내용 (댓글이 없거나 첫 댓글 작성자가 탈퇴했으면 빈 문자열(\"\"). " +
+                                        "댓글 유무는 commentCount로 판단)"
+                                ),
                             fieldWithPath("data.currentPage").type(JsonFieldType.NUMBER).description("현재 페이지"),
                             fieldWithPath("data.totalPages").type(JsonFieldType.NUMBER).description("전체 페이지 수"),
                             fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER).description("전체 항목 수"),
@@ -602,9 +654,6 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
     inner class GetMyAwardsPreview {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.CONTEST_WINNER_API,
-            summary = "내 수상 미리보기 조회",
-            description = "인증된 사용자의 최근 수상 콘테스트 3개의 썸네일과 ID를 조회합니다.",
             headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
 
@@ -624,9 +673,14 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
                     response()
                         .responseBodyField(
                             fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-                            fieldWithPath("data[]").type(JsonFieldType.ARRAY).description("미리보기 목록"),
+                            fieldWithPath("data[]").type(JsonFieldType.ARRAY)
+                                .description(
+                                    "미리보기 목록 (수상자 선정 시각 최신순 최대 3건, 수상 이력이 없으면 빈 배열. " +
+                                        "한 회원은 한 콘테스트에서 한 번만 수상하므로 contestId는 중복되지 않음)"
+                                ),
                             fieldWithPath("data[].contestId").type(JsonFieldType.NUMBER).description("콘테스트 ID"),
-                            fieldWithPath("data[].thumbnailUrl").type(JsonFieldType.STRING).description("콘테스트 썸네일 URL")
+                            fieldWithPath("data[].thumbnailUrl").type(JsonFieldType.STRING)
+                                .description("콘테스트 대표 썸네일 URL (수상 피드 이미지가 아님)")
                         )
                 )
                 .build()
@@ -646,14 +700,19 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
     inner class UpdateAcceptanceSpeech {
 
         private val apiConfig = ApiRequestConfig(
-            tag = Tag.CONTEST_WINNER_API,
-            summary = "수상 소감 등록",
-            description = "수상자 본인이 수상 소감을 등록합니다.",
             pathParameters = listOf(
-                parameterWithName("winnerId").description("수상자 ID")
+                parameterWithName("winnerId")
+                    .description(
+                        "수상 기록 ID (회원 ID가 아님. 내 수상 여부 조회의 data.winnerId 또는 " +
+                            "수상작 상세 조회의 winners[].winnerId 값)"
+                    )
             ),
             requestBodyFields = listOf(
-                fieldWithPath("acceptanceSpeech").type(JsonFieldType.STRING).description("수상 소감 (최대 1000자)")
+                fieldWithPath("acceptanceSpeech").type(JsonFieldType.STRING)
+                    .description(
+                        "수상 소감 (1~1000자, 빈 문자열이나 공백만 있는 값은 불가. 기존 소감을 지우는 기능은 없음. " +
+                            "글자 수는 UTF-16 기준이라 일부 이모지는 2자로 계산됨)"
+                    )
             ),
             headerDescriptors = AUTH_HEADER_DESCRIPTOR
         )
@@ -673,8 +732,9 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
                         .responseBodyField(
                             fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
                             fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
-                            fieldWithPath("data.winnerId").type(JsonFieldType.NUMBER).description("수상자 ID"),
-                            fieldWithPath("data.acceptanceSpeech").type(JsonFieldType.STRING).description("수상 소감")
+                            fieldWithPath("data.winnerId").type(JsonFieldType.NUMBER).description("수상 기록 ID"),
+                            fieldWithPath("data.acceptanceSpeech").type(JsonFieldType.STRING)
+                                .description("저장된 수상 소감 (기존 소감을 덮어쓴 결과)")
                         )
                 )
                 .build()
@@ -687,6 +747,29 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
                 .patch("/api/v1/contests/winners/{winnerId}/acceptance-speech", winnerId)
                 .then()
                 .statusCode(200)
+        }
+
+        @Test
+        fun `수상 기록 없음`() {
+            val winnerId = 999L
+            val request = UpdateAcceptanceSpeechRequest(acceptanceSpeech = "소감입니다.")
+
+            `when`(updateAcceptanceSpeechUseCase.execute(any()))
+                .thenThrow(ContestException(ContestErrorCode.CONTEST_WINNER_NOT_FOUND))
+
+            val documentFilter = document("contest-winner/update-acceptance-speech", "CONTEST_WINNER_NOT_FOUND")
+                .request(request().applyConfig(apiConfig))
+                .response(RestDocumentationResponse.ERROR_RESPONSE)
+                .build()
+
+            given(documentFilter)
+                .headers(AUTH_HEADER)
+                .contentType(ContentType.JSON)
+                .body(objectMapper.writeValueAsString(request))
+                .`when`()
+                .patch("/api/v1/contests/winners/{winnerId}/acceptance-speech", winnerId)
+                .then()
+                .statusCode(404)
         }
 
         @Test
@@ -711,5 +794,15 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
                 .then()
                 .statusCode(403)
         }
+    }
+
+    companion object {
+        private const val WINNER_RANK_DESCRIPTION =
+            "수상 순위 (1, 2, 3 중 하나. 1이 최고 순위이며 한 콘테스트 안에서 중복되지 않음. " +
+                "수상 피드가 삭제되면 해당 순위가 빠질 수 있음)"
+        private const val FEED_IMAGE_URL_DESCRIPTION = "수상 피드의 첫 번째 이미지 URL (이미지가 없는 피드면 null)"
+        private const val ACCEPTANCE_SPEECH_DESCRIPTION = "수상 소감 (아직 등록하지 않았으면 빈 문자열(\"\"))"
+        private const val PAGE_DESCRIPTION = "페이지 번호 (0부터 시작, 0 이상, 기본값: 0)"
+        private const val SIZE_DESCRIPTION = "페이지 크기 (1~1000, 기본값: 20)"
     }
 }

@@ -14,5 +14,11 @@ class FanNoteException(
 
         fun fanNotePageNotFound(): FanNoteException =
             FanNoteException(FanNoteErrorCode.FAN_NOTE_PAGE_NOT_FOUND)
+
+        fun invalidKeepImageUrls(): FanNoteException =
+            FanNoteException(FanNoteErrorCode.INVALID_KEEP_IMAGE_URLS)
+
+        fun coverImageConflict(): FanNoteException =
+            FanNoteException(FanNoteErrorCode.COVER_IMAGE_CONFLICT)
     }
 }

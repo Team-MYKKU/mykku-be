@@ -9,7 +9,7 @@ import java.time.LocalDateTime
 
 class Report private constructor(
     val id: ReportId?,
-    val reporterId: Long,
+    val reporterId: Long?,
     val targetType: ReportTargetType,
     val targetId: Long,
     val targetMemberId: Long?,
@@ -69,7 +69,7 @@ class Report private constructor(
 
         fun reconstitute(
             id: ReportId,
-            reporterId: Long,
+            reporterId: Long?,
             targetType: ReportTargetType,
             targetId: Long,
             targetMemberId: Long?,

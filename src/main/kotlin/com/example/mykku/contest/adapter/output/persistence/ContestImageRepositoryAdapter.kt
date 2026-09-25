@@ -47,4 +47,10 @@ class ContestImageRepositoryAdapter(
         return contestImageJpaRepository.findByContestIn(contestJpaEntities)
             .map { it.toDomain() }
     }
+
+    override fun deleteAllByContestId(contestId: ContestId) {
+        val contestJpaEntity = contestJpaRepository.findById(contestId.value).orElse(null) ?: return
+        contestImageJpaRepository.deleteAllByContest(contestJpaEntity)
+        contestImageJpaRepository.flush()
+    }
 }

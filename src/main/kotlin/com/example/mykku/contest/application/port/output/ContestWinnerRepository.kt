@@ -20,4 +20,5 @@ interface ContestWinnerRepository {
     fun existsByContestId(contestId: ContestId): Boolean
     fun deleteAllByContestId(contestId: ContestId)
     fun deleteAllByParticipationIds(participationIds: List<ContestParticipationId>)
+    fun countByContestIds(contestIds: List<ContestId>): Map<Long, Int>
 }

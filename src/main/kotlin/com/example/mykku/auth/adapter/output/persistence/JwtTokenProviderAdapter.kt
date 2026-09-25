@@ -17,6 +17,12 @@ class JwtTokenProviderAdapter(
     val jwtProperties: JwtProperties
 ) : TokenProvider {
 
+    companion object {
+        private const val TOKEN_TYPE_CLAIM = "tokenType"
+        private const val ACCESS_TOKEN_TYPE = "access"
+        private const val REFRESH_TOKEN_TYPE = "refresh"
+    }
+
     private val logger = LoggerFactory.getLogger(JwtTokenProviderAdapter::class.java)
     private val secretKey = Keys.hmacShaKeyFor(jwtProperties.secret.toByteArray())
 
@@ -27,7 +33,7 @@ class JwtTokenProviderAdapter(
         return Jwts.builder()
             .subject(memberId.toString())
             .claim("email", email)
-            .claim("tokenType", "access")
+            .claim(TOKEN_TYPE_CLAIM, ACCESS_TOKEN_TYPE)
             .issuedAt(now)
             .expiration(expiryDate)
             .signWith(secretKey)
@@ -40,7 +46,7 @@ class JwtTokenProviderAdapter(
 
         return Jwts.builder()
             .subject(memberId.toString())
-            .claim("tokenType", "refresh")
+            .claim(TOKEN_TYPE_CLAIM, REFRESH_TOKEN_TYPE)
             .issuedAt(now)
             .expiration(expiryDate)
             .signWith(secretKey)
@@ -87,9 +93,17 @@ class JwtTokenProviderAdapter(
         return claims.get("email", String::class.java)
     }
 
+    override fun isAccessToken(token: String): Boolean {
+        return hasTokenType(token, ACCESS_TOKEN_TYPE)
+    }
+
     override fun isRefreshToken(token: String): Boolean {
+        return hasTokenType(token, REFRESH_TOKEN_TYPE)
+    }
+
+    private fun hasTokenType(token: String, tokenType: String): Boolean {
         return try {
-            getTokenType(token) == "refresh"
+            getTokenType(token) == tokenType
         } catch (e: Exception) {
             false
         }
@@ -105,7 +119,7 @@ class JwtTokenProviderAdapter(
 
     private fun getTokenType(token: String): String? {
         val claims = parseToken(token)
-        return claims.get("tokenType", String::class.java)
+        return claims.get(TOKEN_TYPE_CLAIM, String::class.java)
     }
 
     private fun parseToken(token: String): Claims {

@@ -2,6 +2,7 @@ package com.example.mykku.contest.application.port.output
 
 import com.example.mykku.contest.domain.entity.Contest
 import com.example.mykku.contest.domain.vo.ContestId
+import com.example.mykku.contest.domain.vo.ContestListFilter
 import com.example.mykku.contest.domain.vo.ContestSortType
 import com.example.mykku.contest.domain.vo.ContestStatusType
 import org.springframework.data.domain.Page
@@ -16,9 +17,10 @@ interface ContestRepository {
     fun findByStatusAndExpiredAtAfter(status: ContestStatusType, dateTime: LocalDateTime): List<Contest>
     fun findAllByIds(ids: List<ContestId>): List<Contest>
     fun findWithPagination(
-        status: ContestStatusType,
+        filter: ContestListFilter,
         sortType: ContestSortType,
         pageable: Pageable,
         currentTime: LocalDateTime
     ): Page<Contest>
+    fun deleteById(id: ContestId)
 }

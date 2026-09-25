@@ -1,7 +1,8 @@
 package com.example.mykku.event.application.dto
 
+import com.example.mykku.event.domain.vo.EventContent
+import com.example.mykku.event.domain.vo.EventListFilter
 import com.example.mykku.event.domain.vo.EventSortType
-import com.example.mykku.event.domain.vo.EventStatusType
 import org.springframework.data.domain.Pageable
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -22,7 +23,7 @@ data class EventImageCommand(
 )
 
 data class EventListQuery(
-    val status: EventStatusType,
+    val filter: EventListFilter,
     val sortType: EventSortType,
     val page: Int,
     val size: Int
@@ -30,7 +31,8 @@ data class EventListQuery(
 
 data class SetEventWinnersCommand(
     val eventId: Long,
-    val participationIds: List<Long>
+    val memberIds: List<String>,
+    val dryRun: Boolean
 )
 
 data class GetMyEventWinnerStatusQuery(
@@ -48,4 +50,12 @@ data class UpsertEventWinnerAnnouncementCommand(
     val title: String,
     val content: String,
     val announcedAt: LocalDate
+)
+
+data class UpdateEventCommand(
+    val eventId: Long,
+    val content: EventContent,
+    val thumbnailUrl: String?,
+    val keepImageUrls: List<String>,
+    val newImageUrls: List<String>
 )

@@ -24,35 +24,24 @@ class ListContestsUseCaseImpl(
     @Transactional(readOnly = true)
     override fun execute(query: ContestListQuery): PagedContestsResult {
         val pageable = PageableValidator.validateAndCreate(query.page, query.size)
+        val now = LocalDateTime.now()
 
-        val contestPage = contestRepository.findWithPagination(
-            query.status,
-            query.sortType,
-            pageable,
-            LocalDateTime.now()
-        )
+        val contestPage = contestRepository.findWithPagination(query.filter, query.sortType, pageable, now)
 
         val contestIds = contestPage.content.map { it.id }
         val tagsByContestId = contestTagRepository.findByContestIds(contestIds)
             .groupBy { it.contestId.value }
 
         val contestListResults = contestPage.content.map { contest ->
-            toContestListResult(contest, tagsByContestId)
+            toContestListResult(contest, tagsByContestId, now)
         }
-
-        return PagedContestsResult(
-            content = contestListResults,
-            page = contestPage.number,
-            size = contestPage.size,
-            totalElements = contestPage.totalElements,
-            totalPages = contestPage.totalPages,
-            isLast = contestPage.isLast
-        )
+        return PagedContestsResult.of(contestPage, contestListResults)
     }
 
     private fun toContestListResult(
         contest: Contest,
-        tagsByContestId: Map<Long, List<ContestTag>>
+        tagsByContestId: Map<Long, List<ContestTag>>,
+        now: LocalDateTime
     ): ContestListResult {
         val tags = tagsByContestId[contest.id.value] ?: emptyList()
 
@@ -61,7 +50,7 @@ class ListContestsUseCaseImpl(
             title = contest.title,
             startedAt = contest.startedAt,
             expiredAt = contest.expiredAt,
-            status = contest.status,
+            status = contest.resolveStatus(now),
             thumbnailUrl = contest.thumbnailUrl,
             tags = tags.map { it.title }
         )

@@ -4,6 +4,7 @@ import com.example.mykku.BaseControllerTest
 import com.example.mykku.auth.adapter.input.web.dto.LogoutRequest
 import com.example.mykku.auth.adapter.input.web.dto.RefreshTokenRequest
 import com.example.mykku.auth.application.port.output.TokenProvider
+import com.example.mykku.auth.exception.AuthErrorCode
 import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import com.example.mykku.member.domain.vo.SocialProvider
 import com.example.mykku.role.adapter.output.persistence.entity.RoleJpaEntity
@@ -79,6 +80,7 @@ class AuthControllerTest : BaseControllerTest() {
             .post("/api/v1/auth/refresh")
             .then()
             .statusCode(401)
+            .body("code", equalTo(AuthErrorCode.INVALID_TOKEN.code))
     }
 
     @Test
@@ -110,6 +112,7 @@ class AuthControllerTest : BaseControllerTest() {
             .post("/api/v1/auth/refresh")
             .then()
             .statusCode(401)
+            .body("code", equalTo(AuthErrorCode.INVALID_TOKEN.code))
     }
 
     @Test

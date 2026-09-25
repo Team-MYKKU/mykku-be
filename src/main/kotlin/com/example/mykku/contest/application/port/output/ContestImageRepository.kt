@@ -7,4 +7,5 @@ interface ContestImageRepository {
     fun save(contestImage: ContestImage): ContestImage
     fun saveAll(contestImages: List<ContestImage>): List<ContestImage>
     fun findByContestIds(contestIds: List<ContestId>): List<ContestImage>
+    fun deleteAllByContestId(contestId: ContestId)
 }

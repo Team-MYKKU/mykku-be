@@ -68,7 +68,7 @@ class GetContestWinnersListUseCaseImpl(
                 WinnerThumbnailResult(
                     winnerId = winner.id.value,
                     winnerRank = winner.winnerRank,
-                    feedImageUrl = feedImageByParticipationId[winner.participationId.value]
+                    feedImageUrl = feedImageByParticipationId[winner.participationId.value] ?: contest.thumbnailUrl
                 )
             }
         )
