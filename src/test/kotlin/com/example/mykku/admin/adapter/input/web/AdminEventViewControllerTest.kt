@@ -5,6 +5,8 @@ import com.example.mykku.event.adapter.output.persistence.entity.EventJpaEntity
 import com.example.mykku.event.adapter.output.persistence.repository.EventJpaRepository
 import com.example.mykku.event.domain.vo.EventStatusType
 import io.restassured.RestAssured
+import io.restassured.http.ContentType
+import io.restassured.response.ValidatableResponse
 import org.hamcrest.Matchers.containsString
 import org.hamcrest.Matchers.endsWith
 import org.hamcrest.Matchers.not
@@ -134,6 +136,116 @@ class AdminEventViewControllerTest : BaseControllerTest() {
             .then()
             .statusCode(302)
             .header("Location", endsWith("/admin/login"))
+    }
+
+    @Test
+    @DisplayName("목록의 각 행에 당첨자 화면 링크가 있다")
+    fun `listPage - 당첨자 링크`() {
+        val adminSessionId = getAdminSessionId()
+        val event = createAndSaveEvent(title = "링크 이벤트", expiredAt = LocalDateTime.now().minusDays(1))
+
+        getPage(adminSessionId, "/admin/event")
+            .statusCode(200)
+            .body(containsString("href=\"/admin/event/${event.id}/winners\""))
+    }
+
+    @Test
+    @DisplayName("당첨자 화면은 현재 당첨자 memberId를 줄마다 채우고, 공지가 없으면 빈 폼을 띄운다")
+    fun `winnersPage - 현재 당첨자 미리 채움과 빈 공지 폼`() {
+        val adminSessionId = getAdminSessionId()
+        createAndSaveMember(memberId = "memberA", email = "a@example.com", socialId = "a1")
+        createAndSaveMember(memberId = "memberB", email = "b@example.com", socialId = "b1")
+        val event = createAndSaveEvent(title = "당첨 이벤트", expiredAt = LocalDateTime.now().minusDays(1))
+        putWinners(adminSessionId, event.id!!, listOf("memberA", "memberB"))
+
+        getPage(adminSessionId, "/admin/event/${event.id}/winners")
+            .statusCode(200)
+            .body(containsString("class=\"nav-link active\" href=\"/admin/event\""))
+            .body(containsString("memberA\nmemberB</textarea>"))
+            .body(containsString("id=\"announcement-empty\""))
+            .body(not(containsString("id=\"withdrawn-winner-notice\"")))
+            .body(not(containsString("id=\"not-selectable-notice\"")))
+    }
+
+    @Test
+    @DisplayName("탈퇴한 당첨자는 입력칸에서 빠지고 유지된다는 안내를 띄운다")
+    fun `winnersPage - 탈퇴 당첨자 안내`() {
+        val adminSessionId = getAdminSessionId()
+        createAndSaveMember(memberId = "memberA", email = "a@example.com", socialId = "a1")
+        val memberB = createAndSaveMember(memberId = "memberB", email = "b@example.com", socialId = "b1")
+        val event = createAndSaveEvent(title = "탈퇴 이벤트", expiredAt = LocalDateTime.now().minusDays(1))
+        putWinners(adminSessionId, event.id!!, listOf("memberA", "memberB"))
+        memberJpaRepository.deleteById(memberB.id)
+
+        getPage(adminSessionId, "/admin/event/${event.id}/winners")
+            .statusCode(200)
+            .body(containsString(">memberA</textarea>"))
+            .body(containsString("탈퇴한 당첨자 1명은"))
+    }
+
+    @Test
+    @DisplayName("공지가 있으면 폼을 미리 채운다")
+    fun `winnersPage - 공지 미리 채움`() {
+        val adminSessionId = getAdminSessionId()
+        val event = createAndSaveEvent(title = "공지 이벤트", expiredAt = LocalDateTime.now().minusDays(1))
+        RestAssured.given()
+            .sessionId(adminSessionId)
+            .contentType(ContentType.JSON)
+            .body(mapOf("title" to "당첨자 발표", "content" to "축하합니다", "announcedAt" to "2025-10-10"))
+            .`when`()
+            .put("/admin/api/v1/events/{eventId}/winner-announcement", event.id)
+            .then()
+            .statusCode(200)
+
+        getPage(adminSessionId, "/admin/event/${event.id}/winners")
+            .statusCode(200)
+            .body(containsString("value=\"당첨자 발표\""))
+            .body(containsString(">축하합니다</textarea>"))
+            .body(containsString("value=\"2025-10-10\""))
+            .body(not(containsString("id=\"announcement-empty\"")))
+    }
+
+    @Test
+    @DisplayName("종료 전인 이벤트는 확인 버튼을 끄고 안내를 띄운다")
+    fun `winnersPage - 종료 전이면 저장 불가 안내`() {
+        val adminSessionId = getAdminSessionId()
+        val event = createAndSaveEvent(title = "진행중 이벤트", expiredAt = LocalDateTime.now().plusDays(3))
+
+        getPage(adminSessionId, "/admin/event/${event.id}/winners")
+            .statusCode(200)
+            .body(containsString("id=\"not-selectable-notice\""))
+            .body(containsString("id=\"check-winners\" class=\"btn btn-outline-primary me-2\" disabled"))
+    }
+
+    @Test
+    @DisplayName("세션 없이 당첨자 화면에 접근하면 로그인으로 리다이렉트된다")
+    fun `winnersPage - 미인증이면 302`() {
+        RestAssured.given()
+            .redirects().follow(false)
+            .`when`()
+            .get("/admin/event/1/winners")
+            .then()
+            .statusCode(302)
+            .header("Location", endsWith("/admin/login"))
+    }
+
+    private fun getPage(adminSessionId: String, path: String): ValidatableResponse {
+        return RestAssured.given()
+            .sessionId(adminSessionId)
+            .`when`()
+            .get(path)
+            .then()
+    }
+
+    private fun putWinners(adminSessionId: String, eventId: Long, memberIds: List<String>) {
+        RestAssured.given()
+            .sessionId(adminSessionId)
+            .contentType(ContentType.JSON)
+            .body(mapOf("memberIds" to memberIds, "dryRun" to false))
+            .`when`()
+            .put("/admin/api/v1/events/{eventId}/winners", eventId)
+            .then()
+            .statusCode(200)
     }
 
     private fun activeTab(status: String): String {

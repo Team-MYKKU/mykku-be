@@ -2,7 +2,7 @@ package com.example.mykku.event.exception
 
 import com.example.mykku.common.exception.BaseDomainException
 
-class EventException(
+open class EventException(
     errorCode: EventErrorCode,
     additionalMessage: String? = null,
     cause: Throwable? = null

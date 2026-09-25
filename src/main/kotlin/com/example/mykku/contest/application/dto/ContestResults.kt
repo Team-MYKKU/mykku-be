@@ -90,6 +90,66 @@ data class WinnerInfoResult(
     val authorNickname: String
 )
 
+data class ContestParticipantsResult(
+    val contest: ContestParticipantsHeaderResult,
+    val currentWinners: List<CurrentContestWinnerResult>,
+    val participants: PagedContestParticipantsResult
+)
+
+data class ContestParticipantsHeaderResult(
+    val id: Long,
+    val title: String,
+    val startedAt: LocalDateTime,
+    val expiredAt: LocalDateTime,
+    val status: ContestStatusType,
+    val tags: List<String>,
+    val winnerSelectable: Boolean
+)
+
+data class CurrentContestWinnerResult(
+    val participationId: Long,
+    val winnerRank: Int,
+    val awardTitle: String?,
+    val description: String,
+    val feedTitle: String,
+    val authorMemberId: String?
+)
+
+data class ContestParticipantResult(
+    val participationId: Long,
+    val feedId: Long,
+    val feedTitle: String,
+    val imageUrl: String?,
+    val authorMemberId: String?,
+    val authorNickname: String?,
+    val authorWithdrawn: Boolean,
+    val likeCount: Int,
+    val participatedAt: LocalDateTime,
+    val participatedBeforeStart: Boolean
+)
+
+data class PagedContestParticipantsResult(
+    val content: List<ContestParticipantResult>,
+    val page: Int,
+    val size: Int,
+    val totalElements: Long,
+    val totalPages: Int,
+    val isLast: Boolean
+) {
+    companion object {
+        fun <T> of(page: Page<T>, content: List<ContestParticipantResult>): PagedContestParticipantsResult {
+            return PagedContestParticipantsResult(
+                content = content,
+                page = page.number,
+                size = page.size,
+                totalElements = page.totalElements,
+                totalPages = page.totalPages,
+                isLast = page.isLast
+            )
+        }
+    }
+}
+
 data class ContestWinnersListResult(
     val contests: List<ContestWinnerPreviewResult>
 )

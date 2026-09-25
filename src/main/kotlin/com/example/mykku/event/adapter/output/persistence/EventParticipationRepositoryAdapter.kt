@@ -71,6 +71,19 @@ class EventParticipationRepositoryAdapter(
             .map { it.toDomain() }
     }
 
+    override fun findAllByEventId(eventId: EventId): List<EventParticipation> {
+        val eventJpaEntity = eventJpaRepository.findById(eventId.value).orElse(null)
+            ?: return emptyList()
+        return eventParticipationJpaRepository.findAllByEventOrderByIdAsc(eventJpaEntity)
+            .map { it.toDomain() }
+    }
+
+    override fun deleteAllByIdIn(ids: List<EventParticipationId>) {
+        if (ids.isEmpty()) return
+        eventParticipationJpaRepository.deleteAllByIdIn(ids.map { it.value })
+        eventParticipationJpaRepository.flush()
+    }
+
     override fun existsByMemberIdAndEventId(memberId: Long, eventId: EventId): Boolean {
         val memberJpaEntity = memberJpaRepository.findById(memberId).orElse(null)
             ?: return false

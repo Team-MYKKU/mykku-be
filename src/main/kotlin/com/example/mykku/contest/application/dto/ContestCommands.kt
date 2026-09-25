@@ -28,6 +28,12 @@ data class ContestListQuery(
     val size: Int
 )
 
+data class GetContestParticipantsQuery(
+    val contestId: Long,
+    val page: Int,
+    val size: Int
+)
+
 data class SetContestWinnersCommand(
     val contestId: Long,
     val winners: List<WinnerSelectionCommand>

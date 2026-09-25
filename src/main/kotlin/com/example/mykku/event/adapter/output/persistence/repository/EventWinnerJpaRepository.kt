@@ -1,6 +1,7 @@
 package com.example.mykku.event.adapter.output.persistence.repository
 
 import com.example.mykku.event.adapter.output.persistence.entity.EventJpaEntity
+import com.example.mykku.event.adapter.output.persistence.entity.EventParticipationJpaEntity
 import com.example.mykku.event.adapter.output.persistence.entity.EventWinnerJpaEntity
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Repository
 interface EventWinnerJpaRepository : JpaRepository<EventWinnerJpaEntity, Long> {
     fun findByEvent(event: EventJpaEntity): List<EventWinnerJpaEntity>
     fun deleteAllByEvent(event: EventJpaEntity)
+    fun deleteAllByParticipationIn(participations: List<EventParticipationJpaEntity>)
 
     @Query(
         "SELECT w FROM EventWinnerJpaEntity w " +

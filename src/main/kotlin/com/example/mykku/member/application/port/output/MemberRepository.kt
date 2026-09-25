@@ -19,6 +19,7 @@ interface MemberRepository {
     fun existsByMemberId(memberId: String): Boolean
     fun existsByMemberIdExcludingId(memberId: String, id: MemberPk): Boolean
     fun findByMemberId(memberId: String): Member?
+    fun findByMemberIds(memberIds: List<String>): List<Member>
     fun deleteById(id: MemberPk)
     fun search(keyword: String?, pageable: Pageable): Page<Member>
 }

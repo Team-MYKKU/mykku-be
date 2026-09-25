@@ -34,6 +34,7 @@ interface MemberJpaRepository : JpaRepository<MemberJpaEntity, Long> {
     fun existsByMemberId(memberId: String): Boolean
     fun existsByMemberIdAndIdNot(memberId: String, id: Long): Boolean
     fun findByMemberId(memberId: String): MemberJpaEntity?
+    fun findAllByMemberIdIn(memberIds: Collection<String>): List<MemberJpaEntity>
     fun findByProviderAndSocialId(provider: SocialProvider, socialId: String): MemberJpaEntity?
     fun findAllByOrderByCreatedAtDescIdDesc(pageable: Pageable): Page<MemberJpaEntity>
     fun findByMemberIdContainingOrNicknameContainingOrEmailContainingOrderByCreatedAtDescIdDesc(

@@ -30,7 +30,8 @@ data class EventListQuery(
 
 data class SetEventWinnersCommand(
     val eventId: Long,
-    val participationIds: List<Long>
+    val memberIds: List<String>,
+    val dryRun: Boolean
 )
 
 data class GetMyEventWinnerStatusQuery(

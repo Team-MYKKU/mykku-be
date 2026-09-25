@@ -13,6 +13,8 @@ interface EventParticipationRepository {
     fun findEventsByMemberId(memberId: Long, pageable: Pageable): Page<Event>
     fun findByMemberIdAndEventIds(memberId: Long, eventIds: List<EventId>): List<EventParticipation>
     fun findAllByIdIn(ids: List<EventParticipationId>): List<EventParticipation>
+    fun findAllByEventId(eventId: EventId): List<EventParticipation>
+    fun deleteAllByIdIn(ids: List<EventParticipationId>)
     fun existsByMemberIdAndEventId(memberId: Long, eventId: EventId): Boolean
     fun countByEventId(eventId: EventId): Long
 }

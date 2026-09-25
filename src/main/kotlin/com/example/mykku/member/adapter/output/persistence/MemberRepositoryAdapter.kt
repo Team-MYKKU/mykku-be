@@ -80,6 +80,11 @@ class MemberRepositoryAdapter(
         return memberJpaRepository.findByMemberId(memberId)?.toDomain()
     }
 
+    override fun findByMemberIds(memberIds: List<String>): List<Member> {
+        if (memberIds.isEmpty()) return emptyList()
+        return memberJpaRepository.findAllByMemberIdIn(memberIds).map { it.toDomain() }
+    }
+
     override fun search(keyword: String?, pageable: Pageable): Page<Member> {
         val trimmed = keyword?.trim()
         val page = if (trimmed.isNullOrEmpty()) {

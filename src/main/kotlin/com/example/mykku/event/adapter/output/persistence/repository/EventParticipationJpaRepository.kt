@@ -16,6 +16,8 @@ interface EventParticipationJpaRepository : JpaRepository<EventParticipationJpaE
     fun countByEvent(event: EventJpaEntity): Long
     fun findByMemberAndEventIn(member: MemberJpaEntity, events: List<EventJpaEntity>): List<EventParticipationJpaEntity>
     fun findAllByIdIn(ids: List<Long>): List<EventParticipationJpaEntity>
+    fun findAllByEventOrderByIdAsc(event: EventJpaEntity): List<EventParticipationJpaEntity>
+    fun deleteAllByIdIn(ids: List<Long>)
 
     @Query("SELECT ep.event FROM EventParticipationJpaEntity ep WHERE ep.member = :member ORDER BY ep.createdAt DESC")
     fun findEventsByMember(member: MemberJpaEntity, pageable: Pageable): Page<EventJpaEntity>

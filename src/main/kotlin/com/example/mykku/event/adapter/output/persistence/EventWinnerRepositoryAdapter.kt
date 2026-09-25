@@ -7,6 +7,7 @@ import com.example.mykku.event.adapter.output.persistence.repository.EventWinner
 import com.example.mykku.event.application.port.output.EventWinnerRepository
 import com.example.mykku.event.domain.entity.EventWinner
 import com.example.mykku.event.domain.vo.EventId
+import com.example.mykku.event.domain.vo.EventParticipationId
 import com.example.mykku.event.exception.EventException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -78,6 +79,14 @@ class EventWinnerRepositoryAdapter(
         val eventJpaEntity = eventJpaRepository.findById(eventId.value).orElse(null)
             ?: return
         eventWinnerJpaRepository.deleteAllByEvent(eventJpaEntity)
+        eventWinnerJpaRepository.flush()
+    }
+
+    override fun deleteAllByParticipationIds(participationIds: List<EventParticipationId>) {
+        if (participationIds.isEmpty()) return
+        val participations = eventParticipationJpaRepository.findAllByIdIn(participationIds.map { it.value })
+        if (participations.isEmpty()) return
+        eventWinnerJpaRepository.deleteAllByParticipationIn(participations)
         eventWinnerJpaRepository.flush()
     }
 }

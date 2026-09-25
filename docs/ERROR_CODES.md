@@ -11,6 +11,8 @@
 }
 ```
 
+예외로, 관리자 이벤트 당첨자 저장 API(`PUT /admin/api/v1/events/{eventId}/winners`)의 EV106 응답에는 저장할 수 없는 입력값 목록 `invalidMemberIds`(문자열 배열, 입력 순서, 중복 없음)가 더 붙습니다.
+
 ## 에러 코드 체계
 
 | Prefix | 도메인 | 설명 |
@@ -169,6 +171,7 @@
 | EV101 | EVENT_IMAGE_LIMIT_EXCEEDED | 400 | 이벤트 이미지는 최대 10개까지 등록할 수 있습니다 |
 | EV102 | EVENT_NOT_ACTIVE | 400 | 진행 중인 이벤트가 아닙니다 |
 | EV103 | EVENT_NOT_EXPIRED | 400 | 아직 종료되지 않은 이벤트입니다 |
+| EV106 | INVALID_WINNER_MEMBER_IDS | 400 | 당첨자로 지정할 수 없는 회원 아이디가 있습니다 |
 | EV301 | ALREADY_PARTICIPATED | 409 | 이미 참여한 이벤트입니다 |
 | EV302 | EVENT_PARTICIPATION_NOT_FOUND | 404 | 이벤트 참여 정보를 찾을 수 없습니다 |
 | EV303 | PARTICIPATION_NOT_BELONG_TO_EVENT | 400 | 해당 이벤트의 참여 정보가 아닙니다 |

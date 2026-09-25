@@ -1,6 +1,7 @@
 package com.example.mykku.event.application.dto
 
 import com.example.mykku.event.domain.vo.EventStatusType
+import com.example.mykku.event.domain.vo.EventWinnerEntryStatus
 import com.example.mykku.event.domain.vo.EventWinnerStatus
 import org.springframework.data.domain.Page
 import java.time.LocalDate
@@ -98,13 +99,30 @@ data class PagedMyParticipatedEventsResult(
 data class SetEventWinnersResult(
     val eventId: Long,
     val eventTitle: String,
-    val winners: List<EventWinnerInfoResult>
+    val dryRun: Boolean,
+    val entries: List<EventWinnerEntryResult>,
+    val addedCount: Int,
+    val keptCount: Int,
+    val removedCount: Int,
+    val withdrawnKeptCount: Int
 )
 
-data class EventWinnerInfoResult(
-    val winnerId: Long,
+data class EventWinnerEntryResult(
+    val input: String,
     val memberId: String?,
-    val nickname: String?
+    val nickname: String?,
+    val result: EventWinnerEntryStatus
+)
+
+data class EventWinnerSelectionResult(
+    val eventId: Long,
+    val title: String,
+    val startedAt: LocalDateTime,
+    val expiredAt: LocalDateTime,
+    val status: EventStatusType,
+    val winnerSelectable: Boolean,
+    val winnerMemberIds: List<String>,
+    val withdrawnWinnerCount: Int
 )
 
 data class EventWinnersResult(
