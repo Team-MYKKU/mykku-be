@@ -9,8 +9,8 @@ import com.example.mykku.contest.adapter.output.persistence.repository.ContestPa
 import com.example.mykku.contest.adapter.output.persistence.repository.ContestWinnerJpaRepository
 import com.example.mykku.contest.domain.vo.ContestStatusType
 import com.example.mykku.contest.exception.ContestErrorCode
-import com.example.mykku.feed.adapter.output.persistence.entity.FeedJpaEntity
 import com.example.mykku.feed.adapter.output.persistence.FeedJpaRepository
+import com.example.mykku.feed.adapter.output.persistence.entity.FeedJpaEntity
 import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
@@ -21,6 +21,7 @@ import org.hamcrest.Matchers.notNullValue
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.jdbc.core.JdbcTemplate
 import java.time.LocalDateTime
 
 @DisplayName("AdminContestController 통합 테스트")
@@ -37,6 +38,9 @@ class AdminContestApiControllerTest : BaseControllerTest() {
 
     @Autowired
     private lateinit var contestWinnerJpaRepository: ContestWinnerJpaRepository
+
+    @Autowired
+    private lateinit var jdbcTemplate: JdbcTemplate
 
     @Test
     @DisplayName("수상자 선정 - 정상 케이스")
@@ -339,6 +343,74 @@ class AdminContestApiControllerTest : BaseControllerTest() {
             .body("code", equalTo(AdminErrorCode.UNAUTHORIZED.code))
     }
 
+    @Test
+    @DisplayName("콘테스트 삭제 - 참여·수상·태그·이미지·공지를 함께 지우고 피드 글은 남긴다")
+    fun `delete - 딸린 기록을 함께 지운다`() {
+        val adminSessionId = getAdminSessionId()
+        val contest = createAndSaveContest()
+        val (participationA, _) = createTwoParticipations(contest)
+        postWinners(adminSessionId, contest.id!!, listOf(participationA to 1)).statusCode(200)
+        jdbcTemplate.update(
+            "INSERT INTO contest_tag (title, contest_id, created_at, updated_at) VALUES ('덕질', ?, NOW(), NOW())",
+            contest.id
+        )
+        jdbcTemplate.update(
+            "INSERT INTO contest_image (url, order_index, contest_id, created_at, updated_at) " +
+                "VALUES ('https://test-bucket.s3.amazonaws.com/c.jpg', 0, ?, NOW(), NOW())",
+            contest.id
+        )
+        saveContestAnnouncement(adminSessionId, contest.id!!)
+
+        RestAssured.given()
+            .sessionId(adminSessionId)
+            .`when`()
+            .delete("/admin/api/v1/contests/{contestId}", contest.id)
+            .then()
+            .statusCode(200)
+            .body("message", equalTo("콘테스트가 삭제되었습니다"))
+
+        CONTEST_CHILD_TABLES.forEach { assertThat(countByContest(it, contest.id!!)).`as`(it).isZero() }
+        assertThat(contestJpaRepository.existsById(contest.id!!)).isFalse()
+        assertThat(feedJpaRepository.count()).isEqualTo(2)
+    }
+
+    @Test
+    @DisplayName("콘테스트 삭제 - 없는 콘테스트는 CN001, 미인증은 401")
+    fun `delete - 없는 콘테스트와 미인증`() {
+        RestAssured.given()
+            .sessionId(getAdminSessionId())
+            .`when`()
+            .delete("/admin/api/v1/contests/{contestId}", 999999L)
+            .then()
+            .statusCode(404)
+            .body("code", equalTo(ContestErrorCode.CONTEST_NOT_FOUND.code))
+        RestAssured.given()
+            .`when`()
+            .delete("/admin/api/v1/contests/{contestId}", 1L)
+            .then()
+            .statusCode(401)
+            .body("code", equalTo(AdminErrorCode.UNAUTHORIZED.code))
+    }
+
+    private fun saveContestAnnouncement(adminSessionId: String, contestId: Long) {
+        RestAssured.given()
+            .sessionId(adminSessionId)
+            .contentType(ContentType.JSON)
+            .body(mapOf("title" to "발표", "content" to "축하합니다", "announcedAt" to "2025-10-10"))
+            .`when`()
+            .put("/admin/api/v1/contests/{contestId}/winner-announcement", contestId)
+            .then()
+            .statusCode(200)
+    }
+
+    private fun countByContest(table: String, contestId: Long): Int {
+        return jdbcTemplate.queryForObject(
+            "SELECT COUNT(*) FROM $table WHERE contest_id = ?",
+            Int::class.java,
+            contestId
+        )!!
+    }
+
     private fun createAndSaveContest(
         title: String = "테스트 공모전",
         status: ContestStatusType = ContestStatusType.ACTIVE,
@@ -431,5 +503,15 @@ class AdminContestApiControllerTest : BaseControllerTest() {
             feed = feed
         )
         return contestParticipationJpaRepository.save(participation)
+    }
+
+    companion object {
+        private val CONTEST_CHILD_TABLES = listOf(
+            "contest_participation",
+            "contest_winner",
+            "contest_tag",
+            "contest_image",
+            "contest_winner_announcement"
+        )
     }
 }

@@ -19,4 +19,5 @@ interface ContestParticipationRepository {
     fun existsByMemberIdAndContestIdAndFeedId(memberId: Long, contestId: ContestId, feedId: Long): Boolean
     fun countByContestId(contestId: ContestId): Long
     fun deleteAll(participations: List<ContestParticipation>)
+    fun countByContestIds(contestIds: List<ContestId>): Map<Long, Int>
 }

@@ -3,6 +3,8 @@ package com.example.mykku.admin.controller
 import com.example.mykku.admin.service.AdminContestService
 import com.example.mykku.contest.application.dto.ContestWinnerAnnouncementResult
 import com.example.mykku.contest.application.dto.GetContestParticipantsQuery
+import com.example.mykku.contest.application.port.input.GetContestDeletionSummariesUseCase
+import com.example.mykku.contest.application.port.input.GetContestForEditUseCase
 import com.example.mykku.contest.application.port.input.GetContestParticipantsUseCase
 import com.example.mykku.contest.application.port.input.GetContestWinnerAnnouncementUseCase
 import com.example.mykku.contest.domain.vo.ContestListFilter
@@ -20,7 +22,9 @@ import org.springframework.web.bind.annotation.RequestParam
 class AdminContestViewController(
     private val adminContestService: AdminContestService,
     private val getContestParticipantsUseCase: GetContestParticipantsUseCase,
-    private val getContestWinnerAnnouncementUseCase: GetContestWinnerAnnouncementUseCase
+    private val getContestWinnerAnnouncementUseCase: GetContestWinnerAnnouncementUseCase,
+    private val getContestDeletionSummariesUseCase: GetContestDeletionSummariesUseCase,
+    private val getContestForEditUseCase: GetContestForEditUseCase
 ) {
 
     @GetMapping
@@ -32,6 +36,8 @@ class AdminContestViewController(
     ): String {
         val contests = adminContestService.findAll(page, size, status)
         model.addAttribute("contests", contests)
+        val deletionSummaries = getContestDeletionSummariesUseCase.execute(contests.content.map { it.id })
+        model.addAttribute("deletionSummaries", deletionSummaries)
         model.addAttribute("currentStatus", status)
         return "admin/contest/list"
     }
@@ -39,6 +45,12 @@ class AdminContestViewController(
     @GetMapping("/create")
     fun createPage(): String {
         return "admin/contest/create"
+    }
+
+    @GetMapping("/{contestId}/edit")
+    fun editPage(@PathVariable contestId: Long, model: Model): String {
+        model.addAttribute("contest", getContestForEditUseCase.execute(contestId))
+        return "admin/contest/edit"
     }
 
     @GetMapping("/{contestId}/participants")

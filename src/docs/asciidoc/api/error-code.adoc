@@ -8,7 +8,7 @@
 * *정렬*: `code` 의 문자열 오름차순입니다(예: `AD001`, `AD101`, ..., `AU101`, ...).
 * `code` 는 에러 응답 본문의 `code` 와 같은 값이고, `name` 은 각 API 문서 *에러 응답* 항목 제목의 에러 이름과 같습니다. 클라이언트 분기는 `code` 로 하세요.
 * `message` 는 기본 메시지입니다. 실제 응답의 `message` 와 다를 수 있으므로(예: `C101` 검증 실패는 필드별 메시지) 표시용으로만 쓰세요.
-* 관리자 전용 코드(`AD`)도 포함됩니다. 신고(`RP`) 코드는 현재 이 목록에 포함되어 있지 않으므로 <<report-api>> 문서의 에러 응답을 참고하세요.
+* 관리자 전용 코드(`AD`)와 신고(`RP`) 코드도 포함됩니다.
 * 정의되어 있어도 현재 어떤 API도 반환하지 않는 코드가 있습니다. 각 API가 반환하는 에러는 해당 API 문서의 *에러 응답* 항목과 <<overview-common-errors>>를 기준으로 하세요.
 
 operation::error-code/list/200[snippets='http-request,http-response,response-fields']

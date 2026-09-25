@@ -281,6 +281,57 @@ class AdminEventApiControllerTest : BaseControllerTest() {
     }
 
     @Test
+    @DisplayName("이벤트 삭제 - 참여·당첨·공지·이미지를 함께 지운다")
+    fun `delete - 딸린 기록을 함께 지운다`() {
+        val adminSessionId = getAdminSessionId()
+        createAndSaveMember(memberId = "memberA", email = "a@example.com", socialId = "a1")
+        val event = createAndSaveEvent()
+        putWinners(adminSessionId, event.id!!, listOf("memberA")).statusCode(200)
+        jdbcTemplate.update(
+            "INSERT INTO event_image (url, order_index, event_id, created_at, updated_at) " +
+                "VALUES ('https://test-bucket.s3.amazonaws.com/e.jpg', 0, ?, NOW(), NOW())",
+            event.id
+        )
+        RestAssured.given()
+            .sessionId(adminSessionId)
+            .contentType(ContentType.JSON)
+            .body(mapOf("title" to "발표", "content" to "축하합니다", "announcedAt" to "2025-10-10"))
+            .`when`()
+            .put("/admin/api/v1/events/{eventId}/winner-announcement", event.id)
+            .then()
+            .statusCode(200)
+
+        RestAssured.given()
+            .sessionId(adminSessionId)
+            .`when`()
+            .delete("/admin/api/v1/events/{eventId}", event.id)
+            .then()
+            .statusCode(200)
+            .body("message", equalTo("이벤트가 삭제되었습니다"))
+
+        EVENT_CHILD_TABLES.forEach { assertThat(countByEvent(it, event.id!!)).`as`(it).isZero() }
+        assertThat(eventJpaRepository.existsById(event.id!!)).isFalse()
+    }
+
+    @Test
+    @DisplayName("이벤트 삭제 - 없는 이벤트는 EV001, 미인증은 401")
+    fun `delete - 없는 이벤트와 미인증`() {
+        RestAssured.given()
+            .sessionId(getAdminSessionId())
+            .`when`()
+            .delete("/admin/api/v1/events/{eventId}", 999999L)
+            .then()
+            .statusCode(404)
+            .body("code", equalTo(EventErrorCode.EVENT_NOT_FOUND.code))
+        RestAssured.given()
+            .`when`()
+            .delete("/admin/api/v1/events/{eventId}", 1L)
+            .then()
+            .statusCode(401)
+            .body("code", equalTo(AdminErrorCode.UNAUTHORIZED.code))
+    }
+
+    @Test
     @DisplayName("당첨자 발표 공지 저장 - 정상 케이스(신규 생성)")
     fun `upsertWinnerAnnouncement - 관리자가 공지를 신규 저장한다`() {
         val adminSessionId = getAdminSessionId()
@@ -415,11 +466,24 @@ class AdminEventApiControllerTest : BaseControllerTest() {
         ).associate { it["member_id"] as String? to (it["winner_id"] as Number).toLong() }
     }
 
+    private fun countByEvent(table: String, eventId: Long): Int {
+        return jdbcTemplate.queryForObject("SELECT COUNT(*) FROM $table WHERE event_id = ?", Int::class.java, eventId)!!
+    }
+
     private fun participationCountOf(eventId: Long): Int {
         return jdbcTemplate.queryForObject(
             "SELECT COUNT(*) FROM event_participation WHERE event_id = ?",
             Int::class.java,
             eventId
         )!!
+    }
+
+    companion object {
+        private val EVENT_CHILD_TABLES = listOf(
+            "event_participation",
+            "event_winner",
+            "event_winner_announcement",
+            "event_image"
+        )
     }
 }

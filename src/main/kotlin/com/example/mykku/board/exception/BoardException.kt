@@ -10,5 +10,8 @@ class BoardException(
 
     companion object {
         fun boardNotFound(): BoardException = BoardException(BoardErrorCode.BOARD_NOT_FOUND)
+        fun moveTargetSameBoard(): BoardException = BoardException(BoardErrorCode.MOVE_TARGET_SAME_BOARD)
+        fun moveTargetBoardNotFound(): BoardException = BoardException(BoardErrorCode.MOVE_TARGET_BOARD_NOT_FOUND)
+        fun boardHasFeeds(): BoardException = BoardException(BoardErrorCode.BOARD_HAS_FEEDS)
     }
 }

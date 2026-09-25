@@ -75,6 +75,10 @@ class EventRepositoryAdapter(
         }
     }
 
+    override fun deleteById(id: EventId) {
+        eventJpaRepository.deleteEventById(id.value)
+    }
+
     companion object {
         private val WINNER_SELECTED = EventStatusType.WINNER_SELECTED
     }

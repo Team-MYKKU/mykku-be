@@ -89,6 +89,10 @@ class ContestRepositoryAdapter(
         }
     }
 
+    override fun deleteById(id: ContestId) {
+        contestJpaRepository.deleteContestById(id.value)
+    }
+
     companion object {
         private val WINNER_SELECTED = ContestStatusType.WINNER_SELECTED
     }

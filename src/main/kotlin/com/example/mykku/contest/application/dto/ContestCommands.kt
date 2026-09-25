@@ -1,5 +1,6 @@
 package com.example.mykku.contest.application.dto
 
+import com.example.mykku.contest.domain.vo.ContestContent
 import com.example.mykku.contest.domain.vo.ContestListFilter
 import com.example.mykku.contest.domain.vo.ContestSortType
 import org.springframework.data.domain.Pageable
@@ -76,4 +77,13 @@ data class UpsertContestWinnerAnnouncementCommand(
     val title: String,
     val content: String,
     val announcedAt: LocalDate
+)
+
+data class UpdateContestCommand(
+    val contestId: Long,
+    val content: ContestContent,
+    val thumbnailUrl: String?,
+    val keepImageUrls: List<String>,
+    val newImageUrls: List<String>,
+    val tags: List<String>
 )

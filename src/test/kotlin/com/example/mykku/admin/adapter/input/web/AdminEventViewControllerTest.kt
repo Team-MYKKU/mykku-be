@@ -150,6 +150,21 @@ class AdminEventViewControllerTest : BaseControllerTest() {
     }
 
     @Test
+    @DisplayName("목록의 삭제 버튼에 참여·당첨 건수를 싣는다")
+    fun `listPage - 삭제 확인용 건수`() {
+        val adminSessionId = getAdminSessionId()
+        createAndSaveMember(memberId = "memberA", email = "a@example.com", socialId = "a1")
+        val event = createAndSaveEvent(title = "건수 이벤트", expiredAt = LocalDateTime.now().minusDays(1))
+        putWinners(adminSessionId, event.id!!, listOf("memberA"))
+
+        getPage(adminSessionId, "/admin/event")
+            .statusCode(200)
+            .body(containsString("data-id=\"${event.id}\""))
+            .body(containsString("data-participation-count=\"1\""))
+            .body(containsString("data-winner-count=\"1\""))
+    }
+
+    @Test
     @DisplayName("당첨자 화면은 현재 당첨자 memberId를 줄마다 채우고, 공지가 없으면 빈 폼을 띄운다")
     fun `winnersPage - 현재 당첨자 미리 채움과 빈 공지 폼`() {
         val adminSessionId = getAdminSessionId()

@@ -18,11 +18,11 @@ data class EventCreateRequest(
     val description: String?,
 
     @field:NotNull(message = "시작일은 필수입니다")
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", fallbackPatterns = ["yyyy-MM-dd'T'HH:mm"])
     val startedAt: LocalDateTime,
 
     @field:NotNull(message = "종료일은 필수입니다")
-    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss", fallbackPatterns = ["yyyy-MM-dd'T'HH:mm"])
     val expiredAt: LocalDateTime,
 
     val thumbnailImage: MultipartFile,

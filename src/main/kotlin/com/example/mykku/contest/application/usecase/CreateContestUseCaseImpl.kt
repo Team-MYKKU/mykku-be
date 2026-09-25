@@ -23,6 +23,7 @@ class CreateContestUseCaseImpl(
 
     @Transactional
     override fun execute(command: CreateContestCommand): CreateContestResult {
+        Contest.validatePeriod(command.startedAt, command.expiredAt)
         validateImages(command)
         val normalizedTags = ContestTag.normalizeAndValidate(command.tags)
 

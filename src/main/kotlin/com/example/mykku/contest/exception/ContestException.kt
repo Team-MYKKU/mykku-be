@@ -42,6 +42,13 @@ class ContestException(
 
         fun contestTagRequired(): ContestException = ContestException(ContestErrorCode.CONTEST_TAG_REQUIRED)
 
+        fun invalidKeepImageUrls(): ContestException = ContestException(ContestErrorCode.INVALID_KEEP_IMAGE_URLS)
+
+        fun periodOrTagsLockedAfterWinnerSelected(): ContestException =
+            ContestException(ContestErrorCode.PERIOD_OR_TAGS_LOCKED_AFTER_WINNER_SELECTED)
+
+        fun invalidContestPeriod(): ContestException = ContestException(ContestErrorCode.INVALID_CONTEST_PERIOD)
+
         fun duplicateWinnerParticipation(): ContestException =
             ContestException(ContestErrorCode.DUPLICATE_WINNER_PARTICIPATION)
 

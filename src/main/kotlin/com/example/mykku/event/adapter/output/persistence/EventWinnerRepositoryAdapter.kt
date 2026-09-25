@@ -1,5 +1,6 @@
 package com.example.mykku.event.adapter.output.persistence
 
+import com.example.mykku.common.adapter.persistence.toCountMap
 import com.example.mykku.event.adapter.output.persistence.entity.EventWinnerJpaEntity
 import com.example.mykku.event.adapter.output.persistence.repository.EventJpaRepository
 import com.example.mykku.event.adapter.output.persistence.repository.EventParticipationJpaRepository
@@ -88,5 +89,10 @@ class EventWinnerRepositoryAdapter(
         if (participations.isEmpty()) return
         eventWinnerJpaRepository.deleteAllByParticipationIn(participations)
         eventWinnerJpaRepository.flush()
+    }
+
+    override fun countByEventIds(eventIds: List<EventId>): Map<Long, Int> {
+        if (eventIds.isEmpty()) return emptyMap()
+        return eventWinnerJpaRepository.countGroupedByEventIdIn(eventIds.map { it.value }).toCountMap()
     }
 }

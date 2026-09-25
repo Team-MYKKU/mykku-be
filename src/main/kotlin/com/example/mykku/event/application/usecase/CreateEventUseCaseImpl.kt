@@ -20,6 +20,7 @@ class CreateEventUseCaseImpl(
 
     @Transactional
     override fun execute(command: CreateEventCommand): CreateEventResult {
+        Event.validatePeriod(command.startedAt, command.expiredAt)
         validateImages(command)
 
         val event = createAndSaveEvent(command)

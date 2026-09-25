@@ -16,7 +16,7 @@ class CreateDailyMessageUseCaseImpl(
 ) : CreateDailyMessageUseCase {
 
     override fun execute(command: CreateDailyMessageCommand): DailyMessageSummaryResult {
-        if (dailyMessageRepository.findByDate(command.date) != null) {
+        if (dailyMessageRepository.findAllByDate(command.date).isNotEmpty()) {
             throw DailyMessageException.dailyMessageDateAlreadyExists()
         }
 

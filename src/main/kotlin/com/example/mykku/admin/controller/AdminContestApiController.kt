@@ -1,6 +1,7 @@
 package com.example.mykku.admin.controller
 
 import com.example.mykku.admin.dto.contest.ContestCreateRequest
+import com.example.mykku.admin.dto.contest.ContestUpdateRequest
 import com.example.mykku.admin.dto.contest.ContestWinnerAnnouncementUpsertRequest
 import com.example.mykku.admin.service.AdminContestService
 import com.example.mykku.common.dto.ApiResponse
@@ -8,10 +9,12 @@ import com.example.mykku.contest.adapter.input.web.ContestWinnerAnnouncementResp
 import com.example.mykku.contest.adapter.input.web.CreateContestResponse
 import com.example.mykku.contest.adapter.input.web.SetContestWinnersRequest
 import com.example.mykku.contest.adapter.input.web.SetContestWinnersResponse
+import com.example.mykku.contest.application.port.input.DeleteContestUseCase
 import com.example.mykku.contest.application.port.input.SetContestWinnersUseCase
 import com.example.mykku.contest.application.port.input.UpsertContestWinnerAnnouncementUseCase
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -25,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController
 class AdminContestApiController(
     private val setContestWinnersUseCase: SetContestWinnersUseCase,
     private val upsertContestWinnerAnnouncementUseCase: UpsertContestWinnerAnnouncementUseCase,
+    private val deleteContestUseCase: DeleteContestUseCase,
     private val adminContestService: AdminContestService
 ) {
 
@@ -67,5 +71,20 @@ class AdminContestApiController(
                 data = ContestWinnerAnnouncementResponse.from(result)
             )
         )
+    }
+
+    @PutMapping("/{contestId}", consumes = ["multipart/form-data"])
+    fun update(
+        @PathVariable contestId: Long,
+        @Valid @ModelAttribute request: ContestUpdateRequest
+    ): ResponseEntity<ApiResponse<Nothing?>> {
+        adminContestService.update(contestId, request)
+        return ResponseEntity.ok(ApiResponse(message = "콘테스트가 수정되었습니다", data = null))
+    }
+
+    @DeleteMapping("/{contestId}")
+    fun delete(@PathVariable contestId: Long): ResponseEntity<ApiResponse<Nothing?>> {
+        deleteContestUseCase.execute(contestId)
+        return ResponseEntity.ok(ApiResponse(message = "콘테스트가 삭제되었습니다", data = null))
     }
 }

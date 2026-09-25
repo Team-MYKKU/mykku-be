@@ -1,5 +1,6 @@
 package com.example.mykku.contest.adapter.output.persistence
 
+import com.example.mykku.common.adapter.persistence.toCountMap
 import com.example.mykku.contest.adapter.output.persistence.entity.ContestParticipationJpaEntity
 import com.example.mykku.contest.adapter.output.persistence.repository.ContestJpaRepository
 import com.example.mykku.contest.adapter.output.persistence.repository.ContestParticipationJpaRepository
@@ -132,5 +133,10 @@ class ContestParticipationRepositoryAdapter(
         val ids = participations.map { it.id.value }
         val jpaEntities = contestParticipationJpaRepository.findAllByIdIn(ids)
         contestParticipationJpaRepository.deleteAll(jpaEntities)
+    }
+
+    override fun countByContestIds(contestIds: List<ContestId>): Map<Long, Int> {
+        if (contestIds.isEmpty()) return emptyMap()
+        return contestParticipationJpaRepository.countGroupedByContestIdIn(contestIds.map { it.value }).toCountMap()
     }
 }

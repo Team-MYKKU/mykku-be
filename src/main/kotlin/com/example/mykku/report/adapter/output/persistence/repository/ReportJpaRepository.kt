@@ -19,4 +19,11 @@ interface ReportJpaRepository : JpaRepository<ReportJpaEntity, Long> {
     fun findAllByStatusOrderByCreatedAtDesc(status: ReportStatus, pageable: Pageable): Page<ReportJpaEntity>
 
     fun findAllByOrderByCreatedAtDesc(pageable: Pageable): Page<ReportJpaEntity>
+
+    fun findAllByTargetTypeAndTargetIdOrderByCreatedAtDescIdDesc(
+        targetType: ReportTargetType,
+        targetId: Long
+    ): List<ReportJpaEntity>
+
+    fun countByTargetMemberId(targetMemberId: Long): Long
 }

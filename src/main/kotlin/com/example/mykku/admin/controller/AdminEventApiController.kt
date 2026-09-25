@@ -1,6 +1,7 @@
 package com.example.mykku.admin.controller
 
 import com.example.mykku.admin.dto.event.EventCreateRequest
+import com.example.mykku.admin.dto.event.EventUpdateRequest
 import com.example.mykku.admin.dto.event.EventWinnerAnnouncementUpsertRequest
 import com.example.mykku.admin.dto.event.InvalidWinnerMemberIdsResponse
 import com.example.mykku.admin.service.AdminEventService
@@ -10,6 +11,7 @@ import com.example.mykku.event.adapter.input.web.CreateEventResponse
 import com.example.mykku.event.adapter.input.web.EventWinnerAnnouncementResponse
 import com.example.mykku.event.adapter.input.web.SetEventWinnersRequest
 import com.example.mykku.event.adapter.input.web.SetEventWinnersResponse
+import com.example.mykku.event.application.port.input.DeleteEventUseCase
 import com.example.mykku.event.application.port.input.SetEventWinnersUseCase
 import com.example.mykku.event.application.port.input.UpsertEventWinnerAnnouncementUseCase
 import com.example.mykku.event.exception.InvalidWinnerMemberIdsException
@@ -17,6 +19,7 @@ import jakarta.validation.Valid
 import org.slf4j.LoggerFactory
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.bind.annotation.PathVariable
@@ -31,6 +34,7 @@ import org.springframework.web.bind.annotation.RestController
 class AdminEventApiController(
     private val setEventWinnersUseCase: SetEventWinnersUseCase,
     private val upsertEventWinnerAnnouncementUseCase: UpsertEventWinnerAnnouncementUseCase,
+    private val deleteEventUseCase: DeleteEventUseCase,
     private val adminEventService: AdminEventService
 ) {
 
@@ -47,6 +51,15 @@ class AdminEventApiController(
                 data = created
             )
         )
+    }
+
+    @PutMapping("/{eventId}", consumes = ["multipart/form-data"])
+    fun update(
+        @PathVariable eventId: Long,
+        @Valid @ModelAttribute request: EventUpdateRequest
+    ): ResponseEntity<ApiResponse<Nothing?>> {
+        adminEventService.update(eventId, request)
+        return ResponseEntity.ok(ApiResponse(message = "이벤트가 수정되었습니다", data = null))
     }
 
     @PutMapping("/{eventId}/winners")
@@ -75,6 +88,12 @@ class AdminEventApiController(
                 data = EventWinnerAnnouncementResponse.from(result)
             )
         )
+    }
+
+    @DeleteMapping("/{eventId}")
+    fun delete(@PathVariable eventId: Long): ResponseEntity<ApiResponse<Nothing?>> {
+        deleteEventUseCase.execute(eventId)
+        return ResponseEntity.ok(ApiResponse(message = "이벤트가 삭제되었습니다", data = null))
     }
 
     @ExceptionHandler(InvalidWinnerMemberIdsException::class)

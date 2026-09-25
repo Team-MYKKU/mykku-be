@@ -5,7 +5,9 @@ import com.example.mykku.contest.domain.vo.ContestStatusType
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
 
@@ -45,4 +47,8 @@ interface ContestJpaRepository : JpaRepository<ContestJpaEntity, Long> {
         status: ContestStatusType,
         pageable: Pageable
     ): Page<ContestJpaEntity>
+
+    @Modifying(flushAutomatically = true)
+    @Query("DELETE FROM ContestJpaEntity c WHERE c.id = :id")
+    fun deleteContestById(@Param("id") id: Long): Int
 }

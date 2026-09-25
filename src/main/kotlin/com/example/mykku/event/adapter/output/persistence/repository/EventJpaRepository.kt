@@ -5,7 +5,9 @@ import com.example.mykku.event.domain.vo.EventStatusType
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Modifying
 import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
 
@@ -41,4 +43,8 @@ interface EventJpaRepository : JpaRepository<EventJpaEntity, Long> {
         status: EventStatusType,
         pageable: Pageable
     ): Page<EventJpaEntity>
+
+    @Modifying(flushAutomatically = true)
+    @Query("DELETE FROM EventJpaEntity e WHERE e.id = :id")
+    fun deleteEventById(@Param("id") id: Long): Int
 }

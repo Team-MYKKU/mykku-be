@@ -167,3 +167,20 @@ data class PagedMyAwardEventsResult(
     val totalPages: Int,
     val isLast: Boolean
 )
+
+data class EventDeletionSummaryResult(
+    val participationCount: Int,
+    val winnerCount: Int
+)
+
+data class EventEditResult(
+    val id: Long,
+    val title: String,
+    val subTitle: String?,
+    val description: String?,
+    val startedAt: LocalDateTime,
+    val expiredAt: LocalDateTime,
+    val status: EventStatusType,
+    val thumbnailUrl: String,
+    val imageUrls: List<String>
+)

@@ -2,6 +2,8 @@ package com.example.mykku.admin.controller
 
 import com.example.mykku.admin.service.AdminEventService
 import com.example.mykku.event.application.dto.EventWinnerAnnouncementResult
+import com.example.mykku.event.application.port.input.GetEventDeletionSummariesUseCase
+import com.example.mykku.event.application.port.input.GetEventForEditUseCase
 import com.example.mykku.event.application.port.input.GetEventWinnerAnnouncementUseCase
 import com.example.mykku.event.application.port.input.GetEventWinnerSelectionUseCase
 import com.example.mykku.event.domain.vo.EventListFilter
@@ -19,7 +21,9 @@ import org.springframework.web.bind.annotation.RequestParam
 class AdminEventViewController(
     private val adminEventService: AdminEventService,
     private val getEventWinnerSelectionUseCase: GetEventWinnerSelectionUseCase,
-    private val getEventWinnerAnnouncementUseCase: GetEventWinnerAnnouncementUseCase
+    private val getEventWinnerAnnouncementUseCase: GetEventWinnerAnnouncementUseCase,
+    private val getEventDeletionSummariesUseCase: GetEventDeletionSummariesUseCase,
+    private val getEventForEditUseCase: GetEventForEditUseCase
 ) {
 
     @GetMapping
@@ -31,6 +35,8 @@ class AdminEventViewController(
     ): String {
         val events = adminEventService.findAll(page, size, status)
         model.addAttribute("events", events)
+        val deletionSummaries = getEventDeletionSummariesUseCase.execute(events.content.map { it.id })
+        model.addAttribute("deletionSummaries", deletionSummaries)
         model.addAttribute("currentStatus", status)
         return "admin/event/list"
     }
@@ -38,6 +44,12 @@ class AdminEventViewController(
     @GetMapping("/create")
     fun createPage(): String {
         return "admin/event/create"
+    }
+
+    @GetMapping("/{eventId}/edit")
+    fun editPage(@PathVariable eventId: Long, model: Model): String {
+        model.addAttribute("event", getEventForEditUseCase.execute(eventId))
+        return "admin/event/edit"
     }
 
     @GetMapping("/{eventId}/winners")

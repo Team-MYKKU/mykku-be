@@ -115,6 +115,9 @@
 | 코드 | 이름 | HTTP 상태 | 메시지 |
 |------|------|-----------|--------|
 | BO001 | BOARD_NOT_FOUND | 404 | 게시판을 찾을 수 없습니다 |
+| BO101 | MOVE_TARGET_SAME_BOARD | 400 | 글을 옮길 게시판은 삭제할 게시판과 달라야 합니다 |
+| BO102 | MOVE_TARGET_BOARD_NOT_FOUND | 400 | 글을 옮길 게시판을 지정하지 않았거나 찾을 수 없습니다 |
+| BO301 | BOARD_HAS_FEEDS | 409 | 게시글이 있는 게시판은 글 처리 방식을 정해야 삭제할 수 있습니다 |
 
 ## Contest (CN)
 
@@ -134,9 +137,12 @@
 | CN109 | PARTICIPATION_NOT_BELONG_TO_CONTEST | 400 | 해당 참여작은 이 콘테스트에 속하지 않습니다 |
 | CN110 | CONTEST_NOT_EXPIRED | 400 | 종료되지 않은 콘테스트입니다 |
 | CN111 | WINNER_NOT_ANNOUNCED | 400 | 아직 수상자가 발표되지 않았습니다 |
+| CN112 | INVALID_KEEP_IMAGE_URLS | 400 | 유지할 이미지 목록에 이 콘테스트의 이미지가 아니거나 중복된 주소가 있습니다 |
 | CN113 | CONTEST_TAG_REQUIRED | 400 | 콘테스트 태그는 1개 이상이어야 합니다 |
 | CN114 | DUPLICATE_WINNER_PARTICIPATION | 400 | 같은 참여작을 중복해서 선정할 수 없습니다 |
 | CN115 | DUPLICATE_WINNER_MEMBER | 400 | 한 회원은 한 콘테스트에서 한 번만 수상할 수 있습니다 |
+| CN116 | PERIOD_OR_TAGS_LOCKED_AFTER_WINNER_SELECTED | 400 | 수상자를 선정한 뒤에는 콘테스트 기간과 태그를 바꿀 수 없습니다 |
+| CN117 | INVALID_CONTEST_PERIOD | 400 | 콘테스트 시작일은 종료일보다 늦을 수 없습니다 |
 | CN201 | NOT_WINNER_OWNER | 403 | 수상 소감을 수정할 권한이 없습니다 |
 | CN301 | ALREADY_PARTICIPATED_WITH_FEED | 409 | 이 피드로 이미 참여한 콘테스트입니다 |
 
@@ -171,7 +177,10 @@
 | EV101 | EVENT_IMAGE_LIMIT_EXCEEDED | 400 | 이벤트 이미지는 최대 10개까지 등록할 수 있습니다 |
 | EV102 | EVENT_NOT_ACTIVE | 400 | 진행 중인 이벤트가 아닙니다 |
 | EV103 | EVENT_NOT_EXPIRED | 400 | 아직 종료되지 않은 이벤트입니다 |
+| EV104 | INVALID_KEEP_IMAGE_URLS | 400 | 유지할 이미지 목록에 이 이벤트의 이미지가 아니거나 중복된 주소가 있습니다 |
+| EV105 | PERIOD_LOCKED_AFTER_WINNER_SELECTED | 400 | 당첨자를 선정한 뒤에는 이벤트 기간을 바꿀 수 없습니다 |
 | EV106 | INVALID_WINNER_MEMBER_IDS | 400 | 당첨자로 지정할 수 없는 회원 아이디가 있습니다 |
+| EV107 | INVALID_EVENT_PERIOD | 400 | 이벤트 시작일은 종료일보다 늦을 수 없습니다 |
 | EV301 | ALREADY_PARTICIPATED | 409 | 이미 참여한 이벤트입니다 |
 | EV302 | EVENT_PARTICIPATION_NOT_FOUND | 404 | 이벤트 참여 정보를 찾을 수 없습니다 |
 | EV303 | PARTICIPATION_NOT_BELONG_TO_EVENT | 400 | 해당 이벤트의 참여 정보가 아닙니다 |
@@ -186,6 +195,8 @@
 |------|------|-----------|--------|
 | FN001 | FAN_NOTE_NOT_FOUND | 404 | 덕질노트를 찾을 수 없습니다 |
 | FN002 | FAN_NOTE_PAGE_NOT_FOUND | 404 | 덕질노트 페이지를 찾을 수 없습니다 |
+| FN101 | INVALID_KEEP_IMAGE_URLS | 400 | 유지할 페이지 이미지 목록에 이 덕질노트의 이미지가 아니거나 중복된 주소가 있습니다 |
+| FN102 | COVER_IMAGE_CONFLICT | 400 | 새 커버 이미지와 커버 삭제를 함께 지정할 수 없습니다 |
 
 ## Feed (FD)
 
@@ -302,5 +313,3 @@
 - `GET /api/error-codes` - 전체 에러 코드 조회 (code 오름차순)
 - `GET /api/error-codes/domains` - 도메인 키 목록 조회 (예: `dailyMessage`, `fanNote`)
 - `GET /api/error-codes/{domain}` - 특정 도메인의 에러 코드 조회 (없는 도메인 키는 빈 목록)
-
-신고(RP) 코드는 현재 위 API 응답에 포함되어 있지 않습니다.

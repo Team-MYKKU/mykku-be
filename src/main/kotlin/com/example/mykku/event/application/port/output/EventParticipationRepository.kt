@@ -17,4 +17,5 @@ interface EventParticipationRepository {
     fun deleteAllByIdIn(ids: List<EventParticipationId>)
     fun existsByMemberIdAndEventId(memberId: Long, eventId: EventId): Boolean
     fun countByEventId(eventId: EventId): Long
+    fun countByEventIds(eventIds: List<EventId>): Map<Long, Int>
 }

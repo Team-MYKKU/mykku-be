@@ -1,5 +1,6 @@
 package com.example.mykku.event.adapter.output.persistence
 
+import com.example.mykku.common.adapter.persistence.toCountMap
 import com.example.mykku.event.adapter.output.persistence.entity.EventParticipationJpaEntity
 import com.example.mykku.event.adapter.output.persistence.repository.EventJpaRepository
 import com.example.mykku.event.adapter.output.persistence.repository.EventParticipationJpaRepository
@@ -96,5 +97,10 @@ class EventParticipationRepositoryAdapter(
         val eventJpaEntity = eventJpaRepository.findById(eventId.value).orElse(null)
             ?: return 0L
         return eventParticipationJpaRepository.countByEvent(eventJpaEntity)
+    }
+
+    override fun countByEventIds(eventIds: List<EventId>): Map<Long, Int> {
+        if (eventIds.isEmpty()) return emptyMap()
+        return eventParticipationJpaRepository.countGroupedByEventIdIn(eventIds.map { it.value }).toCountMap()
     }
 }

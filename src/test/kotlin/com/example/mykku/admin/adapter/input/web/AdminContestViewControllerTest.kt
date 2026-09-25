@@ -171,6 +171,23 @@ class AdminContestViewControllerTest : BaseControllerTest() {
     }
 
     @Test
+    @DisplayName("목록의 삭제 버튼에 참여·수상 건수를 싣는다")
+    fun `listPage - 삭제 확인용 건수`() {
+        val adminSessionId = getAdminSessionId()
+        val contest = createAndSaveContest(title = "건수 콘테스트", expiredAt = LocalDateTime.now().minusDays(1))
+        val member = createAndSaveMember()
+        val participation = saveParticipation(contest, member, "피드")
+        saveParticipation(contest, member, "다른 피드")
+        selectWinner(adminSessionId, contest.id!!, participation.id!!)
+
+        getPage(adminSessionId, "/admin/contest")
+            .statusCode(200)
+            .body(containsString("data-id=\"${contest.id}\""))
+            .body(containsString("data-participation-count=\"2\""))
+            .body(containsString("data-winner-count=\"1\""))
+    }
+
+    @Test
     @DisplayName("참여자 화면은 참여작·작성자·표시를 보여 주고 공지가 없으면 빈 폼을 띄운다")
     fun `participantsPage - 참여작 목록과 빈 공지 폼`() {
         val adminSessionId = getAdminSessionId()

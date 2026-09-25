@@ -1,6 +1,7 @@
 package com.example.mykku.feed.adapter.output.persistence
 
 import com.example.mykku.board.adapter.output.persistence.BoardJpaRepository
+import com.example.mykku.common.adapter.persistence.toCountMap
 import com.example.mykku.feed.adapter.output.persistence.entity.FeedJpaEntity
 import com.example.mykku.feed.application.port.output.FeedRepository
 import com.example.mykku.feed.domain.entity.Feed
@@ -79,6 +80,19 @@ class FeedRepositoryAdapter(
         val pageable = PageRequest.of(0, limit)
         return feedJpaRepository.findPopularFeedsByBoardSince(board, since, pageable)
             .map { it.toDomain() }
+    }
+
+    override fun findAllByBoardId(boardId: Long): List<Feed> {
+        return feedJpaRepository.findAllByBoardIdOrderByIdAsc(boardId).map { it.toDomain() }
+    }
+
+    override fun countByBoardIdIn(boardIds: List<Long>): Map<Long, Int> {
+        if (boardIds.isEmpty()) return emptyMap()
+        return feedJpaRepository.countGroupedByBoardIdIn(boardIds).toCountMap()
+    }
+
+    override fun moveAllToBoard(fromBoardId: Long, toBoardId: Long): Int {
+        return feedJpaRepository.moveAllToBoard(fromBoardId, toBoardId)
     }
 
     override fun delete(feed: Feed) {

@@ -3,6 +3,7 @@ package com.example.mykku.admin.service
 import com.example.mykku.admin.dto.contest.ContestCreateRequest
 import com.example.mykku.contest.application.port.input.CreateContestUseCase
 import com.example.mykku.contest.application.port.input.ListContestsUseCase
+import com.example.mykku.contest.application.port.input.UpdateContestUseCase
 import com.example.mykku.contest.exception.ContestErrorCode
 import com.example.mykku.contest.exception.ContestException
 import com.example.mykku.image.ImageUploadService
@@ -22,8 +23,15 @@ class AdminContestServiceTest {
 
     private val createContestUseCase: CreateContestUseCase = mock()
     private val listContestsUseCase: ListContestsUseCase = mock()
+    private val updateContestUseCase: UpdateContestUseCase = mock()
     private val imageUploadService: ImageUploadService = mock()
-    private val adminContestService = AdminContestService(createContestUseCase, listContestsUseCase, imageUploadService)
+    private val adminContestService = AdminContestService(
+        createContestUseCase,
+        listContestsUseCase,
+        updateContestUseCase,
+        imageUploadService,
+        UploadedImageRollback(imageUploadService)
+    )
 
     @Test
     @DisplayName("태그 없이 콘테스트를 만들면 이미지를 올리기 전에 CONTEST_TAG_REQUIRED 예외가 발생한다")

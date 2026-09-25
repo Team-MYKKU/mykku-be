@@ -1,5 +1,6 @@
 package com.example.mykku.contest.adapter.output.persistence.repository
 
+import com.example.mykku.common.adapter.persistence.IdCountRow
 import com.example.mykku.contest.adapter.output.persistence.entity.ContestJpaEntity
 import com.example.mykku.contest.adapter.output.persistence.entity.ContestParticipationJpaEntity
 import com.example.mykku.contest.adapter.output.persistence.entity.ContestWinnerJpaEntity
@@ -58,4 +59,10 @@ interface ContestWinnerJpaRepository : JpaRepository<ContestWinnerJpaEntity, Lon
         @Param("memberId") memberId: Long,
         @Param("contests") contests: List<ContestJpaEntity>
     ): List<ContestWinnerJpaEntity>
+
+    @Query(
+        "SELECT w.contest.id AS entityId, COUNT(w) AS countValue FROM ContestWinnerJpaEntity w " +
+            "WHERE w.contest.id IN :contestIds GROUP BY w.contest.id"
+    )
+    fun countGroupedByContestIdIn(@Param("contestIds") contestIds: List<Long>): List<IdCountRow>
 }

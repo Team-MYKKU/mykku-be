@@ -231,3 +231,20 @@ data class MyAwardPreviewResult(
     val contestId: Long,
     val thumbnailUrl: String
 )
+
+data class ContestDeletionSummaryResult(
+    val participationCount: Int,
+    val winnerCount: Int
+)
+
+data class ContestEditResult(
+    val id: Long,
+    val title: String,
+    val description: String?,
+    val startedAt: LocalDateTime,
+    val expiredAt: LocalDateTime,
+    val status: ContestStatusType,
+    val thumbnailUrl: String,
+    val imageUrls: List<String>,
+    val tags: List<String>
+)

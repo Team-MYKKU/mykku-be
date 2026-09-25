@@ -15,4 +15,5 @@ interface DailyMessageRepository {
     fun findByDateBeforeOrEqualWithSort(date: LocalDate, limit: Int, sort: SortDirection): List<DailyMessage>
     fun findAll(pageable: Pageable): Page<DailyMessage>
     fun deleteById(id: DailyMessageId)
+    fun findAllByDate(date: LocalDate): List<DailyMessage>
 }

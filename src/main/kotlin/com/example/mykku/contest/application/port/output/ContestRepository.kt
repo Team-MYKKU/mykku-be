@@ -22,4 +22,5 @@ interface ContestRepository {
         pageable: Pageable,
         currentTime: LocalDateTime
     ): Page<Contest>
+    fun deleteById(id: ContestId)
 }

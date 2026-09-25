@@ -1,5 +1,6 @@
 package com.example.mykku.event.application.dto
 
+import com.example.mykku.event.domain.vo.EventContent
 import com.example.mykku.event.domain.vo.EventListFilter
 import com.example.mykku.event.domain.vo.EventSortType
 import org.springframework.data.domain.Pageable
@@ -49,4 +50,12 @@ data class UpsertEventWinnerAnnouncementCommand(
     val title: String,
     val content: String,
     val announcedAt: LocalDate
+)
+
+data class UpdateEventCommand(
+    val eventId: Long,
+    val content: EventContent,
+    val thumbnailUrl: String?,
+    val keepImageUrls: List<String>,
+    val newImageUrls: List<String>
 )

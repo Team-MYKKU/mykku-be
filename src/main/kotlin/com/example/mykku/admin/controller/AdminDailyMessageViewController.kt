@@ -6,6 +6,7 @@ import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 
@@ -37,5 +38,12 @@ class AdminDailyMessageViewController(
     fun createPage(model: Model): String {
         model.addAttribute("title", "데일리 메시지 생성")
         return "admin/dailymessage/create"
+    }
+
+    @GetMapping("/{id}/edit")
+    fun editPage(@PathVariable id: Long, model: Model): String {
+        model.addAttribute("title", "데일리 메시지 수정")
+        model.addAttribute("message", adminDailyMessageService.findById(id))
+        return "admin/dailymessage/edit"
     }
 }

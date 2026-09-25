@@ -52,6 +52,4 @@ interface FeedCommentJpaRepository : JpaRepository<FeedCommentJpaEntity, Long> {
 
     @Query("SELECT fc.id FROM FeedCommentJpaEntity fc WHERE fc.feed = :feed")
     fun findIdsByFeed(@Param("feed") feed: FeedJpaEntity): List<Long>
-
-    fun deleteAllByFeed(feed: FeedJpaEntity)
 }

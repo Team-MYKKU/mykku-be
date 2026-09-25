@@ -15,4 +15,5 @@ interface EventWinnerRepository {
     fun findByMemberIdAndEventIds(memberId: Long, eventIds: List<EventId>): List<EventWinner>
     fun deleteAllByEventId(eventId: EventId)
     fun deleteAllByParticipationIds(participationIds: List<EventParticipationId>)
+    fun countByEventIds(eventIds: List<EventId>): Map<Long, Int>
 }

@@ -19,4 +19,5 @@ interface EventRepository {
         pageable: Pageable,
         currentTime: LocalDateTime
     ): Page<Event>
+    fun deleteById(id: EventId)
 }

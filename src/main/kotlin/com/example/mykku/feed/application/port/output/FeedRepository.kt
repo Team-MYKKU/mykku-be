@@ -15,4 +15,7 @@ interface FeedRepository {
     fun findByMemberId(memberId: Long, pageable: Pageable): Page<Feed>
     fun findPopularFeedsByBoardId(boardId: Long, limit: Int, daysAgo: Int): List<Feed>
     fun delete(feed: Feed)
+    fun findAllByBoardId(boardId: Long): List<Feed>
+    fun countByBoardIdIn(boardIds: List<Long>): Map<Long, Int>
+    fun moveAllToBoard(fromBoardId: Long, toBoardId: Long): Int
 }

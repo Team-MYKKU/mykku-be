@@ -47,4 +47,10 @@ class EventImageRepositoryAdapter(
         val eventEntities = eventJpaRepository.findAllById(eventIds.map { it.value })
         return eventImageJpaRepository.findByEventIn(eventEntities).map { it.toDomain() }
     }
+
+    override fun deleteAllByEventId(eventId: EventId) {
+        val eventJpaEntity = eventJpaRepository.findById(eventId.value).orElse(null) ?: return
+        eventImageJpaRepository.deleteAllByEvent(eventJpaEntity)
+        eventImageJpaRepository.flush()
+    }
 }
