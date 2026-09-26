@@ -1,6 +1,7 @@
 package com.example.mykku.report.application.dto
 
 import com.example.mykku.report.domain.entity.Report
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 data class ReportResult(
@@ -72,11 +73,12 @@ data class ReportDetailResult(
     val report: ReportResult,
     val feed: ReportedFeedResult?,
     val comment: ReportedCommentResult?,
+    val dailyMessageComment: ReportedDailyMessageCommentResult?,
     val sameTargetReports: List<ReportResult>,
     val targetMemberReportCount: Long
 ) {
     val targetDeleted: Boolean
-        get() = feed == null && comment == null
+        get() = feed == null && comment == null && dailyMessageComment == null
 }
 
 data class ReportedFeedResult(
@@ -102,4 +104,12 @@ data class ReportedCommentResult(
     val content: String,
     val feedId: Long,
     val feedTitle: String?
+)
+
+data class ReportedDailyMessageCommentResult(
+    val commentId: Long,
+    val content: String,
+    val dailyMessageId: Long,
+    val dailyMessageTitle: String?,
+    val dailyMessageDate: LocalDate?
 )

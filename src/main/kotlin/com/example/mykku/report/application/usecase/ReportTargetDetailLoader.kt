@@ -5,6 +5,10 @@ import com.example.mykku.board.domain.vo.BoardId
 import com.example.mykku.contest.application.port.output.ContestParticipationRepository
 import com.example.mykku.contest.application.port.output.ContestRepository
 import com.example.mykku.contest.application.port.output.ContestWinnerRepository
+import com.example.mykku.dailymessage.application.port.output.DailyMessageCommentRepository
+import com.example.mykku.dailymessage.application.port.output.DailyMessageRepository
+import com.example.mykku.dailymessage.domain.vo.DailyMessageCommentId
+import com.example.mykku.dailymessage.domain.vo.DailyMessageId
 import com.example.mykku.feed.application.port.output.FeedCommentRepository
 import com.example.mykku.feed.application.port.output.FeedImageRepository
 import com.example.mykku.feed.application.port.output.FeedRepository
@@ -12,6 +16,7 @@ import com.example.mykku.feed.domain.vo.FeedCommentId
 import com.example.mykku.feed.domain.vo.FeedId
 import com.example.mykku.report.application.dto.ReportedCommentResult
 import com.example.mykku.report.application.dto.ReportedContestResult
+import com.example.mykku.report.application.dto.ReportedDailyMessageCommentResult
 import com.example.mykku.report.application.dto.ReportedFeedResult
 import org.springframework.stereotype.Component
 
@@ -23,7 +28,9 @@ class ReportTargetDetailLoader(
     private val boardRepository: BoardRepository,
     private val contestParticipationRepository: ContestParticipationRepository,
     private val contestRepository: ContestRepository,
-    private val contestWinnerRepository: ContestWinnerRepository
+    private val contestWinnerRepository: ContestWinnerRepository,
+    private val dailyMessageCommentRepository: DailyMessageCommentRepository,
+    private val dailyMessageRepository: DailyMessageRepository
 ) {
 
     fun loadFeed(feedId: Long): ReportedFeedResult? {
@@ -45,6 +52,18 @@ class ReportTargetDetailLoader(
             content = comment.content,
             feedId = comment.feedId.value,
             feedTitle = feedRepository.findById(comment.feedId)?.title
+        )
+    }
+
+    fun loadDailyMessageComment(commentId: Long): ReportedDailyMessageCommentResult? {
+        val comment = dailyMessageCommentRepository.findById(DailyMessageCommentId.of(commentId)) ?: return null
+        val dailyMessage = dailyMessageRepository.findById(DailyMessageId.of(comment.dailyMessageId))
+        return ReportedDailyMessageCommentResult(
+            commentId = commentId,
+            content = comment.content,
+            dailyMessageId = comment.dailyMessageId,
+            dailyMessageTitle = dailyMessage?.title,
+            dailyMessageDate = dailyMessage?.date
         )
     }
 

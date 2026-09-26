@@ -6,6 +6,10 @@ import com.example.mykku.contest.adapter.output.persistence.entity.ContestPartic
 import com.example.mykku.contest.adapter.output.persistence.repository.ContestJpaRepository
 import com.example.mykku.contest.adapter.output.persistence.repository.ContestParticipationJpaRepository
 import com.example.mykku.contest.domain.vo.ContestStatusType
+import com.example.mykku.dailymessage.adapter.output.persistence.entity.DailyMessageCommentJpaEntity
+import com.example.mykku.dailymessage.adapter.output.persistence.entity.DailyMessageJpaEntity
+import com.example.mykku.dailymessage.adapter.output.persistence.repository.DailyMessageCommentJpaRepository
+import com.example.mykku.dailymessage.adapter.output.persistence.repository.DailyMessageJpaRepository
 import com.example.mykku.feed.adapter.output.persistence.FeedCommentJpaRepository
 import com.example.mykku.feed.adapter.output.persistence.FeedJpaRepository
 import com.example.mykku.feed.adapter.output.persistence.entity.FeedCommentJpaEntity
@@ -28,6 +32,7 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.jdbc.core.JdbcTemplate
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 @DisplayName("AdminReportViewController 통합 테스트")
@@ -49,6 +54,12 @@ class AdminReportViewControllerTest : BaseControllerTest() {
     private lateinit var contestParticipationJpaRepository: ContestParticipationJpaRepository
 
     @Autowired
+    private lateinit var dailyMessageJpaRepository: DailyMessageJpaRepository
+
+    @Autowired
+    private lateinit var dailyMessageCommentJpaRepository: DailyMessageCommentJpaRepository
+
+    @Autowired
     private lateinit var jdbcTemplate: JdbcTemplate
 
     @Test
@@ -63,7 +74,8 @@ class AdminReportViewControllerTest : BaseControllerTest() {
             .body(containsString("class=\"nav-link active\" href=\"/admin/report\""))
             .extract().asString()
 
-        assertThat(rowOf(body, report.id!!)).contains("reporter1", "신고자", "author1", "작성자", "스팸/도배/광고", "접수")
+        assertThat(rowOf(body, report.id!!))
+            .contains("reporter1", "신고자", "author1", "작성자", ReportReason.SPAM.description, "접수")
     }
 
     @Test
@@ -140,6 +152,21 @@ class AdminReportViewControllerTest : BaseControllerTest() {
     }
 
     @Test
+    @DisplayName("하루덕담 댓글 신고 상세는 댓글 본문과 상위 하루 덕담 제목을 보여 준다")
+    fun `detailPage - 하루덕담 댓글 대상`() {
+        val (reporter, author) = createMembers()
+        val comment = saveDailyMessageComment(author, "나쁜 덕담 댓글")
+        val report = saveReport(reporter, author, ReportTargetType.DAILY_MESSAGE_COMMENT, comment.id!!)
+
+        getPage("/admin/report/${report.id}")
+            .statusCode(200)
+            .body(containsString("id=\"target-daily-message-comment-content\">나쁜 덕담 댓글<"))
+            .body(containsString("상위 하루 덕담: 오늘의 덕담"))
+            .body(containsString("data-target-type=\"DAILY_MESSAGE_COMMENT\""))
+            .body(not(containsString("id=\"target-deleted\"")))
+    }
+
+    @Test
     @DisplayName("대상이 삭제된 신고 상세는 200과 '삭제됨'을 보여 준다")
     fun `detailPage - 삭제된 대상`() {
         val (reporter, author) = createMembers()
@@ -167,13 +194,19 @@ class AdminReportViewControllerTest : BaseControllerTest() {
             detail = "<script>alert(4)</script>"
         )
         val commentReport = saveReport(reporter, author, ReportTargetType.FEED_COMMENT, comment.id!!)
+        val dailyMessageComment = saveDailyMessageComment(author, "<script>alert(5)</script>")
+        val dailyMessageCommentReport =
+            saveReport(reporter, author, ReportTargetType.DAILY_MESSAGE_COMMENT, dailyMessageComment.id!!)
 
         val feedBody = getPage("/admin/report/${feedReport.id}").statusCode(200).extract().asString()
         val commentBody = getPage("/admin/report/${commentReport.id}").statusCode(200).extract().asString()
+        val dailyMessageBody =
+            getPage("/admin/report/${dailyMessageCommentReport.id}").statusCode(200).extract().asString()
 
         assertThat(feedBody).contains("&lt;script&gt;alert(1)", "&lt;script&gt;alert(2)", "&lt;script&gt;alert(4)")
         assertThat(commentBody).contains("&lt;script&gt;alert(3)")
-        assertThat(feedBody + commentBody).doesNotContain("<script>alert(")
+        assertThat(dailyMessageBody).contains("&lt;script&gt;alert(5)")
+        assertThat(feedBody + commentBody + dailyMessageBody).doesNotContain("<script>alert(")
     }
 
     @Test
@@ -215,6 +248,15 @@ class AdminReportViewControllerTest : BaseControllerTest() {
     private fun saveFeed(author: MemberJpaEntity, title: String, content: String = "본문"): FeedJpaEntity {
         return feedJpaRepository.save(
             FeedJpaEntity(title = title, content = content, member = author, board = createAndSaveBoard())
+        )
+    }
+
+    private fun saveDailyMessageComment(author: MemberJpaEntity, content: String): DailyMessageCommentJpaEntity {
+        val dailyMessage = dailyMessageJpaRepository.save(
+            DailyMessageJpaEntity(title = "오늘의 덕담", content = "오늘도 좋은 하루!", date = LocalDate.now())
+        )
+        return dailyMessageCommentJpaRepository.save(
+            DailyMessageCommentJpaEntity(content = content, dailyMessage = dailyMessage, member = author)
         )
     }
 

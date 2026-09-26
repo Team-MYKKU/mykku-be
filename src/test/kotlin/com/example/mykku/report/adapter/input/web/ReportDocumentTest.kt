@@ -39,12 +39,14 @@ class ReportDocumentTest : BaseDocumentTest() {
             requestBodyFields = listOf(
                 fieldWithPath("targetType").type(JsonFieldType.STRING)
                     .description(
-                        "신고 대상 종류 (FEED: 피드 게시글(콘테스트 참여작 포함), FEED_COMMENT: 피드 댓글 또는 답글). " +
-                            "대소문자 구분. 데일리 메시지 댓글, 덕질노트, 회원 등 다른 대상은 신고할 수 없음"
+                        "신고 대상 종류 (FEED: 피드 게시글(콘테스트 참여작 포함), FEED_COMMENT: 피드 댓글 또는 답글, " +
+                            "DAILY_MESSAGE_COMMENT: 하루 덕담 댓글 또는 답글). " +
+                            "대소문자 구분. 하루 덕담 본문, 덕질노트, 회원 등 다른 대상은 신고할 수 없음"
                     ),
                 fieldWithPath("targetId").type(JsonFieldType.NUMBER)
                     .description(
-                        "신고 대상 ID (1 이상의 정수). targetType이 FEED면 피드 ID, FEED_COMMENT면 피드 댓글/답글 ID"
+                        "신고 대상 ID (1 이상의 정수). targetType이 FEED면 피드 ID, FEED_COMMENT면 피드 댓글/답글 ID, " +
+                            "DAILY_MESSAGE_COMMENT면 하루 덕담 댓글/답글 ID"
                     ),
                 fieldWithPath("reason").type(JsonFieldType.STRING)
                     .description(
@@ -101,15 +103,16 @@ class ReportDocumentTest : BaseDocumentTest() {
                                 ).optional(),
                             fieldWithPath("data.targetType").type(JsonFieldType.STRING)
                                 .description(
-                                    "신고 대상 종류 코드 (FEED: 피드 게시글, FEED_COMMENT: 피드 댓글/답글). " +
+                                    "신고 대상 종류 코드 (FEED: 피드 게시글, FEED_COMMENT: 피드 댓글/답글, " +
+                                        "DAILY_MESSAGE_COMMENT: 하루 덕담 댓글/답글). " +
                                         "요청의 targetType과 같은 값. 표시 문구는 targetTypeDescription"
                                 ),
                             fieldWithPath("data.targetTypeDescription").type(JsonFieldType.STRING)
                                 .description("신고 대상 종류의 화면 표시용 한글 라벨 ($reportTargetTypeLabels)"),
                             fieldWithPath("data.targetId").type(JsonFieldType.NUMBER)
                                 .description(
-                                    "신고 대상 ID (요청의 targetId와 같은 값. " +
-                                        "FEED면 피드 ID, FEED_COMMENT면 피드 댓글/답글 ID)"
+                                    "신고 대상 ID (요청의 targetId와 같은 값. FEED면 피드 ID, " +
+                                        "FEED_COMMENT면 피드 댓글/답글 ID, DAILY_MESSAGE_COMMENT면 하루 덕담 댓글/답글 ID)"
                                 ),
                             fieldWithPath("data.targetMemberId").type(JsonFieldType.STRING)
                                 .description(
