@@ -91,4 +91,9 @@ class DailyMessageCommentRepositoryAdapter(
     override fun delete(comment: DailyMessageComment) {
         dailyMessageCommentJpaRepository.deleteById(comment.id.value)
     }
+
+    override fun deleteAllByIds(ids: List<Long>) {
+        if (ids.isEmpty()) return
+        dailyMessageCommentJpaRepository.deleteAllByIdIn(ids)
+    }
 }

@@ -1,6 +1,7 @@
 package com.example.mykku.report.application.usecase
 
 import com.example.mykku.report.application.dto.ReportResult
+import com.example.mykku.report.application.dto.ReportedDailyMessageCommentResult
 import com.example.mykku.report.application.dto.ReportedFeedResult
 import com.example.mykku.report.application.port.output.ReportRepository
 import com.example.mykku.report.domain.entity.Report
@@ -19,6 +20,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 @DisplayName("GetReportDetailService 테스트")
@@ -52,6 +54,7 @@ class GetReportDetailServiceTest {
 
         assertThat(detail.targetDeleted).isTrue()
         verify(reportTargetDetailLoader, never()).loadComment(any())
+        verify(reportTargetDetailLoader, never()).loadDailyMessageComment(any())
     }
 
     @Test
@@ -87,11 +90,33 @@ class GetReportDetailServiceTest {
         verify(reportRepository, never()).countByTargetMemberId(any())
     }
 
-    private fun report(id: Long, targetMemberId: Long?): Report {
+    @Test
+    @DisplayName("하루덕담 댓글 신고는 하루덕담 댓글만 불러오고 피드·피드 댓글은 조회하지 않는다")
+    fun `하루덕담 댓글 대상`() {
+        val report = report(1L, targetMemberId = 7L, targetType = ReportTargetType.DAILY_MESSAGE_COMMENT)
+        whenever(reportRepository.findById(ReportId.of(1L))).thenReturn(report)
+        whenever(reportRepository.findAllByTarget(ReportTargetType.DAILY_MESSAGE_COMMENT, 10L))
+            .thenReturn(listOf(report))
+        whenever(reportMemberIdResolver.toResults(listOf(report))).thenReturn(listOf(result(1L)))
+        whenever(reportTargetDetailLoader.loadDailyMessageComment(10L)).thenReturn(dailyMessageComment())
+
+        val detail = service.execute(1L)
+
+        assertThat(detail.dailyMessageComment?.content).isEqualTo("덕담 댓글")
+        assertThat(detail.targetDeleted).isFalse()
+        verify(reportTargetDetailLoader, never()).loadFeed(any())
+        verify(reportTargetDetailLoader, never()).loadComment(any())
+    }
+
+    private fun report(
+        id: Long,
+        targetMemberId: Long?,
+        targetType: ReportTargetType = ReportTargetType.FEED
+    ): Report {
         return Report.reconstitute(
             id = ReportId.of(id),
             reporterId = 3L,
-            targetType = ReportTargetType.FEED,
+            targetType = targetType,
             targetId = 10L,
             targetMemberId = targetMemberId,
             reason = ReportReason.SPAM,
@@ -105,6 +130,10 @@ class GetReportDetailServiceTest {
 
     private fun result(id: Long): ReportResult {
         return ReportResult.from(report(id, targetMemberId = 7L), "reporter", "author")
+    }
+
+    private fun dailyMessageComment(): ReportedDailyMessageCommentResult {
+        return ReportedDailyMessageCommentResult(10L, "덕담 댓글", 5L, "오늘의 덕담", LocalDate.of(2026, 9, 26))
     }
 
     private fun feed(): ReportedFeedResult {

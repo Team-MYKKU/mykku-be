@@ -2,6 +2,10 @@ package com.example.mykku.report.adapter.input.web
 
 import com.example.mykku.BaseControllerTest
 import com.example.mykku.board.adapter.output.persistence.entity.BoardJpaEntity
+import com.example.mykku.dailymessage.adapter.output.persistence.entity.DailyMessageCommentJpaEntity
+import com.example.mykku.dailymessage.adapter.output.persistence.entity.DailyMessageJpaEntity
+import com.example.mykku.dailymessage.adapter.output.persistence.repository.DailyMessageCommentJpaRepository
+import com.example.mykku.dailymessage.adapter.output.persistence.repository.DailyMessageJpaRepository
 import com.example.mykku.feed.adapter.output.persistence.FeedCommentJpaRepository
 import com.example.mykku.feed.adapter.output.persistence.FeedJpaRepository
 import com.example.mykku.feed.adapter.output.persistence.entity.FeedCommentJpaEntity
@@ -12,12 +16,14 @@ import com.example.mykku.report.domain.vo.ReportTargetType
 import com.example.mykku.report.exception.ReportErrorCode
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
+import io.restassured.response.ValidatableResponse
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.hasItems
 import org.hamcrest.Matchers.hasSize
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import java.time.LocalDate
 
 @DisplayName("ReportController 통합 테스트")
 class ReportControllerTest : BaseControllerTest() {
@@ -27,6 +33,12 @@ class ReportControllerTest : BaseControllerTest() {
 
     @Autowired
     private lateinit var feedCommentJpaRepository: FeedCommentJpaRepository
+
+    @Autowired
+    private lateinit var dailyMessageJpaRepository: DailyMessageJpaRepository
+
+    @Autowired
+    private lateinit var dailyMessageCommentJpaRepository: DailyMessageCommentJpaRepository
 
     private fun createReporter(): MemberJpaEntity = createAndSaveMember(
         memberId = "reporter",
@@ -61,6 +73,51 @@ class ReportControllerTest : BaseControllerTest() {
                 member = author
             )
         )
+    }
+
+    private fun createDailyMessageComment(author: MemberJpaEntity): DailyMessageCommentJpaEntity {
+        val dailyMessage = dailyMessageJpaRepository.save(
+            DailyMessageJpaEntity(title = "오늘의 덕담", content = "오늘도 좋은 하루!", date = LocalDate.now())
+        )
+        return dailyMessageCommentJpaRepository.save(
+            DailyMessageCommentJpaEntity(content = "신고 대상 덕담 댓글", dailyMessage = dailyMessage, member = author)
+        )
+    }
+
+    private fun createDailyMessageReply(
+        parent: DailyMessageCommentJpaEntity,
+        author: MemberJpaEntity
+    ): DailyMessageCommentJpaEntity {
+        return dailyMessageCommentJpaRepository.save(
+            DailyMessageCommentJpaEntity(
+                content = "신고 대상 덕담 답글",
+                dailyMessage = parent.dailyMessage,
+                member = author,
+                parentComment = parent
+            )
+        )
+    }
+
+    private fun dailyMessageCommentReport(
+        targetId: Long,
+        reason: ReportReason = ReportReason.ABUSE
+    ): CreateReportRequest {
+        return CreateReportRequest(
+            targetType = ReportTargetType.DAILY_MESSAGE_COMMENT,
+            targetId = targetId,
+            reason = reason,
+            detail = null
+        )
+    }
+
+    private fun postReport(memberPk: Long, request: CreateReportRequest): ValidatableResponse {
+        return RestAssured.given()
+            .header("Authorization", getBearerToken(memberPk))
+            .contentType(ContentType.JSON)
+            .body(request)
+            .`when`()
+            .post("/api/v1/reports")
+            .then()
     }
 
     @Test
@@ -120,6 +177,57 @@ class ReportControllerTest : BaseControllerTest() {
             .body("data.targetId", equalTo(comment.id!!.toInt()))
             .body("data.reason", equalTo("ABUSE"))
             .body("data.status", equalTo("PENDING"))
+    }
+
+    @Test
+    @DisplayName("하루덕담 댓글 신고 - 정상 케이스")
+    fun `createReport - 하루덕담 댓글을 신고한다`() {
+        val reporter = createReporter()
+        val author = createAuthor()
+        val comment = createDailyMessageComment(author)
+
+        postReport(reporter.id, dailyMessageCommentReport(comment.id!!))
+            .statusCode(201)
+            .body("data.targetType", equalTo("DAILY_MESSAGE_COMMENT"))
+            .body("data.targetTypeDescription", equalTo("하루 덕담 댓글"))
+            .body("data.targetId", equalTo(comment.id!!.toInt()))
+            .body("data.targetMemberId", equalTo(author.memberId))
+            .body("data.status", equalTo("PENDING"))
+    }
+
+    @Test
+    @DisplayName("하루덕담 답글 신고 - 정상 케이스")
+    fun `createReport - 하루덕담 답글을 신고한다`() {
+        val reporter = createReporter()
+        val author = createAuthor()
+        val reply = createDailyMessageReply(createDailyMessageComment(author), author)
+
+        postReport(reporter.id, dailyMessageCommentReport(reply.id!!, ReportReason.SPAM))
+            .statusCode(201)
+            .body("data.targetType", equalTo("DAILY_MESSAGE_COMMENT"))
+            .body("data.targetId", equalTo(reply.id!!.toInt()))
+            .body("data.targetMemberId", equalTo(author.memberId))
+    }
+
+    @Test
+    @DisplayName("하루덕담 댓글 신고 - 없는 댓글이면 RP002")
+    fun `createReport - 없는 하루덕담 댓글은 실패한다`() {
+        val reporter = createReporter()
+
+        postReport(reporter.id, dailyMessageCommentReport(999999L))
+            .statusCode(404)
+            .body("code", equalTo(ReportErrorCode.REPORT_TARGET_NOT_FOUND.code))
+    }
+
+    @Test
+    @DisplayName("하루덕담 댓글 신고 - 자신의 댓글이면 RP101")
+    fun `createReport - 자신의 하루덕담 댓글은 신고할 수 없다`() {
+        val author = createAuthor()
+        val comment = createDailyMessageComment(author)
+
+        postReport(author.id, dailyMessageCommentReport(comment.id!!))
+            .statusCode(400)
+            .body("code", equalTo(ReportErrorCode.CANNOT_REPORT_OWN_CONTENT.code))
     }
 
     @Test
@@ -266,7 +374,8 @@ class ReportControllerTest : BaseControllerTest() {
             .statusCode(200)
             .body("message", equalTo("신고 사유 목록 조회 성공"))
             .body("data", hasSize<Any>(ReportReason.entries.size))
-            .body("data.reason", hasItems(ReportReason.ETC.name, ReportReason.SPAM.name))
+            .body("data.reason", equalTo(ReportReason.entries.map { it.name }))
+            .body("data[-1].reason", equalTo(ReportReason.ETC.name))
             .body("data.description", hasItems(ReportReason.ETC.description))
     }
 }

@@ -36,7 +36,7 @@ class ReportJpaEntity(
     val reporterId: Long?,
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "target_type", nullable = false, length = 20)
+    @Column(name = "target_type", nullable = false, length = 30)
     val targetType: ReportTargetType,
 
     @Column(name = "target_id", nullable = false)
