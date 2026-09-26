@@ -33,17 +33,12 @@ class AdminDailyMessageCommentApiControllerTest : BaseControllerTest() {
     @Test
     @DisplayName("답글과 좋아요가 있는 하루덕담 댓글을 지우면 답글까지 지운다")
     fun `deleteDailyMessageComment - 답글까지 지운다`() {
-        val adminSessionId = getAdminSessionId()
         val author = createAndSaveMember()
         val dailyMessage = saveDailyMessage()
-        val parent = saveComment(dailyMessage, author, null)
-        val reply = saveComment(dailyMessage, author, parent)
-        saveComment(dailyMessage, author, reply)
+        val parent = saveLikedCommentTree(dailyMessage, author)
         val other = saveComment(dailyMessage, author, null)
-        likeComment(author, parent)
-        likeComment(author, reply)
 
-        deleteComment(adminSessionId, parent.id!!)
+        deleteComment(getAdminSessionId(), parent.id!!)
             .statusCode(200)
             .body("message", equalTo("하루 덕담 댓글이 삭제되었습니다"))
 
@@ -83,6 +78,18 @@ class AdminDailyMessageCommentApiControllerTest : BaseControllerTest() {
         return dailyMessageJpaRepository.save(
             DailyMessageJpaEntity(title = "오늘의 덕담", content = "오늘도 좋은 하루!", date = LocalDate.now())
         )
+    }
+
+    private fun saveLikedCommentTree(
+        dailyMessage: DailyMessageJpaEntity,
+        author: MemberJpaEntity
+    ): DailyMessageCommentJpaEntity {
+        val parent = saveComment(dailyMessage, author, null)
+        val reply = saveComment(dailyMessage, author, parent)
+        saveComment(dailyMessage, author, reply)
+        likeComment(author, parent)
+        likeComment(author, reply)
+        return parent
     }
 
     private fun saveComment(

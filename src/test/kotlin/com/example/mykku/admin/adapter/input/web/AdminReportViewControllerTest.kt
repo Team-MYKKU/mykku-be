@@ -179,6 +179,18 @@ class AdminReportViewControllerTest : BaseControllerTest() {
     }
 
     @Test
+    @DisplayName("삭제된 하루덕담 댓글 신고 상세는 200과 '삭제됨'을 보여 준다")
+    fun `detailPage - 삭제된 하루덕담 댓글 대상`() {
+        val (reporter, author) = createMembers()
+        val report = saveReport(reporter, author, ReportTargetType.DAILY_MESSAGE_COMMENT, 999999L)
+
+        getPage("/admin/report/${report.id}")
+            .statusCode(200)
+            .body(containsString("id=\"target-deleted\""))
+            .body(not(containsString("id=\"delete-content\"")))
+    }
+
+    @Test
     @DisplayName("신고 사유와 대상 피드·댓글에 들어간 스크립트는 이스케이프한다")
     fun `detailPage - XSS 이스케이프`() {
         val (reporter, author) = createMembers()

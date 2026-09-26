@@ -13,4 +13,5 @@ interface DailyMessageCommentRepository {
     fun findByDailyMessageIdAndParentCommentIsNull(dailyMessageId: DailyMessageId, pageable: Pageable): Page<DailyMessageComment>
     fun findByParentCommentIds(parentCommentIds: List<Long>): List<DailyMessageComment>
     fun delete(comment: DailyMessageComment)
+    fun deleteAllByIds(ids: List<Long>)
 }

@@ -16,6 +16,7 @@ import com.example.mykku.report.domain.vo.ReportTargetType
 import com.example.mykku.report.exception.ReportErrorCode
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
+import io.restassured.response.ValidatableResponse
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.hasItems
 import org.hamcrest.Matchers.hasSize
@@ -83,6 +84,42 @@ class ReportControllerTest : BaseControllerTest() {
         )
     }
 
+    private fun createDailyMessageReply(
+        parent: DailyMessageCommentJpaEntity,
+        author: MemberJpaEntity
+    ): DailyMessageCommentJpaEntity {
+        return dailyMessageCommentJpaRepository.save(
+            DailyMessageCommentJpaEntity(
+                content = "신고 대상 덕담 답글",
+                dailyMessage = parent.dailyMessage,
+                member = author,
+                parentComment = parent
+            )
+        )
+    }
+
+    private fun dailyMessageCommentReport(
+        targetId: Long,
+        reason: ReportReason = ReportReason.ABUSE
+    ): CreateReportRequest {
+        return CreateReportRequest(
+            targetType = ReportTargetType.DAILY_MESSAGE_COMMENT,
+            targetId = targetId,
+            reason = reason,
+            detail = null
+        )
+    }
+
+    private fun postReport(memberPk: Long, request: CreateReportRequest): ValidatableResponse {
+        return RestAssured.given()
+            .header("Authorization", getBearerToken(memberPk))
+            .contentType(ContentType.JSON)
+            .body(request)
+            .`when`()
+            .post("/api/v1/reports")
+            .then()
+    }
+
     @Test
     @DisplayName("게시글 신고 - 정상 케이스")
     fun `createReport - 게시글을 신고한다`() {
@@ -148,20 +185,8 @@ class ReportControllerTest : BaseControllerTest() {
         val reporter = createReporter()
         val author = createAuthor()
         val comment = createDailyMessageComment(author)
-        val request = CreateReportRequest(
-            targetType = ReportTargetType.DAILY_MESSAGE_COMMENT,
-            targetId = comment.id!!,
-            reason = ReportReason.ABUSE,
-            detail = null
-        )
 
-        RestAssured.given()
-            .header("Authorization", getBearerToken(reporter.id))
-            .contentType(ContentType.JSON)
-            .body(request)
-            .`when`()
-            .post("/api/v1/reports")
-            .then()
+        postReport(reporter.id, dailyMessageCommentReport(comment.id!!))
             .statusCode(201)
             .body("data.targetType", equalTo("DAILY_MESSAGE_COMMENT"))
             .body("data.targetTypeDescription", equalTo("하루 덕담 댓글"))
@@ -175,29 +200,9 @@ class ReportControllerTest : BaseControllerTest() {
     fun `createReport - 하루덕담 답글을 신고한다`() {
         val reporter = createReporter()
         val author = createAuthor()
-        val parent = createDailyMessageComment(author)
-        val reply = dailyMessageCommentJpaRepository.save(
-            DailyMessageCommentJpaEntity(
-                content = "신고 대상 덕담 답글",
-                dailyMessage = parent.dailyMessage,
-                member = author,
-                parentComment = parent
-            )
-        )
-        val request = CreateReportRequest(
-            targetType = ReportTargetType.DAILY_MESSAGE_COMMENT,
-            targetId = reply.id!!,
-            reason = ReportReason.SPAM,
-            detail = null
-        )
+        val reply = createDailyMessageReply(createDailyMessageComment(author), author)
 
-        RestAssured.given()
-            .header("Authorization", getBearerToken(reporter.id))
-            .contentType(ContentType.JSON)
-            .body(request)
-            .`when`()
-            .post("/api/v1/reports")
-            .then()
+        postReport(reporter.id, dailyMessageCommentReport(reply.id!!, ReportReason.SPAM))
             .statusCode(201)
             .body("data.targetType", equalTo("DAILY_MESSAGE_COMMENT"))
             .body("data.targetId", equalTo(reply.id!!.toInt()))
@@ -208,20 +213,8 @@ class ReportControllerTest : BaseControllerTest() {
     @DisplayName("하루덕담 댓글 신고 - 없는 댓글이면 RP002")
     fun `createReport - 없는 하루덕담 댓글은 실패한다`() {
         val reporter = createReporter()
-        val request = CreateReportRequest(
-            targetType = ReportTargetType.DAILY_MESSAGE_COMMENT,
-            targetId = 999999L,
-            reason = ReportReason.ABUSE,
-            detail = null
-        )
 
-        RestAssured.given()
-            .header("Authorization", getBearerToken(reporter.id))
-            .contentType(ContentType.JSON)
-            .body(request)
-            .`when`()
-            .post("/api/v1/reports")
-            .then()
+        postReport(reporter.id, dailyMessageCommentReport(999999L))
             .statusCode(404)
             .body("code", equalTo(ReportErrorCode.REPORT_TARGET_NOT_FOUND.code))
     }
@@ -231,20 +224,8 @@ class ReportControllerTest : BaseControllerTest() {
     fun `createReport - 자신의 하루덕담 댓글은 신고할 수 없다`() {
         val author = createAuthor()
         val comment = createDailyMessageComment(author)
-        val request = CreateReportRequest(
-            targetType = ReportTargetType.DAILY_MESSAGE_COMMENT,
-            targetId = comment.id!!,
-            reason = ReportReason.ABUSE,
-            detail = null
-        )
 
-        RestAssured.given()
-            .header("Authorization", getBearerToken(author.id))
-            .contentType(ContentType.JSON)
-            .body(request)
-            .`when`()
-            .post("/api/v1/reports")
-            .then()
+        postReport(author.id, dailyMessageCommentReport(comment.id!!))
             .statusCode(400)
             .body("code", equalTo(ReportErrorCode.CANNOT_REPORT_OWN_CONTENT.code))
     }

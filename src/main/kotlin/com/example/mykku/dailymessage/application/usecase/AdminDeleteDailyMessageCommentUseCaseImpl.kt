@@ -2,7 +2,6 @@ package com.example.mykku.dailymessage.application.usecase
 
 import com.example.mykku.dailymessage.application.port.input.AdminDeleteDailyMessageCommentUseCase
 import com.example.mykku.dailymessage.application.port.output.DailyMessageCommentRepository
-import com.example.mykku.dailymessage.domain.entity.DailyMessageComment
 import com.example.mykku.dailymessage.domain.vo.DailyMessageCommentId
 import com.example.mykku.dailymessage.exception.DailyMessageException
 import org.slf4j.LoggerFactory
@@ -24,19 +23,19 @@ class AdminDeleteDailyMessageCommentUseCaseImpl(
             comment.dailyMessageId,
             comment.memberId
         )
-        val deepestFirst = collectDescendants(comment.id.value).reversed() + comment
-        deepestFirst.forEach { dailyMessageCommentRepository.delete(it) }
+        collectDescendantLevels(comment.id.value).reversed()
+            .forEach { dailyMessageCommentRepository.deleteAllByIds(it) }
+        dailyMessageCommentRepository.delete(comment)
     }
 
-    private fun collectDescendants(commentId: Long): List<DailyMessageComment> {
-        val descendants = mutableListOf<DailyMessageComment>()
+    private fun collectDescendantLevels(commentId: Long): List<List<Long>> {
+        val levels = mutableListOf<List<Long>>()
         var parentIds = listOf(commentId)
         while (parentIds.isNotEmpty()) {
-            val children = dailyMessageCommentRepository.findByParentCommentIds(parentIds)
-            descendants += children
-            parentIds = children.map { it.id.value }
+            parentIds = dailyMessageCommentRepository.findByParentCommentIds(parentIds).map { it.id.value }
+            if (parentIds.isNotEmpty()) levels += parentIds
         }
-        return descendants
+        return levels
     }
 
     companion object {
