@@ -37,6 +37,8 @@ class MemberContestDocumentTest : BaseDocumentTest() {
                 ContestListResult(
                     id = 1L,
                     title = "첫 번째 콘테스트",
+                    subTitle = "첫 번째 콘테스트 부제목",
+                    description = "첫 번째 콘테스트 설명",
                     startedAt = LocalDateTime.of(2025, 1, 1, 0, 0, 0),
                     expiredAt = LocalDateTime.of(2025, 12, 31, 23, 59, 59),
                     status = ContestStatusType.WINNER_SELECTED,
@@ -48,6 +50,8 @@ class MemberContestDocumentTest : BaseDocumentTest() {
                 ContestListResult(
                     id = 2L,
                     title = "두 번째 콘테스트",
+                    subTitle = null,
+                    description = null,
                     startedAt = LocalDateTime.of(2025, 1, 1, 0, 0, 0),
                     expiredAt = LocalDateTime.of(2025, 11, 30, 23, 59, 59),
                     status = ContestStatusType.EXPIRED,
@@ -80,6 +84,12 @@ class MemberContestDocumentTest : BaseDocumentTest() {
                                 .description("참여한 콘테스트 목록 (참여 시각 최신순, 참여 피드 1건당 1항목)"),
                             fieldWithPath("data.content[].id").type(JsonFieldType.NUMBER).description("콘테스트 ID"),
                             fieldWithPath("data.content[].title").type(JsonFieldType.STRING).description("콘테스트 제목"),
+                            fieldWithPath("data.content[].subTitle").type(JsonFieldType.STRING)
+                                .description("콘테스트 부제목 (관리자가 입력하지 않았으면 null)")
+                                .optional(),
+                            fieldWithPath("data.content[].description").type(JsonFieldType.STRING)
+                                .description("콘테스트 설명 (등록 시 입력하지 않았으면 null 또는 빈 문자열)")
+                                .optional(),
                             fieldWithPath("data.content[].startedAt").type(JsonFieldType.STRING)
                                 .description("콘테스트 시작 일시 (yyyy-MM-dd'T'HH:mm:ss, KST, 오프셋 없음)"),
                             fieldWithPath("data.content[].expiredAt").type(JsonFieldType.STRING)

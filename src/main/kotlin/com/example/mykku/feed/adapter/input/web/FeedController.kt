@@ -1,12 +1,12 @@
 package com.example.mykku.feed.adapter.input.web
 
 import com.example.mykku.auth.config.CurrentMember
+import com.example.mykku.comment.adapter.input.web.dto.CommentPageResponse
 import com.example.mykku.common.dto.ApiResponse
 import com.example.mykku.common.util.PageableValidator
 import com.example.mykku.feed.adapter.input.web.dto.CreateFeedRequest
 import com.example.mykku.feed.adapter.input.web.dto.CreateFeedRequestDto
 import com.example.mykku.feed.adapter.input.web.dto.CreateFeedResponse
-import com.example.mykku.feed.adapter.input.web.dto.FeedCommentsResponse
 import com.example.mykku.feed.adapter.input.web.dto.FeedDetailResponse
 import com.example.mykku.feed.adapter.input.web.dto.UpdateFeedRequest
 import com.example.mykku.feed.adapter.input.web.dto.UpdateFeedRequestDto
@@ -115,7 +115,7 @@ class FeedController(
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "20") size: Int,
         @CurrentMember(required = false) member: Member?
-    ): ResponseEntity<ApiResponse<FeedCommentsResponse>> {
+    ): ResponseEntity<ApiResponse<CommentPageResponse>> {
         val pageable = PageableValidator.validateAndCreate(
             page,
             size,
@@ -134,7 +134,7 @@ class FeedController(
         return ResponseEntity.ok(
             ApiResponse(
                 message = "댓글 목록을 성공적으로 조회했습니다.",
-                data = FeedCommentsResponse.from(result)
+                data = CommentPageResponse.from(result)
             )
         )
     }

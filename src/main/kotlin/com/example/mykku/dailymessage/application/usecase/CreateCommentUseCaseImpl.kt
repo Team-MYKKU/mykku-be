@@ -3,7 +3,7 @@ package com.example.mykku.dailymessage.application.usecase
 import com.example.mykku.achievement.application.event.ActivityEvent
 import com.example.mykku.achievement.application.port.output.ActivityEventPublisher
 import com.example.mykku.achievement.domain.vo.ActivityType
-import com.example.mykku.dailymessage.application.dto.CommentResult
+import com.example.mykku.comment.application.dto.CommentResult
 import com.example.mykku.dailymessage.application.dto.CreateCommentCommand
 import com.example.mykku.dailymessage.application.port.input.CreateCommentUseCase
 import com.example.mykku.dailymessage.application.port.output.DailyMessageCommentRepository
@@ -24,7 +24,7 @@ class CreateCommentUseCaseImpl(
     private val dailyMessageRepository: DailyMessageRepository,
     private val dailyMessageCommentRepository: DailyMessageCommentRepository,
     private val activityEventPublisher: ActivityEventPublisher,
-    private val commentAuthorResolver: CommentAuthorResolver,
+    private val dailyMessageCommentResultReader: DailyMessageCommentResultReader,
     private val memberRepository: MemberRepository
 ) : CreateCommentUseCase {
 
@@ -37,9 +37,7 @@ class CreateCommentUseCaseImpl(
 
         activityEventPublisher.publish(ActivityEvent(command.memberId, ActivityType.COMMENT_CREATE))
 
-        val author = commentAuthorResolver.resolveOne(command.memberId)
-
-        return CommentResult.from(savedComment, author, replies = emptyList())
+        return dailyMessageCommentResultReader.readOne(savedComment, command.memberId)
     }
 
     private fun validateProfileCompleted(memberId: Long) {
@@ -70,8 +68,6 @@ class CreateCommentUseCaseImpl(
         return DailyMessageComment.create(
             dailyMessageId = command.dailyMessageId,
             memberId = command.memberId,
-            memberNickname = command.memberNickname,
-            memberProfileImage = command.memberProfileImage,
             content = command.content,
             parentCommentId = command.parentCommentId
         )

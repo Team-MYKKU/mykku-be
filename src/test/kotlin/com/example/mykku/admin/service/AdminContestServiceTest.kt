@@ -58,6 +58,7 @@ class AdminContestServiceTest {
     private fun createRequest(tags: List<String>?): ContestCreateRequest {
         return ContestCreateRequest(
             title = "테스트 콘테스트",
+            subTitle = null,
             description = "설명",
             startedAt = LocalDateTime.now(),
             expiredAt = LocalDateTime.now().plusDays(7),

@@ -10,6 +10,7 @@ import java.time.temporal.ChronoUnit
 class Contest private constructor(
     val id: ContestId,
     title: String,
+    subTitle: String?,
     description: String?,
     startedAt: LocalDateTime,
     expiredAt: LocalDateTime,
@@ -19,6 +20,9 @@ class Contest private constructor(
     updatedAt: LocalDateTime
 ) {
     var title: String = title
+        private set
+
+    var subTitle: String? = subTitle
         private set
 
     var description: String? = description
@@ -43,6 +47,7 @@ class Contest private constructor(
         validatePeriod(content.startedAt, content.expiredAt)
         validateEditable(content, tagsChanged)
         title = content.title
+        subTitle = content.subTitle
         description = content.description
         startedAt = content.startedAt
         expiredAt = content.expiredAt
@@ -84,6 +89,7 @@ class Contest private constructor(
 
         fun create(
             title: String,
+            subTitle: String?,
             description: String?,
             startedAt: LocalDateTime,
             expiredAt: LocalDateTime,
@@ -93,6 +99,7 @@ class Contest private constructor(
             return Contest(
                 id = ContestId(0),
                 title = title,
+                subTitle = subTitle,
                 description = description,
                 startedAt = startedAt,
                 expiredAt = expiredAt,
@@ -106,6 +113,7 @@ class Contest private constructor(
         fun reconstitute(
             id: ContestId,
             title: String,
+            subTitle: String?,
             description: String?,
             startedAt: LocalDateTime,
             expiredAt: LocalDateTime,
@@ -117,6 +125,7 @@ class Contest private constructor(
             return Contest(
                 id = id,
                 title = title,
+                subTitle = subTitle,
                 description = description,
                 startedAt = startedAt,
                 expiredAt = expiredAt,

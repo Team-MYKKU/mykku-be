@@ -11,7 +11,6 @@ import org.springframework.stereotype.Repository
 interface LikeDailyMessageCommentJpaRepository : JpaRepository<LikeDailyMessageCommentJpaEntity, Long> {
     fun existsByMemberIdAndDailyMessageCommentId(memberId: Long, dailyMessageCommentId: Long): Boolean
     fun deleteByMemberIdAndDailyMessageCommentId(memberId: Long, dailyMessageCommentId: Long)
-    fun countByDailyMessageCommentId(dailyMessageCommentId: Long): Long
 
     @Query(
         "SELECT l.dailyMessageComment.id FROM LikeDailyMessageCommentJpaEntity l " +

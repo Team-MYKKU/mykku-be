@@ -172,7 +172,7 @@ include::{snippets}/common/UNAUTHORIZED/http-response.adoc[]
 === 탈퇴 회원과 빈 값
 
 * 프로필 이미지가 없는 회원(이메일 가입, Apple 로그인, 소셜 계정에 이미지가 없는 경우 등)의 `profileImage` 는 `null` 이 아니라 빈 문자열(`+""+`)일 수 있습니다. `null` 과 `+""+` 를 모두 "이미지 없음"으로 처리하세요.
-* 회원이 탈퇴해도 작성한 콘텐츠는 남고, 작성자 정보는 API별로 아래처럼 내려옵니다. 서버는 "탈퇴한 회원" 같은 대체 문구나 기본 이미지를 내려주지 않으므로 클라이언트에서 표시하세요.
+* 회원이 탈퇴해도 작성한 콘텐츠는 남고, 작성자 정보는 API별로 아래처럼 내려옵니다. 서버는 대체 문구나 기본 이미지를 내려주지 않으므로 클라이언트에서 표시하세요. 단, 댓글 API(피드 댓글·하루 덕담 댓글의 목록/생성/수정)는 예외로 `author.nickname` 에 `탈퇴한 회원` 을 내려줍니다.
 
 [cols="2,3"]
 |===
@@ -182,13 +182,10 @@ include::{snippets}/common/UNAUTHORIZED/http-response.adoc[]
 |`author` 가 `null`
 
 |게시판별 피드 목록의 첫 댓글 미리보기
-|`comment.profileImage` 가 `null`
+|`comment.profileImage` 가 `null` (`content` 는 그대로)
 
-|피드 댓글 목록
-|댓글·답글의 `author` 가 `null`
-
-|하루 덕담 댓글 목록
-|`memberId`, `memberName`, `role`, `profileImage` 가 각각 `null`
+|피드 댓글 목록, 하루 덕담 댓글 목록 (댓글·답글)
+|`author` 의 `memberId`·`profileImage`·`role` 이 `null`, `nickname` 이 `+"탈퇴한 회원"+`
 
 |수상작 상세
 |`authorNickname`, `authorProfileImage` 가 각각 `+""+`

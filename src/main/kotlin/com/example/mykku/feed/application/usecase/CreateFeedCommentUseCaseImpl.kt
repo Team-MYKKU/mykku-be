@@ -3,9 +3,8 @@ package com.example.mykku.feed.application.usecase
 import com.example.mykku.achievement.application.event.ActivityEvent
 import com.example.mykku.achievement.application.port.output.ActivityEventPublisher
 import com.example.mykku.achievement.domain.vo.ActivityType
-import com.example.mykku.feed.application.dto.CommentAuthorResult
+import com.example.mykku.comment.application.dto.CommentResult
 import com.example.mykku.feed.application.dto.CreateFeedCommentCommand
-import com.example.mykku.feed.application.dto.SingleFeedCommentResult
 import com.example.mykku.feed.application.port.input.CreateFeedCommentUseCase
 import com.example.mykku.feed.application.port.output.FeedCommentRepository
 import com.example.mykku.feed.application.port.output.FeedRepository
@@ -21,10 +20,11 @@ import org.springframework.transaction.annotation.Transactional
 class CreateFeedCommentUseCaseImpl(
     private val feedRepository: FeedRepository,
     private val feedCommentRepository: FeedCommentRepository,
-    private val activityEventPublisher: ActivityEventPublisher
+    private val activityEventPublisher: ActivityEventPublisher,
+    private val feedCommentResultReader: FeedCommentResultReader
 ) : CreateFeedCommentUseCase {
 
-    override fun execute(command: CreateFeedCommentCommand, member: Member): SingleFeedCommentResult {
+    override fun execute(command: CreateFeedCommentCommand, member: Member): CommentResult {
         member.requireProfileCompleted()
 
         val feed = feedRepository.findByIdOrThrow(FeedId.of(command.feedId))
@@ -39,20 +39,6 @@ class CreateFeedCommentUseCaseImpl(
 
         activityEventPublisher.publish(ActivityEvent(member.id.value, ActivityType.COMMENT_CREATE))
 
-        return toSingleResult(savedComment, member)
-    }
-
-    private fun toSingleResult(comment: FeedComment, member: Member): SingleFeedCommentResult {
-        return SingleFeedCommentResult(
-            id = comment.id!!.value,
-            content = comment.content,
-            author = CommentAuthorResult(
-                memberId = member.memberId,
-                nickname = member.nickname,
-                profileImage = member.profileImage
-            ),
-            likeCount = comment.likeCount,
-            createdAt = comment.createdAt
-        )
+        return feedCommentResultReader.readOne(savedComment, member.id.value)
     }
 }

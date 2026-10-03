@@ -24,6 +24,9 @@ class ContestJpaEntity(
     @Column(name = "title")
     var title: String,
 
+    @Column(name = "sub_title")
+    var subTitle: String? = null,
+
     @Column(name = "description", columnDefinition = "TEXT")
     var description: String? = null,
 
@@ -45,6 +48,7 @@ class ContestJpaEntity(
         return Contest.reconstitute(
             id = ContestId.of(id!!),
             title = title,
+            subTitle = subTitle,
             description = description,
             startedAt = startedAt,
             expiredAt = expiredAt,
@@ -57,6 +61,7 @@ class ContestJpaEntity(
 
     fun updateFromDomain(contest: Contest) {
         this.title = contest.title
+        this.subTitle = contest.subTitle
         this.description = contest.description
         this.startedAt = contest.startedAt
         this.expiredAt = contest.expiredAt
@@ -72,6 +77,7 @@ class ContestJpaEntity(
             return ContestJpaEntity(
                 id = if (contest.id.value == 0L) null else contest.id.value,
                 title = contest.title,
+                subTitle = contest.subTitle,
                 description = contest.description,
                 startedAt = contest.startedAt,
                 expiredAt = contest.expiredAt,

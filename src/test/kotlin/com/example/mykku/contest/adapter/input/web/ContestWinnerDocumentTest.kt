@@ -626,8 +626,8 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
                                 .optional(),
                             fieldWithPath("data.feeds[].comment.content").type(JsonFieldType.STRING)
                                 .description(
-                                    "댓글 내용 (댓글이 없거나 첫 댓글 작성자가 탈퇴했으면 빈 문자열(\"\"). " +
-                                        "댓글 유무는 commentCount로 판단)"
+                                    "댓글 내용 (댓글이 없으면 빈 문자열(\"\"). " +
+                                        "첫 댓글 작성자가 탈퇴해도 내용은 그대로 나감)"
                                 ),
                             fieldWithPath("data.currentPage").type(JsonFieldType.NUMBER).description("현재 페이지"),
                             fieldWithPath("data.totalPages").type(JsonFieldType.NUMBER).description("전체 페이지 수"),

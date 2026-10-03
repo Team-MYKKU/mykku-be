@@ -40,10 +40,6 @@ class LikeFeedCommentPersistenceAdapter(
         likeFeedCommentJpaRepository.deleteAllByFeedCommentIdIn(feedCommentIds)
     }
 
-    override fun countByFeedCommentId(feedCommentId: Long): Int {
-        return likeFeedCommentJpaRepository.countByFeedCommentId(feedCommentId).toInt()
-    }
-
     override fun countByFeedCommentIdIn(feedCommentIds: List<Long>): Map<Long, Int> {
         if (feedCommentIds.isEmpty()) return emptyMap()
         return likeFeedCommentJpaRepository.countGroupedByFeedCommentIdIn(feedCommentIds).toCountMap()

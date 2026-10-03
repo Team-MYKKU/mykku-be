@@ -283,6 +283,27 @@ class BoardControllerTest : BaseControllerTest() {
     }
 
     @Test
+    @DisplayName("보드별 피드 목록 조회 - 첫 댓글 작성자가 탈퇴해도 미리보기 내용이 나간다")
+    fun `getFeedsByBoard - 탈퇴 회원의 첫 댓글도 미리보기에 포함된다`() {
+        val author = createFeedMember(memberId = "prevauthor", socialId = "prev1", email = "prev1@example.com")
+        val board = boardJpaRepository.save(BoardJpaEntity(title = "미리보기 게시판", logo = "test_logo.png"))
+        val feed = feedJpaRepository.save(
+            FeedJpaEntity(title = "미리보기 피드", content = "미리보기 피드 내용", member = author, board = board)
+        )
+        feedCommentJpaRepository.save(FeedCommentJpaEntity(content = "탈퇴자 첫 댓글", feed = feed, member = null))
+        feedCommentJpaRepository.save(FeedCommentJpaEntity(content = "두번째 댓글", feed = feed, member = author))
+
+        RestAssured.given()
+            .`when`()
+            .get("/api/v1/boards/{boardId}/feeds", board.id)
+            .then()
+            .statusCode(200)
+            .body("data.feeds[0].commentCount", equalTo(2))
+            .body("data.feeds[0].comment.content", equalTo("탈퇴자 첫 댓글"))
+            .body("data.feeds[0].comment.profileImage", equalTo(null))
+    }
+
+    @Test
     @DisplayName("보드별 인기 피드 목록 조회 - 빈 목록")
     fun `getPopularFeedsByBoard - 인기 피드가 없으면 빈 목록을 반환한다`() {
         val board = boardJpaRepository.save(

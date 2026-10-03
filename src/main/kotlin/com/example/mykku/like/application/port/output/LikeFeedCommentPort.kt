@@ -7,7 +7,6 @@ interface LikeFeedCommentPort {
     fun existsByMemberIdAndFeedCommentId(memberId: Long, feedCommentId: Long): Boolean
     fun deleteByMemberIdAndFeedCommentId(memberId: Long, feedCommentId: Long)
     fun deleteAllByFeedCommentIdIn(feedCommentIds: List<Long>)
-    fun countByFeedCommentId(feedCommentId: Long): Int
     fun countByFeedCommentIdIn(feedCommentIds: List<Long>): Map<Long, Int>
     fun findLikedFeedCommentIds(memberId: Long, feedCommentIds: List<Long>): Set<Long>
 }

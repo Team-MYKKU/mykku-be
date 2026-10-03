@@ -1,9 +1,9 @@
 package com.example.mykku.feed.adapter.input.web
 
 import com.example.mykku.auth.config.CurrentMember
+import com.example.mykku.comment.adapter.input.web.dto.CommentResponse
 import com.example.mykku.common.dto.ApiResponse
 import com.example.mykku.feed.adapter.input.web.dto.CreateFeedCommentRequest
-import com.example.mykku.feed.adapter.input.web.dto.SingleFeedCommentResponse
 import com.example.mykku.feed.adapter.input.web.dto.UpdateFeedCommentRequest
 import com.example.mykku.feed.application.dto.CreateFeedCommentCommand
 import com.example.mykku.feed.application.dto.DeleteFeedCommentCommand
@@ -33,7 +33,7 @@ class FeedCommentController(
         @PathVariable feedId: Long,
         @RequestBody request: CreateFeedCommentRequest,
         @CurrentMember member: Member
-    ): ResponseEntity<ApiResponse<SingleFeedCommentResponse>> {
+    ): ResponseEntity<ApiResponse<CommentResponse>> {
         val command = CreateFeedCommentCommand(
             feedId = feedId,
             memberId = member.id.value,
@@ -46,7 +46,7 @@ class FeedCommentController(
         return ResponseEntity.ok(
             ApiResponse(
                 message = "댓글이 성공적으로 등록되었습니다.",
-                data = SingleFeedCommentResponse.from(result)
+                data = CommentResponse.from(result)
             )
         )
     }
@@ -56,7 +56,7 @@ class FeedCommentController(
         @PathVariable commentId: Long,
         @RequestBody request: UpdateFeedCommentRequest,
         @CurrentMember member: Member
-    ): ResponseEntity<ApiResponse<SingleFeedCommentResponse>> {
+    ): ResponseEntity<ApiResponse<CommentResponse>> {
         val command = UpdateFeedCommentCommand(
             commentId = commentId,
             memberId = member.id.value,
@@ -68,7 +68,7 @@ class FeedCommentController(
         return ResponseEntity.ok(
             ApiResponse(
                 message = "댓글이 성공적으로 수정되었습니다.",
-                data = SingleFeedCommentResponse.from(result)
+                data = CommentResponse.from(result)
             )
         )
     }

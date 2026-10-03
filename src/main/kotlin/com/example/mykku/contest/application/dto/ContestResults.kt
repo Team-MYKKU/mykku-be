@@ -9,6 +9,7 @@ import java.time.LocalDateTime
 data class CreateContestResult(
     val id: Long,
     val title: String,
+    val subTitle: String?,
     val description: String?,
     val startedAt: LocalDateTime,
     val expiredAt: LocalDateTime,
@@ -26,6 +27,8 @@ data class ContestImageResult(
 data class ContestListResult(
     val id: Long,
     val title: String,
+    val subTitle: String?,
+    val description: String?,
     val startedAt: LocalDateTime,
     val expiredAt: LocalDateTime,
     val status: ContestStatusType,
@@ -60,6 +63,7 @@ data class PagedContestsResult(
 data class ContestDetailResult(
     val id: Long,
     val title: String,
+    val subTitle: String?,
     val description: String?,
     val startedAt: LocalDateTime,
     val expiredAt: LocalDateTime,
@@ -240,6 +244,7 @@ data class ContestDeletionSummaryResult(
 data class ContestEditResult(
     val id: Long,
     val title: String,
+    val subTitle: String?,
     val description: String?,
     val startedAt: LocalDateTime,
     val expiredAt: LocalDateTime,

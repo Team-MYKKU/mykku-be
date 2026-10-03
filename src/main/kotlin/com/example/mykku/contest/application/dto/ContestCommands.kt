@@ -9,6 +9,7 @@ import java.time.LocalDateTime
 
 data class CreateContestCommand(
     val title: String,
+    val subTitle: String?,
     val description: String?,
     val startedAt: LocalDateTime,
     val expiredAt: LocalDateTime,

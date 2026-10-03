@@ -11,6 +11,7 @@ import com.example.mykku.contest.domain.vo.ContestStatusType
 import com.example.mykku.feed.adapter.output.persistence.FeedJpaRepository
 import com.example.mykku.feed.adapter.output.persistence.entity.FeedJpaEntity
 import io.restassured.RestAssured
+import org.hamcrest.Matchers.containsInAnyOrder
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.notNullValue
 import org.junit.jupiter.api.DisplayName
@@ -44,6 +45,8 @@ class MemberContestControllerTest : BaseControllerTest() {
         val contest1 = contestJpaRepository.save(
             ContestJpaEntity(
                 title = "콘테스트1",
+                subTitle = "부제1",
+                description = "설명1",
                 startedAt = LocalDateTime.now(),
                 expiredAt = LocalDateTime.now().plusDays(7),
                 thumbnailUrl = "https://example.com/thumbnail.jpg"
@@ -52,6 +55,8 @@ class MemberContestControllerTest : BaseControllerTest() {
         val contest2 = contestJpaRepository.save(
             ContestJpaEntity(
                 title = "콘테스트2",
+                subTitle = "부제2",
+                description = "설명2",
                 startedAt = LocalDateTime.now(),
                 expiredAt = LocalDateTime.now().plusDays(7),
                 thumbnailUrl = "https://example.com/thumbnail.jpg"
@@ -80,6 +85,8 @@ class MemberContestControllerTest : BaseControllerTest() {
             .body("message", equalTo("참여한 콘테스트 목록을 성공적으로 조회했습니다."))
             .body("data", notNullValue())
             .body("data.totalElements", equalTo(2))
+            .body("data.content.subTitle", containsInAnyOrder("부제1", "부제2"))
+            .body("data.content.description", containsInAnyOrder("설명1", "설명2"))
     }
 
     @Test

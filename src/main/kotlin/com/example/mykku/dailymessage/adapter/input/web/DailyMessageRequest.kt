@@ -9,15 +9,11 @@ data class CreateCommentRequest(
 ) {
     fun toCommand(
         dailyMessageId: Long,
-        memberId: Long,
-        memberNickname: String?,
-        memberProfileImage: String
+        memberId: Long
     ): CreateCommentCommand {
         return CreateCommentCommand(
             dailyMessageId = dailyMessageId,
             memberId = memberId,
-            memberNickname = memberNickname,
-            memberProfileImage = memberProfileImage,
             content = content,
             parentCommentId = parentCommentId
         )

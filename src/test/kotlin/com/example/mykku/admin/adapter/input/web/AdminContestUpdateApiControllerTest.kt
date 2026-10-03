@@ -36,11 +36,13 @@ class AdminContestUpdateApiControllerTest : BaseControllerTest() {
 
         putContest(
             contest.id!!,
-            basicParts(title = "새 콘테스트", startedAt = "2026-01-02T09:30") + tagParts("새태그", "둘째") + keepParts(urls)
+            basicParts(title = "새 콘테스트", startedAt = "2026-01-02T09:30") + text("subTitle", "새 부제") +
+                tagParts("새태그", "둘째") + keepParts(urls)
         ).statusCode(200).body("message", equalTo("콘테스트가 수정되었습니다"))
 
         val saved = contestJpaRepository.findById(contest.id!!).get()
         assertThat(saved.title).isEqualTo("새 콘테스트")
+        assertThat(saved.subTitle).isEqualTo("새 부제")
         assertThat(saved.startedAt).isEqualTo(LocalDateTime.of(2026, 1, 2, 9, 30))
         assertThat(tagsOf(contest.id!!)).containsExactlyInAnyOrder("새태그", "둘째")
         assertThat(imageUrlsOf(contest.id!!)).containsExactlyElementsOf(urls)
@@ -78,10 +80,26 @@ class AdminContestUpdateApiControllerTest : BaseControllerTest() {
     fun `update - 선정 후 제목만 수정`() {
         val contest = saveContest(status = ContestStatusType.WINNER_SELECTED, tags = listOf("덕질", "굿즈"))
 
-        putContest(contest.id!!, basicParts(title = "제목만 변경") + tagParts(" 굿즈 ", "덕질") + keepParts(emptyList()))
-            .statusCode(200)
+        val parts = basicParts(title = "제목만 변경") + text("subTitle", "선정 후 부제") +
+            tagParts(" 굿즈 ", "덕질") + keepParts(emptyList())
+        putContest(contest.id!!, parts).statusCode(200)
 
-        assertThat(contestJpaRepository.findById(contest.id!!).get().title).isEqualTo("제목만 변경")
+        val saved = contestJpaRepository.findById(contest.id!!).get()
+        assertThat(saved.title).isEqualTo("제목만 변경")
+        assertThat(saved.subTitle).isEqualTo("선정 후 부제")
+    }
+
+    @Test
+    @DisplayName("부제목을 보내지 않거나 공백으로 보내면 기존 부제목이 지워진다")
+    fun `update - 부제목 제거`() {
+        val contest = saveContest(subTitle = "기존 부제")
+
+        putContest(contest.id!!, basicParts() + tagParts("덕질") + keepParts(emptyList())).statusCode(200)
+        assertThat(contestJpaRepository.findById(contest.id!!).get().subTitle).isNull()
+
+        val blankParts = basicParts() + text("subTitle", "   ") + tagParts("덕질") + keepParts(emptyList())
+        putContest(contest.id!!, blankParts).statusCode(200)
+        assertThat(contestJpaRepository.findById(contest.id!!).get().subTitle).isNull()
     }
 
     @Test
@@ -148,11 +166,13 @@ class AdminContestUpdateApiControllerTest : BaseControllerTest() {
 
     private fun saveContest(
         status: ContestStatusType = ContestStatusType.ACTIVE,
-        tags: List<String> = listOf("덕질")
+        tags: List<String> = listOf("덕질"),
+        subTitle: String? = null
     ): ContestJpaEntity {
         val contest = contestJpaRepository.save(
             ContestJpaEntity(
                 title = "콘테스트",
+                subTitle = subTitle,
                 startedAt = LocalDateTime.of(2026, 1, 1, 0, 0),
                 expiredAt = LocalDateTime.of(2026, 1, 31, 0, 0),
                 status = status,

@@ -45,8 +45,6 @@ class DailyMessageCommentJpaEntity(
             id = DailyMessageCommentId.of(id!!),
             dailyMessageId = dailyMessage.id!!,
             memberId = member?.id,
-            memberNickname = member?.nickname,
-            memberProfileImage = member?.profileImage,
             content = content,
             likeCount = likeCount,
             parentCommentId = parentComment?.id,

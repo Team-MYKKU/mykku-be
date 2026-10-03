@@ -45,17 +45,17 @@ class GetMyParticipatedContestsUseCaseImpl(
         winnersByContestId: Map<Long, ContestWinner>,
         now: LocalDateTime
     ): ContestListResult {
-        val tags = tagsByContestId[contest.id.value] ?: emptyList()
         val winner = winnersByContestId[contest.id.value]
-
         return ContestListResult(
             id = contest.id.value,
             title = contest.title,
+            subTitle = contest.subTitle,
+            description = contest.description,
             startedAt = contest.startedAt,
             expiredAt = contest.expiredAt,
             status = contest.resolveStatus(now),
             thumbnailUrl = contest.thumbnailUrl,
-            tags = tags.map { it.title },
+            tags = tagsByContestId[contest.id.value].orEmpty().map { it.title },
             winnerStatus = resolveWinnerStatus(contest, winner),
             winnerRank = winner?.winnerRank
         )

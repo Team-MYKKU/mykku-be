@@ -24,16 +24,12 @@ class DailyMessageCommentTest {
             val comment = DailyMessageComment.create(
                 dailyMessageId = 1L,
                 memberId = 1L,
-                memberNickname = "닉네임",
-                memberProfileImage = "https://example.com/profile.jpg",
                 content = "테스트 댓글"
             )
 
             assertThat(comment.id.value).isEqualTo(0L)
             assertThat(comment.dailyMessageId).isEqualTo(1L)
             assertThat(comment.memberId).isEqualTo(1L)
-            assertThat(comment.memberNickname).isEqualTo("닉네임")
-            assertThat(comment.memberProfileImage).isEqualTo("https://example.com/profile.jpg")
             assertThat(comment.content).isEqualTo("테스트 댓글")
             assertThat(comment.parentCommentId).isNull()
         }
@@ -44,8 +40,6 @@ class DailyMessageCommentTest {
             val comment = DailyMessageComment.create(
                 dailyMessageId = 1L,
                 memberId = 1L,
-                memberNickname = "닉네임",
-                memberProfileImage = "https://example.com/profile.jpg",
                 content = "테스트 댓글"
             )
 
@@ -58,8 +52,6 @@ class DailyMessageCommentTest {
             val comment = DailyMessageComment.create(
                 dailyMessageId = 1L,
                 memberId = 1L,
-                memberNickname = "닉네임",
-                memberProfileImage = "https://example.com/profile.jpg",
                 content = "테스트 댓글"
             )
 
@@ -74,8 +66,6 @@ class DailyMessageCommentTest {
             val comment = DailyMessageComment.create(
                 dailyMessageId = 1L,
                 memberId = 1L,
-                memberNickname = "닉네임",
-                memberProfileImage = "https://example.com/profile.jpg",
                 content = "대댓글 내용",
                 parentCommentId = 10L
             )
@@ -93,8 +83,6 @@ class DailyMessageCommentTest {
                 DailyMessageComment.create(
                     dailyMessageId = 1L,
                     memberId = 1L,
-                    memberNickname = "닉네임",
-                    memberProfileImage = "https://example.com/profile.jpg",
                     content = longContent
                 )
             }
@@ -110,8 +98,6 @@ class DailyMessageCommentTest {
             val comment = DailyMessageComment.create(
                 dailyMessageId = 1L,
                 memberId = 1L,
-                memberNickname = "닉네임",
-                memberProfileImage = "https://example.com/profile.jpg",
                 content = exactContent
             )
 
@@ -124,8 +110,6 @@ class DailyMessageCommentTest {
             val comment = DailyMessageComment.create(
                 dailyMessageId = 1L,
                 memberId = 1L,
-                memberNickname = "닉네임",
-                memberProfileImage = "https://example.com/profile.jpg",
                 content = ""
             )
 
@@ -169,8 +153,6 @@ class DailyMessageCommentTest {
             assertThat(updatedComment.id).isEqualTo(comment.id)
             assertThat(updatedComment.dailyMessageId).isEqualTo(comment.dailyMessageId)
             assertThat(updatedComment.memberId).isEqualTo(comment.memberId)
-            assertThat(updatedComment.memberNickname).isEqualTo(comment.memberNickname)
-            assertThat(updatedComment.memberProfileImage).isEqualTo(comment.memberProfileImage)
             assertThat(updatedComment.likeCount).isEqualTo(comment.likeCount)
             assertThat(updatedComment.parentCommentId).isEqualTo(comment.parentCommentId)
             assertThat(updatedComment.createdAt).isEqualTo(comment.createdAt)
@@ -242,8 +224,6 @@ class DailyMessageCommentTest {
                 id = DailyMessageCommentId(1L),
                 dailyMessageId = 10L,
                 memberId = 1L,
-                memberNickname = "닉네임",
-                memberProfileImage = "https://example.com/profile.jpg",
                 content = "댓글 내용",
                 likeCount = 5,
                 parentCommentId = null,
@@ -254,8 +234,6 @@ class DailyMessageCommentTest {
             assertThat(comment.id.value).isEqualTo(1L)
             assertThat(comment.dailyMessageId).isEqualTo(10L)
             assertThat(comment.memberId).isEqualTo(1L)
-            assertThat(comment.memberNickname).isEqualTo("닉네임")
-            assertThat(comment.memberProfileImage).isEqualTo("https://example.com/profile.jpg")
             assertThat(comment.content).isEqualTo("댓글 내용")
             assertThat(comment.likeCount).isEqualTo(5)
             assertThat(comment.parentCommentId).isNull()
@@ -271,8 +249,6 @@ class DailyMessageCommentTest {
                 id = DailyMessageCommentId(2L),
                 dailyMessageId = 10L,
                 memberId = 1L,
-                memberNickname = "닉네임",
-                memberProfileImage = "https://example.com/profile.jpg",
                 content = "대댓글 내용",
                 likeCount = 0,
                 parentCommentId = 1L,
@@ -293,8 +269,6 @@ class DailyMessageCommentTest {
                 id = DailyMessageCommentId(1L),
                 dailyMessageId = 10L,
                 memberId = 1L,
-                memberNickname = "닉네임",
-                memberProfileImage = "https://example.com/profile.jpg",
                 content = longContent,
                 likeCount = 0,
                 parentCommentId = null,
@@ -321,8 +295,6 @@ class DailyMessageCommentTest {
         return DailyMessageComment.create(
             dailyMessageId = 1L,
             memberId = 1L,
-            memberNickname = "닉네임",
-            memberProfileImage = "https://example.com/profile.jpg",
             content = "테스트 댓글"
         )
     }

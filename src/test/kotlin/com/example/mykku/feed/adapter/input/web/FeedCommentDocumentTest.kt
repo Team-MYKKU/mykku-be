@@ -1,12 +1,12 @@
 package com.example.mykku.feed.adapter.input.web
 
 import com.example.mykku.BaseDocumentTest
+import com.example.mykku.comment.CommentDocumentFields
+import com.example.mykku.comment.CommentFixtures
 import com.example.mykku.docs.ApiRequestConfig
 import com.example.mykku.docs.RestDocumentationResponse
 import com.example.mykku.feed.adapter.input.web.dto.CreateFeedCommentRequest
 import com.example.mykku.feed.adapter.input.web.dto.UpdateFeedCommentRequest
-import com.example.mykku.feed.application.dto.CommentAuthorResult
-import com.example.mykku.feed.application.dto.SingleFeedCommentResult
 import com.example.mykku.feed.exception.FeedErrorCode
 import com.example.mykku.feed.exception.FeedException
 import com.example.mykku.member.exception.MemberErrorCode
@@ -17,37 +17,12 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.`when`
 import org.mockito.kotlin.any
-import org.springframework.restdocs.payload.FieldDescriptor
 import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
 import org.springframework.restdocs.request.RequestDocumentation.parameterWithName
 import java.time.LocalDateTime
 
 class FeedCommentDocumentTest : BaseDocumentTest() {
-
-    private fun singleCommentResponseFields(
-        dataDescription: String,
-        idDescription: String,
-        contentDescription: String,
-        likeCountDescription: String,
-        createdAtDescription: String
-    ): Array<FieldDescriptor> = arrayOf(
-        fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-        fieldWithPath("data").type(JsonFieldType.OBJECT).description(dataDescription),
-        fieldWithPath("data.id").type(JsonFieldType.NUMBER).description(idDescription),
-        fieldWithPath("data.content").type(JsonFieldType.STRING).description(contentDescription),
-        fieldWithPath("data.author").type(JsonFieldType.OBJECT).description("작성자 정보 (요청한 회원 본인)"),
-        fieldWithPath("data.author.memberId").type(JsonFieldType.STRING)
-            .description(
-                "작성자 아이디 (회원이 설정한 영문·숫자 문자열 ID, DB PK 아님. " +
-                    "내 프로필 조회의 memberId와 같으면 본인 댓글)"
-            ),
-        fieldWithPath("data.author.nickname").type(JsonFieldType.STRING).description("작성자 닉네임"),
-        fieldWithPath("data.author.profileImage").type(JsonFieldType.STRING)
-            .description("작성자 프로필 이미지 URL (이미지가 없는 회원은 null이 아닌 빈 문자열 \"\")"),
-        fieldWithPath("data.likeCount").type(JsonFieldType.NUMBER).description(likeCountDescription),
-        fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description(createdAtDescription)
-    )
 
     @Nested
     @DisplayName("피드 댓글 생성")
@@ -74,16 +49,10 @@ class FeedCommentDocumentTest : BaseDocumentTest() {
                 content = "좋은 피드네요!",
                 parentCommentId = null
             )
-            val result = SingleFeedCommentResult(
+            val result = CommentFixtures.comment(
                 id = 1L,
                 content = "좋은 피드네요!",
-                author = CommentAuthorResult(
-                    memberId = testMember.memberId,
-                    nickname = "testuser",
-                    profileImage = "https://example.com/profile.jpg"
-                ),
-                likeCount = 0,
-                createdAt = LocalDateTime.now()
+                author = CommentFixtures.author(memberId = testMember.memberId, nickname = "testuser")
             )
 
             `when`(createFeedCommentUseCase.execute(any(), any())).thenReturn(result)
@@ -91,18 +60,12 @@ class FeedCommentDocumentTest : BaseDocumentTest() {
             val documentFilter = document("feed-comment/create", 200)
                 .request(request().applyConfig(apiConfig))
                 .response(
-                    response()
-                        .responseBodyField(
-                            *singleCommentResponseFields(
-                                dataDescription = "생성된 댓글 정보. 목록 조회 아이템과 달리 " +
-                                    "isLiked·updatedAt·replies·replyCount는 없음 " +
-                                    "(새 댓글은 isLiked=false, replies=[], replyCount=0)",
-                                idDescription = "댓글 ID",
-                                contentDescription = "댓글 내용",
-                                likeCountDescription = "좋아요 수 (생성 직후 항상 0)",
-                                createdAtDescription = "작성 일시 (KST, ISO-8601, 오프셋 없음)"
-                            )
+                    response().responseBodyField(
+                        *CommentDocumentFields.singleFields(
+                            "생성된 댓글 정보 (피드 댓글 목록 아이템과 같은 형식)",
+                            "답글 목록 (새 댓글은 항상 빈 배열)"
                         )
+                    )
                 )
                 .build()
 
@@ -219,16 +182,10 @@ class FeedCommentDocumentTest : BaseDocumentTest() {
                 content = "저도 동감합니다!",
                 parentCommentId = 10L
             )
-            val result = SingleFeedCommentResult(
+            val result = CommentFixtures.comment(
                 id = 2L,
                 content = "저도 동감합니다!",
-                author = CommentAuthorResult(
-                    memberId = testMember.memberId,
-                    nickname = "testuser",
-                    profileImage = "https://example.com/profile.jpg"
-                ),
-                likeCount = 0,
-                createdAt = LocalDateTime.now()
+                author = CommentFixtures.author(memberId = testMember.memberId, nickname = "testuser")
             )
 
             `when`(createFeedCommentUseCase.execute(any(), any())).thenReturn(result)
@@ -236,17 +193,12 @@ class FeedCommentDocumentTest : BaseDocumentTest() {
             val documentFilter = document("feed-comment/reply-create", 200)
                 .request(request().applyConfig(apiConfig))
                 .response(
-                    response()
-                        .responseBodyField(
-                            *singleCommentResponseFields(
-                                dataDescription = "생성된 답글 정보. 목록 조회 replies[] 아이템과 달리 " +
-                                    "isLiked·updatedAt은 없음 (새 답글은 isLiked=false)",
-                                idDescription = "답글 ID",
-                                contentDescription = "답글 내용",
-                                likeCountDescription = "좋아요 수 (생성 직후 항상 0)",
-                                createdAtDescription = "작성 일시 (KST, ISO-8601, 오프셋 없음)"
-                            )
+                    response().responseBodyField(
+                        *CommentDocumentFields.singleFields(
+                            "생성된 답글 정보 (피드 댓글 목록 아이템과 같은 형식)",
+                            "답글 목록 (새 답글은 항상 빈 배열)"
                         )
+                    )
                 )
                 .build()
 
@@ -280,16 +232,19 @@ class FeedCommentDocumentTest : BaseDocumentTest() {
         fun `성공`() {
             val commentId = 1L
             val request = UpdateFeedCommentRequest(content = "수정된 댓글 내용입니다!")
-            val result = SingleFeedCommentResult(
+            val result = CommentFixtures.comment(
                 id = commentId,
                 content = "수정된 댓글 내용입니다!",
-                author = CommentAuthorResult(
-                    memberId = testMember.memberId,
-                    nickname = "testuser",
-                    profileImage = "https://example.com/profile.jpg"
-                ),
+                author = CommentFixtures.author(memberId = testMember.memberId, nickname = "testuser"),
                 likeCount = 5,
-                createdAt = LocalDateTime.now()
+                replies = listOf(
+                    CommentFixtures.reply(
+                        id = 2L,
+                        author = CommentFixtures.author(memberId = "otheruser", nickname = "다른회원", role = null)
+                    )
+                ),
+                createdAt = LocalDateTime.of(2026, 10, 1, 12, 0, 0),
+                updatedAt = LocalDateTime.of(2026, 10, 2, 9, 30, 0)
             )
 
             `when`(updateFeedCommentUseCase.execute(any(), any())).thenReturn(result)
@@ -297,18 +252,12 @@ class FeedCommentDocumentTest : BaseDocumentTest() {
             val documentFilter = document("feed-comment/update", 200)
                 .request(request().applyConfig(apiConfig))
                 .response(
-                    response()
-                        .responseBodyField(
-                            *singleCommentResponseFields(
-                                dataDescription = "수정된 댓글 또는 답글 정보. 목록 조회 아이템과 달리 " +
-                                    "isLiked·updatedAt·replies·replyCount는 없음",
-                                idDescription = "댓글 또는 답글 ID",
-                                contentDescription = "수정된 내용",
-                                likeCountDescription = "현재 좋아요 수",
-                                createdAtDescription = "수정 요청을 처리한 시각 (최초 작성 일시 아님. " +
-                                    "저장된 작성 일시는 바뀌지 않음. KST, ISO-8601, 오프셋 없음)"
-                            )
+                    response().responseBodyField(
+                        *CommentDocumentFields.singleFields(
+                            "수정된 댓글 또는 답글 정보 (피드 댓글 목록 아이템과 같은 형식)",
+                            "현재 답글 목록 (최상위 댓글 수정 시 모든 답글이 오래된 순으로, 답글 수정 시 빈 배열)"
                         )
+                    )
                 )
                 .build()
 

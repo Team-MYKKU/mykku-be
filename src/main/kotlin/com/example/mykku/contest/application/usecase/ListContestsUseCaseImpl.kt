@@ -48,6 +48,8 @@ class ListContestsUseCaseImpl(
         return ContestListResult(
             id = contest.id.value,
             title = contest.title,
+            subTitle = contest.subTitle,
+            description = contest.description,
             startedAt = contest.startedAt,
             expiredAt = contest.expiredAt,
             status = contest.resolveStatus(now),

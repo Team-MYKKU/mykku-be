@@ -12,6 +12,9 @@ data class ContestCreateRequest(
     @field:Size(max = 255, message = "제목은 255자 이하여야 합니다")
     val title: String,
 
+    @field:Size(max = 255, message = "부제목은 255자 이하여야 합니다")
+    val subTitle: String?,
+
     val description: String?,
 
     @field:NotNull(message = "시작일은 필수입니다")

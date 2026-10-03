@@ -1,16 +1,15 @@
 package com.example.mykku.dailymessage.adapter.input.web
 
 import com.example.mykku.BaseDocumentTest
+import com.example.mykku.comment.CommentDocumentFields
+import com.example.mykku.comment.CommentFixtures
+import com.example.mykku.comment.application.dto.CommentAuthorResult
 import com.example.mykku.docs.ApiRequestConfig
 import com.example.mykku.docs.RestDocumentationResponse
-import com.example.mykku.dailymessage.application.dto.CommentResult
-import com.example.mykku.dailymessage.application.dto.DailyMessageCommentsResult
-import com.example.mykku.dailymessage.application.dto.ReplyResult
 import com.example.mykku.dailymessage.exception.DailyMessageErrorCode
 import com.example.mykku.dailymessage.exception.DailyMessageException
 import com.example.mykku.member.exception.MemberErrorCode
 import com.example.mykku.member.exception.MemberException
-import com.example.mykku.role.application.dto.RoleResult
 import io.restassured.http.ContentType
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -45,130 +44,35 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
         @Test
         fun `성공`() {
             val dailyMessageId = 1L
-            val result = DailyMessageCommentsResult(
-                comments = listOf(
-                    CommentResult(
+            val result = CommentFixtures.page(
+                listOf(
+                    CommentFixtures.comment(
                         id = 1L,
                         content = "좋은 덕담이네요!",
+                        author = CommentFixtures.author(memberId = "honggildong", nickname = "홍길동"),
                         likeCount = 5,
                         isLiked = true,
-                        memberId = "honggildong",
-                        memberName = "홍길동",
-                        role = RoleResult(1L, "덕담왕", "덕담을 많이 남긴 사람"),
-                        profileImage = "https://example.com/profile1.jpg",
-                        createdAt = LocalDateTime.now(),
                         replies = listOf(
-                            ReplyResult(
+                            CommentFixtures.reply(
                                 id = 2L,
                                 content = "저도 동감합니다!",
-                                likeCount = 2,
-                                isLiked = false,
-                                memberId = "kimchulsoo",
-                                memberName = "김철수",
-                                role = null,
-                                profileImage = "https://example.com/profile2.jpg",
-                                createdAt = LocalDateTime.now()
+                                author = CommentFixtures.author(memberId = "kimchulsoo", nickname = "김철수", role = null)
                             )
                         )
                     ),
-                    CommentResult(
+                    CommentFixtures.comment(
                         id = 3L,
                         content = "오늘 하루도 힘내세요!",
-                        likeCount = 3,
-                        isLiked = false,
-                        memberId = "leeyounghee",
-                        memberName = "이영희",
-                        role = null,
-                        profileImage = "https://example.com/profile3.jpg",
-                        createdAt = LocalDateTime.now(),
-                        replies = emptyList()
+                        author = CommentAuthorResult.withdrawn()
                     )
-                ),
-                totalElements = 2,
-                totalPages = 1,
-                currentPage = 0,
-                pageSize = 20,
-                hasNext = false
+                )
             )
 
             `when`(getCommentsUseCase.execute(eq(dailyMessageId), anyOrNull(), any())).thenReturn(result)
 
             val documentFilter = document("daily-message-comment/list", 200)
                 .request(request().applyConfig(apiConfig))
-                .response(
-                    response()
-                        .responseBodyField(
-                            fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("댓글 목록 응답 데이터"),
-                            fieldWithPath("data.comments[]").type(JsonFieldType.ARRAY)
-                                .description("최상위 댓글 목록 (작성 일시 최신순)"),
-                            fieldWithPath("data.comments[].id").type(JsonFieldType.NUMBER).description("댓글 ID"),
-                            fieldWithPath("data.comments[].content").type(JsonFieldType.STRING).description("댓글 내용"),
-                            fieldWithPath("data.comments[].likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
-                            fieldWithPath("data.comments[].isLiked").type(JsonFieldType.BOOLEAN)
-                                .description("요청한 회원의 좋아요 여부 (비로그인이거나 토큰이 유효하지 않으면 항상 false)"),
-                            fieldWithPath("data.comments[].memberId").type(JsonFieldType.STRING)
-                                .description("작성자 아이디 (탈퇴했거나 아이디를 설정하지 않은 회원이면 null)").optional(),
-                            fieldWithPath("data.comments[].memberName").type(JsonFieldType.STRING)
-                                .description(
-                                    "작성자 닉네임 (작성 당시가 아닌 조회 시점의 현재 닉네임, " +
-                                        "탈퇴했거나 닉네임을 설정하지 않은 회원이면 null)"
-                                ).optional(),
-                            fieldWithPath("data.comments[].role").type(JsonFieldType.OBJECT)
-                                .description("작성자 대표 칭호 (대표 칭호가 없거나 탈퇴 시 null)").optional(),
-                            fieldWithPath("data.comments[].role.id").type(JsonFieldType.NUMBER).description("칭호 ID").optional(),
-                            fieldWithPath("data.comments[].role.name").type(JsonFieldType.STRING).description("칭호 이름").optional(),
-                            fieldWithPath("data.comments[].role.description").type(JsonFieldType.STRING)
-                                .description("칭호 설명 (설명이 없는 칭호는 null)").optional(),
-                            fieldWithPath("data.comments[].profileImage").type(JsonFieldType.STRING)
-                                .description(
-                                    "작성자 프로필 이미지 URL (조회 시점의 현재 이미지, 탈퇴 시 null, " +
-                                        "이미지가 없는 회원은 빈 문자열 \"\")"
-                                ).optional(),
-                            fieldWithPath("data.comments[].createdAt").type(JsonFieldType.STRING)
-                                .description("작성 일시 (KST, ISO-8601, 오프셋 없음)"),
-                            fieldWithPath("data.comments[].replies[]").type(JsonFieldType.ARRAY)
-                                .description("답글 목록 (페이지네이션 없이 전부 포함, 별도 정렬 없음)"),
-                            fieldWithPath("data.comments[].replies[].id").type(JsonFieldType.NUMBER).description("답글 ID"),
-                            fieldWithPath("data.comments[].replies[].content").type(JsonFieldType.STRING)
-                                .description("답글 내용"),
-                            fieldWithPath("data.comments[].replies[].likeCount").type(JsonFieldType.NUMBER)
-                                .description("답글 좋아요 수"),
-                            fieldWithPath("data.comments[].replies[].isLiked").type(JsonFieldType.BOOLEAN)
-                                .description("요청한 회원의 답글 좋아요 여부 (비로그인이거나 토큰이 유효하지 않으면 항상 false)"),
-                            fieldWithPath("data.comments[].replies[].memberId").type(JsonFieldType.STRING)
-                                .description("답글 작성자 아이디 (탈퇴했거나 아이디를 설정하지 않은 회원이면 null)").optional(),
-                            fieldWithPath("data.comments[].replies[].memberName").type(JsonFieldType.STRING)
-                                .description(
-                                    "답글 작성자 닉네임 (작성 당시가 아닌 조회 시점의 현재 닉네임, " +
-                                        "탈퇴했거나 닉네임을 설정하지 않은 회원이면 null)"
-                                ).optional(),
-                            fieldWithPath("data.comments[].replies[].role").type(JsonFieldType.OBJECT)
-                                .description("답글 작성자 대표 칭호 (대표 칭호가 없거나 탈퇴 시 null)").optional(),
-                            fieldWithPath("data.comments[].replies[].role.id").type(JsonFieldType.NUMBER)
-                                .description("칭호 ID").optional(),
-                            fieldWithPath("data.comments[].replies[].role.name").type(JsonFieldType.STRING)
-                                .description("칭호 이름").optional(),
-                            fieldWithPath("data.comments[].replies[].role.description").type(JsonFieldType.STRING)
-                                .description("칭호 설명 (설명이 없는 칭호는 null)").optional(),
-                            fieldWithPath("data.comments[].replies[].profileImage").type(JsonFieldType.STRING)
-                                .description(
-                                    "답글 작성자 프로필 이미지 URL (조회 시점의 현재 이미지, 탈퇴 시 null, " +
-                                        "이미지가 없는 회원은 빈 문자열 \"\")"
-                                ).optional(),
-                            fieldWithPath("data.comments[].replies[].createdAt").type(JsonFieldType.STRING)
-                                .description("답글 작성 일시 (KST, ISO-8601, 오프셋 없음)"),
-                            fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER)
-                                .description("전체 최상위 댓글 수 (답글 제외)"),
-                            fieldWithPath("data.totalPages").type(JsonFieldType.NUMBER)
-                                .description("최상위 댓글 기준 전체 페이지 수"),
-                            fieldWithPath("data.currentPage").type(JsonFieldType.NUMBER)
-                                .description("현재 페이지 번호 (0부터 시작)"),
-                            fieldWithPath("data.pageSize").type(JsonFieldType.NUMBER).description("페이지 크기"),
-                            fieldWithPath("data.hasNext").type(JsonFieldType.BOOLEAN)
-                                .description("다음 페이지(최상위 댓글 기준) 존재 여부")
-                        )
-                )
+                .response(response().responseBodyField(*CommentDocumentFields.pageFields()))
                 .build()
 
             given(documentFilter)
@@ -237,17 +141,10 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
                 "content" to "좋은 덕담 감사합니다!",
                 "parentCommentId" to null
             )
-            val result = CommentResult(
+            val result = CommentFixtures.comment(
                 id = 1L,
                 content = "좋은 덕담 감사합니다!",
-                likeCount = 0,
-                isLiked = false,
-                memberId = "honggildong",
-                memberName = "홍길동",
-                role = RoleResult(1L, "덕담왕", "덕담을 많이 남긴 사람"),
-                profileImage = "https://example.com/profile.jpg",
-                createdAt = LocalDateTime.now(),
-                replies = emptyList()
+                author = CommentFixtures.author(memberId = "honggildong", nickname = "홍길동")
             )
 
             `when`(createCommentUseCase.execute(any())).thenReturn(result)
@@ -255,32 +152,12 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
             val documentFilter = document("daily-message-comment/create", 200)
                 .request(request().applyConfig(apiConfig))
                 .response(
-                    response()
-                        .responseBodyField(
-                            fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("생성된 댓글 정보"),
-                            fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("댓글 ID"),
-                            fieldWithPath("data.content").type(JsonFieldType.STRING).description("댓글 내용"),
-                            fieldWithPath("data.likeCount").type(JsonFieldType.NUMBER)
-                                .description("좋아요 수 (새로 작성된 댓글이므로 항상 0)"),
-                            fieldWithPath("data.isLiked").type(JsonFieldType.BOOLEAN)
-                                .description("좋아요 여부 (새로 작성된 댓글이므로 항상 false)"),
-                            fieldWithPath("data.memberId").type(JsonFieldType.STRING)
-                                .description("작성자(요청한 회원)의 아이디"),
-                            fieldWithPath("data.memberName").type(JsonFieldType.STRING)
-                                .description("작성자(요청한 회원)의 현재 닉네임"),
-                            fieldWithPath("data.role").type(JsonFieldType.OBJECT)
-                                .description("작성자 대표 칭호 (대표 칭호가 없으면 null)").optional(),
-                            fieldWithPath("data.role.id").type(JsonFieldType.NUMBER).description("칭호 ID").optional(),
-                            fieldWithPath("data.role.name").type(JsonFieldType.STRING).description("칭호 이름").optional(),
-                            fieldWithPath("data.role.description").type(JsonFieldType.STRING)
-                                .description("칭호 설명 (설명이 없는 칭호는 null)").optional(),
-                            fieldWithPath("data.createdAt").type(JsonFieldType.STRING)
-                                .description("작성 일시 (KST, ISO-8601, 오프셋 없음)"),
-                            fieldWithPath("data.profileImage").type(JsonFieldType.STRING)
-                                .description("작성자 프로필 이미지 URL (이미지가 없는 회원은 빈 문자열 \"\")"),
-                            fieldWithPath("data.replies[]").type(JsonFieldType.ARRAY).description("답글 목록 (항상 빈 배열)")
+                    response().responseBodyField(
+                        *CommentDocumentFields.singleFields(
+                            "생성된 댓글 정보 (목록 아이템과 같은 형식)",
+                            "답글 목록 (새 댓글은 항상 빈 배열)"
                         )
+                    )
                 )
                 .build()
 
@@ -404,17 +281,10 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
                 "content" to "저도 동감합니다!",
                 "parentCommentId" to 10L
             )
-            val result = CommentResult(
+            val result = CommentFixtures.comment(
                 id = 2L,
                 content = "저도 동감합니다!",
-                likeCount = 0,
-                isLiked = false,
-                memberId = "kimchulsoo",
-                memberName = "김철수",
-                role = null,
-                profileImage = "https://example.com/profile2.jpg",
-                createdAt = LocalDateTime.now(),
-                replies = emptyList()
+                author = CommentFixtures.author(memberId = "kimchulsoo", nickname = "김철수", role = null)
             )
 
             `when`(createCommentUseCase.execute(any())).thenReturn(result)
@@ -422,32 +292,12 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
             val documentFilter = document("daily-message-comment/reply-create", 200)
                 .request(request().applyConfig(apiConfig))
                 .response(
-                    response()
-                        .responseBodyField(
-                            fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("생성된 답글 정보"),
-                            fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("답글 ID"),
-                            fieldWithPath("data.content").type(JsonFieldType.STRING).description("답글 내용"),
-                            fieldWithPath("data.likeCount").type(JsonFieldType.NUMBER)
-                                .description("좋아요 수 (새로 작성된 답글이므로 항상 0)"),
-                            fieldWithPath("data.isLiked").type(JsonFieldType.BOOLEAN)
-                                .description("좋아요 여부 (새로 작성된 답글이므로 항상 false)"),
-                            fieldWithPath("data.memberId").type(JsonFieldType.STRING)
-                                .description("작성자(요청한 회원)의 아이디"),
-                            fieldWithPath("data.memberName").type(JsonFieldType.STRING)
-                                .description("작성자(요청한 회원)의 현재 닉네임"),
-                            fieldWithPath("data.role").type(JsonFieldType.OBJECT)
-                                .description("작성자 대표 칭호 (대표 칭호가 없으면 null)").optional(),
-                            fieldWithPath("data.role.id").type(JsonFieldType.NUMBER).description("칭호 ID").optional(),
-                            fieldWithPath("data.role.name").type(JsonFieldType.STRING).description("칭호 이름").optional(),
-                            fieldWithPath("data.role.description").type(JsonFieldType.STRING)
-                                .description("칭호 설명 (설명이 없는 칭호는 null)").optional(),
-                            fieldWithPath("data.createdAt").type(JsonFieldType.STRING)
-                                .description("작성 일시 (KST, ISO-8601, 오프셋 없음)"),
-                            fieldWithPath("data.replies[]").type(JsonFieldType.ARRAY).description("답글 목록 (항상 빈 배열)"),
-                            fieldWithPath("data.profileImage").type(JsonFieldType.STRING)
-                                .description("작성자 프로필 이미지 URL (이미지가 없는 회원은 빈 문자열 \"\")")
+                    response().responseBodyField(
+                        *CommentDocumentFields.singleFields(
+                            "생성된 답글 정보 (목록 아이템과 같은 형식)",
+                            "답글 목록 (새 답글은 항상 빈 배열)"
                         )
+                    )
                 )
                 .build()
 
@@ -618,17 +468,19 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
         fun `성공`() {
             val commentId = 1L
             val request = mapOf("content" to "수정된 댓글 내용입니다!")
-            val result = CommentResult(
+            val result = CommentFixtures.comment(
                 id = commentId,
                 content = "수정된 댓글 내용입니다!",
+                author = CommentFixtures.author(memberId = "honggildong", nickname = "홍길동"),
                 likeCount = 5,
-                isLiked = false,
-                memberId = "honggildong",
-                memberName = "홍길동",
-                role = RoleResult(1L, "덕담왕", "덕담을 많이 남긴 사람"),
-                profileImage = "https://example.com/profile.jpg",
-                createdAt = LocalDateTime.now(),
-                replies = emptyList()
+                replies = listOf(
+                    CommentFixtures.reply(
+                        id = 2L,
+                        author = CommentFixtures.author(memberId = "kimchulsoo", nickname = "김철수", role = null)
+                    )
+                ),
+                createdAt = LocalDateTime.of(2026, 10, 1, 12, 0, 0),
+                updatedAt = LocalDateTime.of(2026, 10, 2, 9, 30, 0)
             )
 
             `when`(updateCommentUseCase.execute(any())).thenReturn(result)
@@ -636,34 +488,12 @@ class DailyMessageCommentDocumentTest : BaseDocumentTest() {
             val documentFilter = document("daily-message-comment/update", 200)
                 .request(request().applyConfig(apiConfig))
                 .response(
-                    response()
-                        .responseBodyField(
-                            fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-                            fieldWithPath("data").type(JsonFieldType.OBJECT).description("수정된 댓글 정보"),
-                            fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("댓글 또는 답글 ID"),
-                            fieldWithPath("data.content").type(JsonFieldType.STRING).description("수정된 내용"),
-                            fieldWithPath("data.likeCount").type(JsonFieldType.NUMBER).description("현재 좋아요 수"),
-                            fieldWithPath("data.isLiked").type(JsonFieldType.BOOLEAN)
-                                .description("요청한 회원(작성자 본인)의 좋아요 여부"),
-                            fieldWithPath("data.memberId").type(JsonFieldType.STRING)
-                                .description("작성자(요청한 회원)의 아이디 (아이디를 설정하지 않은 회원이면 null)")
-                                .optional(),
-                            fieldWithPath("data.memberName").type(JsonFieldType.STRING)
-                                .description("작성자(요청한 회원)의 현재 닉네임 (닉네임을 설정하지 않은 회원이면 null)")
-                                .optional(),
-                            fieldWithPath("data.role").type(JsonFieldType.OBJECT)
-                                .description("작성자 대표 칭호 (대표 칭호가 없으면 null)").optional(),
-                            fieldWithPath("data.role.id").type(JsonFieldType.NUMBER).description("칭호 ID").optional(),
-                            fieldWithPath("data.role.name").type(JsonFieldType.STRING).description("칭호 이름").optional(),
-                            fieldWithPath("data.role.description").type(JsonFieldType.STRING)
-                                .description("칭호 설명 (설명이 없는 칭호는 null)").optional(),
-                            fieldWithPath("data.createdAt").type(JsonFieldType.STRING)
-                                .description("최초 작성 일시 (수정해도 바뀌지 않음, KST, ISO-8601, 오프셋 없음)"),
-                            fieldWithPath("data.profileImage").type(JsonFieldType.STRING)
-                                .description("작성자 프로필 이미지 URL (이미지가 없는 회원은 빈 문자열 \"\")"),
-                            fieldWithPath("data.replies[]").type(JsonFieldType.ARRAY)
-                                .description("답글 목록 (답글이 있어도 항상 빈 배열)")
+                    response().responseBodyField(
+                        *CommentDocumentFields.singleFields(
+                            "수정된 댓글 정보 (목록 아이템과 같은 형식)",
+                            "현재 답글 목록 (최상위 댓글 수정 시 모든 답글이 오래된 순으로, 답글 수정 시 빈 배열)"
                         )
+                    )
                 )
                 .build()
 
