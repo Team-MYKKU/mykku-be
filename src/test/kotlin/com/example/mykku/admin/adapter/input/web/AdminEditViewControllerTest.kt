@@ -82,6 +82,7 @@ class AdminEditViewControllerTest : BaseControllerTest() {
         val contest = contestJpaRepository.save(
             ContestJpaEntity(
                 title = "수정할 콘테스트",
+                subTitle = "콘테스트 부제",
                 startedAt = LocalDateTime.of(2026, 1, 1, 0, 0),
                 expiredAt = LocalDateTime.of(2026, 1, 31, 0, 0),
                 status = ContestStatusType.WINNER_SELECTED,
@@ -99,6 +100,7 @@ class AdminEditViewControllerTest : BaseControllerTest() {
         getPage("/admin/contest/${contest.id}/edit")
             .statusCode(200)
             .body(containsString("value=\"수정할 콘테스트\""))
+            .body(containsString("value=\"콘테스트 부제\""))
             .body(containsString("value=\"덕질, 굿즈\""))
             .body(containsString("id=\"period-locked-notice\""))
             .body(containsString("readonly=\"readonly\""))

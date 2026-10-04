@@ -57,6 +57,8 @@ class ContestDocumentTest : BaseDocumentTest() {
                 ContestListResult(
                     id = 1L,
                     title = "첫 번째 공모전",
+                    subTitle = "첫 번째 공모전 부제목",
+                    description = "첫 번째 공모전 설명",
                     startedAt = LocalDateTime.of(2026, 9, 15, 0, 0, 0),
                     expiredAt = LocalDateTime.of(2026, 11, 30, 23, 59, 59),
                     status = ContestStatusType.ACTIVE,
@@ -66,6 +68,8 @@ class ContestDocumentTest : BaseDocumentTest() {
                 ContestListResult(
                     id = 2L,
                     title = "두 번째 공모전",
+                    subTitle = null,
+                    description = null,
                     startedAt = LocalDateTime.of(2026, 9, 1, 0, 0, 0),
                     expiredAt = LocalDateTime.of(2026, 10, 31, 23, 59, 59),
                     status = ContestStatusType.ACTIVE,
@@ -96,6 +100,12 @@ class ContestDocumentTest : BaseDocumentTest() {
                                 .description("공모전 목록 (결과가 없으면 빈 배열)"),
                             fieldWithPath("data.content[].id").type(JsonFieldType.NUMBER).description("공모전 ID"),
                             fieldWithPath("data.content[].title").type(JsonFieldType.STRING).description("공모전 제목"),
+                            fieldWithPath("data.content[].subTitle").type(JsonFieldType.STRING)
+                                .description("공모전 부제목 (관리자가 입력하지 않았으면 null)")
+                                .optional(),
+                            fieldWithPath("data.content[].description").type(JsonFieldType.STRING)
+                                .description("공모전 설명 (등록 시 입력하지 않았으면 null 또는 빈 문자열)")
+                                .optional(),
                             fieldWithPath("data.content[].expiredAt").type(JsonFieldType.STRING)
                                 .description(
                                     "공모전 마감 일시 (KST, ISO-8601, 오프셋 없음). " +
@@ -164,6 +174,7 @@ class ContestDocumentTest : BaseDocumentTest() {
             val result = ContestDetailResult(
                 id = contestId,
                 title = "공모전 제목",
+                subTitle = "공모전 부제목입니다.",
                 description = "공모전 상세 설명입니다.",
                 startedAt = LocalDateTime.of(2026, 9, 1, 0, 0, 0),
                 expiredAt = LocalDateTime.of(2026, 10, 31, 23, 59, 59),
@@ -188,6 +199,9 @@ class ContestDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data").type(JsonFieldType.OBJECT).description("응답 데이터"),
                             fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("공모전 ID"),
                             fieldWithPath("data.title").type(JsonFieldType.STRING).description("공모전 제목"),
+                            fieldWithPath("data.subTitle").type(JsonFieldType.STRING)
+                                .description("공모전 부제목 (관리자가 입력하지 않았으면 null)")
+                                .optional(),
                             fieldWithPath("data.description").type(JsonFieldType.STRING)
                                 .description("공모전 설명 (등록 시 입력하지 않았으면 null 또는 빈 문자열)")
                                 .optional(),

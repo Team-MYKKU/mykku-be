@@ -31,11 +31,19 @@ class CreateFeedCommentActivityPublishTest {
     @Mock
     private lateinit var activityEventPublisher: ActivityEventPublisher
 
+    @Mock
+    private lateinit var feedCommentResultReader: FeedCommentResultReader
+
     @Test
     @DisplayName("피드 댓글을 작성하면 COMMENT_CREATE 이벤트를 발행한다")
     fun publishesCommentCreate() {
         val feedCommentRepository: FeedCommentRepository = mock(defaultAnswer = { stubSavedComment() })
-        val useCase = CreateFeedCommentUseCaseImpl(feedRepository, feedCommentRepository, activityEventPublisher)
+        val useCase = CreateFeedCommentUseCaseImpl(
+            feedRepository,
+            feedCommentRepository,
+            activityEventPublisher,
+            feedCommentResultReader
+        )
         whenever(feedRepository.findByIdOrThrow(FeedId.of(2L))).thenReturn(stubFeed())
 
         useCase.execute(

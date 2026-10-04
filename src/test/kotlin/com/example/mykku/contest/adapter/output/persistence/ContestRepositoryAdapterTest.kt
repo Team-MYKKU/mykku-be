@@ -53,6 +53,7 @@ class ContestRepositoryAdapterTest : BaseRepositoryTest() {
         fun saveNewContest() {
             val contest = Contest.create(
                 title = "새 콘테스트",
+                subTitle = "새 부제",
                 description = "콘테스트 설명",
                 startedAt = LocalDateTime.now(),
                 expiredAt = LocalDateTime.now().plusDays(7),
@@ -63,6 +64,7 @@ class ContestRepositoryAdapterTest : BaseRepositoryTest() {
 
             assertThat(saved.id.value).isGreaterThan(0)
             assertThat(saved.title).isEqualTo("새 콘테스트")
+            assertThat(contestRepository.findById(saved.id)?.subTitle).isEqualTo("새 부제")
             assertThat(saved.description).isEqualTo("콘테스트 설명")
             assertThat(saved.status).isEqualTo(ContestStatusType.ACTIVE)
         }

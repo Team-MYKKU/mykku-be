@@ -3,11 +3,14 @@ package com.example.mykku.feed.adapter.input.web
 import com.example.mykku.BaseControllerTest
 import com.example.mykku.board.adapter.output.persistence.entity.BoardJpaEntity
 import com.example.mykku.feed.adapter.input.web.dto.CreateFeedRequestDto
+import com.example.mykku.feed.adapter.output.persistence.FeedCommentJpaRepository
 import com.example.mykku.feed.adapter.output.persistence.FeedJpaRepository
+import com.example.mykku.feed.adapter.output.persistence.entity.FeedCommentJpaEntity
 import com.example.mykku.feed.adapter.output.persistence.entity.FeedJpaEntity
 import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import com.example.mykku.member.domain.vo.SocialProvider
 import com.example.mykku.member.exception.MemberErrorCode
+import com.example.mykku.role.adapter.output.persistence.entity.RoleJpaEntity
 import com.example.mykku.util.TestTokenGenerator
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.restassured.RestAssured
@@ -23,6 +26,9 @@ class FeedControllerTest : BaseControllerTest() {
 
     @Autowired
     private lateinit var feedJpaRepository: FeedJpaRepository
+
+    @Autowired
+    private lateinit var feedCommentJpaRepository: FeedCommentJpaRepository
 
     @Test
     @DisplayName("피드 생성 - 정상 케이스")
@@ -224,6 +230,76 @@ class FeedControllerTest : BaseControllerTest() {
             .statusCode(200)
             .body("message", equalTo("댓글 목록을 성공적으로 조회했습니다."))
             .body("data", notNullValue())
+    }
+
+    @Test
+    @DisplayName("피드 댓글 조회 - 탈퇴한 회원의 댓글과 답글도 포함된다")
+    fun `getComments - 탈퇴한 회원의 댓글과 답글도 포함된다`() {
+        val member = saveCommentMember("aliveauthor", null)
+        val feed = saveFeed(member)
+        val aliveComment = feedCommentJpaRepository.save(
+            FeedCommentJpaEntity(content = "살아있는 댓글", feed = feed, member = member)
+        )
+        feedCommentJpaRepository.save(
+            FeedCommentJpaEntity(content = "탈퇴자 답글", feed = feed, member = null, parentComment = aliveComment)
+        )
+        val withdrawnComment = feedCommentJpaRepository.save(
+            FeedCommentJpaEntity(content = "탈퇴자 댓글", feed = feed, member = null)
+        )
+        val withdrawn = "data.comments.find { it.id == ${withdrawnComment.id} }"
+        val alive = "data.comments.find { it.id == ${aliveComment.id} }"
+
+        RestAssured.given()
+            .`when`()
+            .get("/api/v1/feeds/{feedId}/comments", feed.id)
+            .then()
+            .statusCode(200)
+            .body("data.comments.size()", equalTo(2))
+            .body("data.totalElements", equalTo(2))
+            .body("$withdrawn.author.memberId", equalTo(null))
+            .body("$withdrawn.author.nickname", equalTo("탈퇴한 회원"))
+            .body("$withdrawn.author.profileImage", equalTo(null))
+            .body("$withdrawn.author.role", equalTo(null))
+            .body("$alive.replyCount", equalTo(1))
+            .body("$alive.replies[0].author.nickname", equalTo("탈퇴한 회원"))
+    }
+
+    @Test
+    @DisplayName("피드 댓글 조회 - 작성자 대표 칭호를 반환한다")
+    fun `getComments - 작성자 칭호를 반환한다`() {
+        val role = roleJpaRepository.save(RoleJpaEntity(name = "피드왕", description = "피드를 많이 쓴 사람"))
+        val member = saveCommentMember("roleauthor", role)
+        val feed = saveFeed(member)
+        feedCommentJpaRepository.save(FeedCommentJpaEntity(content = "칭호 댓글", feed = feed, member = member))
+
+        RestAssured.given()
+            .`when`()
+            .get("/api/v1/feeds/{feedId}/comments", feed.id)
+            .then()
+            .statusCode(200)
+            .body("data.comments[0].author.memberId", equalTo("roleauthor"))
+            .body("data.comments[0].author.role.name", equalTo("피드왕"))
+            .body("data.comments[0].author.role.description", equalTo("피드를 많이 쓴 사람"))
+    }
+
+    private fun saveCommentMember(memberId: String, role: RoleJpaEntity?): MemberJpaEntity =
+        memberJpaRepository.save(
+            MemberJpaEntity(
+                memberId = memberId,
+                socialId = memberId,
+                provider = SocialProvider.GOOGLE,
+                email = "$memberId@example.com",
+                nickname = "댓글회원",
+                role = role,
+                profileImage = ""
+            )
+        )
+
+    private fun saveFeed(member: MemberJpaEntity): FeedJpaEntity {
+        val board = boardJpaRepository.save(BoardJpaEntity(title = "테스트 게시판", logo = "test_logo.png"))
+        return feedJpaRepository.save(
+            FeedJpaEntity(title = "테스트 피드", content = "테스트 내용", member = member, board = board)
+        )
     }
 
     // TODO: MemberArgumentResolver의 nullable 처리 문제로 인해 임시 주석 처리

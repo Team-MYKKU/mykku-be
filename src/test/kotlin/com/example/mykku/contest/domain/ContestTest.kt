@@ -1,6 +1,7 @@
 package com.example.mykku.contest.domain
 
 import com.example.mykku.contest.domain.entity.Contest
+import com.example.mykku.contest.domain.vo.ContestContent
 import com.example.mykku.contest.domain.vo.ContestId
 import com.example.mykku.contest.domain.vo.ContestStatusType
 import org.assertj.core.api.Assertions.assertThat
@@ -24,6 +25,7 @@ class ContestTest {
 
             val contest = Contest.create(
                 title = "테스트 콘테스트",
+                subTitle = "콘테스트 부제",
                 description = "콘테스트 설명",
                 startedAt = startedAt,
                 expiredAt = expiredAt,
@@ -32,6 +34,7 @@ class ContestTest {
 
             assertThat(contest.id.value).isEqualTo(0L)
             assertThat(contest.title).isEqualTo("테스트 콘테스트")
+            assertThat(contest.subTitle).isEqualTo("콘테스트 부제")
             assertThat(contest.description).isEqualTo("콘테스트 설명")
             assertThat(contest.startedAt).isEqualTo(startedAt)
             assertThat(contest.expiredAt).isEqualTo(expiredAt)
@@ -59,6 +62,7 @@ class ContestTest {
         fun `콘테스트 생성 - 설명 없음`() {
             val contest = Contest.create(
                 title = "테스트 콘테스트",
+                subTitle = null,
                 description = null,
                 startedAt = LocalDateTime.now().plusDays(1),
                 expiredAt = LocalDateTime.now().plusDays(7),
@@ -129,6 +133,7 @@ class ContestTest {
             val contest = Contest.reconstitute(
                 id = ContestId(1L),
                 title = "복원된 콘테스트",
+                subTitle = null,
                 description = "설명",
                 startedAt = startedAt,
                 expiredAt = expiredAt,
@@ -151,6 +156,7 @@ class ContestTest {
             val activeContest = Contest.reconstitute(
                 id = ContestId(1L),
                 title = "활성 콘테스트",
+                subTitle = null,
                 description = null,
                 startedAt = now,
                 expiredAt = now.plusDays(7),
@@ -163,6 +169,7 @@ class ContestTest {
             val winnerSelectedContest = Contest.reconstitute(
                 id = ContestId(2L),
                 title = "수상자 선정 완료 콘테스트",
+                subTitle = null,
                 description = null,
                 startedAt = now,
                 expiredAt = now.plusDays(7),
@@ -174,6 +181,42 @@ class ContestTest {
 
             assertThat(activeContest.status).isEqualTo(ContestStatusType.ACTIVE)
             assertThat(winnerSelectedContest.status).isEqualTo(ContestStatusType.WINNER_SELECTED)
+        }
+    }
+
+    @Nested
+    @DisplayName("update 메서드")
+    inner class Update {
+
+        @Test
+        @DisplayName("부제목을 수정한다")
+        fun `콘테스트 수정 - 부제목 변경`() {
+            val contest = createContest()
+
+            contest.update(contentOf(contest, "새 부제"), null, false)
+
+            assertThat(contest.subTitle).isEqualTo("새 부제")
+        }
+
+        @Test
+        @DisplayName("수상자 선정 후에도 부제목은 수정할 수 있다")
+        fun `콘테스트 수정 - 수상자 선정 후 부제목 변경`() {
+            val contest = createContest()
+            contest.updateStatus(ContestStatusType.WINNER_SELECTED)
+
+            contest.update(contentOf(contest, "선정 후 부제"), null, false)
+
+            assertThat(contest.subTitle).isEqualTo("선정 후 부제")
+        }
+
+        private fun contentOf(contest: Contest, subTitle: String?): ContestContent {
+            return ContestContent(
+                title = contest.title,
+                subTitle = subTitle,
+                description = contest.description,
+                startedAt = contest.startedAt,
+                expiredAt = contest.expiredAt
+            )
         }
     }
 
@@ -239,6 +282,7 @@ class ContestTest {
     private fun createContest(): Contest {
         return Contest.create(
             title = "테스트 콘테스트",
+            subTitle = null,
             description = "콘테스트 설명",
             startedAt = LocalDateTime.now().plusDays(1),
             expiredAt = LocalDateTime.now().plusDays(7),
@@ -249,6 +293,7 @@ class ContestTest {
     private fun createContest(expiredAt: LocalDateTime): Contest {
         return Contest.create(
             title = "테스트 콘테스트",
+            subTitle = null,
             description = "콘테스트 설명",
             startedAt = LocalDateTime.now().minusDays(1),
             expiredAt = expiredAt,

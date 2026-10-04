@@ -1,6 +1,8 @@
 package com.example.mykku.dailymessage.adapter.input.web
 
 import com.example.mykku.auth.config.CurrentMember
+import com.example.mykku.comment.adapter.input.web.dto.CommentPageResponse
+import com.example.mykku.comment.adapter.input.web.dto.CommentResponse
 import com.example.mykku.common.dto.ApiResponse
 import com.example.mykku.common.util.PageableValidator
 import com.example.mykku.dailymessage.application.port.input.CreateCommentUseCase
@@ -34,7 +36,7 @@ class DailyMessageCommentController(
         @RequestParam(defaultValue = "0") page: Int,
         @RequestParam(defaultValue = "20") size: Int,
         @CurrentMember(required = false) member: Member?
-    ): ResponseEntity<ApiResponse<DailyMessageCommentsResponse>> {
+    ): ResponseEntity<ApiResponse<CommentPageResponse>> {
         val pageable = PageableValidator.validateAndCreate(
             page,
             size,
@@ -46,7 +48,7 @@ class DailyMessageCommentController(
         return ResponseEntity.ok(
             ApiResponse(
                 message = "댓글 목록을 성공적으로 조회했습니다.",
-                data = DailyMessageCommentsResponse.from(result)
+                data = CommentPageResponse.from(result)
             )
         )
     }
@@ -59,9 +61,7 @@ class DailyMessageCommentController(
     ): ResponseEntity<ApiResponse<CommentResponse>> {
         val command = request.toCommand(
             dailyMessageId = dailyMessageId,
-            memberId = member.id.value,
-            memberNickname = member.nickname,
-            memberProfileImage = member.profileImage
+            memberId = member.id.value
         )
         val result = createCommentUseCase.execute(command)
 

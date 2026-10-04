@@ -27,6 +27,7 @@ import java.time.LocalDateTime
 data class CreateContestResponse(
     val id: Long,
     val title: String,
+    val subTitle: String?,
     val description: String?,
     val startedAt: LocalDateTime,
     val expiredAt: LocalDateTime,
@@ -40,6 +41,7 @@ data class CreateContestResponse(
             return CreateContestResponse(
                 id = result.id,
                 title = result.title,
+                subTitle = result.subTitle,
                 description = result.description,
                 startedAt = result.startedAt,
                 expiredAt = result.expiredAt,
@@ -69,6 +71,8 @@ data class ContestImageResponse(
 data class ContestListResponse(
     val id: Long,
     val title: String,
+    val subTitle: String?,
+    val description: String?,
     val startedAt: LocalDateTime,
     val expiredAt: LocalDateTime,
     val status: ContestStatusType,
@@ -84,6 +88,8 @@ data class ContestListResponse(
             return ContestListResponse(
                 id = result.id,
                 title = result.title,
+                subTitle = result.subTitle,
+                description = result.description,
                 startedAt = result.startedAt,
                 expiredAt = result.expiredAt,
                 status = if (result.status in WINNER_STATUSES) ContestStatusType.EXPIRED else result.status,
@@ -121,6 +127,7 @@ data class PagedContestsResponse(
 data class ContestDetailResponse(
     val id: Long,
     val title: String,
+    val subTitle: String?,
     val description: String?,
     val startedAt: LocalDateTime,
     val expiredAt: LocalDateTime,
@@ -135,6 +142,7 @@ data class ContestDetailResponse(
             return ContestDetailResponse(
                 id = result.id,
                 title = result.title,
+                subTitle = result.subTitle,
                 description = result.description,
                 startedAt = result.startedAt,
                 expiredAt = result.expiredAt,

@@ -212,8 +212,6 @@ class DailyMessageCommentRepositoryAdapterTest : BaseRepositoryTest() {
                 DailyMessageComment.create(
                     dailyMessageId = otherDailyMessage.id.value,
                     memberId = savedMember.id,
-                    memberNickname = savedMember.nickname,
-                    memberProfileImage = savedMember.profileImage,
                     content = "다른 메시지 댓글"
                 )
             )
@@ -245,6 +243,23 @@ class DailyMessageCommentRepositoryAdapterTest : BaseRepositoryTest() {
     @Nested
     @DisplayName("findByParentCommentIds 메서드")
     inner class FindByParentCommentIds {
+
+        @Test
+        @DisplayName("답글을 부모 댓글 순, 같은 부모 안에서는 작성 순으로 반환한다")
+        fun `답글 정렬 - 부모 순 그리고 작성 순`() {
+            val parentA = dailyMessageCommentRepository.save(createComment(content = "부모A"))
+            val parentB = dailyMessageCommentRepository.save(createComment(content = "부모B"))
+            dailyMessageCommentRepository.save(createComment(content = "B-1", parentCommentId = parentB.id.value))
+            dailyMessageCommentRepository.save(createComment(content = "A-1", parentCommentId = parentA.id.value))
+            dailyMessageCommentRepository.save(createComment(content = "A-2", parentCommentId = parentA.id.value))
+            dailyMessageCommentRepository.save(createComment(content = "B-2", parentCommentId = parentB.id.value))
+
+            val replies = dailyMessageCommentRepository.findByParentCommentIds(
+                listOf(parentB.id.value, parentA.id.value)
+            )
+
+            assertThat(replies.map { it.content }).containsExactly("A-1", "A-2", "B-1", "B-2")
+        }
 
         @Test
         @DisplayName("여러 부모 댓글의 대댓글을 조회한다")
@@ -335,8 +350,6 @@ class DailyMessageCommentRepositoryAdapterTest : BaseRepositoryTest() {
         return DailyMessageComment.create(
             dailyMessageId = savedDailyMessage.id.value,
             memberId = savedMember.id,
-            memberNickname = savedMember.nickname,
-            memberProfileImage = savedMember.profileImage,
             content = content,
             parentCommentId = parentCommentId
         )

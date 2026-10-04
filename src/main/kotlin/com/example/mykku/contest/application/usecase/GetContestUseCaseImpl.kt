@@ -41,6 +41,7 @@ class GetContestUseCaseImpl(
         return ContestDetailResult(
             id = contest.id.value,
             title = contest.title,
+            subTitle = contest.subTitle,
             description = contest.description,
             startedAt = contest.startedAt,
             expiredAt = contest.expiredAt,

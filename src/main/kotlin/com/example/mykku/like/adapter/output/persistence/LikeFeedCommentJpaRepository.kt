@@ -12,7 +12,6 @@ interface LikeFeedCommentJpaRepository : JpaRepository<LikeFeedCommentJpaEntity,
     fun existsByMemberIdAndFeedCommentId(memberId: Long, feedCommentId: Long): Boolean
     fun deleteByMemberIdAndFeedCommentId(memberId: Long, feedCommentId: Long)
     fun deleteAllByFeedCommentIdIn(feedCommentIds: List<Long>)
-    fun countByFeedCommentId(feedCommentId: Long): Long
 
     @Query(
         """

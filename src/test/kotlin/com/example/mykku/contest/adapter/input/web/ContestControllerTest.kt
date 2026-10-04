@@ -43,6 +43,8 @@ class ContestControllerTest : BaseControllerTest() {
             .statusCode(200)
             .body("message", equalTo("공모전 목록을 성공적으로 조회했습니다."))
             .body("data.content", notNullValue())
+            .body("data.content[0].subTitle", equalTo("테스트 부제목"))
+            .body("data.content[0].description", equalTo("테스트 공모전 설명"))
     }
 
     @Test
@@ -155,6 +157,7 @@ class ContestControllerTest : BaseControllerTest() {
             .body("message", equalTo("공모전 상세 정보를 성공적으로 조회했습니다."))
             .body("data.id", equalTo(contest.id!!.toInt()))
             .body("data.title", equalTo("상세 조회 테스트 공모전"))
+            .body("data.subTitle", equalTo("테스트 부제목"))
     }
 
     @Test
@@ -186,6 +189,7 @@ class ContestControllerTest : BaseControllerTest() {
 
     private fun createAndSaveContest(
         title: String,
+        subTitle: String? = "테스트 부제목",
         description: String? = "테스트 공모전 설명",
         startedAt: LocalDateTime,
         expiredAt: LocalDateTime,
@@ -193,6 +197,7 @@ class ContestControllerTest : BaseControllerTest() {
     ): ContestJpaEntity {
         val contest = ContestJpaEntity(
             title = title,
+            subTitle = subTitle,
             description = description,
             startedAt = startedAt,
             expiredAt = expiredAt,

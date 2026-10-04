@@ -155,12 +155,15 @@ class MemberFeedDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.feeds[].comment").type(JsonFieldType.OBJECT)
                                 .description("첫 댓글 미리보기. 가장 먼저 작성된 최상위 댓글(대댓글 제외) 기준이며, 댓글이 없어도 객체는 항상 존재함"),
                             fieldWithPath("data.feeds[].comment.profileImage").type(JsonFieldType.STRING)
-                                .description("첫 댓글 작성자 프로필 이미지 URL (미리보기가 비어 있으면 null, 작성자의 프로필 이미지가 없으면 빈 문자열 \"\")")
+                                .description(
+                                    "첫 댓글 작성자 프로필 이미지 URL (댓글이 없거나 첫 댓글 작성자가 탈퇴했으면 null, " +
+                                        "작성자의 프로필 이미지가 없으면 빈 문자열 \"\")"
+                                )
                                 .optional(),
                             fieldWithPath("data.feeds[].comment.content").type(JsonFieldType.STRING)
                                 .description(
-                                    "첫 댓글 내용 (댓글이 없거나 첫 댓글 작성자가 탈퇴한 경우 빈 문자열 \"\". " +
-                                        "이때 commentCount가 1 이상일 수 있음)"
+                                    "첫 댓글 내용 (댓글이 없으면 빈 문자열 \"\". " +
+                                        "첫 댓글 작성자가 탈퇴해도 내용은 그대로 나감)"
                                 ),
                             fieldWithPath("data.currentPage").type(JsonFieldType.NUMBER)
                                 .description("현재 페이지 번호 (0부터 시작)"),

@@ -57,8 +57,9 @@ spring:
           auth: true
           starttls:
             enable: true
-          timeout: 5000
-          connection-timeout: 5000
+          connectiontimeout: 5000
+          timeout: 15000
+          writetimeout: 10000
   data:
     redis:
       host: ${secret.redis.host}

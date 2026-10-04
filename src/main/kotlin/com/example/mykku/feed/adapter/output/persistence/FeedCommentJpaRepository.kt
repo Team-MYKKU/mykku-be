@@ -13,14 +13,19 @@ import org.springframework.stereotype.Repository
 @Repository
 interface FeedCommentJpaRepository : JpaRepository<FeedCommentJpaEntity, Long> {
     @Query(
-        value = "SELECT fc FROM FeedCommentJpaEntity fc JOIN FETCH fc.member WHERE fc.feed = :feed AND fc.parentComment IS NULL ORDER BY fc.createdAt DESC",
-        countQuery = "SELECT COUNT(fc) FROM FeedCommentJpaEntity fc WHERE fc.feed = :feed AND fc.parentComment IS NULL"
+        value = "SELECT fc FROM FeedCommentJpaEntity fc LEFT JOIN FETCH fc.member " +
+            "WHERE fc.feed = :feed AND fc.parentComment IS NULL ORDER BY fc.createdAt DESC",
+        countQuery = "SELECT COUNT(fc) FROM FeedCommentJpaEntity fc " +
+            "WHERE fc.feed = :feed AND fc.parentComment IS NULL"
     )
-    fun findByFeedAndParentCommentIsNull(@Param("feed") feed: FeedJpaEntity, pageable: Pageable): Page<FeedCommentJpaEntity>
+    fun findByFeedAndParentCommentIsNull(
+        @Param("feed") feed: FeedJpaEntity,
+        pageable: Pageable
+    ): Page<FeedCommentJpaEntity>
 
     @Query("""
         SELECT fc FROM FeedCommentJpaEntity fc
-        JOIN FETCH fc.member
+        LEFT JOIN FETCH fc.member
         WHERE fc.feed.id IN :feedIds
         AND fc.parentComment IS NULL
         AND fc.id = (
@@ -30,11 +35,13 @@ interface FeedCommentJpaRepository : JpaRepository<FeedCommentJpaEntity, Long> {
     """)
     fun findFirstCommentsByFeedIds(@Param("feedIds") feedIds: List<Long>): List<FeedCommentJpaEntity>
 
-    @Query("SELECT fc FROM FeedCommentJpaEntity fc JOIN FETCH fc.member WHERE fc.parentComment = :parentComment ORDER BY fc.createdAt ASC")
-    fun findByParentComment(@Param("parentComment") parentComment: FeedCommentJpaEntity): List<FeedCommentJpaEntity>
-
-    @Query("SELECT fc FROM FeedCommentJpaEntity fc JOIN FETCH fc.member WHERE fc.parentComment IN :parentComments ORDER BY fc.parentComment.id, fc.createdAt ASC")
-    fun findByParentCommentIn(@Param("parentComments") parentComments: List<FeedCommentJpaEntity>): List<FeedCommentJpaEntity>
+    @Query(
+        "SELECT fc FROM FeedCommentJpaEntity fc LEFT JOIN FETCH fc.member " +
+            "WHERE fc.parentComment IN :parentComments ORDER BY fc.parentComment.id, fc.createdAt ASC, fc.id ASC"
+    )
+    fun findByParentCommentIn(
+        @Param("parentComments") parentComments: List<FeedCommentJpaEntity>
+    ): List<FeedCommentJpaEntity>
 
     fun countByFeed(feed: FeedJpaEntity): Long
 

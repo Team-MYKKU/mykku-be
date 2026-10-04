@@ -72,6 +72,14 @@ class DailyMessageCommentControllerTest : BaseControllerTest() {
             .statusCode(200)
             .body("message", equalTo("댓글이 성공적으로 등록되었습니다."))
             .body("data", notNullValue())
+            .body("data.author.memberId", equalTo("testmemberid1"))
+            .body("data.author.nickname", equalTo("Member1"))
+            .body("data.author.role", equalTo(null))
+            .body("data.replies.size()", equalTo(0))
+            .body("data.replyCount", equalTo(0))
+            .body("data.likeCount", equalTo(0))
+            .body("data.isLiked", equalTo(false))
+            .body("data.updatedAt", notNullValue())
     }
 
     @Test
@@ -200,6 +208,25 @@ class DailyMessageCommentControllerTest : BaseControllerTest() {
                 member = member
             )
         )
+        val replier = memberJpaRepository.save(
+            MemberJpaEntity(
+                memberId = "updatereplier",
+                socialId = "updatereplier",
+                provider = SocialProvider.GOOGLE,
+                email = "updatereplier@example.com",
+                nickname = "답글러",
+                role = null,
+                profileImage = ""
+            )
+        )
+        dailyMessageCommentJpaRepository.save(
+            DailyMessageCommentJpaEntity(
+                content = "기존 답글",
+                dailyMessage = dailyMessage,
+                member = replier,
+                parentComment = comment
+            )
+        )
         val authHeader = TestTokenGenerator.getBearerToken(member.id)
         val request = UpdateCommentRequest(content = "수정된 댓글")
 
@@ -214,6 +241,12 @@ class DailyMessageCommentControllerTest : BaseControllerTest() {
             .statusCode(200)
             .body("message", equalTo("댓글이 성공적으로 수정되었습니다."))
             .body("data", notNullValue())
+            .body("data.content", equalTo("수정된 댓글"))
+            .body("data.author.memberId", equalTo("testmemberid2"))
+            .body("data.replies.size()", equalTo(1))
+            .body("data.replyCount", equalTo(1))
+            .body("data.replies[0].author.memberId", equalTo("updatereplier"))
+            .body("data.replies[0].author.nickname", equalTo("답글러"))
     }
 
     @Test
@@ -463,10 +496,13 @@ class DailyMessageCommentControllerTest : BaseControllerTest() {
             .get("/api/v1/daily-messages/{dailyMessageId}/comments", dailyMessage.id)
             .then()
             .statusCode(200)
-            .body("data.comments[0].memberId", equalTo("commentauthor"))
-            .body("data.comments[0].role.name", equalTo("덕담왕"))
-            .body("data.comments[0].replies[0].memberId", equalTo("replyauthor"))
-            .body("data.comments[0].replies[0].role", equalTo(null))
+            .body("data.comments[0].author.memberId", equalTo("commentauthor"))
+            .body("data.comments[0].author.nickname", equalTo("댓글작성자"))
+            .body("data.comments[0].author.role.name", equalTo("덕담왕"))
+            .body("data.comments[0].author.role.description", equalTo("덕담을 많이 남긴 사람"))
+            .body("data.comments[0].replies[0].author.memberId", equalTo("replyauthor"))
+            .body("data.comments[0].replies[0].author.role", equalTo(null))
+            .body("data.comments[0].replyCount", equalTo(1))
     }
 
     @Test
@@ -475,7 +511,29 @@ class DailyMessageCommentControllerTest : BaseControllerTest() {
         val dailyMessage = dailyMessageJpaRepository.save(
             DailyMessageJpaEntity(title = "오늘의 덕담", content = "좋은 하루!", date = LocalDate.now())
         )
+        val author = memberJpaRepository.save(
+            MemberJpaEntity(
+                memberId = "aliveauthor",
+                socialId = "aliveauthor",
+                provider = SocialProvider.GOOGLE,
+                email = "aliveauthor@example.com",
+                nickname = "살아있는회원",
+                role = null,
+                profileImage = ""
+            )
+        )
+        val aliveComment = dailyMessageCommentJpaRepository.save(
+            DailyMessageCommentJpaEntity(content = "살아있는 댓글", dailyMessage = dailyMessage, member = author)
+        )
         dailyMessageCommentJpaRepository.save(
+            DailyMessageCommentJpaEntity(
+                content = "탈퇴자 답글",
+                dailyMessage = dailyMessage,
+                member = null,
+                parentComment = aliveComment
+            )
+        )
+        val withdrawnComment = dailyMessageCommentJpaRepository.save(
             DailyMessageCommentJpaEntity(content = "탈퇴자 댓글", dailyMessage = dailyMessage, member = null)
         )
 
@@ -484,9 +542,66 @@ class DailyMessageCommentControllerTest : BaseControllerTest() {
             .get("/api/v1/daily-messages/{dailyMessageId}/comments", dailyMessage.id)
             .then()
             .statusCode(200)
-            .body("data.comments.size()", equalTo(1))
-            .body("data.comments[0].memberId", equalTo(null))
-            .body("data.totalElements", equalTo(1))
+            .body("data.comments.size()", equalTo(2))
+            .body("data.totalElements", equalTo(2))
+            .body("data.comments.find { it.id == ${withdrawnComment.id} }.author.memberId", equalTo(null))
+            .body("data.comments.find { it.id == ${withdrawnComment.id} }.author.nickname", equalTo("탈퇴한 회원"))
+            .body("data.comments.find { it.id == ${withdrawnComment.id} }.author.profileImage", equalTo(null))
+            .body("data.comments.find { it.id == ${withdrawnComment.id} }.author.role", equalTo(null))
+            .body("data.comments.find { it.id == ${aliveComment.id} }.replyCount", equalTo(1))
+            .body(
+                "data.comments.find { it.id == ${aliveComment.id} }.replies[0].author.nickname",
+                equalTo("탈퇴한 회원")
+            )
+            .body("data.comments.find { it.id == ${aliveComment.id} }.replies[0].author.memberId", equalTo(null))
+    }
+
+    @Test
+    @DisplayName("댓글 목록 조회 - 답글은 오래된 순으로 정렬된다")
+    fun `getComments - 답글은 오래된 순으로 반환된다`() {
+        val author = memberJpaRepository.save(
+            MemberJpaEntity(
+                memberId = "orderauthor",
+                socialId = "orderauthor",
+                provider = SocialProvider.GOOGLE,
+                email = "orderauthor@example.com",
+                nickname = "정렬회원",
+                role = null,
+                profileImage = ""
+            )
+        )
+        val dailyMessage = dailyMessageJpaRepository.save(
+            DailyMessageJpaEntity(title = "오늘의 덕담", content = "좋은 하루!", date = LocalDate.now())
+        )
+        val comment = dailyMessageCommentJpaRepository.save(
+            DailyMessageCommentJpaEntity(content = "댓글", dailyMessage = dailyMessage, member = author)
+        )
+        val first = dailyMessageCommentJpaRepository.save(
+            DailyMessageCommentJpaEntity(
+                content = "첫 답글",
+                dailyMessage = dailyMessage,
+                member = author,
+                parentComment = comment
+            )
+        )
+        val second = dailyMessageCommentJpaRepository.save(
+            DailyMessageCommentJpaEntity(
+                content = "둘째 답글",
+                dailyMessage = dailyMessage,
+                member = author,
+                parentComment = comment
+            )
+        )
+
+        RestAssured.given()
+            .`when`()
+            .get("/api/v1/daily-messages/{dailyMessageId}/comments", dailyMessage.id)
+            .then()
+            .statusCode(200)
+            .body("data.comments[0].replies.size()", equalTo(2))
+            .body("data.comments[0].replies[0].id", equalTo(first.id!!.toInt()))
+            .body("data.comments[0].replies[0].content", equalTo("첫 답글"))
+            .body("data.comments[0].replies[1].id", equalTo(second.id!!.toInt()))
     }
 
     @Test

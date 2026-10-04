@@ -3,14 +3,13 @@ package com.example.mykku.feed.adapter.input.web
 import com.example.mykku.BaseDocumentTest
 import com.example.mykku.board.exception.BoardErrorCode
 import com.example.mykku.board.exception.BoardException
+import com.example.mykku.comment.CommentDocumentFields
+import com.example.mykku.comment.CommentFixtures
+import com.example.mykku.comment.application.dto.CommentAuthorResult
 import com.example.mykku.docs.ApiRequestConfig
 import com.example.mykku.docs.RestDocumentationResponse
 import com.example.mykku.feed.application.dto.AuthorResult
-import com.example.mykku.feed.application.dto.CommentAuthorResult
 import com.example.mykku.feed.application.dto.CreateFeedResult
-import com.example.mykku.feed.application.dto.FeedCommentReplyResult
-import com.example.mykku.feed.application.dto.FeedCommentResult
-import com.example.mykku.feed.application.dto.FeedCommentsResult
 import com.example.mykku.feed.application.dto.FeedDetailResult
 import com.example.mykku.feed.application.dto.FeedImageResult
 import com.example.mykku.feed.application.dto.TagResult
@@ -565,109 +564,34 @@ class FeedDocumentTest : BaseDocumentTest() {
         @Test
         fun `성공`() {
             val feedId = 1L
-            val feedCommentsResult = FeedCommentsResult(
-                comments = listOf(
-                    FeedCommentResult(
+            val feedCommentsResult = CommentFixtures.page(
+                listOf(
+                    CommentFixtures.comment(
                         id = 1L,
                         content = "좋은 글이네요!",
-                        author = CommentAuthorResult(
-                            memberId = "member1",
-                            nickname = "댓글작성자1",
-                            profileImage = "https://example.com/profile1.jpg"
-                        ),
+                        author = CommentFixtures.author(memberId = "member1", nickname = "댓글작성자1"),
                         likeCount = 5,
-                        isLiked = false,
                         replies = listOf(
-                            FeedCommentReplyResult(
+                            CommentFixtures.reply(
                                 id = 2L,
                                 content = "저도 동의합니다!",
-                                author = CommentAuthorResult(
-                                    memberId = "member2",
-                                    nickname = "대댓글작성자",
-                                    profileImage = "https://example.com/profile2.jpg"
-                                ),
-                                likeCount = 2,
-                                isLiked = false,
-                                createdAt = LocalDateTime.of(2024, 1, 1, 13, 0),
-                                updatedAt = LocalDateTime.of(2024, 1, 1, 13, 0)
+                                author = CommentFixtures.author(memberId = "member2", nickname = "대댓글작성자", role = null)
                             )
-                        ),
-                        replyCount = 1,
-                        createdAt = LocalDateTime.of(2024, 1, 1, 12, 0),
-                        updatedAt = LocalDateTime.of(2024, 1, 1, 12, 0)
+                        )
+                    ),
+                    CommentFixtures.comment(
+                        id = 3L,
+                        content = "탈퇴한 회원이 남긴 댓글",
+                        author = CommentAuthorResult.withdrawn()
                     )
-                ),
-                totalElements = 1,
-                totalPages = 1,
-                currentPage = 0,
-                pageSize = 20,
-                hasNext = false
+                )
             )
 
             `when`(getFeedCommentsUseCase.execute(any())).thenReturn(feedCommentsResult)
 
             val documentFilter = document("feed/comments", 200)
                 .request(request().applyConfig(apiConfig))
-                .response(
-                    response()
-                        .responseBodyField(
-                            fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
-                            fieldWithPath("data.comments").type(JsonFieldType.ARRAY)
-                                .description("최상위 댓글 목록 (createdAt 내림차순, 없으면 빈 배열)"),
-                            fieldWithPath("data.comments[].id").type(JsonFieldType.NUMBER).description("댓글 ID"),
-                            fieldWithPath("data.comments[].content").type(JsonFieldType.STRING).description("댓글 내용"),
-                            fieldWithPath("data.comments[].author").type(JsonFieldType.OBJECT)
-                                .description("댓글 작성자 정보 (탈퇴한 회원의 댓글은 목록에서 제외되므로 항상 존재)"),
-                            fieldWithPath("data.comments[].author.memberId").type(JsonFieldType.STRING)
-                                .description("작성자 아이디 (사용자가 설정한 문자열 memberId, 영문·숫자 최대 16자. 내부 PK 아님)"),
-                            fieldWithPath("data.comments[].author.nickname").type(JsonFieldType.STRING)
-                                .description("작성자 닉네임"),
-                            fieldWithPath("data.comments[].author.profileImage").type(JsonFieldType.STRING)
-                                .description("작성자 프로필 이미지 URL (null 아님. 프로필 이미지가 없으면 빈 문자열이므로 클라이언트 기본 이미지 사용)"),
-                            fieldWithPath("data.comments[].likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
-                            fieldWithPath("data.comments[].isLiked").type(JsonFieldType.BOOLEAN)
-                                .description("로그인 회원의 좋아요 여부 (비로그인이거나 토큰이 유효하지 않으면 false)"),
-                            fieldWithPath("data.comments[].replies").type(JsonFieldType.ARRAY)
-                                .description(
-                                    "대댓글 목록 (페이지네이션 없이 전부, createdAt 오름차순. 없으면 빈 배열). " +
-                                        "각 대댓글 항목의 필드는 항상 존재"
-                                ),
-                            fieldWithPath("data.comments[].replies[].id").type(JsonFieldType.NUMBER)
-                                .description("대댓글 ID"),
-                            fieldWithPath("data.comments[].replies[].content").type(JsonFieldType.STRING)
-                                .description("대댓글 내용"),
-                            fieldWithPath("data.comments[].replies[].author").type(JsonFieldType.OBJECT)
-                                .description("대댓글 작성자 정보 (탈퇴한 회원의 대댓글은 목록에서 제외되므로 항상 존재)"),
-                            fieldWithPath("data.comments[].replies[].author.memberId").type(JsonFieldType.STRING)
-                                .description("대댓글 작성자 아이디 (사용자가 설정한 문자열 memberId, 영문·숫자 최대 16자. 내부 PK 아님)"),
-                            fieldWithPath("data.comments[].replies[].author.nickname").type(JsonFieldType.STRING)
-                                .description("대댓글 작성자 닉네임"),
-                            fieldWithPath("data.comments[].replies[].author.profileImage").type(JsonFieldType.STRING)
-                                .description("대댓글 작성자 프로필 이미지 URL (null 아님. 프로필 이미지가 없으면 빈 문자열)"),
-                            fieldWithPath("data.comments[].replies[].likeCount").type(JsonFieldType.NUMBER)
-                                .description("대댓글 좋아요 수"),
-                            fieldWithPath("data.comments[].replies[].isLiked").type(JsonFieldType.BOOLEAN)
-                                .description("로그인 회원의 대댓글 좋아요 여부 (비로그인이거나 토큰이 유효하지 않으면 false)"),
-                            fieldWithPath("data.comments[].replies[].createdAt").type(JsonFieldType.STRING)
-                                .description("대댓글 작성 일시 (KST, ISO-8601)"),
-                            fieldWithPath("data.comments[].replies[].updatedAt").type(JsonFieldType.STRING)
-                                .description("대댓글 수정 일시 (KST, ISO-8601)"),
-                            fieldWithPath("data.comments[].replyCount").type(JsonFieldType.NUMBER)
-                                .description("대댓글 수 (replies 배열의 길이와 같음)"),
-                            fieldWithPath("data.comments[].createdAt").type(JsonFieldType.STRING)
-                                .description("댓글 작성 일시 (KST, ISO-8601)"),
-                            fieldWithPath("data.comments[].updatedAt").type(JsonFieldType.STRING)
-                                .description("댓글 수정 일시 (KST, ISO-8601)"),
-                            fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER)
-                                .description("전체 최상위 댓글 수 (대댓글 미포함)"),
-                            fieldWithPath("data.totalPages").type(JsonFieldType.NUMBER)
-                                .description("전체 페이지 수 (최상위 댓글 기준)"),
-                            fieldWithPath("data.currentPage").type(JsonFieldType.NUMBER)
-                                .description("현재 페이지 번호 (0부터 시작)"),
-                            fieldWithPath("data.pageSize").type(JsonFieldType.NUMBER).description("페이지 크기"),
-                            fieldWithPath("data.hasNext").type(JsonFieldType.BOOLEAN).description("다음 페이지 존재 여부")
-                        )
-                )
+                .response(response().responseBodyField(*CommentDocumentFields.pageFields()))
                 .build()
 
             given(documentFilter)

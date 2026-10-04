@@ -2,6 +2,7 @@ package com.example.mykku.feed.adapter.output.persistence
 
 import com.example.mykku.BaseRepositoryTest
 import com.example.mykku.board.adapter.output.persistence.entity.BoardJpaEntity
+import com.example.mykku.feed.adapter.output.persistence.entity.FeedCommentJpaEntity
 import com.example.mykku.feed.adapter.output.persistence.entity.FeedJpaEntity
 import com.example.mykku.feed.application.port.output.FeedCommentRepository
 import com.example.mykku.feed.domain.entity.FeedComment
@@ -29,6 +30,9 @@ class FeedCommentRepositoryAdapterTest : BaseRepositoryTest() {
 
     @Autowired
     private lateinit var feedJpaRepository: FeedJpaRepository
+
+    @Autowired
+    private lateinit var feedCommentJpaRepository: FeedCommentJpaRepository
 
     private lateinit var member: MemberJpaEntity
     private lateinit var board: BoardJpaEntity
@@ -273,66 +277,6 @@ class FeedCommentRepositoryAdapterTest : BaseRepositoryTest() {
             assertThat(firstPage.content).hasSize(10)
             assertThat(secondPage.content).hasSize(5)
             assertThat(firstPage.totalPages).isEqualTo(2)
-        }
-    }
-
-    @Nested
-    @DisplayName("findByParentCommentId 메서드")
-    inner class FindByParentCommentId {
-
-        @Test
-        @DisplayName("부모 댓글 ID로 대댓글 목록을 조회한다")
-        fun `대댓글 조회 - 정상 케이스`() {
-            val feedId = FeedId.of(feed.id!!)
-            val parentComment = FeedComment.create(
-                content = "부모 댓글",
-                feedId = feedId,
-                memberId = member.id
-            )
-            val savedParentComment = feedCommentRepository.save(parentComment, feedId, member.id)
-
-            repeat(3) { index ->
-                val replyComment = FeedComment.create(
-                    content = "대댓글 $index",
-                    feedId = feedId,
-                    memberId = member.id,
-                    parentCommentId = savedParentComment.id
-                )
-                feedCommentRepository.save(replyComment, feedId, member.id)
-            }
-
-            val replies = feedCommentRepository.findByParentCommentId(savedParentComment.id!!)
-
-            assertThat(replies).hasSize(3)
-            replies.forEach { reply ->
-                assertThat(reply.parentCommentId).isEqualTo(savedParentComment.id)
-            }
-        }
-
-        @Test
-        @DisplayName("대댓글이 없는 부모 댓글의 경우 빈 목록을 반환한다")
-        fun `대댓글 조회 - 대댓글 없음`() {
-            val feedId = FeedId.of(feed.id!!)
-            val parentComment = FeedComment.create(
-                content = "부모 댓글",
-                feedId = feedId,
-                memberId = member.id
-            )
-            val savedParentComment = feedCommentRepository.save(parentComment, feedId, member.id)
-
-            val replies = feedCommentRepository.findByParentCommentId(savedParentComment.id!!)
-
-            assertThat(replies).isEmpty()
-        }
-
-        @Test
-        @DisplayName("존재하지 않는 부모 댓글 ID로 조회하면 빈 목록을 반환한다")
-        fun `대댓글 조회 - 존재하지 않는 부모 댓글`() {
-            val nonExistentParentCommentId = FeedCommentId.of(99999L)
-
-            val replies = feedCommentRepository.findByParentCommentId(nonExistentParentCommentId)
-
-            assertThat(replies).isEmpty()
         }
     }
 
@@ -706,6 +650,55 @@ class FeedCommentRepositoryAdapterTest : BaseRepositoryTest() {
 
             assertThat(feedCommentRepository.countByFeedId(feedId1)).isEqualTo(0)
             assertThat(feedCommentRepository.countByFeedId(feedId2)).isEqualTo(1)
+        }
+    }
+
+    @Nested
+    @DisplayName("탈퇴한 회원의 댓글")
+    inner class WithdrawnAuthor {
+
+        @Test
+        @DisplayName("최상위 댓글 목록은 작성자가 없는 댓글을 포함하고 개수와 내용이 일치한다")
+        fun `findByFeedIdAndParentCommentIsNull - 탈퇴 회원 댓글 포함`() {
+            feedCommentJpaRepository.save(FeedCommentJpaEntity(content = "살아있는 댓글", feed = feed, member = member))
+            feedCommentJpaRepository.save(FeedCommentJpaEntity(content = "탈퇴자 댓글", feed = feed, member = null))
+
+            val page = feedCommentRepository.findByFeedIdAndParentCommentIsNull(
+                FeedId.of(feed.id!!),
+                PageRequest.of(0, 20)
+            )
+
+            assertThat(page.content.map { it.content }).containsExactlyInAnyOrder("살아있는 댓글", "탈퇴자 댓글")
+            assertThat(page.totalElements).isEqualTo(page.content.size.toLong())
+        }
+
+        @Test
+        @DisplayName("답글 조회는 작성자가 없는 답글을 포함하고 오래된 순으로 반환한다")
+        fun `findByParentCommentIds - 탈퇴 회원 답글 포함`() {
+            val parent = feedCommentJpaRepository.save(FeedCommentJpaEntity(content = "부모", feed = feed, member = member))
+            feedCommentJpaRepository.save(
+                FeedCommentJpaEntity(content = "탈퇴자 답글", feed = feed, member = null, parentComment = parent)
+            )
+            feedCommentJpaRepository.save(
+                FeedCommentJpaEntity(content = "회원 답글", feed = feed, member = member, parentComment = parent)
+            )
+
+            val replies = feedCommentRepository.findByParentCommentIds(listOf(FeedCommentId.of(parent.id!!)))
+
+            assertThat(replies.map { it.content }).containsExactly("탈퇴자 답글", "회원 답글")
+            assertThat(replies.first().memberId).isNull()
+        }
+
+        @Test
+        @DisplayName("첫 댓글 미리보기는 작성자가 탈퇴한 첫 댓글을 반환한다")
+        fun `findFirstCommentsByFeedIds - 탈퇴 회원 첫 댓글 포함`() {
+            feedCommentJpaRepository.save(FeedCommentJpaEntity(content = "탈퇴자 첫 댓글", feed = feed, member = null))
+            feedCommentJpaRepository.save(FeedCommentJpaEntity(content = "두번째 댓글", feed = feed, member = member))
+
+            val firstComments = feedCommentRepository.findFirstCommentsByFeedIds(listOf(FeedId.of(feed.id!!)))
+
+            assertThat(firstComments[feed.id!!]?.content).isEqualTo("탈퇴자 첫 댓글")
+            assertThat(firstComments[feed.id!!]?.memberId).isNull()
         }
     }
 }

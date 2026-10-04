@@ -2,6 +2,7 @@ package com.example.mykku.admin.adapter.input.web
 
 import com.example.mykku.BaseControllerTest
 import com.example.mykku.admin.exception.AdminErrorCode
+import com.example.mykku.common.exception.CommonErrorCode
 import com.example.mykku.contest.adapter.output.persistence.entity.ContestJpaEntity
 import com.example.mykku.contest.adapter.output.persistence.entity.ContestParticipationJpaEntity
 import com.example.mykku.contest.adapter.output.persistence.repository.ContestJpaRepository
@@ -18,6 +19,7 @@ import io.restassured.response.ValidatableResponse
 import org.assertj.core.api.Assertions.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.notNullValue
+import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -41,6 +43,52 @@ class AdminContestApiControllerTest : BaseControllerTest() {
 
     @Autowired
     private lateinit var jdbcTemplate: JdbcTemplate
+
+    @Test
+    @DisplayName("콘테스트 생성 - 부제목을 함께 저장한다")
+    fun `create - 부제목과 함께 콘테스트를 생성한다`() {
+        val response = createContest(subTitle = "Contest Sub Title")
+            .statusCode(200)
+            .body("data.subTitle", equalTo("Contest Sub Title"))
+
+        val id = response.extract().jsonPath().getLong("data.id")
+        assertThat(contestJpaRepository.findById(id).get().subTitle).isEqualTo("Contest Sub Title")
+    }
+
+    @Test
+    @DisplayName("콘테스트 생성 - 공백 부제목은 null로 저장한다")
+    fun `create - 공백 부제목은 null이다`() {
+        val response = createContest(subTitle = "   ")
+            .statusCode(200)
+            .body("data.subTitle", nullValue())
+
+        val id = response.extract().jsonPath().getLong("data.id")
+        assertThat(contestJpaRepository.findById(id).get().subTitle).isNull()
+    }
+
+    @Test
+    @DisplayName("콘테스트 생성 - 부제목이 255자를 초과하면 실패한다")
+    fun `create - 부제목 길이 초과 시 400을 반환한다`() {
+        createContest(subTitle = "a".repeat(256))
+            .statusCode(400)
+            .body("code", equalTo(CommonErrorCode.INVALID_INPUT.code))
+    }
+
+    private fun createContest(subTitle: String): ValidatableResponse {
+        return RestAssured.given()
+            .sessionId(getAdminSessionId())
+            .contentType("multipart/form-data")
+            .multiPart("title", "New Contest")
+            .multiPart("subTitle", subTitle)
+            .multiPart("description", "Contest Description")
+            .multiPart("startedAt", "2026-08-01T00:00:00")
+            .multiPart("expiredAt", "2026-09-01T00:00:00")
+            .multiPart("tags", "fandom")
+            .multiPart("thumbnailImage", "thumbnail.jpg", ByteArray(10), "image/jpeg")
+            .`when`()
+            .post("/admin/api/v1/contests")
+            .then()
+    }
 
     @Test
     @DisplayName("수상자 선정 - 정상 케이스")

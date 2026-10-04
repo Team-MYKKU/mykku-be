@@ -8,5 +8,4 @@ interface LikeDailyMessageCommentPort {
     fun deleteByMemberIdAndDailyMessageCommentId(memberId: Long, dailyMessageCommentId: Long)
     fun findLikedCommentIds(memberId: Long, dailyMessageCommentIds: List<Long>): Set<Long>
     fun countByCommentIdIn(dailyMessageCommentIds: List<Long>): Map<Long, Int>
-    fun countByCommentId(dailyMessageCommentId: Long): Int
 }

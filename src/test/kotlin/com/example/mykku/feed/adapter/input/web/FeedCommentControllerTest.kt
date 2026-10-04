@@ -78,6 +78,13 @@ class FeedCommentControllerTest : BaseControllerTest() {
             .body("message", equalTo("댓글이 성공적으로 등록되었습니다."))
             .body("data.content", equalTo("테스트 댓글"))
             .body("data.author.memberId", equalTo("member1"))
+            .body("data.author.nickname", equalTo("Member1"))
+            .body("data.author.role", equalTo(null))
+            .body("data.replies.size()", equalTo(0))
+            .body("data.replyCount", equalTo(0))
+            .body("data.likeCount", equalTo(0))
+            .body("data.isLiked", equalTo(false))
+            .body("data.updatedAt", notNullValue())
     }
 
     @Test
@@ -326,6 +333,14 @@ class FeedCommentControllerTest : BaseControllerTest() {
                 member = member
             )
         )
+        feedCommentJpaRepository.save(
+            FeedCommentJpaEntity(
+                content = "기존 답글",
+                feed = feed,
+                member = member,
+                parentComment = comment
+            )
+        )
         val authHeader = TestTokenGenerator.getBearerToken(member.id)
         val request = UpdateFeedCommentRequest(content = "수정된 댓글")
         val requestJson = objectMapper.writeValueAsString(request)
@@ -340,6 +355,11 @@ class FeedCommentControllerTest : BaseControllerTest() {
             .statusCode(200)
             .body("message", equalTo("댓글이 성공적으로 수정되었습니다."))
             .body("data.content", equalTo("수정된 댓글"))
+            .body("data.author.memberId", equalTo("testmemberid4"))
+            .body("data.replies.size()", equalTo(1))
+            .body("data.replyCount", equalTo(1))
+            .body("data.replies[0].content", equalTo("기존 답글"))
+            .body("data.isLiked", equalTo(false))
     }
 
     @Test

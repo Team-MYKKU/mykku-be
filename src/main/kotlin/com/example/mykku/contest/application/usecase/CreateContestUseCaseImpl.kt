@@ -43,6 +43,7 @@ class CreateContestUseCaseImpl(
     private fun createAndSaveContest(command: CreateContestCommand): Contest {
         val contest = Contest.create(
             title = command.title,
+            subTitle = command.subTitle,
             description = command.description,
             startedAt = command.startedAt,
             expiredAt = command.expiredAt,
@@ -77,6 +78,7 @@ class CreateContestUseCaseImpl(
         return CreateContestResult(
             id = contest.id.value,
             title = contest.title,
+            subTitle = contest.subTitle,
             description = contest.description,
             startedAt = contest.startedAt,
             expiredAt = contest.expiredAt,

@@ -51,10 +51,4 @@ class LikeDailyMessageCommentPersistenceAdapter(
             .countGroupedByDailyMessageCommentIdIn(dailyMessageCommentIds)
             .toCountMap()
     }
-
-    override fun countByCommentId(dailyMessageCommentId: Long): Int {
-        return likeDailyMessageCommentJpaRepository
-            .countByDailyMessageCommentId(dailyMessageCommentId)
-            .toInt()
-    }
 }

@@ -40,7 +40,7 @@ class CreateCommentActivityPublishTest {
     private lateinit var activityEventPublisher: ActivityEventPublisher
 
     @Mock
-    private lateinit var commentAuthorResolver: CommentAuthorResolver
+    private lateinit var dailyMessageCommentResultReader: DailyMessageCommentResultReader
 
     @Mock
     private lateinit var memberRepository: MemberRepository
@@ -59,8 +59,6 @@ class CreateCommentActivityPublishTest {
             CreateCommentCommand(
                 dailyMessageId = 3L,
                 memberId = 1L,
-                memberNickname = "테스터",
-                memberProfileImage = "",
                 content = "댓글",
                 parentCommentId = null
             )
@@ -100,8 +98,6 @@ class CreateCommentActivityPublishTest {
             id = DailyMessageCommentId.of(9L),
             dailyMessageId = 3L,
             memberId = 1L,
-            memberNickname = "테스터",
-            memberProfileImage = "",
             content = "댓글",
             likeCount = 0,
             parentCommentId = null,

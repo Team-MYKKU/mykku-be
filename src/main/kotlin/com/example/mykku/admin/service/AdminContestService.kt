@@ -56,6 +56,7 @@ class AdminContestService(
     ): CreateContestCommand {
         return CreateContestCommand(
             title = request.title,
+            subTitle = request.subTitle?.takeIf { it.isNotBlank() },
             description = request.description,
             startedAt = request.startedAt,
             expiredAt = request.expiredAt,

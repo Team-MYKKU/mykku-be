@@ -12,7 +12,6 @@ interface FeedCommentRepository {
     fun findByIdOrThrow(id: FeedCommentId): FeedComment
     fun findByFeedIdAndParentCommentIsNull(feedId: FeedId, pageable: Pageable): Page<FeedComment>
     fun findFirstCommentsByFeedIds(feedIds: List<FeedId>): Map<Long, FeedComment>
-    fun findByParentCommentId(parentCommentId: FeedCommentId): List<FeedComment>
     fun findByParentCommentIds(parentCommentIds: List<FeedCommentId>): List<FeedComment>
     fun countByFeedId(feedId: FeedId): Long
     fun countByFeedIdIn(feedIds: List<FeedId>): Map<Long, Int>

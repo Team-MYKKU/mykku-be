@@ -23,7 +23,10 @@ interface DailyMessageCommentJpaRepository : JpaRepository<DailyMessageCommentJp
         pageable: Pageable
     ): Page<DailyMessageCommentJpaEntity>
 
-    @Query("SELECT c FROM DailyMessageCommentJpaEntity c LEFT JOIN FETCH c.member WHERE c.parentComment.id IN :parentCommentIds")
+    @Query(
+        "SELECT c FROM DailyMessageCommentJpaEntity c LEFT JOIN FETCH c.member " +
+            "WHERE c.parentComment.id IN :parentCommentIds ORDER BY c.parentComment.id, c.createdAt ASC, c.id ASC"
+    )
     fun findByParentCommentIdIn(parentCommentIds: List<Long>): List<DailyMessageCommentJpaEntity>
 
     @Modifying(flushAutomatically = true, clearAutomatically = true)
