@@ -1,5 +1,6 @@
 package com.example.mykku.feed.application.usecase
 
+import com.example.mykku.block.application.port.input.BlockFilterUseCase
 import com.example.mykku.board.application.port.output.BoardRepository
 import com.example.mykku.board.domain.vo.BoardId
 import com.example.mykku.board.exception.BoardException
@@ -35,7 +36,8 @@ class GetFeedDetailUseCaseImpl(
     private val memberRepository: MemberRepository,
     private val roleRepository: RoleRepository,
     private val contestTagRepository: ContestTagRepository,
-    private val likeFeedPort: LikeFeedPort
+    private val likeFeedPort: LikeFeedPort,
+    private val blockFilterUseCase: BlockFilterUseCase
 ) : GetFeedDetailUseCase {
 
     override fun execute(query: GetFeedDetailQuery): FeedDetailResult {
@@ -75,7 +77,7 @@ class GetFeedDetailUseCaseImpl(
             tags = feedTags.map { TagResult(it.title, contestTagTitles.contains(it.title)) },
             likeCount = likeFeedPort.countByFeedId(feed.id!!.value),
             isLiked = isLiked,
-            commentCount = feedCommentRepository.countByFeedId(feed.id!!).toInt()
+            commentCount = countVisibleComments(feed.id!!, query.memberId)
         )
     }
 
@@ -83,4 +85,7 @@ class GetFeedDetailUseCaseImpl(
         val contestTags = contestTagRepository.findAllByTitleIn(tagTitles)
         return contestTags.map { it.title }.toSet()
     }
+
+    private fun countVisibleComments(feedId: FeedId, viewerId: Long?): Int =
+        feedCommentRepository.countByFeedId(feedId, blockFilterUseCase.getHiddenMemberIds(viewerId)).toInt()
 }

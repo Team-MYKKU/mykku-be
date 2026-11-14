@@ -23,6 +23,20 @@ interface FeedCommentJpaRepository : JpaRepository<FeedCommentJpaEntity, Long> {
         pageable: Pageable
     ): Page<FeedCommentJpaEntity>
 
+    @Query(
+        value = "SELECT fc FROM FeedCommentJpaEntity fc LEFT JOIN FETCH fc.member " +
+            "WHERE fc.feed = :feed AND fc.parentComment IS NULL " +
+            "AND (fc.member IS NULL OR fc.member.id NOT IN :excludedMemberIds) ORDER BY fc.createdAt DESC",
+        countQuery = "SELECT COUNT(fc) FROM FeedCommentJpaEntity fc " +
+            "WHERE fc.feed = :feed AND fc.parentComment IS NULL " +
+            "AND (fc.member IS NULL OR fc.member.id NOT IN :excludedMemberIds)"
+    )
+    fun findTopLevelByFeedExcludingMembers(
+        @Param("feed") feed: FeedJpaEntity,
+        @Param("excludedMemberIds") excludedMemberIds: Collection<Long>,
+        pageable: Pageable
+    ): Page<FeedCommentJpaEntity>
+
     @Query("""
         SELECT fc FROM FeedCommentJpaEntity fc
         LEFT JOIN FETCH fc.member
@@ -34,6 +48,23 @@ interface FeedCommentJpaRepository : JpaRepository<FeedCommentJpaEntity, Long> {
         )
     """)
     fun findFirstCommentsByFeedIds(@Param("feedIds") feedIds: List<Long>): List<FeedCommentJpaEntity>
+
+    @Query("""
+        SELECT fc FROM FeedCommentJpaEntity fc
+        LEFT JOIN FETCH fc.member
+        WHERE fc.feed.id IN :feedIds
+        AND fc.parentComment IS NULL
+        AND fc.id = (
+            SELECT MIN(fc2.id) FROM FeedCommentJpaEntity fc2
+            LEFT JOIN fc2.member m2
+            WHERE fc2.feed.id = fc.feed.id AND fc2.parentComment IS NULL
+            AND (m2 IS NULL OR m2.id NOT IN :excludedMemberIds)
+        )
+    """)
+    fun findFirstCommentsByFeedIdsExcludingMembers(
+        @Param("feedIds") feedIds: List<Long>,
+        @Param("excludedMemberIds") excludedMemberIds: Collection<Long>
+    ): List<FeedCommentJpaEntity>
 
     @Query(
         "SELECT fc FROM FeedCommentJpaEntity fc LEFT JOIN FETCH fc.member " +
@@ -54,6 +85,32 @@ interface FeedCommentJpaRepository : JpaRepository<FeedCommentJpaEntity, Long> {
         GROUP BY fc.feed.id
     """)
     fun countGroupedByFeedIdIn(@Param("feedIds") feedIds: List<Long>): List<IdCountRow>
+
+    @Query("""
+        SELECT COUNT(fc) FROM FeedCommentJpaEntity fc
+        LEFT JOIN fc.parentComment p
+        WHERE fc.feed.id = :feedId
+        AND (fc.member IS NULL OR fc.member.id NOT IN :excludedMemberIds)
+        AND (p IS NULL OR p.member IS NULL OR p.member.id NOT IN :excludedMemberIds)
+    """)
+    fun countByFeedIdExcludingMembers(
+        @Param("feedId") feedId: Long,
+        @Param("excludedMemberIds") excludedMemberIds: Collection<Long>
+    ): Long
+
+    @Query("""
+        SELECT fc.feed.id AS entityId, COUNT(fc) AS countValue
+        FROM FeedCommentJpaEntity fc
+        LEFT JOIN fc.parentComment p
+        WHERE fc.feed.id IN :feedIds
+        AND (fc.member IS NULL OR fc.member.id NOT IN :excludedMemberIds)
+        AND (p IS NULL OR p.member IS NULL OR p.member.id NOT IN :excludedMemberIds)
+        GROUP BY fc.feed.id
+    """)
+    fun countGroupedByFeedIdInExcludingMembers(
+        @Param("feedIds") feedIds: List<Long>,
+        @Param("excludedMemberIds") excludedMemberIds: Collection<Long>
+    ): List<IdCountRow>
 
     fun findAllByFeed(feed: FeedJpaEntity): List<FeedCommentJpaEntity>
 

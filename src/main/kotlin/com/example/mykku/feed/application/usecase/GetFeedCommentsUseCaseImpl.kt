@@ -1,5 +1,6 @@
 package com.example.mykku.feed.application.usecase
 
+import com.example.mykku.block.application.port.input.BlockFilterUseCase
 import com.example.mykku.comment.application.dto.CommentPageResult
 import com.example.mykku.feed.application.dto.GetFeedCommentsQuery
 import com.example.mykku.feed.application.port.input.GetFeedCommentsUseCase
@@ -14,12 +15,15 @@ import org.springframework.transaction.annotation.Transactional
 class GetFeedCommentsUseCaseImpl(
     private val feedRepository: FeedRepository,
     private val feedCommentRepository: FeedCommentRepository,
-    private val feedCommentResultReader: FeedCommentResultReader
+    private val feedCommentResultReader: FeedCommentResultReader,
+    private val blockFilterUseCase: BlockFilterUseCase
 ) : GetFeedCommentsUseCase {
 
     override fun execute(query: GetFeedCommentsQuery): CommentPageResult {
         val feed = feedRepository.findByIdOrThrow(FeedId.of(query.feedId))
-        val page = feedCommentRepository.findByFeedIdAndParentCommentIsNull(feed.id!!, query.pageable)
-        return CommentPageResult.of(page, feedCommentResultReader.readAll(page.content, query.memberId))
+        val hiddenMemberIds = blockFilterUseCase.getHiddenMemberIds(query.memberId)
+        val page = feedCommentRepository.findByFeedIdAndParentCommentIsNull(feed.id!!, hiddenMemberIds, query.pageable)
+        val comments = feedCommentResultReader.readAll(page.content, query.memberId, hiddenMemberIds)
+        return CommentPageResult.of(page, comments)
     }
 }

@@ -27,6 +27,10 @@ class BlockFilterService(
         return blockedByMe + blockedMe
     }
 
+    override fun getHiddenMemberIds(viewerId: Long?): Set<Long> {
+        return viewerId?.let { getAllBlockRelatedMemberIds(it) } ?: emptySet()
+    }
+
     override fun getBlockedKeywords(memberId: Long): List<String> {
         return keywordBlockRepository.findKeywordsByMemberId(memberId)
     }

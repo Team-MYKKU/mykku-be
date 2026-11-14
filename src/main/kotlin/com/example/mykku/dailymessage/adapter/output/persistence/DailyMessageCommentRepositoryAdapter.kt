@@ -75,11 +75,16 @@ class DailyMessageCommentRepositoryAdapter(
 
     override fun findByDailyMessageIdAndParentCommentIsNull(
         dailyMessageId: DailyMessageId,
+        excludedMemberIds: Set<Long>,
         pageable: Pageable
     ): Page<DailyMessageComment> {
-        return dailyMessageCommentJpaRepository
-            .findByDailyMessageIdAndParentCommentIsNull(dailyMessageId.value, pageable)
-            .map { it.toDomain() }
+        val id = dailyMessageId.value
+        val page = if (excludedMemberIds.isEmpty()) {
+            dailyMessageCommentJpaRepository.findByDailyMessageIdAndParentCommentIsNull(id, pageable)
+        } else {
+            dailyMessageCommentJpaRepository.findTopLevelExcludingMembers(id, excludedMemberIds, pageable)
+        }
+        return page.map { it.toDomain() }
     }
 
     override fun findByParentCommentIds(parentCommentIds: List<Long>): List<DailyMessageComment> {

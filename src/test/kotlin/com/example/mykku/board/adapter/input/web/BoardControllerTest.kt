@@ -1,6 +1,8 @@
 package com.example.mykku.board.adapter.input.web
 
 import com.example.mykku.BaseControllerTest
+import com.example.mykku.block.adapter.output.persistence.entity.MemberBlockJpaEntity
+import com.example.mykku.block.adapter.output.persistence.repository.MemberBlockJpaRepository
 import com.example.mykku.board.adapter.output.persistence.entity.BoardJpaEntity
 import com.example.mykku.board.exception.BoardErrorCode
 import com.example.mykku.feed.adapter.output.persistence.FeedCommentJpaRepository
@@ -30,6 +32,9 @@ class BoardControllerTest : BaseControllerTest() {
 
     @Autowired
     private lateinit var feedCommentJpaRepository: FeedCommentJpaRepository
+
+    @Autowired
+    private lateinit var memberBlockJpaRepository: MemberBlockJpaRepository
 
     @Test
     @DisplayName("게시판 목록 조회 - 정상 케이스")
@@ -302,6 +307,90 @@ class BoardControllerTest : BaseControllerTest() {
             .body("data.feeds[0].comment.content", equalTo("탈퇴자 첫 댓글"))
             .body("data.feeds[0].comment.profileImage", equalTo(null))
     }
+
+    @Test
+    @DisplayName("보드별 피드 목록 조회 - 내가 차단한 회원의 첫 댓글은 미리보기에서 건너뛴다")
+    fun `getFeedsByBoard - 내가 차단한 회원의 첫 댓글은 미리보기에서 건너뛴다`() {
+        val viewer = createFeedMember(memberId = "pvviewer", socialId = "pvviewer", email = "pvviewer@example.com")
+        val author = createFeedMember(memberId = "pvauthor", socialId = "pvauthor", email = "pvauthor@example.com")
+        val blocked = createFeedMember(memberId = "pvblocked", socialId = "pvblocked", email = "pvblocked@example.com")
+        val board = boardJpaRepository.save(BoardJpaEntity(title = "미리보기 게시판", logo = "test_logo.png"))
+        val feed = feedJpaRepository.save(
+            FeedJpaEntity(title = "미리보기 피드", content = "미리보기 피드 내용", member = author, board = board)
+        )
+        feedCommentJpaRepository.save(FeedCommentJpaEntity(content = "차단 회원 첫 댓글", feed = feed, member = blocked))
+        feedCommentJpaRepository.save(FeedCommentJpaEntity(content = "두번째 댓글", feed = feed, member = author))
+        memberBlockJpaRepository.save(MemberBlockJpaEntity(blocker = viewer, blocked = blocked))
+
+        RestAssured.given()
+            .headers(createAuthHeaders(viewer.id))
+            .`when`()
+            .get("/api/v1/boards/{boardId}/feeds", board.id)
+            .then()
+            .statusCode(200)
+            .body("data.feeds.size()", equalTo(1))
+            .body("data.feeds[0].comment.content", equalTo("두번째 댓글"))
+    }
+
+    @Test
+    @DisplayName("보드별 피드 목록 조회 - 나를 차단한 회원의 댓글만 있으면 미리보기가 비어 있다")
+    fun `getFeedsByBoard - 나를 차단한 회원의 댓글만 있으면 미리보기가 비어 있다`() {
+        val viewer = createFeedMember(memberId = "pvblockedme", socialId = "pvblockedme", email = "pvme@example.com")
+        val author = createFeedMember(memberId = "pvauthor2", socialId = "pvauthor2", email = "pvauthor2@example.com")
+        val blocker = createFeedMember(memberId = "pvblocker", socialId = "pvblocker", email = "pvblocker@example.com")
+        val board = boardJpaRepository.save(BoardJpaEntity(title = "미리보기 게시판", logo = "test_logo.png"))
+        val feed = feedJpaRepository.save(
+            FeedJpaEntity(title = "미리보기 피드", content = "미리보기 피드 내용", member = author, board = board)
+        )
+        feedCommentJpaRepository.save(FeedCommentJpaEntity(content = "차단자 댓글", feed = feed, member = blocker))
+        memberBlockJpaRepository.save(MemberBlockJpaEntity(blocker = blocker, blocked = viewer))
+
+        RestAssured.given()
+            .headers(createAuthHeaders(viewer.id))
+            .`when`()
+            .get("/api/v1/boards/{boardId}/feeds", board.id)
+            .then()
+            .statusCode(200)
+            .body("data.feeds.size()", equalTo(1))
+            .body("data.feeds[0].comment.content", equalTo(""))
+            .body("data.feeds[0].comment.profileImage", equalTo(null))
+    }
+
+    @Test
+    @DisplayName("보드별 피드 목록 조회 - 댓글 수에서 차단 관계 회원의 댓글·답글과 그 댓글의 답글은 빠진다")
+    fun `getFeedsByBoard - 댓글 수에서 차단 관계 회원의 댓글과 그 답글은 빠진다`() {
+        val viewer = createFeedMember(memberId = "cntviewer", socialId = "cntviewer", email = "cntviewer@example.com")
+        val blocked = createFeedMember(memberId = "cntblocked", socialId = "cntblocked", email = "cntb@example.com")
+        val board = boardJpaRepository.save(BoardJpaEntity(title = "댓글 수 게시판", logo = "test_logo.png"))
+        val feed = feedJpaRepository.save(
+            FeedJpaEntity(title = "댓글 수 피드", content = "댓글 수 피드 내용", member = viewer, board = board)
+        )
+        val blockedTop = saveComment(feed, blocked, null)
+        saveComment(feed, viewer, blockedTop)
+        val viewerTop = saveComment(feed, viewer, null)
+        saveComment(feed, blocked, viewerTop)
+        val withdrawnTop = saveComment(feed, null, null)
+        saveComment(feed, viewer, withdrawnTop)
+        memberBlockJpaRepository.save(MemberBlockJpaEntity(blocker = blocked, blocked = viewer))
+
+        RestAssured.given()
+            .headers(createAuthHeaders(viewer.id))
+            .`when`()
+            .get("/api/v1/boards/{boardId}/feeds", board.id)
+            .then()
+            .statusCode(200)
+            .body("data.feeds.size()", equalTo(1))
+            .body("data.feeds[0].commentCount", equalTo(3))
+    }
+
+    private fun saveComment(
+        feed: FeedJpaEntity,
+        member: MemberJpaEntity?,
+        parent: FeedCommentJpaEntity?
+    ): FeedCommentJpaEntity =
+        feedCommentJpaRepository.save(
+            FeedCommentJpaEntity(content = "댓글", feed = feed, member = member, parentComment = parent)
+        )
 
     @Test
     @DisplayName("보드별 인기 피드 목록 조회 - 빈 목록")

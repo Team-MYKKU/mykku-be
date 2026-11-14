@@ -1,6 +1,8 @@
 package com.example.mykku.dailymessage.adapter.input.web
 
 import com.example.mykku.BaseControllerTest
+import com.example.mykku.block.adapter.output.persistence.entity.MemberBlockJpaEntity
+import com.example.mykku.block.adapter.output.persistence.repository.MemberBlockJpaRepository
 import com.example.mykku.dailymessage.adapter.output.persistence.entity.DailyMessageJpaEntity
 import com.example.mykku.dailymessage.adapter.output.persistence.entity.DailyMessageCommentJpaEntity
 import com.example.mykku.dailymessage.adapter.input.web.CreateCommentRequest
@@ -35,6 +37,9 @@ class DailyMessageCommentControllerTest : BaseControllerTest() {
 
     @Autowired
     private lateinit var likeDailyMessageCommentJpaRepository: LikeDailyMessageCommentJpaRepository
+
+    @Autowired
+    private lateinit var memberBlockJpaRepository: MemberBlockJpaRepository
 
     @Test
     @DisplayName("댓글 생성 - 정상 케이스")
@@ -603,6 +608,165 @@ class DailyMessageCommentControllerTest : BaseControllerTest() {
             .body("data.comments[0].replies[0].content", equalTo("첫 답글"))
             .body("data.comments[0].replies[1].id", equalTo(second.id!!.toInt()))
     }
+
+    @Test
+    @DisplayName("댓글 목록 조회 - 내가 차단한 회원의 댓글과 답글은 제외된다")
+    fun `getComments - 내가 차단한 회원의 댓글과 답글은 제외된다`() {
+        val viewer = saveBlockTestMember("dmblockviewer")
+        val blocked = saveBlockTestMember("dmblocked")
+        val dailyMessage = dailyMessageJpaRepository.save(
+            DailyMessageJpaEntity(title = "오늘의 덕담", content = "좋은 하루!", date = LocalDate.now())
+        )
+        val visibleComment = dailyMessageCommentJpaRepository.save(
+            DailyMessageCommentJpaEntity(content = "보이는 댓글", dailyMessage = dailyMessage, member = viewer)
+        )
+        dailyMessageCommentJpaRepository.save(
+            DailyMessageCommentJpaEntity(
+                content = "차단 답글",
+                dailyMessage = dailyMessage,
+                member = blocked,
+                parentComment = visibleComment
+            )
+        )
+        dailyMessageCommentJpaRepository.save(
+            DailyMessageCommentJpaEntity(content = "차단 댓글", dailyMessage = dailyMessage, member = blocked)
+        )
+        memberBlockJpaRepository.save(MemberBlockJpaEntity(blocker = viewer, blocked = blocked))
+
+        RestAssured.given()
+            .headers(createAuthHeaders(viewer.id))
+            .`when`()
+            .get("/api/v1/daily-messages/{dailyMessageId}/comments", dailyMessage.id)
+            .then()
+            .statusCode(200)
+            .body("data.comments.size()", equalTo(1))
+            .body("data.comments[0].id", equalTo(visibleComment.id!!.toInt()))
+            .body("data.comments[0].replies.size()", equalTo(0))
+            .body("data.comments[0].replyCount", equalTo(0))
+    }
+
+    @Test
+    @DisplayName("댓글 목록 조회 - 나를 차단한 회원의 댓글은 제외된다")
+    fun `getComments - 나를 차단한 회원의 댓글은 제외된다`() {
+        val viewer = saveBlockTestMember("dmblockedviewer")
+        val blocker = saveBlockTestMember("dmblocker")
+        val dailyMessage = dailyMessageJpaRepository.save(
+            DailyMessageJpaEntity(title = "오늘의 덕담", content = "좋은 하루!", date = LocalDate.now())
+        )
+        val visibleComment = dailyMessageCommentJpaRepository.save(
+            DailyMessageCommentJpaEntity(content = "보이는 댓글", dailyMessage = dailyMessage, member = viewer)
+        )
+        dailyMessageCommentJpaRepository.save(
+            DailyMessageCommentJpaEntity(content = "차단자 댓글", dailyMessage = dailyMessage, member = blocker)
+        )
+        memberBlockJpaRepository.save(MemberBlockJpaEntity(blocker = blocker, blocked = viewer))
+
+        RestAssured.given()
+            .headers(createAuthHeaders(viewer.id))
+            .`when`()
+            .get("/api/v1/daily-messages/{dailyMessageId}/comments", dailyMessage.id)
+            .then()
+            .statusCode(200)
+            .body("data.comments.size()", equalTo(1))
+            .body("data.comments[0].id", equalTo(visibleComment.id!!.toInt()))
+    }
+
+    @Test
+    @DisplayName("댓글 수정 - 응답의 답글에서 차단 관계 회원의 답글은 제외된다")
+    fun `updateComment - 응답의 답글에서 차단 관계 회원의 답글은 제외된다`() {
+        val author = saveBlockTestMember("dmupauthor")
+        val blocker = saveBlockTestMember("dmupblocker")
+        val replier = saveBlockTestMember("dmupreplier")
+        val dailyMessage = dailyMessageJpaRepository.save(
+            DailyMessageJpaEntity(title = "오늘의 덕담", content = "좋은 하루!", date = LocalDate.now())
+        )
+        val comment = dailyMessageCommentJpaRepository.save(
+            DailyMessageCommentJpaEntity(content = "원래 댓글", dailyMessage = dailyMessage, member = author)
+        )
+        saveReply(comment, blocker, "차단자 답글")
+        saveReply(comment, replier, "보이는 답글")
+        memberBlockJpaRepository.save(MemberBlockJpaEntity(blocker = blocker, blocked = author))
+
+        RestAssured.given()
+            .headers(createAuthHeaders(author.id))
+            .contentType(ContentType.JSON)
+            .body(UpdateCommentRequest(content = "수정된 댓글"))
+            .`when`()
+            .put("/api/v1/daily-messages/comments/{commentId}", comment.id)
+            .then()
+            .statusCode(200)
+            .body("data.replies.size()", equalTo(1))
+            .body("data.replyCount", equalTo(1))
+            .body("data.replies[0].content", equalTo("보이는 답글"))
+    }
+
+    @Test
+    @DisplayName("댓글 목록 조회 - 차단 필터는 페이지를 자르기 전에 적용된다")
+    fun `getComments - 차단 필터는 페이지를 자르기 전에 적용된다`() {
+        val viewer = saveBlockTestMember("dmpageviewer")
+        val blocked = saveBlockTestMember("dmpageblocked")
+        val dailyMessage = dailyMessageJpaRepository.save(
+            DailyMessageJpaEntity(title = "오늘의 덕담", content = "좋은 하루!", date = LocalDate.now())
+        )
+        val visible = dailyMessageCommentJpaRepository.save(
+            DailyMessageCommentJpaEntity(content = "보이는 댓글", dailyMessage = dailyMessage, member = viewer)
+        )
+        repeat(2) {
+            dailyMessageCommentJpaRepository.save(
+                DailyMessageCommentJpaEntity(content = "차단 댓글 $it", dailyMessage = dailyMessage, member = blocked)
+            )
+        }
+        memberBlockJpaRepository.save(MemberBlockJpaEntity(blocker = viewer, blocked = blocked))
+
+        RestAssured.given()
+            .headers(createAuthHeaders(viewer.id))
+            .queryParam("size", 1)
+            .`when`()
+            .get("/api/v1/daily-messages/{dailyMessageId}/comments", dailyMessage.id)
+            .then()
+            .statusCode(200)
+            .body("data.comments.size()", equalTo(1))
+            .body("data.comments[0].id", equalTo(visible.id!!.toInt()))
+            .body("data.totalElements", equalTo(1))
+            .body("data.hasNext", equalTo(false))
+    }
+
+    @Test
+    @DisplayName("댓글 목록 조회 - 나를 차단한 회원의 댓글에 단 내 답글도 함께 숨겨진다")
+    fun `getComments - 나를 차단한 회원의 댓글에 단 내 답글도 함께 숨겨진다`() {
+        val viewer = saveBlockTestMember("dmownviewer")
+        val blocker = saveBlockTestMember("dmownblocker")
+        val dailyMessage = dailyMessageJpaRepository.save(
+            DailyMessageJpaEntity(title = "오늘의 덕담", content = "좋은 하루!", date = LocalDate.now())
+        )
+        val parent = dailyMessageCommentJpaRepository.save(
+            DailyMessageCommentJpaEntity(content = "차단자 댓글", dailyMessage = dailyMessage, member = blocker)
+        )
+        saveReply(parent, viewer, "내 답글")
+        memberBlockJpaRepository.save(MemberBlockJpaEntity(blocker = blocker, blocked = viewer))
+
+        RestAssured.given()
+            .headers(createAuthHeaders(viewer.id))
+            .`when`()
+            .get("/api/v1/daily-messages/{dailyMessageId}/comments", dailyMessage.id)
+            .then()
+            .statusCode(200)
+            .body("data.comments.size()", equalTo(0))
+    }
+
+    private fun saveReply(parent: DailyMessageCommentJpaEntity, member: MemberJpaEntity, content: String) {
+        dailyMessageCommentJpaRepository.save(
+            DailyMessageCommentJpaEntity(
+                content = content,
+                dailyMessage = parent.dailyMessage,
+                member = member,
+                parentComment = parent
+            )
+        )
+    }
+
+    private fun saveBlockTestMember(name: String): MemberJpaEntity =
+        createAndSaveMember(memberId = name, email = "$name@example.com", socialId = "social-$name")
 
     @Test
     @DisplayName("답글에 답글을 작성할 수 없다")

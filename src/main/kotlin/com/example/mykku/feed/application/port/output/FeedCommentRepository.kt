@@ -10,11 +10,15 @@ interface FeedCommentRepository {
     fun save(feedComment: FeedComment, feedId: FeedId, memberId: Long): FeedComment
     fun findById(id: FeedCommentId): FeedComment?
     fun findByIdOrThrow(id: FeedCommentId): FeedComment
-    fun findByFeedIdAndParentCommentIsNull(feedId: FeedId, pageable: Pageable): Page<FeedComment>
-    fun findFirstCommentsByFeedIds(feedIds: List<FeedId>): Map<Long, FeedComment>
+    fun findByFeedIdAndParentCommentIsNull(
+        feedId: FeedId,
+        excludedMemberIds: Set<Long>,
+        pageable: Pageable
+    ): Page<FeedComment>
+    fun findFirstCommentsByFeedIds(feedIds: List<FeedId>, excludedMemberIds: Set<Long>): Map<Long, FeedComment>
     fun findByParentCommentIds(parentCommentIds: List<FeedCommentId>): List<FeedComment>
-    fun countByFeedId(feedId: FeedId): Long
-    fun countByFeedIdIn(feedIds: List<FeedId>): Map<Long, Int>
+    fun countByFeedId(feedId: FeedId, excludedMemberIds: Set<Long>): Long
+    fun countByFeedIdIn(feedIds: List<FeedId>, excludedMemberIds: Set<Long>): Map<Long, Int>
     fun findIdsByFeedId(feedId: FeedId): List<Long>
     fun delete(feedComment: FeedComment)
     fun deleteAllByFeedId(feedId: FeedId)

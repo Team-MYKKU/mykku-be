@@ -504,7 +504,10 @@ class FeedDocumentTest : BaseDocumentTest() {
                                 ),
                             fieldWithPath("data.likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
                             fieldWithPath("data.commentCount").type(JsonFieldType.NUMBER)
-                                .description("댓글 수 (대댓글과 탈퇴한 회원의 댓글도 포함)"),
+                                .description(
+                                    "댓글 수 (대댓글과 탈퇴한 회원의 댓글도 포함. 로그인 요청이면 내가 차단했거나 " +
+                                        "나를 차단한 회원의 댓글·답글과 그 댓글에 달린 답글은 빼고 셈)"
+                                ),
                             fieldWithPath("data.isLiked").type(JsonFieldType.BOOLEAN)
                                 .description("로그인 회원의 좋아요 여부 (비로그인이거나 토큰이 유효하지 않으면 false)"),
                             fieldWithPath("data.createdAt").type(JsonFieldType.STRING)
@@ -753,7 +756,10 @@ class FeedDocumentTest : BaseDocumentTest() {
                                 ),
                             fieldWithPath("data.likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
                             fieldWithPath("data.commentCount").type(JsonFieldType.NUMBER)
-                                .description("댓글 수 (대댓글과 탈퇴한 회원의 댓글도 포함)"),
+                                .description(
+                                    "댓글 수 (대댓글과 탈퇴한 회원의 댓글도 포함. 요청한 회원이 차단했거나 " +
+                                        "요청한 회원을 차단한 회원의 댓글·답글과 그 댓글에 달린 답글은 빼고 셈)"
+                                ),
                             fieldWithPath("data.isLiked").type(JsonFieldType.BOOLEAN)
                                 .description("요청한 회원의 좋아요 여부"),
                             fieldWithPath("data.createdAt").type(JsonFieldType.STRING)
