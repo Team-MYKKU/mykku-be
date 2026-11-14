@@ -215,7 +215,7 @@ class FeedCommentRepositoryAdapterTest : BaseRepositoryTest() {
             }
 
             val pageable = PageRequest.of(0, 10)
-            val result = feedCommentRepository.findByFeedIdAndParentCommentIsNull(feedId, pageable)
+            val result = feedCommentRepository.findByFeedIdAndParentCommentIsNull(feedId, emptySet(), pageable)
 
             assertThat(result.content).hasSize(5)
             assertThat(result.totalElements).isEqualTo(5)
@@ -241,7 +241,7 @@ class FeedCommentRepositoryAdapterTest : BaseRepositoryTest() {
             feedCommentRepository.save(replyComment, feedId, member.id)
 
             val pageable = PageRequest.of(0, 10)
-            val result = feedCommentRepository.findByFeedIdAndParentCommentIsNull(feedId, pageable)
+            val result = feedCommentRepository.findByFeedIdAndParentCommentIsNull(feedId, emptySet(), pageable)
 
             assertThat(result.content).hasSize(1)
             assertThat(result.content[0].parentCommentId).isNull()
@@ -253,7 +253,11 @@ class FeedCommentRepositoryAdapterTest : BaseRepositoryTest() {
             val nonExistentFeedId = FeedId.of(99999L)
             val pageable = PageRequest.of(0, 10)
 
-            val result = feedCommentRepository.findByFeedIdAndParentCommentIsNull(nonExistentFeedId, pageable)
+            val result = feedCommentRepository.findByFeedIdAndParentCommentIsNull(
+                nonExistentFeedId,
+                emptySet(),
+                pageable
+            )
 
             assertThat(result.content).isEmpty()
         }
@@ -271,8 +275,16 @@ class FeedCommentRepositoryAdapterTest : BaseRepositoryTest() {
                 feedCommentRepository.save(comment, feedId, member.id)
             }
 
-            val firstPage = feedCommentRepository.findByFeedIdAndParentCommentIsNull(feedId, PageRequest.of(0, 10))
-            val secondPage = feedCommentRepository.findByFeedIdAndParentCommentIsNull(feedId, PageRequest.of(1, 10))
+            val firstPage = feedCommentRepository.findByFeedIdAndParentCommentIsNull(
+                feedId,
+                emptySet(),
+                PageRequest.of(0, 10)
+            )
+            val secondPage = feedCommentRepository.findByFeedIdAndParentCommentIsNull(
+                feedId,
+                emptySet(),
+                PageRequest.of(1, 10)
+            )
 
             assertThat(firstPage.content).hasSize(10)
             assertThat(secondPage.content).hasSize(5)
@@ -344,7 +356,7 @@ class FeedCommentRepositoryAdapterTest : BaseRepositoryTest() {
                 )
             }
 
-            val count = feedCommentRepository.countByFeedId(feedId)
+            val count = feedCommentRepository.countByFeedId(feedId, emptySet())
 
             assertThat(count).isEqualTo(5)
         }
@@ -369,7 +381,7 @@ class FeedCommentRepositoryAdapterTest : BaseRepositoryTest() {
                 member.id
             )
 
-            val count = feedCommentRepository.countByFeedId(feedId)
+            val count = feedCommentRepository.countByFeedId(feedId, emptySet())
 
             assertThat(count).isEqualTo(3)
         }
@@ -379,7 +391,7 @@ class FeedCommentRepositoryAdapterTest : BaseRepositoryTest() {
         fun `댓글 수 조회 - 댓글 없음`() {
             val feedId = FeedId.of(feed.id!!)
 
-            val count = feedCommentRepository.countByFeedId(feedId)
+            val count = feedCommentRepository.countByFeedId(feedId, emptySet())
 
             assertThat(count).isEqualTo(0)
         }
@@ -389,7 +401,7 @@ class FeedCommentRepositoryAdapterTest : BaseRepositoryTest() {
         fun `댓글 수 조회 - 존재하지 않는 피드`() {
             val nonExistentFeedId = FeedId.of(99999L)
 
-            val count = feedCommentRepository.countByFeedId(nonExistentFeedId)
+            val count = feedCommentRepository.countByFeedId(nonExistentFeedId, emptySet())
 
             assertThat(count).isEqualTo(0)
         }
@@ -410,7 +422,7 @@ class FeedCommentRepositoryAdapterTest : BaseRepositoryTest() {
             saveComments(feedId1, 3)
             saveComments(feedId2, 1)
 
-            val counts = feedCommentRepository.countByFeedIdIn(listOf(feedId1, feedId2, feedId3))
+            val counts = feedCommentRepository.countByFeedIdIn(listOf(feedId1, feedId2, feedId3), emptySet())
 
             assertThat(counts).containsEntry(feed.id!!, 3)
             assertThat(counts).containsEntry(feed2.id!!, 1)
@@ -424,7 +436,8 @@ class FeedCommentRepositoryAdapterTest : BaseRepositoryTest() {
             saveComments(feedId1, 2)
 
             val counts = feedCommentRepository.countByFeedIdIn(
-                listOf(feedId1, FeedId.of(feedWithoutComment.id!!))
+                listOf(feedId1, FeedId.of(feedWithoutComment.id!!)),
+                emptySet()
             )
 
             assertThat(counts).hasSize(1)
@@ -465,7 +478,7 @@ class FeedCommentRepositoryAdapterTest : BaseRepositoryTest() {
             )
             saveComments(feedId2, 1)
 
-            val counts = feedCommentRepository.countByFeedIdIn(listOf(feedId1, feedId2))
+            val counts = feedCommentRepository.countByFeedIdIn(listOf(feedId1, feedId2), emptySet())
 
             assertThat(counts).containsEntry(feed.id!!, 3)
             assertThat(counts).containsEntry(feed2.id!!, 1)
@@ -479,7 +492,7 @@ class FeedCommentRepositoryAdapterTest : BaseRepositoryTest() {
             saveComments(feedId1, 1)
             saveComments(FeedId.of(otherFeed.id!!), 2)
 
-            val counts = feedCommentRepository.countByFeedIdIn(listOf(feedId1))
+            val counts = feedCommentRepository.countByFeedIdIn(listOf(feedId1), emptySet())
 
             assertThat(counts).hasSize(1)
             assertThat(counts).containsEntry(feed.id!!, 1)
@@ -489,7 +502,7 @@ class FeedCommentRepositoryAdapterTest : BaseRepositoryTest() {
         @Test
         @DisplayName("빈 피드 ID 목록으로 조회하면 빈 맵을 반환한다")
         fun `댓글 수 일괄 조회 - 빈 목록`() {
-            val counts = feedCommentRepository.countByFeedIdIn(emptyList())
+            val counts = feedCommentRepository.countByFeedIdIn(emptyList(), emptySet())
 
             assertThat(counts).isEmpty()
         }
@@ -589,7 +602,7 @@ class FeedCommentRepositoryAdapterTest : BaseRepositoryTest() {
 
             feedCommentRepository.deleteAllByFeedId(feedId)
 
-            val count = feedCommentRepository.countByFeedId(feedId)
+            val count = feedCommentRepository.countByFeedId(feedId, emptySet())
             assertThat(count).isEqualTo(0)
         }
 
@@ -610,7 +623,7 @@ class FeedCommentRepositoryAdapterTest : BaseRepositoryTest() {
 
             feedCommentRepository.deleteAllByFeedId(feedId)
 
-            val count = feedCommentRepository.countByFeedId(feedId)
+            val count = feedCommentRepository.countByFeedId(feedId, emptySet())
             assertThat(count).isEqualTo(0)
         }
 
@@ -648,8 +661,8 @@ class FeedCommentRepositoryAdapterTest : BaseRepositoryTest() {
 
             feedCommentRepository.deleteAllByFeedId(feedId1)
 
-            assertThat(feedCommentRepository.countByFeedId(feedId1)).isEqualTo(0)
-            assertThat(feedCommentRepository.countByFeedId(feedId2)).isEqualTo(1)
+            assertThat(feedCommentRepository.countByFeedId(feedId1, emptySet())).isEqualTo(0)
+            assertThat(feedCommentRepository.countByFeedId(feedId2, emptySet())).isEqualTo(1)
         }
     }
 
@@ -665,6 +678,7 @@ class FeedCommentRepositoryAdapterTest : BaseRepositoryTest() {
 
             val page = feedCommentRepository.findByFeedIdAndParentCommentIsNull(
                 FeedId.of(feed.id!!),
+                emptySet(),
                 PageRequest.of(0, 20)
             )
 
@@ -695,10 +709,121 @@ class FeedCommentRepositoryAdapterTest : BaseRepositoryTest() {
             feedCommentJpaRepository.save(FeedCommentJpaEntity(content = "탈퇴자 첫 댓글", feed = feed, member = null))
             feedCommentJpaRepository.save(FeedCommentJpaEntity(content = "두번째 댓글", feed = feed, member = member))
 
-            val firstComments = feedCommentRepository.findFirstCommentsByFeedIds(listOf(FeedId.of(feed.id!!)))
+            val firstComments = feedCommentRepository.findFirstCommentsByFeedIds(
+                listOf(FeedId.of(feed.id!!)),
+                emptySet()
+            )
 
             assertThat(firstComments[feed.id!!]?.content).isEqualTo("탈퇴자 첫 댓글")
             assertThat(firstComments[feed.id!!]?.memberId).isNull()
+        }
+    }
+
+    @Nested
+    @DisplayName("제외할 회원이 있는 댓글 조회와 개수")
+    inner class ExcludedMembers {
+
+        @Test
+        @DisplayName("최상위 댓글 페이지는 제외할 회원의 댓글을 빼고 자르며 탈퇴 회원 댓글은 남긴다")
+        fun `findByFeedIdAndParentCommentIsNull - 제외할 회원 댓글을 빼고 페이지를 자른다`() {
+            val excluded = createAndSaveMember(memberId = "fcpg-excl", email = "fcpg@example.com", socialId = "fcpg")
+            feedCommentJpaRepository.save(FeedCommentJpaEntity(content = "탈퇴자 댓글", feed = feed, member = null))
+            feedCommentJpaRepository.save(FeedCommentJpaEntity(content = "회원 댓글", feed = feed, member = member))
+            feedCommentJpaRepository.save(FeedCommentJpaEntity(content = "제외 댓글", feed = feed, member = excluded))
+
+            val page = feedCommentRepository.findByFeedIdAndParentCommentIsNull(
+                FeedId.of(feed.id!!),
+                setOf(excluded.id),
+                PageRequest.of(0, 20)
+            )
+
+            assertThat(page.content.map { it.content }).containsExactlyInAnyOrder("탈퇴자 댓글", "회원 댓글")
+            assertThat(page.totalElements).isEqualTo(2)
+        }
+
+        @Test
+        @DisplayName("댓글 수는 제외할 회원의 댓글·답글과 그 댓글에 달린 답글을 빼고 센다")
+        fun `countByFeedId - 제외할 회원의 댓글과 그 답글을 빼고 센다`() {
+            val excluded = createAndSaveMember(memberId = "fccnt-excl1", email = "fc1@example.com", socialId = "fccnt1")
+            saveMixedComments(excluded)
+
+            val count = feedCommentRepository.countByFeedId(FeedId.of(feed.id!!), setOf(excluded.id))
+
+            assertThat(count).isEqualTo(3)
+        }
+
+        @Test
+        @DisplayName("피드별 댓글 수도 제외할 회원의 댓글·답글과 그 댓글에 달린 답글을 빼고 센다")
+        fun `countByFeedIdIn - 제외할 회원의 댓글과 그 답글을 빼고 센다`() {
+            val excluded = createAndSaveMember(memberId = "fccnt-excl2", email = "fc2@example.com", socialId = "fccnt2")
+            saveMixedComments(excluded)
+
+            val counts = feedCommentRepository.countByFeedIdIn(listOf(FeedId.of(feed.id!!)), setOf(excluded.id))
+
+            assertThat(counts).containsEntry(feed.id!!, 3)
+        }
+
+        private fun saveMixedComments(excluded: MemberJpaEntity) {
+            val excludedTop = saveComment(excluded, null)
+            saveComment(member, excludedTop)
+            val memberTop = saveComment(member, null)
+            saveComment(excluded, memberTop)
+            val withdrawnTop = saveComment(null, null)
+            saveComment(member, withdrawnTop)
+        }
+
+        private fun saveComment(author: MemberJpaEntity?, parent: FeedCommentJpaEntity?): FeedCommentJpaEntity =
+            feedCommentJpaRepository.save(
+                FeedCommentJpaEntity(content = "댓글", feed = feed, member = author, parentComment = parent)
+            )
+    }
+
+    @Nested
+    @DisplayName("첫 댓글 미리보기에서 제외할 회원")
+    inner class ExcludedFirstCommentAuthor {
+
+        @Test
+        @DisplayName("제외할 회원의 첫 댓글은 건너뛰고 다음 최상위 댓글을 반환한다")
+        fun `findFirstCommentsByFeedIds - 제외할 회원의 댓글은 건너뛴다`() {
+            val excluded = createAndSaveMember(memberId = "fcpv-excl1", email = "fcpv1@example.com", socialId = "fcpv1")
+            feedCommentJpaRepository.save(FeedCommentJpaEntity(content = "제외 회원 댓글", feed = feed, member = excluded))
+            feedCommentJpaRepository.save(FeedCommentJpaEntity(content = "두번째 댓글", feed = feed, member = member))
+
+            val firstComments = feedCommentRepository.findFirstCommentsByFeedIds(
+                listOf(FeedId.of(feed.id!!)),
+                setOf(excluded.id)
+            )
+
+            assertThat(firstComments[feed.id!!]?.content).isEqualTo("두번째 댓글")
+        }
+
+        @Test
+        @DisplayName("제외할 회원이 있어도 탈퇴 회원의 첫 댓글은 반환한다")
+        fun `findFirstCommentsByFeedIds - 제외 목록이 있어도 탈퇴 회원 댓글은 유지된다`() {
+            val excluded = createAndSaveMember(memberId = "fcpv-excl2", email = "fcpv2@example.com", socialId = "fcpv2")
+            feedCommentJpaRepository.save(FeedCommentJpaEntity(content = "탈퇴자 첫 댓글", feed = feed, member = null))
+            feedCommentJpaRepository.save(FeedCommentJpaEntity(content = "제외 회원 댓글", feed = feed, member = excluded))
+
+            val firstComments = feedCommentRepository.findFirstCommentsByFeedIds(
+                listOf(FeedId.of(feed.id!!)),
+                setOf(excluded.id)
+            )
+
+            assertThat(firstComments[feed.id!!]?.content).isEqualTo("탈퇴자 첫 댓글")
+        }
+
+        @Test
+        @DisplayName("보이는 최상위 댓글이 없는 피드는 결과에 포함되지 않는다")
+        fun `findFirstCommentsByFeedIds - 제외할 회원의 댓글만 있으면 결과에 없다`() {
+            val excluded = createAndSaveMember(memberId = "fcpv-excl3", email = "fcpv3@example.com", socialId = "fcpv3")
+            feedCommentJpaRepository.save(FeedCommentJpaEntity(content = "제외 회원 댓글", feed = feed, member = excluded))
+
+            val firstComments = feedCommentRepository.findFirstCommentsByFeedIds(
+                listOf(FeedId.of(feed.id!!)),
+                setOf(excluded.id)
+            )
+
+            assertThat(firstComments).doesNotContainKey(feed.id!!)
         }
     }
 }

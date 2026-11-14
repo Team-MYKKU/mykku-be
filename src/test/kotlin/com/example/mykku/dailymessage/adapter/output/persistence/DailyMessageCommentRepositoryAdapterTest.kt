@@ -1,6 +1,9 @@
 package com.example.mykku.dailymessage.adapter.output.persistence
 
 import com.example.mykku.BaseRepositoryTest
+import com.example.mykku.dailymessage.adapter.output.persistence.entity.DailyMessageCommentJpaEntity
+import com.example.mykku.dailymessage.adapter.output.persistence.repository.DailyMessageCommentJpaRepository
+import com.example.mykku.dailymessage.adapter.output.persistence.repository.DailyMessageJpaRepository
 import com.example.mykku.dailymessage.application.port.output.DailyMessageCommentRepository
 import com.example.mykku.dailymessage.application.port.output.DailyMessageRepository
 import com.example.mykku.dailymessage.domain.entity.DailyMessage
@@ -25,6 +28,12 @@ class DailyMessageCommentRepositoryAdapterTest : BaseRepositoryTest() {
 
     @Autowired
     private lateinit var dailyMessageRepository: DailyMessageRepository
+
+    @Autowired
+    private lateinit var dailyMessageJpaRepository: DailyMessageJpaRepository
+
+    @Autowired
+    private lateinit var dailyMessageCommentJpaRepository: DailyMessageCommentJpaRepository
 
     private lateinit var savedDailyMessage: DailyMessage
     private lateinit var savedMember: com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
@@ -171,6 +180,7 @@ class DailyMessageCommentRepositoryAdapterTest : BaseRepositoryTest() {
             val pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt"))
             val result = dailyMessageCommentRepository.findByDailyMessageIdAndParentCommentIsNull(
                 dailyMessageId = DailyMessageId(savedDailyMessage.id.value),
+                excludedMemberIds = emptySet(),
                 pageable = pageable
             )
 
@@ -188,6 +198,7 @@ class DailyMessageCommentRepositoryAdapterTest : BaseRepositoryTest() {
             val pageable = PageRequest.of(0, 2, Sort.by(Sort.Direction.DESC, "createdAt"))
             val result = dailyMessageCommentRepository.findByDailyMessageIdAndParentCommentIsNull(
                 dailyMessageId = DailyMessageId(savedDailyMessage.id.value),
+                excludedMemberIds = emptySet(),
                 pageable = pageable
             )
 
@@ -219,6 +230,7 @@ class DailyMessageCommentRepositoryAdapterTest : BaseRepositoryTest() {
             val pageable = PageRequest.of(0, 10)
             val result = dailyMessageCommentRepository.findByDailyMessageIdAndParentCommentIsNull(
                 dailyMessageId = DailyMessageId(savedDailyMessage.id.value),
+                excludedMemberIds = emptySet(),
                 pageable = pageable
             )
 
@@ -232,6 +244,7 @@ class DailyMessageCommentRepositoryAdapterTest : BaseRepositoryTest() {
             val pageable = PageRequest.of(0, 10)
             val result = dailyMessageCommentRepository.findByDailyMessageIdAndParentCommentIsNull(
                 dailyMessageId = DailyMessageId(savedDailyMessage.id.value),
+                excludedMemberIds = emptySet(),
                 pageable = pageable
             )
 
@@ -340,6 +353,34 @@ class DailyMessageCommentRepositoryAdapterTest : BaseRepositoryTest() {
             val foundReply = dailyMessageCommentRepository.findById(reply.id)
             assertThat(foundParent).isNull()
             assertThat(foundReply).isNotNull
+        }
+    }
+
+    @Nested
+    @DisplayName("제외할 회원이 있는 최상위 댓글 조회")
+    inner class FindExcludingMembers {
+
+        @Test
+        @DisplayName("제외할 회원의 댓글을 빼고 페이지를 자르며 탈퇴 회원 댓글은 남긴다")
+        fun `조회 - 제외할 회원 댓글을 빼고 페이지를 자른다`() {
+            val excluded = createAndSaveMember(memberId = "dmpg-excl", email = "dmpg@example.com", socialId = "dmpg")
+            val dailyMessage = dailyMessageJpaRepository.findById(savedDailyMessage.id.value).get()
+            dailyMessageCommentRepository.save(createComment(content = "회원 댓글"))
+            dailyMessageCommentJpaRepository.save(
+                DailyMessageCommentJpaEntity(content = "탈퇴자 댓글", dailyMessage = dailyMessage, member = null)
+            )
+            dailyMessageCommentRepository.save(
+                DailyMessageComment.create(savedDailyMessage.id.value, excluded.id, "제외 회원 댓글")
+            )
+
+            val result = dailyMessageCommentRepository.findByDailyMessageIdAndParentCommentIsNull(
+                dailyMessageId = DailyMessageId(savedDailyMessage.id.value),
+                excludedMemberIds = setOf(excluded.id),
+                pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt"))
+            )
+
+            assertThat(result.content.map { it.content }).containsExactlyInAnyOrder("회원 댓글", "탈퇴자 댓글")
+            assertThat(result.totalElements).isEqualTo(2)
         }
     }
 

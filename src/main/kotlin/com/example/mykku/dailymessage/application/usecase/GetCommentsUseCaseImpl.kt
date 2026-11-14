@@ -1,5 +1,6 @@
 package com.example.mykku.dailymessage.application.usecase
 
+import com.example.mykku.block.application.port.input.BlockFilterUseCase
 import com.example.mykku.comment.application.dto.CommentPageResult
 import com.example.mykku.dailymessage.application.port.input.GetCommentsUseCase
 import com.example.mykku.dailymessage.application.port.output.DailyMessageCommentRepository
@@ -15,7 +16,8 @@ import org.springframework.transaction.annotation.Transactional
 class GetCommentsUseCaseImpl(
     private val dailyMessageRepository: DailyMessageRepository,
     private val dailyMessageCommentRepository: DailyMessageCommentRepository,
-    private val dailyMessageCommentResultReader: DailyMessageCommentResultReader
+    private val dailyMessageCommentResultReader: DailyMessageCommentResultReader,
+    private val blockFilterUseCase: BlockFilterUseCase
 ) : GetCommentsUseCase {
 
     override fun execute(dailyMessageId: Long, memberId: Long?, pageable: Pageable): CommentPageResult {
@@ -23,7 +25,10 @@ class GetCommentsUseCaseImpl(
         dailyMessageRepository.findById(id)
             ?: throw DailyMessageException.dailyMessageNotFound()
 
-        val page = dailyMessageCommentRepository.findByDailyMessageIdAndParentCommentIsNull(id, pageable)
-        return CommentPageResult.of(page, dailyMessageCommentResultReader.readAll(page.content, memberId))
+        val hiddenMemberIds = blockFilterUseCase.getHiddenMemberIds(memberId)
+        val page = dailyMessageCommentRepository
+            .findByDailyMessageIdAndParentCommentIsNull(id, hiddenMemberIds, pageable)
+        val comments = dailyMessageCommentResultReader.readAll(page.content, memberId, hiddenMemberIds)
+        return CommentPageResult.of(page, comments)
     }
 }

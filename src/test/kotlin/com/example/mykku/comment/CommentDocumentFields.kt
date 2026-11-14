@@ -55,12 +55,16 @@ object CommentDocumentFields {
         fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),
         fieldWithPath("data").type(JsonFieldType.OBJECT).description("댓글 목록 응답 데이터"),
         fieldWithPath("data.comments").type(JsonFieldType.ARRAY).description("최상위 댓글 목록 (작성 일시 최신순)"),
-        fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER).description("전체 최상위 댓글 수 (답글 제외)"),
+        fieldWithPath("data.totalElements").type(JsonFieldType.NUMBER)
+            .description("전체 최상위 댓글 수 (답글 제외. 로그인 요청이면 차단 관계 회원의 댓글 제외)"),
         fieldWithPath("data.totalPages").type(JsonFieldType.NUMBER).description("최상위 댓글 기준 전체 페이지 수"),
         fieldWithPath("data.currentPage").type(JsonFieldType.NUMBER).description("현재 페이지 번호 (0부터 시작)"),
         fieldWithPath("data.pageSize").type(JsonFieldType.NUMBER).description("페이지 크기"),
         fieldWithPath("data.hasNext").type(JsonFieldType.BOOLEAN).description("다음 페이지(최상위 댓글 기준) 존재 여부")
-    ) + commentFields("data.comments[]", "답글 목록 (페이지네이션 없이 전부 포함, 오래된 순)")
+    ) + commentFields(
+        "data.comments[]",
+        "답글 목록 (페이지네이션 없이 오래된 순. 로그인 요청이면 내가 차단했거나 나를 차단한 회원의 답글 제외)"
+    )
 
     fun singleFields(dataDescription: String, repliesDescription: String): Array<FieldDescriptor> = arrayOf(
         fieldWithPath("message").type(JsonFieldType.STRING).description("응답 메시지"),

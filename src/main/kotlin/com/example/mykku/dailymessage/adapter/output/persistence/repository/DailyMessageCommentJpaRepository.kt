@@ -24,6 +24,20 @@ interface DailyMessageCommentJpaRepository : JpaRepository<DailyMessageCommentJp
     ): Page<DailyMessageCommentJpaEntity>
 
     @Query(
+        value = "SELECT c FROM DailyMessageCommentJpaEntity c LEFT JOIN FETCH c.member " +
+            "WHERE c.dailyMessage.id = :dailyMessageId AND c.parentComment IS NULL " +
+            "AND (c.member IS NULL OR c.member.id NOT IN :excludedMemberIds)",
+        countQuery = "SELECT COUNT(c) FROM DailyMessageCommentJpaEntity c " +
+            "WHERE c.dailyMessage.id = :dailyMessageId AND c.parentComment IS NULL " +
+            "AND (c.member IS NULL OR c.member.id NOT IN :excludedMemberIds)"
+    )
+    fun findTopLevelExcludingMembers(
+        @Param("dailyMessageId") dailyMessageId: Long,
+        @Param("excludedMemberIds") excludedMemberIds: Collection<Long>,
+        pageable: Pageable
+    ): Page<DailyMessageCommentJpaEntity>
+
+    @Query(
         "SELECT c FROM DailyMessageCommentJpaEntity c LEFT JOIN FETCH c.member " +
             "WHERE c.parentComment.id IN :parentCommentIds ORDER BY c.parentComment.id, c.createdAt ASC, c.id ASC"
     )

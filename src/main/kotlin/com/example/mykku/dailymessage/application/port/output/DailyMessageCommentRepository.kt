@@ -10,7 +10,11 @@ interface DailyMessageCommentRepository {
     fun save(comment: DailyMessageComment): DailyMessageComment
     fun findById(id: DailyMessageCommentId): DailyMessageComment?
     fun findByIdAndDailyMessageId(commentId: DailyMessageCommentId, dailyMessageId: DailyMessageId): DailyMessageComment?
-    fun findByDailyMessageIdAndParentCommentIsNull(dailyMessageId: DailyMessageId, pageable: Pageable): Page<DailyMessageComment>
+    fun findByDailyMessageIdAndParentCommentIsNull(
+        dailyMessageId: DailyMessageId,
+        excludedMemberIds: Set<Long>,
+        pageable: Pageable
+    ): Page<DailyMessageComment>
     fun findByParentCommentIds(parentCommentIds: List<Long>): List<DailyMessageComment>
     fun delete(comment: DailyMessageComment)
     fun deleteAllByIds(ids: List<Long>)

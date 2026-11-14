@@ -255,7 +255,8 @@ class FeedCommentDocumentTest : BaseDocumentTest() {
                     response().responseBodyField(
                         *CommentDocumentFields.singleFields(
                             "수정된 댓글 또는 답글 정보 (피드 댓글 목록 아이템과 같은 형식)",
-                            "현재 답글 목록 (최상위 댓글 수정 시 모든 답글이 오래된 순으로, 답글 수정 시 빈 배열)"
+                            "현재 답글 목록 (최상위 댓글 수정 시 차단 관계 회원의 답글을 뺀 모든 답글이 오래된 순으로, " +
+                                "답글 수정 시 빈 배열)"
                         )
                     )
                 )

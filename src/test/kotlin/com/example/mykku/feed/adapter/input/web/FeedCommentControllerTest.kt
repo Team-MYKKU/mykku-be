@@ -1,6 +1,8 @@
 package com.example.mykku.feed.adapter.input.web
 
 import com.example.mykku.BaseControllerTest
+import com.example.mykku.block.adapter.output.persistence.entity.MemberBlockJpaEntity
+import com.example.mykku.block.adapter.output.persistence.repository.MemberBlockJpaRepository
 import com.example.mykku.board.adapter.output.persistence.entity.BoardJpaEntity
 import com.example.mykku.feed.adapter.input.web.dto.CreateFeedCommentRequest
 import com.example.mykku.feed.adapter.input.web.dto.UpdateFeedCommentRequest
@@ -29,6 +31,9 @@ class FeedCommentControllerTest : BaseControllerTest() {
 
     @Autowired
     private lateinit var feedCommentJpaRepository: FeedCommentJpaRepository
+
+    @Autowired
+    private lateinit var memberBlockJpaRepository: MemberBlockJpaRepository
 
     private val objectMapper = ObjectMapper()
 
@@ -361,6 +366,43 @@ class FeedCommentControllerTest : BaseControllerTest() {
             .body("data.replies[0].content", equalTo("기존 답글"))
             .body("data.isLiked", equalTo(false))
     }
+
+    @Test
+    @DisplayName("댓글 수정 - 응답의 답글에서 차단 관계 회원의 답글은 제외된다")
+    fun `updateComment - 응답의 답글에서 차단 관계 회원의 답글은 제외된다`() {
+        val author = saveUpdateTestMember("upauthor")
+        val blocked = saveUpdateTestMember("upblocked")
+        val replier = saveUpdateTestMember("upreplier")
+        val board = boardJpaRepository.save(BoardJpaEntity(title = "테스트 게시판", logo = "test_logo.png"))
+        val feed = feedJpaRepository.save(
+            FeedJpaEntity(title = "테스트 피드", content = "테스트 내용", member = author, board = board)
+        )
+        val comment = feedCommentJpaRepository.save(
+            FeedCommentJpaEntity(content = "원본 댓글", feed = feed, member = author)
+        )
+        feedCommentJpaRepository.save(
+            FeedCommentJpaEntity(content = "차단 답글", feed = feed, member = blocked, parentComment = comment)
+        )
+        feedCommentJpaRepository.save(
+            FeedCommentJpaEntity(content = "보이는 답글", feed = feed, member = replier, parentComment = comment)
+        )
+        memberBlockJpaRepository.save(MemberBlockJpaEntity(blocker = author, blocked = blocked))
+
+        RestAssured.given()
+            .headers(createAuthHeaders(author.id))
+            .contentType(ContentType.JSON)
+            .body(objectMapper.writeValueAsString(UpdateFeedCommentRequest(content = "수정된 댓글")))
+        .`when`()
+            .put("/api/v1/feeds/comments/{commentId}", comment.id)
+        .then()
+            .statusCode(200)
+            .body("data.replies.size()", equalTo(1))
+            .body("data.replyCount", equalTo(1))
+            .body("data.replies[0].content", equalTo("보이는 답글"))
+    }
+
+    private fun saveUpdateTestMember(name: String): MemberJpaEntity =
+        createAndSaveMember(memberId = name, email = "$name@example.com", socialId = name)
 
     @Test
     @DisplayName("댓글 수정 - 권한 없는 사용자")

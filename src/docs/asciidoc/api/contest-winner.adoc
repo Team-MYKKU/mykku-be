@@ -109,6 +109,8 @@ operation::contest-winner/my-awards/200[snippets='http-request,request-headers,q
 * *인증 필요*: 토큰이 없거나 유효하지 않으면(만료 포함) 401 `AU201` (<<overview-error-response,공통 에러>> 참고)
 * 수상한 피드를 피드 작성일(`createdAt`) 최신순으로 반환하며, 같은 피드는 한 번만 포함됩니다. 정렬 파라미터는 없습니다.
 * 수상 이력이 없으면 `feeds` 는 빈 배열입니다.
+* *첫 댓글 미리보기*: `comment` 는 내가 차단했거나 나를 차단한 회원의 댓글을 건너뛴 최상위 댓글 중 가장 먼저 작성된 댓글입니다. 남은 댓글이 없으면 `content` 는 빈 문자열(`+""+`), `profileImage` 는 `null` 입니다.
+* *댓글 수*: `commentCount` 는 대댓글을 포함한 수이며, 내가 차단했거나 나를 차단한 회원의 댓글·답글과 그 댓글에 달린 답글은 빼고 셉니다.
 * *페이징*: `page` 0 이상, `size` 1~1000. `page` 가 음수면 400 `C103`, `size` 가 범위를 벗어나면 400 `C104`, 숫자가 아니면 400 `C106` (<<overview-error-response,공통 에러>> 참고)
 * 이 API 고유의 에러 응답은 없습니다 (인증·페이징 공통 에러만 발생).
 

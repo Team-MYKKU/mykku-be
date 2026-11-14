@@ -151,18 +151,24 @@ class MemberFeedDocumentTest : BaseDocumentTest() {
                             fieldWithPath("data.feeds[].isLiked").type(JsonFieldType.BOOLEAN)
                                 .description("로그인한 회원(본인)의 좋아요 여부 (true: 좋아요 누름, false: 누르지 않음)"),
                             fieldWithPath("data.feeds[].commentCount").type(JsonFieldType.NUMBER)
-                                .description("댓글 수 (대댓글 포함 전체 댓글 수)"),
+                                .description(
+                                    "댓글 수 (대댓글 포함. 내가 차단했거나 나를 차단한 회원의 " +
+                                        "댓글·답글과 그 댓글에 달린 답글은 빼고 셈)"
+                                ),
                             fieldWithPath("data.feeds[].comment").type(JsonFieldType.OBJECT)
-                                .description("첫 댓글 미리보기. 가장 먼저 작성된 최상위 댓글(대댓글 제외) 기준이며, 댓글이 없어도 객체는 항상 존재함"),
+                                .description(
+                                    "첫 댓글 미리보기. 가장 먼저 작성된 최상위 댓글(대댓글 제외) 기준이며, " +
+                                        "내가 차단했거나 나를 차단한 회원의 댓글은 건너뜀. 댓글이 없어도 객체는 항상 존재함"
+                                ),
                             fieldWithPath("data.feeds[].comment.profileImage").type(JsonFieldType.STRING)
                                 .description(
-                                    "첫 댓글 작성자 프로필 이미지 URL (댓글이 없거나 첫 댓글 작성자가 탈퇴했으면 null, " +
+                                    "첫 댓글 작성자 프로필 이미지 URL (보여줄 댓글이 없거나 첫 댓글 작성자가 탈퇴했으면 null, " +
                                         "작성자의 프로필 이미지가 없으면 빈 문자열 \"\")"
                                 )
                                 .optional(),
                             fieldWithPath("data.feeds[].comment.content").type(JsonFieldType.STRING)
                                 .description(
-                                    "첫 댓글 내용 (댓글이 없으면 빈 문자열 \"\". " +
+                                    "첫 댓글 내용 (보여줄 댓글이 없으면 빈 문자열 \"\". " +
                                         "첫 댓글 작성자가 탈퇴해도 내용은 그대로 나감)"
                                 ),
                             fieldWithPath("data.currentPage").type(JsonFieldType.NUMBER)

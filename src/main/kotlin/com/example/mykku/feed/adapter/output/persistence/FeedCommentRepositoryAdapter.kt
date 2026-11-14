@@ -43,16 +43,32 @@ class FeedCommentRepositoryAdapter(
             .orElseThrow { FeedException.feedCommentNotFound() }
     }
 
-    override fun findByFeedIdAndParentCommentIsNull(feedId: FeedId, pageable: Pageable): Page<FeedComment> {
+    override fun findByFeedIdAndParentCommentIsNull(
+        feedId: FeedId,
+        excludedMemberIds: Set<Long>,
+        pageable: Pageable
+    ): Page<FeedComment> {
         val feed = feedJpaRepository.findById(feedId.value).orElse(null)
             ?: return Page.empty(pageable)
-        return feedCommentJpaRepository.findByFeedAndParentCommentIsNull(feed, pageable)
-            .map { it.toDomain() }
+        val page = if (excludedMemberIds.isEmpty()) {
+            feedCommentJpaRepository.findByFeedAndParentCommentIsNull(feed, pageable)
+        } else {
+            feedCommentJpaRepository.findTopLevelByFeedExcludingMembers(feed, excludedMemberIds, pageable)
+        }
+        return page.map { it.toDomain() }
     }
 
-    override fun findFirstCommentsByFeedIds(feedIds: List<FeedId>): Map<Long, FeedComment> {
+    override fun findFirstCommentsByFeedIds(
+        feedIds: List<FeedId>,
+        excludedMemberIds: Set<Long>
+    ): Map<Long, FeedComment> {
         if (feedIds.isEmpty()) return emptyMap()
-        val comments = feedCommentJpaRepository.findFirstCommentsByFeedIds(feedIds.map { it.value })
+        val ids = feedIds.map { it.value }
+        val comments = if (excludedMemberIds.isEmpty()) {
+            feedCommentJpaRepository.findFirstCommentsByFeedIds(ids)
+        } else {
+            feedCommentJpaRepository.findFirstCommentsByFeedIdsExcludingMembers(ids, excludedMemberIds)
+        }
         return comments.associate { it.feed.id!! to it.toDomain() }
     }
 
@@ -63,13 +79,20 @@ class FeedCommentRepositoryAdapter(
         return feedCommentJpaRepository.findByParentCommentIn(parentComments.toList()).map { it.toDomain() }
     }
 
-    override fun countByFeedId(feedId: FeedId): Long {
-        return feedCommentJpaRepository.countByFeedId(feedId.value)
+    override fun countByFeedId(feedId: FeedId, excludedMemberIds: Set<Long>): Long {
+        if (excludedMemberIds.isEmpty()) return feedCommentJpaRepository.countByFeedId(feedId.value)
+        return feedCommentJpaRepository.countByFeedIdExcludingMembers(feedId.value, excludedMemberIds)
     }
 
-    override fun countByFeedIdIn(feedIds: List<FeedId>): Map<Long, Int> {
+    override fun countByFeedIdIn(feedIds: List<FeedId>, excludedMemberIds: Set<Long>): Map<Long, Int> {
         if (feedIds.isEmpty()) return emptyMap()
-        return feedCommentJpaRepository.countGroupedByFeedIdIn(feedIds.map { it.value }).toCountMap()
+        val ids = feedIds.map { it.value }
+        val rows = if (excludedMemberIds.isEmpty()) {
+            feedCommentJpaRepository.countGroupedByFeedIdIn(ids)
+        } else {
+            feedCommentJpaRepository.countGroupedByFeedIdInExcludingMembers(ids, excludedMemberIds)
+        }
+        return rows.toCountMap()
     }
 
     override fun findIdsByFeedId(feedId: FeedId): List<Long> {

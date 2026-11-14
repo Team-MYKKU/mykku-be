@@ -1,8 +1,11 @@
 package com.example.mykku.feed.adapter.input.web
 
 import com.example.mykku.BaseControllerTest
+import com.example.mykku.block.adapter.output.persistence.entity.MemberBlockJpaEntity
+import com.example.mykku.block.adapter.output.persistence.repository.MemberBlockJpaRepository
 import com.example.mykku.board.adapter.output.persistence.entity.BoardJpaEntity
 import com.example.mykku.feed.adapter.input.web.dto.CreateFeedRequestDto
+import com.example.mykku.feed.adapter.input.web.dto.UpdateFeedRequestDto
 import com.example.mykku.feed.adapter.output.persistence.FeedCommentJpaRepository
 import com.example.mykku.feed.adapter.output.persistence.FeedJpaRepository
 import com.example.mykku.feed.adapter.output.persistence.entity.FeedCommentJpaEntity
@@ -29,6 +32,9 @@ class FeedControllerTest : BaseControllerTest() {
 
     @Autowired
     private lateinit var feedCommentJpaRepository: FeedCommentJpaRepository
+
+    @Autowired
+    private lateinit var memberBlockJpaRepository: MemberBlockJpaRepository
 
     @Test
     @DisplayName("피드 생성 - 정상 케이스")
@@ -281,6 +287,190 @@ class FeedControllerTest : BaseControllerTest() {
             .body("data.comments[0].author.role.name", equalTo("피드왕"))
             .body("data.comments[0].author.role.description", equalTo("피드를 많이 쓴 사람"))
     }
+
+    @Test
+    @DisplayName("피드 댓글 조회 - 내가 차단한 회원의 댓글과 답글은 제외된다")
+    fun `getComments - 내가 차단한 회원의 댓글과 답글은 제외된다`() {
+        val viewer = saveCommentMember("blockviewer", null)
+        val blocked = saveCommentMember("blockedauthor", null)
+        val feed = saveFeed(viewer)
+        val visibleComment = feedCommentJpaRepository.save(
+            FeedCommentJpaEntity(content = "보이는 댓글", feed = feed, member = viewer)
+        )
+        feedCommentJpaRepository.save(
+            FeedCommentJpaEntity(
+                content = "차단 답글",
+                feed = feed,
+                member = blocked,
+                parentComment = visibleComment
+            )
+        )
+        feedCommentJpaRepository.save(FeedCommentJpaEntity(content = "차단 댓글", feed = feed, member = blocked))
+        memberBlockJpaRepository.save(MemberBlockJpaEntity(blocker = viewer, blocked = blocked))
+
+        RestAssured.given()
+            .headers(createAuthHeaders(viewer.id))
+            .`when`()
+            .get("/api/v1/feeds/{feedId}/comments", feed.id)
+            .then()
+            .statusCode(200)
+            .body("data.comments.size()", equalTo(1))
+            .body("data.comments[0].id", equalTo(visibleComment.id!!.toInt()))
+            .body("data.comments[0].replies.size()", equalTo(0))
+            .body("data.comments[0].replyCount", equalTo(0))
+    }
+
+    @Test
+    @DisplayName("피드 댓글 조회 - 나를 차단한 회원의 댓글은 제외된다")
+    fun `getComments - 나를 차단한 회원의 댓글은 제외된다`() {
+        val viewer = saveCommentMember("blockedviewer", null)
+        val blocker = saveCommentMember("blockerauthor", null)
+        val feed = saveFeed(viewer)
+        val visibleComment = feedCommentJpaRepository.save(
+            FeedCommentJpaEntity(content = "보이는 댓글", feed = feed, member = viewer)
+        )
+        feedCommentJpaRepository.save(FeedCommentJpaEntity(content = "차단자 댓글", feed = feed, member = blocker))
+        memberBlockJpaRepository.save(MemberBlockJpaEntity(blocker = blocker, blocked = viewer))
+
+        RestAssured.given()
+            .headers(createAuthHeaders(viewer.id))
+            .`when`()
+            .get("/api/v1/feeds/{feedId}/comments", feed.id)
+            .then()
+            .statusCode(200)
+            .body("data.comments.size()", equalTo(1))
+            .body("data.comments[0].id", equalTo(visibleComment.id!!.toInt()))
+    }
+
+    @Test
+    @DisplayName("피드 댓글 조회 - 차단 필터는 페이지를 자르기 전에 적용된다")
+    fun `getComments - 차단 필터는 페이지를 자르기 전에 적용된다`() {
+        val viewer = saveCommentMember("pageviewer", null)
+        val blocked = saveCommentMember("pageblocked", null)
+        val feed = saveFeed(viewer)
+        val visible = feedCommentJpaRepository.save(
+            FeedCommentJpaEntity(content = "보이는 댓글", feed = feed, member = viewer)
+        )
+        feedCommentJpaRepository.save(FeedCommentJpaEntity(content = "차단 댓글 1", feed = feed, member = blocked))
+        feedCommentJpaRepository.save(FeedCommentJpaEntity(content = "차단 댓글 2", feed = feed, member = blocked))
+        memberBlockJpaRepository.save(MemberBlockJpaEntity(blocker = viewer, blocked = blocked))
+
+        RestAssured.given()
+            .headers(createAuthHeaders(viewer.id))
+            .queryParam("size", 1)
+            .`when`()
+            .get("/api/v1/feeds/{feedId}/comments", feed.id)
+            .then()
+            .statusCode(200)
+            .body("data.comments.size()", equalTo(1))
+            .body("data.comments[0].id", equalTo(visible.id!!.toInt()))
+            .body("data.totalElements", equalTo(1))
+            .body("data.hasNext", equalTo(false))
+    }
+
+    @Test
+    @DisplayName("피드 댓글 조회 - 나를 차단한 회원의 댓글에 단 내 답글도 함께 숨겨진다")
+    fun `getComments - 나를 차단한 회원의 댓글에 단 내 답글도 함께 숨겨진다`() {
+        val viewer = saveCommentMember("ownreplyviewer", null)
+        val blocker = saveCommentMember("ownreplyblocker", null)
+        val feed = saveFeed(viewer)
+        val parent = feedCommentJpaRepository.save(
+            FeedCommentJpaEntity(content = "차단자 댓글", feed = feed, member = blocker)
+        )
+        feedCommentJpaRepository.save(
+            FeedCommentJpaEntity(content = "내 답글", feed = feed, member = viewer, parentComment = parent)
+        )
+        memberBlockJpaRepository.save(MemberBlockJpaEntity(blocker = blocker, blocked = viewer))
+
+        RestAssured.given()
+            .headers(createAuthHeaders(viewer.id))
+            .`when`()
+            .get("/api/v1/feeds/{feedId}/comments", feed.id)
+            .then()
+            .statusCode(200)
+            .body("data.comments.size()", equalTo(0))
+    }
+
+    @Test
+    @DisplayName("피드 상세 조회 - 댓글 수에서 차단 관계 회원의 댓글·답글과 그 댓글의 답글은 빠진다")
+    fun `getFeedDetail - 댓글 수에서 차단 관계 회원의 댓글과 그 답글은 빠진다`() {
+        val viewer = saveCommentMember("detailviewer", null)
+        val blocked = saveCommentMember("detailblocked", null)
+        val feed = saveFeed(viewer)
+        saveMixedComments(feed, viewer, blocked)
+        memberBlockJpaRepository.save(MemberBlockJpaEntity(blocker = viewer, blocked = blocked))
+
+        RestAssured.given()
+            .headers(createAuthHeaders(viewer.id))
+            .`when`()
+            .get("/api/v1/feeds/{feedId}", feed.id)
+            .then()
+            .statusCode(200)
+            .body("data.commentCount", equalTo(3))
+    }
+
+    @Test
+    @DisplayName("피드 상세 조회 - 비로그인 요청의 댓글 수는 전체 댓글 수다")
+    fun `getFeedDetail - 비로그인 요청의 댓글 수는 전체 댓글 수다`() {
+        val viewer = saveCommentMember("anonviewer", null)
+        val blocked = saveCommentMember("anonblocked", null)
+        val feed = saveFeed(viewer)
+        saveMixedComments(feed, viewer, blocked)
+        memberBlockJpaRepository.save(MemberBlockJpaEntity(blocker = viewer, blocked = blocked))
+
+        RestAssured.given()
+            .`when`()
+            .get("/api/v1/feeds/{feedId}", feed.id)
+            .then()
+            .statusCode(200)
+            .body("data.commentCount", equalTo(6))
+    }
+
+    @Test
+    @DisplayName("피드 수정 - 응답의 댓글 수에서 차단 관계 회원의 댓글·답글과 그 댓글의 답글은 빠진다")
+    fun `updateFeed - 응답의 댓글 수에서 차단 관계 회원의 댓글과 그 답글은 빠진다`() {
+        val author = saveCommentMember("upfeedauthor", null)
+        val blocker = saveCommentMember("upfeedblocker", null)
+        val feed = saveFeed(author)
+        saveMixedComments(feed, author, blocker)
+        memberBlockJpaRepository.save(MemberBlockJpaEntity(blocker = blocker, blocked = author))
+        val request = UpdateFeedRequestDto(
+            title = "edited title",
+            content = null,
+            boardId = null,
+            tags = null,
+            deleteImageIds = null
+        )
+
+        RestAssured.given()
+            .headers(createAuthHeaders(author.id))
+            .contentType(ContentType.MULTIPART)
+            .multiPart("request", ObjectMapper().writeValueAsString(request), "application/json")
+            .`when`()
+            .patch("/api/v1/feeds/{feedId}", feed.id)
+            .then()
+            .statusCode(200)
+            .body("data.title", equalTo("edited title"))
+            .body("data.commentCount", equalTo(3))
+    }
+
+    private fun saveMixedComments(feed: FeedJpaEntity, member: MemberJpaEntity, blocked: MemberJpaEntity) {
+        val blockedTop = saveComment(feed, blocked, null)
+        saveComment(feed, member, blockedTop)
+        val memberTop = saveComment(feed, member, null)
+        saveComment(feed, blocked, memberTop)
+        val withdrawnTop = saveComment(feed, null, null)
+        saveComment(feed, member, withdrawnTop)
+    }
+
+    private fun saveComment(
+        feed: FeedJpaEntity,
+        member: MemberJpaEntity?,
+        parent: FeedCommentJpaEntity?
+    ): FeedCommentJpaEntity =
+        feedCommentJpaRepository.save(
+            FeedCommentJpaEntity(content = "댓글", feed = feed, member = member, parentComment = parent)
+        )
 
     private fun saveCommentMember(memberId: String, role: RoleJpaEntity?): MemberJpaEntity =
         memberJpaRepository.save(

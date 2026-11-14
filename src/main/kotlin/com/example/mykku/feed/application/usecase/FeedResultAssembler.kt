@@ -1,5 +1,6 @@
 package com.example.mykku.feed.application.usecase
 
+import com.example.mykku.block.application.port.input.BlockFilterUseCase
 import com.example.mykku.board.application.port.output.BoardRepository
 import com.example.mykku.board.domain.vo.BoardId
 import com.example.mykku.contest.application.port.output.ContestTagRepository
@@ -34,7 +35,8 @@ class FeedResultAssembler(
     private val memberRepository: MemberRepository,
     private val roleRepository: RoleRepository,
     private val contestTagRepository: ContestTagRepository,
-    private val likeFeedPort: LikeFeedPort
+    private val likeFeedPort: LikeFeedPort,
+    private val blockFilterUseCase: BlockFilterUseCase
 ) {
 
     fun assemble(feeds: List<Feed>, viewerId: Long?): List<FeedResult> {
@@ -48,7 +50,8 @@ class FeedResultAssembler(
         val feedIds = feeds.map { it.id!! }
         val feedIdValues = feedIds.map { it.value }
         val tagsByFeedId = feedTagRepository.findByFeedIds(feedIds).groupBy { it.feedId.value }
-        val firstComments = feedCommentRepository.findFirstCommentsByFeedIds(feedIds)
+        val hiddenMemberIds = blockFilterUseCase.getHiddenMemberIds(viewerId)
+        val firstComments = feedCommentRepository.findFirstCommentsByFeedIds(feedIds, hiddenMemberIds)
         val authors = loadMembers(feeds.mapNotNull { it.memberId })
 
         return FeedAssemblyContext(
@@ -61,7 +64,7 @@ class FeedResultAssembler(
             firstCommentByFeedId = firstComments,
             commentAuthorsById = loadMembers(firstComments.values.mapNotNull { it.memberId }),
             likeCountByFeedId = likeFeedPort.countByFeedIdIn(feedIdValues),
-            commentCountByFeedId = feedCommentRepository.countByFeedIdIn(feedIds),
+            commentCountByFeedId = feedCommentRepository.countByFeedIdIn(feedIds, hiddenMemberIds),
             likedFeedIds = loadLikedFeedIds(viewerId, feedIdValues)
         )
     }
