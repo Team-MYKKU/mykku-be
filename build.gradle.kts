@@ -67,6 +67,7 @@ allOpen {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    systemProperty("user.timezone", "Asia/Seoul")
     outputs.dir("build/generated-snippets")
     inputs.files(fileTree("mykku-be-config/templates"))
         .withPropertyName("adminTemplates")

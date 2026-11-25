@@ -7,6 +7,10 @@ spring:
   config:
     activate:
       on-profile: test
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 50MB
   thymeleaf:
     prefix: file:mykku-be-config/templates/
     suffix: .html
@@ -18,7 +22,7 @@ spring:
       add-mappings: true
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3311/mykku_test
+    url: jdbc:mysql://localhost:3311/mykku_test?serverTimezone=Asia/Seoul&sessionVariables=time_zone='%2B09:00'
     username: root
     password: root
   jpa:
