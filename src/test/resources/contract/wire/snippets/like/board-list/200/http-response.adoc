@@ -1,0 +1,45 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "message" : "즐겨찾기한 게시판 목록을 성공적으로 조회하였습니다.",
+  "data" : {
+    "content" : [ {
+      "id" : 1,
+      "title" : "자유게시판",
+      "logo" : "https://example.com/logo1.png"
+    }, {
+      "id" : 2,
+      "title" : "질문게시판",
+      "logo" : "https://example.com/logo2.png"
+    } ],
+    "empty" : false,
+    "first" : true,
+    "last" : true,
+    "number" : 0,
+    "numberOfElements" : 2,
+    "pageable" : {
+      "offset" : 0,
+      "pageNumber" : 0,
+      "pageSize" : 20,
+      "paged" : true,
+      "sort" : {
+        "empty" : false,
+        "sorted" : true,
+        "unsorted" : false
+      },
+      "unpaged" : false
+    },
+    "size" : 20,
+    "sort" : {
+      "empty" : false,
+      "sorted" : true,
+      "unsorted" : false
+    },
+    "totalElements" : 2,
+    "totalPages" : 1
+  }
+}
+----

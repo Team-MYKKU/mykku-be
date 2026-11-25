@@ -1,0 +1,57 @@
+### GET /api/error-codes/auth
+HTTP 200
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "message" : "success",
+  "data" : [ {
+    "code" : "AU201",
+    "domain" : "auth",
+    "name" : "UNAUTHORIZED",
+    "status" : 401,
+    "message" : "인증이 필요합니다"
+  }, {
+    "code" : "AU202",
+    "domain" : "auth",
+    "name" : "INVALID_TOKEN",
+    "status" : 401,
+    "message" : "유효하지 않은 토큰입니다"
+  }, {
+    "code" : "AU203",
+    "domain" : "auth",
+    "name" : "OAUTH_INVALID_TOKEN",
+    "status" : 401,
+    "message" : "유효하지 않은 토큰입니다"
+  }, {
+    "code" : "AU204",
+    "domain" : "auth",
+    "name" : "OAUTH_ACCESS_DENIED",
+    "status" : 403,
+    "message" : "OAuth 접근이 거부되었습니다"
+  }, {
+    "code" : "AU101",
+    "domain" : "auth",
+    "name" : "OAUTH_USER_INFO_FAILED",
+    "status" : 400,
+    "message" : "사용자 정보를 가져오는데 실패했습니다"
+  }, {
+    "code" : "AU102",
+    "domain" : "auth",
+    "name" : "MOBILE_LOGIN_NOT_SUPPORTED",
+    "status" : 400,
+    "message" : "EMAIL 제공자는 모바일 로그인을 지원하지 않습니다"
+  }, {
+    "code" : "AU401",
+    "domain" : "auth",
+    "name" : "OAUTH_EXTERNAL_SERVICE_ERROR",
+    "status" : 503,
+    "message" : "외부 서비스 오류가 발생했습니다"
+  }, {
+    "code" : "AU402",
+    "domain" : "auth",
+    "name" : "OAUTH_SERVER_ERROR",
+    "status" : 503,
+    "message" : "OAuth 서버에서 오류가 발생했습니다"
+  } ]
+}

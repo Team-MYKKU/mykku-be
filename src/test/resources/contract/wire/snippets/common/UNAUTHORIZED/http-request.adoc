@@ -1,0 +1,6 @@
+[source,http,options="nowrap"]
+----
+GET /api/v1/members/me HTTP/1.1
+Host: api.dev.mykku.kr
+
+----

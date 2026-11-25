@@ -1,0 +1,141 @@
+### GET /api/error-codes/contest
+HTTP 200
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "message" : "success",
+  "data" : [ {
+    "code" : "CN001",
+    "domain" : "contest",
+    "name" : "CONTEST_NOT_FOUND",
+    "status" : 404,
+    "message" : "콘테스트를 찾을 수 없습니다"
+  }, {
+    "code" : "CN002",
+    "domain" : "contest",
+    "name" : "CONTEST_WINNER_NOT_FOUND",
+    "status" : 404,
+    "message" : "콘테스트 수상자를 찾을 수 없습니다"
+  }, {
+    "code" : "CN003",
+    "domain" : "contest",
+    "name" : "PARTICIPATION_NOT_FOUND",
+    "status" : 404,
+    "message" : "콘테스트 참여 정보를 찾을 수 없습니다"
+  }, {
+    "code" : "CN004",
+    "domain" : "contest",
+    "name" : "WINNER_ANNOUNCEMENT_NOT_FOUND",
+    "status" : 404,
+    "message" : "콘테스트 수상자 발표 공지를 찾을 수 없습니다"
+  }, {
+    "code" : "CN101",
+    "domain" : "contest",
+    "name" : "CONTEST_IMAGE_LIMIT_EXCEEDED",
+    "status" : 400,
+    "message" : "콘테스트 이미지는 10개 이하여야 합니다"
+  }, {
+    "code" : "CN102",
+    "domain" : "contest",
+    "name" : "CONTEST_TAG_LIMIT_EXCEEDED",
+    "status" : 400,
+    "message" : "콘테스트 태그는 7개 이하여야 합니다"
+  }, {
+    "code" : "CN104",
+    "domain" : "contest",
+    "name" : "TAG_TITLE_TOO_LONG",
+    "status" : 400,
+    "message" : "태그는 20자 이하여야 합니다"
+  }, {
+    "code" : "CN105",
+    "domain" : "contest",
+    "name" : "TAG_INVALID_FORMAT",
+    "status" : 400,
+    "message" : "태그는 한글, 영문, 숫자만 사용할 수 있습니다"
+  }, {
+    "code" : "CN106",
+    "domain" : "contest",
+    "name" : "INVALID_WINNER_RANK",
+    "status" : 400,
+    "message" : "수상 순위는 1, 2, 3 중 하나여야 합니다"
+  }, {
+    "code" : "CN107",
+    "domain" : "contest",
+    "name" : "INVALID_WINNER_COUNT",
+    "status" : 400,
+    "message" : "수상자는 1~3명이어야 합니다"
+  }, {
+    "code" : "CN108",
+    "domain" : "contest",
+    "name" : "DUPLICATE_WINNER_RANK",
+    "status" : 400,
+    "message" : "중복된 수상 순위가 있습니다"
+  }, {
+    "code" : "CN109",
+    "domain" : "contest",
+    "name" : "PARTICIPATION_NOT_BELONG_TO_CONTEST",
+    "status" : 400,
+    "message" : "해당 참여작은 이 콘테스트에 속하지 않습니다"
+  }, {
+    "code" : "CN110",
+    "domain" : "contest",
+    "name" : "CONTEST_NOT_EXPIRED",
+    "status" : 400,
+    "message" : "종료되지 않은 콘테스트입니다"
+  }, {
+    "code" : "CN111",
+    "domain" : "contest",
+    "name" : "WINNER_NOT_ANNOUNCED",
+    "status" : 400,
+    "message" : "아직 수상자가 발표되지 않았습니다"
+  }, {
+    "code" : "CN112",
+    "domain" : "contest",
+    "name" : "INVALID_KEEP_IMAGE_URLS",
+    "status" : 400,
+    "message" : "유지할 이미지 목록에 이 콘테스트의 이미지가 아니거나 중복된 주소가 있습니다"
+  }, {
+    "code" : "CN113",
+    "domain" : "contest",
+    "name" : "CONTEST_TAG_REQUIRED",
+    "status" : 400,
+    "message" : "콘테스트 태그는 1개 이상이어야 합니다"
+  }, {
+    "code" : "CN114",
+    "domain" : "contest",
+    "name" : "DUPLICATE_WINNER_PARTICIPATION",
+    "status" : 400,
+    "message" : "같은 참여작을 중복해서 선정할 수 없습니다"
+  }, {
+    "code" : "CN115",
+    "domain" : "contest",
+    "name" : "DUPLICATE_WINNER_MEMBER",
+    "status" : 400,
+    "message" : "한 회원은 한 콘테스트에서 한 번만 수상할 수 있습니다"
+  }, {
+    "code" : "CN116",
+    "domain" : "contest",
+    "name" : "PERIOD_OR_TAGS_LOCKED_AFTER_WINNER_SELECTED",
+    "status" : 400,
+    "message" : "수상자를 선정한 뒤에는 콘테스트 기간과 태그를 바꿀 수 없습니다"
+  }, {
+    "code" : "CN117",
+    "domain" : "contest",
+    "name" : "INVALID_CONTEST_PERIOD",
+    "status" : 400,
+    "message" : "콘테스트 시작일은 종료일보다 늦을 수 없습니다"
+  }, {
+    "code" : "CN201",
+    "domain" : "contest",
+    "name" : "NOT_WINNER_OWNER",
+    "status" : 403,
+    "message" : "수상 소감을 수정할 권한이 없습니다"
+  }, {
+    "code" : "CN301",
+    "domain" : "contest",
+    "name" : "ALREADY_PARTICIPATED_WITH_FEED",
+    "status" : 409,
+    "message" : "이 피드로 이미 참여한 콘테스트입니다"
+  } ]
+}

@@ -1,0 +1,10 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "message" : "사용자 차단을 해제했습니다.",
+  "data" : { }
+}
+----

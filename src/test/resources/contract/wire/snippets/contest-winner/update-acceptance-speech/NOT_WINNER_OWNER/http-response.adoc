@@ -1,0 +1,10 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 403 Forbidden
+Content-Type: application/json
+
+{
+  "code" : "CN201",
+  "message" : "수상 소감을 수정할 권한이 없습니다"
+}
+----

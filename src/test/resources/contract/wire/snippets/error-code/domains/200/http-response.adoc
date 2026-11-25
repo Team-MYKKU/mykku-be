@@ -1,0 +1,10 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "message" : "success",
+  "data" : [ "admin", "auth", "block", "board", "common", "contest", "dailyMessage", "email", "event", "fanNote", "feed", "image", "like", "member", "notification", "preference", "report", "role" ]
+}
+----

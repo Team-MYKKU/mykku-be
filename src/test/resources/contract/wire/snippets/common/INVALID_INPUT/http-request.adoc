@@ -1,0 +1,11 @@
+[source,http,options="nowrap"]
+----
+POST /api/v1/members/check-id HTTP/1.1
+Content-Type: application/json
+Host: api.dev.mykku.kr
+Content-Length: 32
+
+{
+  "memberId" : "invalid_id!"
+}
+----

@@ -1,0 +1,17 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "message" : "참여한 이벤트 목록을 성공적으로 조회했습니다.",
+  "data" : {
+    "content" : [ ],
+    "page" : 0,
+    "size" : 20,
+    "totalElements" : 0,
+    "totalPages" : 0,
+    "isLast" : true
+  }
+}
+----

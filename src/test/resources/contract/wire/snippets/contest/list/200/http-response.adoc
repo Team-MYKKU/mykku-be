@@ -1,0 +1,41 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "message" : "공모전 목록을 성공적으로 조회했습니다.",
+  "data" : {
+    "content" : [ {
+      "id" : 1,
+      "title" : "첫 번째 공모전",
+      "subTitle" : "첫 번째 공모전 부제목",
+      "description" : "첫 번째 공모전 설명",
+      "startedAt" : "2026-09-15T00:00:00",
+      "expiredAt" : "2026-11-30T23:59:59",
+      "status" : "ACTIVE",
+      "thumbnailUrl" : "https://example.com/thumbnail1.jpg",
+      "tags" : [ "디자인", "개발" ],
+      "winnerStatus" : "PENDING",
+      "winnerRank" : null
+    }, {
+      "id" : 2,
+      "title" : "두 번째 공모전",
+      "subTitle" : null,
+      "description" : null,
+      "startedAt" : "2026-09-01T00:00:00",
+      "expiredAt" : "2026-10-31T23:59:59",
+      "status" : "ACTIVE",
+      "thumbnailUrl" : "https://example.com/thumbnail2.jpg",
+      "tags" : [ "기획" ],
+      "winnerStatus" : "PENDING",
+      "winnerRank" : null
+    } ],
+    "page" : 0,
+    "size" : 20,
+    "totalElements" : 2,
+    "totalPages" : 1,
+    "isLast" : true
+  }
+}
+----

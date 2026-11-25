@@ -1,0 +1,16 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "message" : "하루 덕담 데이터 불러오기에 성공했습니다.",
+  "data" : {
+    "id" : 1,
+    "title" : "오늘의 덕담",
+    "content" : "좋은 하루 되세요! 올 한해도 건강하시길 바랍니다.",
+    "date" : "2026-08-14",
+    "createdAt" : "2026-11-24T15:52:36.744298"
+  }
+}
+----

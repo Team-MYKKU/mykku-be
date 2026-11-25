@@ -1,0 +1,13 @@
+[source,http,options="nowrap"]
+----
+POST /api/v1/email-auth/verify-code HTTP/1.1
+Content-Type: application/json
+Host: api.dev.mykku.kr
+Content-Length: 79
+
+{
+  "email" : "user@example.com",
+  "code" : "000000",
+  "purpose" : "SIGNUP"
+}
+----

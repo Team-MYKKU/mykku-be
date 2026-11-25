@@ -1,0 +1,10 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+
+{
+  "code" : "LK104",
+  "message" : "이미 좋아요한 하루 덕담 댓글입니다"
+}
+----

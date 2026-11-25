@@ -1,0 +1,10 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 409 Conflict
+Content-Type: application/json
+
+{
+  "code" : "C302",
+  "message" : "이미 존재하는 값이거나 참조할 수 없는 값입니다"
+}
+----

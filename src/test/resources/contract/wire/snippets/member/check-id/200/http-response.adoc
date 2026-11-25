@@ -1,0 +1,13 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "message" : "아이디 중복 확인 완료",
+  "data" : {
+    "memberId" : "availableid",
+    "available" : true
+  }
+}
+----

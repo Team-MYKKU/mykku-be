@@ -1,0 +1,14 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "message" : "수상 여부를 성공적으로 조회했습니다.",
+  "data" : {
+    "isWinner" : true,
+    "winnerId" : 5,
+    "winnerRank" : 1
+  }
+}
+----

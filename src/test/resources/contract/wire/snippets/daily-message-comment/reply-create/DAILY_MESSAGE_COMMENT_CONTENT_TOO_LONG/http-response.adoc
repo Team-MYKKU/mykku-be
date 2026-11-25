@@ -1,0 +1,10 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+
+{
+  "code" : "DM102",
+  "message" : "일상 메시지 댓글은 1000자 이하여야 합니다"
+}
+----

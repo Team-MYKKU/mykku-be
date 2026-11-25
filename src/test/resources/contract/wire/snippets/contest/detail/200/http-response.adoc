@@ -1,0 +1,28 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "message" : "공모전 상세 정보를 성공적으로 조회했습니다.",
+  "data" : {
+    "id" : 1,
+    "title" : "공모전 제목",
+    "subTitle" : "공모전 부제목입니다.",
+    "description" : "공모전 상세 설명입니다.",
+    "startedAt" : "2026-09-01T00:00:00",
+    "expiredAt" : "2026-10-31T23:59:59",
+    "status" : "ACTIVE",
+    "thumbnailUrl" : "https://example.com/thumbnail.jpg",
+    "images" : [ {
+      "url" : "https://example.com/image1.jpg",
+      "orderIndex" : 0
+    }, {
+      "url" : "https://example.com/image2.jpg",
+      "orderIndex" : 1
+    } ],
+    "tags" : [ "디자인", "개발", "기획" ],
+    "createdAt" : "2026-08-25T10:00:00"
+  }
+}
+----

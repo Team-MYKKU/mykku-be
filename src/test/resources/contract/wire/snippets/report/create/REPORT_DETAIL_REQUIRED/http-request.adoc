@@ -1,0 +1,15 @@
+[source,http,options="nowrap"]
+----
+POST /api/v1/reports HTTP/1.1
+Authorization: Bearer test-access-token
+Content-Type: application/json
+Host: api.dev.mykku.kr
+Content-Length: 85
+
+{
+  "targetType" : "FEED",
+  "targetId" : 1,
+  "reason" : "ETC",
+  "detail" : "   "
+}
+----

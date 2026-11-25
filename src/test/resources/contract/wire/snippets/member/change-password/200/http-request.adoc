@@ -1,0 +1,13 @@
+[source,http,options="nowrap"]
+----
+PUT /api/v1/members/password HTTP/1.1
+Authorization: Bearer test-access-token
+Content-Type: application/json
+Host: api.dev.mykku.kr
+Content-Length: 80
+
+{
+  "currentPassword" : "oldPassword123!",
+  "newPassword" : "newPassword123!"
+}
+----

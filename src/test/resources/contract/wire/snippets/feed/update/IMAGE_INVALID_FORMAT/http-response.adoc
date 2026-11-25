@@ -1,0 +1,10 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+
+{
+  "code" : "IM103",
+  "message" : "지원하지 않는 이미지 형식입니다"
+}
+----

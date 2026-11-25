@@ -1,0 +1,10 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+
+{
+  "code" : "FD102",
+  "message" : "피드 이미지는 10개 이하여야 합니다"
+}
+----

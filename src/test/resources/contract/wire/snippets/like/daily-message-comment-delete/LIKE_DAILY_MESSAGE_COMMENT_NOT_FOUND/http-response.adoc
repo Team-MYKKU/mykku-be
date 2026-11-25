@@ -1,0 +1,10 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 404 Not Found
+Content-Type: application/json
+
+{
+  "code" : "LK004",
+  "message" : "좋아요한 하루 덕담 댓글을 찾을 수 없습니다"
+}
+----

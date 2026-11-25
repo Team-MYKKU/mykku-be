@@ -1,0 +1,10 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+
+{
+  "code" : "DM103",
+  "message" : "답글에는 답글을 작성할 수 없습니다"
+}
+----

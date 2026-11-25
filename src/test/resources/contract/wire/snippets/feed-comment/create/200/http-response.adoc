@@ -1,0 +1,29 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "message" : "댓글이 성공적으로 등록되었습니다.",
+  "data" : {
+    "id" : 1,
+    "content" : "좋은 피드네요!",
+    "author" : {
+      "memberId" : "testmemberid",
+      "nickname" : "testuser",
+      "profileImage" : "https://example.com/profile.jpg",
+      "role" : {
+        "id" : 1,
+        "name" : "덕담왕",
+        "description" : "덕담을 많이 남긴 사람"
+      }
+    },
+    "likeCount" : 0,
+    "isLiked" : false,
+    "replies" : [ ],
+    "replyCount" : 0,
+    "createdAt" : "2026-10-01T12:00:00",
+    "updatedAt" : "2026-10-01T12:00:00"
+  }
+}
+----

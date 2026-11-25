@@ -1,0 +1,10 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "message" : "읽지 않은 알림 개수를 성공적으로 조회했습니다.",
+  "data" : 5
+}
+----

@@ -1,0 +1,8 @@
+.+/api/v1/likes/boards/{boardId}+
+|===
+|파라미터|필수
+
+|`+boardId+`
+|O
+
+|===

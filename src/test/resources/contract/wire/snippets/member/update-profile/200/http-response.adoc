@@ -1,0 +1,23 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "message" : "프로필이 수정되었습니다",
+  "data" : {
+    "memberId" : "testmemberid",
+    "email" : "test@example.com",
+    "nickname" : "새닉네임",
+    "profileImage" : "https://example.com/new-profile.jpg",
+    "role" : {
+      "id" : 1,
+      "name" : "테스트 칭호",
+      "description" : "테스트 칭호 설명"
+    },
+    "provider" : "GOOGLE",
+    "emailVerified" : true,
+    "createdAt" : "2026-11-24T15:52:36.744298"
+  }
+}
+----

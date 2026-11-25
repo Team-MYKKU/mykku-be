@@ -1,0 +1,20 @@
+[source,http,options="nowrap"]
+----
+PATCH /api/v1/feeds/1 HTTP/1.1
+Authorization: Bearer test-access-token
+Content-Type: multipart/form-data; boundary="<BOUNDARY>"; boundary=6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm
+Host: api.dev.mykku.kr
+
+--6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm
+Content-Disposition: form-data; name=request; filename=file
+Content-Type: application/json
+
+{
+                "title": "수정된 제목",
+                "content": null,
+                "boardId": null,
+                "tags": null,
+                "deleteImageIds": []
+            }
+--6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm--
+----

@@ -1,0 +1,13 @@
+[source,http,options="nowrap"]
+----
+POST /api/v1/members/setup-profile HTTP/1.1
+Authorization: Bearer test-access-token
+Content-Type: application/json
+Host: api.dev.mykku.kr
+Content-Length: 59
+
+{
+  "memberId" : "takenid",
+  "nickname" : "새닉네임"
+}
+----

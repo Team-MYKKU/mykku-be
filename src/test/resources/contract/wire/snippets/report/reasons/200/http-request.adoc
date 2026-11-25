@@ -1,0 +1,6 @@
+[source,http,options="nowrap"]
+----
+GET /api/v1/reports/reasons HTTP/1.1
+Host: api.dev.mykku.kr
+
+----

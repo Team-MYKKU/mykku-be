@@ -1,0 +1,8 @@
+[source,http,options="nowrap"]
+----
+DELETE /api/v1/notifications/1 HTTP/1.1
+Authorization: Bearer test-access-token
+Content-Type: application/json
+Host: api.dev.mykku.kr
+
+----

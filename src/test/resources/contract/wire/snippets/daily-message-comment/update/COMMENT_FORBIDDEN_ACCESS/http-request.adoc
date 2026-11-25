@@ -1,0 +1,12 @@
+[source,http,options="nowrap"]
+----
+PUT /api/v1/daily-messages/comments/1 HTTP/1.1
+Authorization: Bearer test-access-token
+Content-Type: application/json
+Host: api.dev.mykku.kr
+Content-Length: 53
+
+{
+  "content" : "수정된 댓글 내용입니다!"
+}
+----

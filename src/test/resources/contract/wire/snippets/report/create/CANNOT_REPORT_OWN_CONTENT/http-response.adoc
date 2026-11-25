@@ -1,0 +1,10 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+
+{
+  "code" : "RP101",
+  "message" : "자신의 콘텐츠는 신고할 수 없습니다"
+}
+----

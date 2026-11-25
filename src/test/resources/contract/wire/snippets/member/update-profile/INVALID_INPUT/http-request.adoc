@@ -1,0 +1,13 @@
+[source,http,options="nowrap"]
+----
+PATCH /api/v1/members/me HTTP/1.1
+Authorization: Bearer test-access-token
+Content-Type: application/json
+Host: api.dev.mykku.kr
+Content-Length: 79
+
+{
+  "nickname" : "가나다라마바사아자차카",
+  "profileImage" : null
+}
+----

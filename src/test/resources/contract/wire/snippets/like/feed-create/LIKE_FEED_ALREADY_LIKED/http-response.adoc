@@ -1,0 +1,10 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+
+{
+  "code" : "LK102",
+  "message" : "이미 좋아요한 피드입니다"
+}
+----

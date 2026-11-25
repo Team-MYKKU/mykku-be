@@ -1,0 +1,8 @@
+.+/api/v1/contests/winners/{winnerId}/acceptance-speech+
+|===
+|파라미터|필수
+
+|`+winnerId+`
+|O
+
+|===

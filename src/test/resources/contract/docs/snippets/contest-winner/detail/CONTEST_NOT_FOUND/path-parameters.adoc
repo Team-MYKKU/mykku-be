@@ -1,0 +1,8 @@
+.+/api/v1/contests/{contestId}/winners+
+|===
+|파라미터|필수
+
+|`+contestId+`
+|O
+
+|===

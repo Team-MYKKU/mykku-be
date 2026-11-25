@@ -1,0 +1,19 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "message" : "내 수상 미리보기를 성공적으로 조회했습니다.",
+  "data" : [ {
+    "contestId" : 1,
+    "thumbnailUrl" : "https://example.com/thumb1.jpg"
+  }, {
+    "contestId" : 2,
+    "thumbnailUrl" : "https://example.com/thumb2.jpg"
+  }, {
+    "contestId" : 3,
+    "thumbnailUrl" : "https://example.com/thumb3.jpg"
+  } ]
+}
+----

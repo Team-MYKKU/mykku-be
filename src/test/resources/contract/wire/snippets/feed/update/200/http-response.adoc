@@ -1,0 +1,41 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "message" : "피드가 성공적으로 수정되었습니다.",
+  "data" : {
+    "id" : 1,
+    "author" : {
+      "memberId" : "member1",
+      "nickname" : "작성자닉네임",
+      "profileImage" : "https://example.com/profile.jpg",
+      "role" : {
+        "id" : 1,
+        "name" : "일반 덕후",
+        "description" : "일반 덕후 칭호"
+      }
+    },
+    "boardId" : 1,
+    "boardTitle" : "자유게시판",
+    "createdAt" : "2024-01-01T12:00:00",
+    "updatedAt" : "2024-01-02T14:30:00",
+    "title" : "수정된 피드 제목",
+    "content" : "수정된 피드 내용입니다.",
+    "images" : [ {
+      "id" : 2,
+      "url" : "https://example.com/new-image.jpg",
+      "width" : 1920,
+      "height" : 1080
+    } ],
+    "tags" : [ {
+      "title" : "수정된태그",
+      "isContest" : false
+    } ],
+    "likeCount" : 25,
+    "isLiked" : true,
+    "commentCount" : 10
+  }
+}
+----

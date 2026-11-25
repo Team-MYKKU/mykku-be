@@ -1,0 +1,12 @@
+[source,http,options="nowrap"]
+----
+PATCH /api/v1/contests/winners/1/acceptance-speech HTTP/1.1
+Authorization: Bearer test-access-token
+Content-Type: application/json
+Host: api.dev.mykku.kr
+Content-Length: 93
+
+{
+  "acceptanceSpeech" : "정말 감사합니다. 이 영광을 가족에게 돌립니다."
+}
+----

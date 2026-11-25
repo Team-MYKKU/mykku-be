@@ -1,0 +1,20 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "message" : "FCM 토큰 목록을 성공적으로 조회했습니다.",
+  "data" : [ {
+    "id" : 1,
+    "deviceId" : "device_android_001",
+    "deviceType" : "ANDROID",
+    "createdAt" : "2026-11-24T15:52:36"
+  }, {
+    "id" : 2,
+    "deviceId" : "device_ios_002",
+    "deviceType" : "IOS",
+    "createdAt" : "2026-11-24T15:52:36"
+  } ]
+}
+----

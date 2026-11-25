@@ -1,0 +1,10 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 403 Forbidden
+Content-Type: application/json
+
+{
+  "code" : "AU204",
+  "message" : "OAuth 접근이 거부되었습니다"
+}
+----

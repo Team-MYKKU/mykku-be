@@ -1,0 +1,57 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "message" : "알림 목록을 성공적으로 조회했습니다.",
+  "data" : {
+    "content" : [ {
+      "id" : 1,
+      "type" : "FEED_LIKE",
+      "senderNickname" : "홍길동",
+      "senderProfileImage" : "https://example.com/profile.jpg",
+      "content" : "홍길동님이 회원님의 피드를 좋아합니다.",
+      "isRead" : false,
+      "relatedResourceId" : 123,
+      "relatedResourceType" : "FEED",
+      "createdAt" : "2026-09-24T14:17:57"
+    }, {
+      "id" : 2,
+      "type" : "FEED_COMMENT",
+      "senderNickname" : "김철수",
+      "senderProfileImage" : "",
+      "content" : "김철수님이 회원님의 피드에 댓글을 남겼습니다: 사진 너무 예뻐요!",
+      "isRead" : true,
+      "relatedResourceId" : 123,
+      "relatedResourceType" : "FEED",
+      "createdAt" : "2026-09-23T14:17:57"
+    } ],
+    "empty" : false,
+    "first" : true,
+    "last" : true,
+    "number" : 0,
+    "numberOfElements" : 2,
+    "pageable" : {
+      "offset" : 0,
+      "pageNumber" : 0,
+      "pageSize" : 20,
+      "paged" : true,
+      "sort" : {
+        "empty" : false,
+        "sorted" : true,
+        "unsorted" : false
+      },
+      "unpaged" : false
+    },
+    "size" : 20,
+    "sort" : {
+      "empty" : false,
+      "sorted" : true,
+      "unsorted" : false
+    },
+    "totalElements" : 2,
+    "totalPages" : 1
+  }
+}
+----

@@ -1,0 +1,8 @@
+.+/api/v1/likes/feed-comments/{feedCommentId}+
+|===
+|파라미터|필수
+
+|`+feedCommentId+`
+|O
+
+|===

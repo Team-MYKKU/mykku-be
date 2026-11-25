@@ -1,0 +1,58 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "message" : "피드 검색 결과를 성공적으로 조회했습니다.",
+  "data" : {
+    "boards" : [ {
+      "boardId" : 2,
+      "boardTitle" : "아이브",
+      "boardLogo" : "https://example.com/ive-logo.png",
+      "totalCount" : 12,
+      "hasMore" : true,
+      "feeds" : [ {
+        "id" : 18,
+        "boardId" : 2,
+        "boardTitle" : "아이브",
+        "title" : "IVE 컴백 무대 18",
+        "content" : "오늘 ive 컴백 무대 본문 전체입니다.",
+        "thumbnailUrl" : "https://example.com/feed18.jpg",
+        "createdAt" : "2025-03-01T12:34:56"
+      }, {
+        "id" : 17,
+        "boardId" : 2,
+        "boardTitle" : "아이브",
+        "title" : "IVE 컴백 무대 17",
+        "content" : "오늘 ive 컴백 무대 본문 전체입니다.",
+        "thumbnailUrl" : null,
+        "createdAt" : "2025-03-01T11:34:56"
+      }, {
+        "id" : 16,
+        "boardId" : 2,
+        "boardTitle" : "아이브",
+        "title" : "IVE 컴백 무대 16",
+        "content" : "오늘 ive 컴백 무대 본문 전체입니다.",
+        "thumbnailUrl" : "https://example.com/feed16.jpg",
+        "createdAt" : "2025-03-01T10:34:56"
+      } ]
+    }, {
+      "boardId" : 1,
+      "boardTitle" : "자유게시판",
+      "boardLogo" : "https://example.com/free-logo.png",
+      "totalCount" : 1,
+      "hasMore" : false,
+      "feeds" : [ {
+        "id" : 5,
+        "boardId" : 1,
+        "boardTitle" : "자유게시판",
+        "title" : "IVE 컴백 무대 5",
+        "content" : "오늘 ive 컴백 무대 본문 전체입니다.",
+        "thumbnailUrl" : "https://example.com/feed5.jpg",
+        "createdAt" : "2025-02-28T23:34:56"
+      } ]
+    } ]
+  }
+}
+----

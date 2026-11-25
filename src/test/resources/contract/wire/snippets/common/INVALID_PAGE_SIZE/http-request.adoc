@@ -1,0 +1,6 @@
+[source,http,options="nowrap"]
+----
+GET /api/v1/boards/1/feeds?size=1001 HTTP/1.1
+Host: api.dev.mykku.kr
+
+----

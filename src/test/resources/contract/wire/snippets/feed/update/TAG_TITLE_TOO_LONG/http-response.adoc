@@ -1,0 +1,10 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+
+{
+  "code" : "FD106",
+  "message" : "태그는 20자 이하여야 합니다"
+}
+----

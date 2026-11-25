@@ -1,0 +1,8 @@
+.+/api/v1/boards/{boardId}/feeds/popular+
+|===
+|파라미터|필수
+
+|`+boardId+`
+|O
+
+|===

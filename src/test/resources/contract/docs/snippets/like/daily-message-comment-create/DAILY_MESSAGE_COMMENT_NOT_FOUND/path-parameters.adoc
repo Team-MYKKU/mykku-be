@@ -1,0 +1,8 @@
+.+/api/v1/likes/daily-message-comments/{dailyMessageCommentId}+
+|===
+|파라미터|필수
+
+|`+dailyMessageCommentId+`
+|O
+
+|===

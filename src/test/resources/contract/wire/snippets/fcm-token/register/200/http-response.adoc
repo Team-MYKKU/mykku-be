@@ -1,0 +1,15 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "message" : "FCM 토큰이 성공적으로 등록되었습니다.",
+  "data" : {
+    "id" : 1,
+    "deviceId" : "device_android_001",
+    "deviceType" : "ANDROID",
+    "createdAt" : "2026-11-24T15:52:36.744298456"
+  }
+}
+----

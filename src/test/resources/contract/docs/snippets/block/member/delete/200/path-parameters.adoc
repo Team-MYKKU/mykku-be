@@ -1,0 +1,8 @@
+.+/api/v1/blocks/members/{memberId}+
+|===
+|파라미터|필수
+
+|`+memberId+`
+|O
+
+|===

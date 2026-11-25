@@ -1,0 +1,75 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "message" : "내 피드 목록을 성공적으로 조회했습니다.",
+  "data" : {
+    "feeds" : [ {
+      "id" : 1,
+      "author" : {
+        "memberId" : "testmemberid",
+        "nickname" : "testuser",
+        "profileImage" : "https://example.com/profile.jpg",
+        "role" : {
+          "id" : 1,
+          "name" : "아미",
+          "description" : "BTS 팬클럽"
+        }
+      },
+      "board" : "자유게시판",
+      "createdAt" : "2026-11-24T15:52:36.744298",
+      "title" : "내가 쓴 피드",
+      "content" : "피드 내용입니다.",
+      "images" : [ {
+        "id" : 1,
+        "url" : "https://example.com/feed-image.jpg",
+        "width" : 1080,
+        "height" : 1080
+      } ],
+      "tags" : [ {
+        "title" : "일상",
+        "isContest" : false
+      } ],
+      "likeCount" : 10,
+      "isLiked" : false,
+      "commentCount" : 3,
+      "comment" : {
+        "profileImage" : "https://example.com/commenter.jpg",
+        "content" : "좋은 글이네요!"
+      }
+    }, {
+      "id" : 2,
+      "author" : {
+        "memberId" : "testmemberid",
+        "nickname" : "testuser",
+        "profileImage" : "https://example.com/profile.jpg",
+        "role" : null
+      },
+      "board" : "콘테스트게시판",
+      "createdAt" : "2026-11-23T15:52:36.744298",
+      "title" : "두 번째 피드",
+      "content" : "두 번째 피드 내용입니다.",
+      "images" : [ ],
+      "tags" : [ {
+        "title" : "콘테스트태그",
+        "isContest" : true
+      } ],
+      "likeCount" : 5,
+      "isLiked" : true,
+      "commentCount" : 0,
+      "comment" : {
+        "profileImage" : null,
+        "content" : ""
+      }
+    } ],
+    "currentPage" : 0,
+    "totalPages" : 1,
+    "totalElements" : 2,
+    "size" : 20,
+    "hasNext" : false,
+    "hasPrevious" : false
+  }
+}
+----

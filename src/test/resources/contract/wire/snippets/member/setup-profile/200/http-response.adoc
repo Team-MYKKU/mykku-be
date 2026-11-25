@@ -1,0 +1,23 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "message" : "프로필 설정이 완료되었습니다",
+  "data" : {
+    "memberId" : "newuser1",
+    "email" : "test@example.com",
+    "nickname" : "새닉네임",
+    "profileImage" : "https://example.com/profile.jpg",
+    "role" : {
+      "id" : 1,
+      "name" : "첫 만남",
+      "description" : "로그인 하면 무조건 줌"
+    },
+    "provider" : "GOOGLE",
+    "emailVerified" : true,
+    "createdAt" : "2026-11-24T15:52:36.744298"
+  }
+}
+----

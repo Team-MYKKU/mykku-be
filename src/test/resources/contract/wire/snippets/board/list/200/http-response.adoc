@@ -1,0 +1,20 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "message" : "게시판 목록을 성공적으로 조회했습니다.",
+  "data" : {
+    "boards" : [ {
+      "id" : 1,
+      "title" : "자유게시판",
+      "logo" : "https://example.com/logo1.png"
+    }, {
+      "id" : 2,
+      "title" : "정보게시판",
+      "logo" : "https://example.com/logo2.png"
+    } ]
+  }
+}
+----
