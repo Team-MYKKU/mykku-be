@@ -2,6 +2,7 @@ package com.example.mykku.notification.adapter.input.web
 
 import com.example.mykku.BaseDocumentTest
 import com.example.mykku.docs.ApiRequestConfig
+import com.example.mykku.docs.DocumentFixtureTime
 import com.example.mykku.docs.RestDocumentationResponse
 import com.example.mykku.notification.application.dto.FcmTokenResult
 import io.restassured.http.ContentType
@@ -15,7 +16,6 @@ import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
 import org.springframework.restdocs.request.RequestDocumentation.parameterWithName
-import java.time.LocalDateTime
 
 class FcmTokenDocumentTest : BaseDocumentTest() {
 
@@ -64,7 +64,7 @@ class FcmTokenDocumentTest : BaseDocumentTest() {
                 id = 1L,
                 deviceId = "device_android_001",
                 deviceType = "ANDROID",
-                createdAt = LocalDateTime.now()
+                createdAt = DocumentFixtureTime.NOW
             )
 
             `when`(manageFcmTokenUseCase.registerOrUpdateToken(any())).thenReturn(response)
@@ -142,13 +142,13 @@ class FcmTokenDocumentTest : BaseDocumentTest() {
                     id = 1L,
                     deviceId = "device_android_001",
                     deviceType = "ANDROID",
-                    createdAt = LocalDateTime.now()
+                    createdAt = DocumentFixtureTime.NOW_SECONDS
                 ),
                 FcmTokenResult(
                     id = 2L,
                     deviceId = "device_ios_002",
                     deviceType = "IOS",
-                    createdAt = LocalDateTime.now()
+                    createdAt = DocumentFixtureTime.NOW_SECONDS
                 )
             )
 

@@ -6,6 +6,7 @@ import com.example.mykku.block.application.dto.KeywordBlockResult
 import com.example.mykku.block.application.dto.MemberBlockListResult
 import com.example.mykku.block.application.dto.MemberBlockResult
 import com.example.mykku.docs.ApiRequestConfig
+import com.example.mykku.docs.DocumentFixtureTime
 import com.example.mykku.docs.RestDocumentationResponse
 import com.example.mykku.block.exception.BlockErrorCode
 import com.example.mykku.block.exception.BlockException
@@ -47,7 +48,7 @@ class BlockDocumentTest : BaseDocumentTest() {
                 blockedMemberId = "blockeduser1",
                 blockedMemberNickname = "차단유저",
                 blockedMemberProfileImage = "https://example.com/profile.jpg",
-                blockedAt = LocalDateTime.now()
+                blockedAt = DocumentFixtureTime.NOW
             )
 
             `when`(blockMemberUseCase.blockMember(any())).thenReturn(result)
@@ -327,7 +328,7 @@ class BlockDocumentTest : BaseDocumentTest() {
             val result = KeywordBlockResult(
                 id = 1L,
                 keyword = "스포일러",
-                blockedAt = LocalDateTime.now()
+                blockedAt = DocumentFixtureTime.NOW
             )
 
             `when`(blockKeywordUseCase.blockKeyword(any())).thenReturn(result)

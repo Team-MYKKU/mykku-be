@@ -2,6 +2,7 @@ package com.example.mykku.report.adapter.input.web
 
 import com.example.mykku.BaseDocumentTest
 import com.example.mykku.docs.ApiRequestConfig
+import com.example.mykku.docs.DocumentFixtureTime
 import com.example.mykku.docs.RestDocumentationResponse
 import com.example.mykku.report.application.dto.ReportResult
 import com.example.mykku.report.domain.vo.ReportReason
@@ -18,7 +19,6 @@ import org.mockito.kotlin.any
 import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
-import java.time.LocalDateTime
 
 class ReportDocumentTest : BaseDocumentTest() {
 
@@ -83,7 +83,7 @@ class ReportDocumentTest : BaseDocumentTest() {
                 status = ReportStatus.PENDING.name,
                 statusDescription = ReportStatus.PENDING.description,
                 processedAt = null,
-                createdAt = LocalDateTime.now()
+                createdAt = DocumentFixtureTime.NOW
             )
 
             `when`(createReportUseCase.createReport(any())).thenReturn(result)

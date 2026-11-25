@@ -2,6 +2,7 @@ package com.example.mykku.member.adapter.input.web
 
 import com.example.mykku.BaseDocumentTest
 import com.example.mykku.docs.ApiRequestConfig
+import com.example.mykku.docs.DocumentFixtureTime
 import com.example.mykku.docs.RestDocumentationResponse
 import com.example.mykku.image.exception.ImageErrorCode
 import com.example.mykku.image.exception.ImageException
@@ -27,7 +28,6 @@ import org.springframework.restdocs.payload.FieldDescriptor
 import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
 import org.springframework.restdocs.request.RequestDocumentation
-import java.time.LocalDateTime
 
 class MemberDocumentTest : BaseDocumentTest() {
 
@@ -176,7 +176,7 @@ class MemberDocumentTest : BaseDocumentTest() {
                 role = RoleResult(id = 1L, name = "테스트 칭호", description = "테스트 칭호 설명"),
                 provider = "GOOGLE",
                 emailVerified = true,
-                createdAt = LocalDateTime.now()
+                createdAt = DocumentFixtureTime.NOW_MICROS
             )
 
             whenever(getMemberProfileUseCase.getMyProfile(any())).thenReturn(result)
@@ -229,7 +229,7 @@ class MemberDocumentTest : BaseDocumentTest() {
                 role = RoleResult(id = 1L, name = "테스트 칭호", description = "테스트 칭호 설명"),
                 provider = "GOOGLE",
                 emailVerified = true,
-                createdAt = LocalDateTime.now()
+                createdAt = DocumentFixtureTime.NOW_MICROS
             )
 
             whenever(updateMemberProfileUseCase.updateProfile(any(), any())).thenReturn(result)
@@ -364,7 +364,7 @@ class MemberDocumentTest : BaseDocumentTest() {
                 role = RoleResult(id = 1L, name = "테스트 칭호", description = "테스트 칭호 설명"),
                 provider = "GOOGLE",
                 emailVerified = true,
-                createdAt = LocalDateTime.now()
+                createdAt = DocumentFixtureTime.NOW_MICROS
             )
 
             whenever(updateMemberProfileUseCase.updateProfile(any(), any())).thenReturn(result)
@@ -502,7 +502,7 @@ class MemberDocumentTest : BaseDocumentTest() {
                 role = RoleResult(id = 1L, name = "첫 만남", description = "로그인 하면 무조건 줌"),
                 provider = "GOOGLE",
                 emailVerified = true,
-                createdAt = LocalDateTime.now()
+                createdAt = DocumentFixtureTime.NOW_MICROS
             )
 
             whenever(setupProfileUseCase.setupProfile(any(), any())).thenReturn(result)
@@ -581,7 +581,7 @@ class MemberDocumentTest : BaseDocumentTest() {
                 role = RoleResult(id = 1L, name = "테스트 칭호", description = "테스트 칭호 설명"),
                 provider = "GOOGLE",
                 emailVerified = true,
-                createdAt = LocalDateTime.now()
+                createdAt = DocumentFixtureTime.NOW_MICROS
             )
 
             whenever(changeMemberIdUseCase.changeMemberId(any(), any())).thenReturn(result)

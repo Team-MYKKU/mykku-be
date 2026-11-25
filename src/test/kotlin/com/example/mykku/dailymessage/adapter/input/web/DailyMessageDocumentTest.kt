@@ -2,6 +2,7 @@ package com.example.mykku.dailymessage.adapter.input.web
 
 import com.example.mykku.BaseDocumentTest
 import com.example.mykku.docs.ApiRequestConfig
+import com.example.mykku.docs.DocumentFixtureTime
 import com.example.mykku.docs.RestDocumentationResponse
 import com.example.mykku.dailymessage.application.dto.DailyMessageResult
 import com.example.mykku.dailymessage.application.dto.DailyMessageSummaryResult
@@ -25,7 +26,6 @@ import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
 import org.springframework.restdocs.request.RequestDocumentation.parameterWithName
 import java.time.LocalDate
-import java.time.LocalDateTime
 
 class DailyMessageDocumentTest : BaseDocumentTest() {
 
@@ -46,21 +46,21 @@ class DailyMessageDocumentTest : BaseDocumentTest() {
 
         @Test
         fun `성공`() {
-            val date = LocalDate.now()
+            val date = DocumentFixtureTime.TODAY
             val dailyMessages = listOf(
                 DailyMessageSummaryResult(
                     id = 2L,
                     title = "오늘의 덕담",
                     content = "좋은 하루 되세요!",
                     date = date,
-                    createdAt = LocalDateTime.now()
+                    createdAt = DocumentFixtureTime.NOW_MICROS
                 ),
                 DailyMessageSummaryResult(
                     id = 1L,
                     title = "희망찬 하루",
                     content = "모든 소망이 이루어지길!",
                     date = date.minusDays(1),
-                    createdAt = LocalDateTime.now()
+                    createdAt = DocumentFixtureTime.NOW_MICROS
                 )
             )
             val pageable = PageRequest.of(0, 20, Sort.by(Sort.Direction.DESC, "date"))
@@ -167,7 +167,7 @@ class DailyMessageDocumentTest : BaseDocumentTest() {
                 title = "오늘의 덕담",
                 content = "좋은 하루 되세요! 올 한해도 건강하시길 바랍니다.",
                 date = LocalDate.of(2026, 8, 14),
-                createdAt = LocalDateTime.now()
+                createdAt = DocumentFixtureTime.NOW_MICROS
             )
 
             `when`(getDailyMessageUseCase.execute(eq(dailyMessageId), anyOrNull())).thenReturn(dailyMessage)

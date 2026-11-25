@@ -2,6 +2,7 @@ package com.example.mykku.role.adapter.input.web
 
 import com.example.mykku.BaseDocumentTest
 import com.example.mykku.docs.ApiRequestConfig
+import com.example.mykku.docs.DocumentFixtureTime
 import com.example.mykku.docs.RestDocumentationResponse
 import com.example.mykku.role.application.dto.ChangeRepresentativeRoleCommand
 import com.example.mykku.role.application.dto.MemberRoleResult
@@ -20,7 +21,6 @@ import org.mockito.kotlin.anyOrNull
 import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
 import org.springframework.restdocs.request.RequestDocumentation.parameterWithName
-import java.time.LocalDateTime
 
 class RoleDocumentTest : BaseDocumentTest() {
 
@@ -39,13 +39,13 @@ class RoleDocumentTest : BaseDocumentTest() {
                     id = 12L,
                     role = RoleResult(id = 1L, name = "첫 만남", description = "로그인 하면 무조건 줌"),
                     isRepresentative = true,
-                    earnedAt = LocalDateTime.now()
+                    earnedAt = DocumentFixtureTime.NOW_MICROS
                 ),
                 MemberRoleResult(
                     id = 15L,
                     role = RoleResult(id = 11L, name = "이 몸 등장", description = "게시글 1회 업로드"),
                     isRepresentative = false,
-                    earnedAt = LocalDateTime.now()
+                    earnedAt = DocumentFixtureTime.NOW_MICROS
                 )
             )
 
@@ -146,7 +146,7 @@ class RoleDocumentTest : BaseDocumentTest() {
                     id = 15L,
                     role = RoleResult(id = 11L, name = "이 몸 등장", description = "게시글 1회 업로드"),
                     isRepresentative = false,
-                    earnedAt = LocalDateTime.now()
+                    earnedAt = DocumentFixtureTime.NOW_MICROS
                 )
             )
 
