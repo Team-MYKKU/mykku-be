@@ -387,6 +387,14 @@ src/main/kotlin/com/example/mykku/
   - `@InjectMocks` UseCase 주입
   - 정상 케이스와 예외 케이스 테스트
 
+#### 4. ContractTest (API 계약 골든)
+- **위치**: `src/test/kotlin/com/example/mykku/contract/` (예외: 위 1~3처럼 도메인 패키지에 두지 않고 `contract/` 패키지에 둔다)
+- **목적**: 앱이 받는 HTTP 규약(상태·헤더·본문 바이트·에러 코드 목록)을 `src/test/resources/contract/`의 골든 파일과 바이트 단위로 비교해 고정
+- **예외**: 응답 message 문자열 자체가 규약이므로 문자열 비교가 목적이다. 아래 'ErrorCode Enum 사용 필수' 규칙을 적용하지 않는다
+- **상속**: `BaseControllerTest`·`BaseDocumentTest`를 그대로 상속한다 (`@MockitoBean`·`@Import`를 더해 새 Spring 컨텍스트를 만들지 않는다)
+- **골든 변경**: `contract/wire/**`·`contract/fixtures/**`의 기존 파일은 고치지 않는다. 승인된 규약 변경만 로컬에서 `./gradlew test -Pcontract.update=true`로 갱신한다 (CI에서는 갱신하면 실패)
+- 주석 금지·메서드 15줄·들여쓰기 2단계 규칙은 계약 테스트에도 적용한다
+
 ### 테스트 작성 체크리스트
 - [ ] ControllerTest로 엔드포인트 검증
 - [ ] DocumentTest로 API 문서 생성 (Admin 제외)
@@ -443,6 +451,7 @@ throw FeedException.feedNotFound()
 #### 예외 검증 시 ErrorCode Enum 사용 필수
 - **테스트에서 예외 검증 시 반드시 ErrorCode enum 사용**
 - **예외 메시지 문자열 직접 비교 금지**
+- 단, 계약 테스트(`contract/`)는 응답 message 문자열 비교가 목적이라 이 규칙의 예외다
 
 ```kotlin
 // ❌ 잘못된 예시 - 메시지 문자열 직접 비교

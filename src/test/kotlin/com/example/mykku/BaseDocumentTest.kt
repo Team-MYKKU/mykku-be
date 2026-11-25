@@ -92,6 +92,9 @@ import com.example.mykku.role.application.port.input.GetMyRolesUseCase
 import com.example.mykku.role.application.port.input.GetNewRolesUseCase
 import com.example.mykku.role.application.port.input.GetRolesUseCase
 import com.example.mykku.contest.application.port.input.GetMyParticipatedContestsUseCase
+import com.example.mykku.contract.snippet.SnippetGoldenExtension
+import com.example.mykku.contract.snippet.SnippetIdentifierSource
+import com.example.mykku.contract.support.ContractManifestExtension
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
@@ -122,9 +125,15 @@ import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 
 @ActiveProfiles("test")
-@ExtendWith(DatabaseCleaner::class, RestDocumentationExtension::class, MockitoExtension::class)
+@ExtendWith(
+    DatabaseCleaner::class,
+    RestDocumentationExtension::class,
+    MockitoExtension::class,
+    SnippetGoldenExtension::class,
+    ContractManifestExtension::class
+)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-abstract class BaseDocumentTest {
+abstract class BaseDocumentTest : SnippetIdentifierSource {
 
     @MockitoBean
     protected lateinit var adminRoleService: AdminRoleService
@@ -412,6 +421,11 @@ abstract class BaseDocumentTest {
 
     protected lateinit var testMember: MemberJpaEntity
 
+    private val snippetIdentifiers = mutableListOf<String>()
+
+    override fun drainSnippetIdentifiers(): List<String> =
+        snippetIdentifiers.toList().also { snippetIdentifiers.clear() }
+
     @BeforeEach
     fun setEnvironment(restDocumentation: RestDocumentationContextProvider) {
         setRestAssured(restDocumentation)
@@ -485,10 +499,10 @@ abstract class BaseDocumentTest {
     }
 
     protected fun document(identifierPrefix: String, status: Int): RestDocumentationFilterBuilder =
-        RestDocumentationFilterBuilder(identifierPrefix, status.toString())
+        document(identifierPrefix, status.toString())
 
     protected fun document(identifierPrefix: String, errorCode: String): RestDocumentationFilterBuilder =
-        RestDocumentationFilterBuilder(identifierPrefix, errorCode)
+        RestDocumentationFilterBuilder(identifierPrefix, errorCode).also { snippetIdentifiers.add(it.identifier) }
 
     protected fun given(documentationFilter: RestDocumentationFilter): RequestSpecification =
         RestAssured.given(spec).filter(documentationFilter)
