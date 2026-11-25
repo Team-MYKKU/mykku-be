@@ -7,6 +7,10 @@ spring:
   config:
     activate:
       on-profile: test
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 50MB
   thymeleaf:
     prefix: file:mykku-be-config/templates/
     suffix: .html
