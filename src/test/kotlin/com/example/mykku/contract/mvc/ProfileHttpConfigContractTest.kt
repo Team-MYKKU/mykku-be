@@ -7,9 +7,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.junit.jupiter.api.io.TempDir
-import java.nio.file.Files
-import java.nio.file.Path
 
 @DisplayName("dev 프로필 HTTP 설정 계약")
 @ExtendWith(ContractManifestExtension::class)
@@ -22,13 +19,6 @@ class ProfileHttpConfigContractTest {
         val violation = ContractGolden.DEFAULT.violationOf(GOLDEN, config.render()) ?: return
 
         throw ContractViolationError("$violation\n- 병합한 파일: ${config.mergedSources()}")
-    }
-
-    @Test
-    fun `덤프는 병합 대상 파일만 읽고 같은 디렉터리의 다른 설정 파일에 영향받지 않는다`(@TempDir copy: Path) {
-        config.mergedSources().forEach { Files.copy(it, copy.resolve(it.fileName)) }
-
-        assertThat(DevProfileHttpConfig(copy) { true }.properties()).isEqualTo(config.properties())
     }
 
     @Test

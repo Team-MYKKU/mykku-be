@@ -2,10 +2,8 @@ package com.example.mykku.contract.mvc
 
 import com.example.mykku.contract.dump.KotlinTypes
 import org.springframework.context.ApplicationContext
-import org.springframework.core.MethodIntrospector
 import org.springframework.core.Ordered
 import org.springframework.core.ResolvableType
-import org.springframework.core.annotation.AnnotatedElementUtils
 import org.springframework.core.annotation.AnnotationAwareOrderComparator
 import org.springframework.core.convert.converter.Converter
 import org.springframework.core.convert.converter.ConverterFactory
@@ -14,10 +12,6 @@ import org.springframework.core.io.Resource
 import org.springframework.format.Parser
 import org.springframework.format.Printer
 import org.springframework.util.ClassUtils
-import org.springframework.util.ReflectionUtils
-import org.springframework.web.bind.annotation.InitBinder
-import org.springframework.web.bind.annotation.ModelAttribute
-import org.springframework.web.method.ControllerAdviceBean
 import org.springframework.web.servlet.HandlerMapping
 import org.springframework.web.servlet.function.HandlerFunction
 import org.springframework.web.servlet.function.RequestPredicate
@@ -27,8 +21,7 @@ import org.springframework.web.servlet.function.ServerRequest
 import org.springframework.web.servlet.function.support.RouterFunctionMapping
 import org.springframework.web.servlet.handler.AbstractUrlHandlerMapping
 import org.springframework.web.servlet.mvc.ParameterizableViewController
-import org.springframework.web.servlet.mvc.method.annotation.RequestBodyAdvice
-import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import org.springframework.web.servlet.resource.ResourceHttpRequestHandler
 import java.util.Optional
 import java.util.function.Function
@@ -101,40 +94,56 @@ private class RouteCollector(private val routes: MutableList<String>) : RouterFu
     }
 }
 
-class TypeConverterLines(private val context: ApplicationContext) {
+class TypeConverterLines(private val context: ApplicationContext, private val boundTypes: Set<Class<*>>) {
 
-    fun render(): List<String> = CONVERTER_TYPES.flatMap { context.getBeansOfType(it).values }
+    fun render(): List<String> = converters().ifEmpty { listOf(NONE) } + listOf(addFormattersLine())
+
+    private fun converters(): List<String> = CONVERTER_TYPES.flatMap { context.getBeansOfType(it).values }
         .distinct()
-        .filter { ClassUtils.getUserClass(it).name.startsWith(PROJECT_PACKAGE) }
+        .filter { isProject(ClassUtils.getUserClass(it)) }
         .flatMap { describe(it) }
+        .filter { (_, target) -> target == null || boundTypes.any { target.isAssignableFrom(it) } }
+        .map { (line, _) -> line }
         .sorted()
-        .ifEmpty { listOf(NONE) }
 
-    private fun describe(bean: Any): List<String> {
+    private fun describe(bean: Any): List<Pair<String, Class<*>?>> {
         val type = ClassUtils.getUserClass(bean)
         val generics = listOfNotNull(
-            generics(type, Converter::class.java)?.let { "${it[0]} -> ${it[1]}" },
-            generics(type, ConverterFactory::class.java)?.let { "${it[0]} -> ${it[1]}(하위 타입 포함)" },
-            generics(type, Printer::class.java)?.let { "${it[0]} -> String(Printer)" },
-            generics(type, Parser::class.java)?.let { "String -> ${it[0]}(Parser)" }
+            generics(type, Converter::class.java)?.let { converterLine(it, "") },
+            generics(type, ConverterFactory::class.java)?.let { converterLine(it, "(하위 타입)") },
+            generics(type, Printer::class.java)?.let { "${typeName(it[0])} -> String(Printer)" to it[0] },
+            generics(type, Parser::class.java)?.let { "String -> ${typeName(it[0])}(Parser)" to it[0] }
         )
         val pairs = (bean as? GenericConverter)?.convertibleTypes.orEmpty()
-        return generics + pairs.map { "${typeName(it.sourceType)} -> ${typeName(it.targetType)}" }
+        return generics + pairs.map { "${typeName(it.sourceType)} -> ${typeName(it.targetType)}" to it.targetType }
     }
 
-    private fun generics(type: Class<*>, contract: Class<*>): List<String>? {
+    private fun converterLine(generics: List<Class<*>?>, suffix: String): Pair<String, Class<*>?> =
+        "${typeName(generics[0])} -> ${typeName(generics[1])}$suffix" to generics[1]
+
+    private fun addFormattersLine(): String {
+        val overriding = context.getBeansOfType(WebMvcConfigurer::class.java).values
+            .map { ClassUtils.getUserClass(it) }
+            .filter { isProject(it) && it.declaredMethods.any { method -> method.name == ADD_FORMATTERS } }
+        return "add-formatters-overrides=${overriding.size}"
+    }
+
+    private fun generics(type: Class<*>, contract: Class<*>): List<Class<*>?>? {
         if (!contract.isAssignableFrom(type)) {
             return null
         }
-        return ResolvableType.forClass(type).`as`(contract).resolveGenerics().map { typeName(it) }
+        return ResolvableType.forClass(type).`as`(contract).resolveGenerics().toList()
     }
 
     private fun typeName(type: Class<*>?): String =
         type?.kotlin?.let { KotlinTypes.render(it.starProjectedType) } ?: "?"
 
+    private fun isProject(type: Class<*>): Boolean = type.name.startsWith(PROJECT_PACKAGE)
+
     private companion object {
         const val PROJECT_PACKAGE = "com.example.mykku."
-        const val NONE = "(없음)"
+        const val NONE = "(핸들러 인자 타입에 닿는 프로젝트 변환기 없음)"
+        const val ADD_FORMATTERS = "addFormatters"
         val CONVERTER_TYPES = listOf(
             Converter::class.java,
             ConverterFactory::class.java,
@@ -143,22 +152,4 @@ class TypeConverterLines(private val context: ApplicationContext) {
             Parser::class.java
         )
     }
-}
-
-class AdviceLines(private val context: ApplicationContext) {
-
-    fun render(): List<String> {
-        val advices = ControllerAdviceBean.findAnnotatedBeans(context).mapNotNull { it.beanType }
-        return listOf(
-            "request-body-advice=${advices.count { RequestBodyAdvice::class.java.isAssignableFrom(it) }}",
-            "response-body-advice=${advices.count { ResponseBodyAdvice::class.java.isAssignableFrom(it) }}",
-            "init-binder-methods=${advices.sumOf { methodCount(it, InitBinder::class.java) }}",
-            "model-attribute-methods=${advices.sumOf { methodCount(it, ModelAttribute::class.java) }}"
-        )
-    }
-
-    private fun methodCount(type: Class<*>, annotation: Class<out Annotation>): Int = MethodIntrospector.selectMethods(
-        type,
-        ReflectionUtils.MethodFilter { AnnotatedElementUtils.hasAnnotation(it, annotation) }
-    ).size
 }

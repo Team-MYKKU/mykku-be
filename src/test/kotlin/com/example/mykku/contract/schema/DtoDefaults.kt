@@ -19,35 +19,39 @@ import kotlin.reflect.jvm.isAccessible
 object DtoDefaults {
 
     const val NONE = "none"
-    private const val UNKNOWN = "(계산 불가)"
 
     fun of(klass: KClass<*>): Map<String, String> {
         val constructor = klass.primaryConstructor ?: return emptyMap()
-        val instance = instantiate(constructor)
-        return constructor.parameters.filter { it.isOptional }
-            .associate { it.name.orEmpty() to rendered(klass, instance, it) }
+        val optional = constructor.parameters.filter { it.isOptional }
+        if (optional.isEmpty()) {
+            return emptyMap()
+        }
+        val instance = runCatching { construct(constructor, setOf(klass)) }.getOrElse {
+            throw IllegalStateException("${klass.qualifiedName} 기본값을 계산하지 못했습니다. 필수 인자 더미 값을 보강합니다", it)
+        }
+        return optional.associate { it.name.orEmpty() to rendered(klass, instance, it) }
     }
 
-    fun instantiate(constructor: KFunction<*>): Any? = runCatching {
+    private fun construct(constructor: KFunction<*>, visiting: Set<KClass<*>>): Any? {
         constructor.isAccessible = true
-        constructor.callBy(constructor.parameters.filterNot { it.isOptional }.associateWith { dummy(it.type) })
-    }.getOrNull()
+        val required = constructor.parameters.filterNot { it.isOptional }
+        return constructor.callBy(required.associateWith { dummy(it.type, visiting) })
+    }
 
     private fun rendered(klass: KClass<*>, instance: Any?, parameter: KParameter): String {
-        val property = klass.memberProperties.firstOrNull { it.name == parameter.name }
-        if (instance == null || property == null) {
-            return UNKNOWN
+        val property = checkNotNull(klass.memberProperties.firstOrNull { it.name == parameter.name }) {
+            "${klass.qualifiedName}의 기본값 있는 생성자 인자 ${parameter.name}이 프로퍼티가 아니라 기본값을 읽을 수 없습니다"
         }
         property.isAccessible = true
         return AttributeValues.value(property.getter.call(instance))
     }
 
-    private fun dummy(type: KType): Any? {
+    private fun dummy(type: KType, visiting: Set<KClass<*>>): Any? {
         val klass = type.classifier as? KClass<*> ?: return null
-        KotlinTypes.valueClassUnderlying(klass)?.let { return klass.primaryConstructor?.call(dummy(it)) }
+        KotlinTypes.valueClassUnderlying(klass)?.let { return klass.primaryConstructor?.call(dummy(it, visiting)) }
         klass.java.enumConstants?.let { return it.firstOrNull() }
-        if (KotlinTypes.isProjectDto(klass)) {
-            return klass.primaryConstructor?.let { instantiate(it) }
+        if (KotlinTypes.isProjectDto(klass) && klass !in visiting) {
+            return klass.primaryConstructor?.let { construct(it, visiting + klass) }
         }
         return SIMPLE[klass] ?: COLLECTIONS[klass]
     }

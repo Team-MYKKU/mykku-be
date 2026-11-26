@@ -15,6 +15,7 @@ import jakarta.validation.Validation
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.data.domain.Page
@@ -116,12 +117,48 @@ class SchemaWritersTest {
         assertThat(lines).anyMatch { it.startsWith("id kotlin=id type=Long default=none") }
     }
 
+    @Test
+    fun `클래스 수준 @JsonInclude도 실제 직렬화기처럼 프로퍼티 포함 규칙에 넣는다`() {
+        val lines = writer().lines(mapper.constructType(ClassIncludeProbe::class.java), typeOf<ClassIncludeProbe>())
+
+        assertThat(lines.drop(1)).allMatch { it.endsWith(" include=NON_NULL/ALWAYS") }.hasSize(2)
+    }
+
+    @Test
+    fun `검증 그룹을 지정하면 그 그룹에 속하지 않는 제약은 미적용으로 적는다`() {
+        val target = RequestTarget("POST /probe body:json", typeOf<GroupedProbe>(), RequestBinding.JSON, true, GROUPS)
+        val constraints = RequestSchemaWriter(mapper, validator).render(target).lines().filter { it.startsWith("  ") }
+
+        assertThat(constraints).containsExactly(
+            "  미적용 @NotBlank(message=\"기본\")",
+            "  @NotBlank(groups=[GroupProbe], message=\"그룹\")"
+        )
+    }
+
+    @Test
+    fun `생성자 밖 프로퍼티는 Jackson이 채우는 필드와 폼이 쓰는 public setter만 적는다`() {
+        val writer = RequestSchemaWriter(mapper, validator)
+        val json = writer.render(target<FieldPropertyProbe>(validated = true)).lines()
+        val formTarget = RequestTarget("POST /probe model:form", typeOf<FormSetterProbe>(), RequestBinding.FORM, true)
+        val form = writer.render(formTarget).lines()
+
+        assertThat(json).contains("normalized (생성자 밖 프로퍼티: field type=String)")
+        assertThat(form).contains("editable (생성자 밖 프로퍼티: setter type=String)").noneMatch { it.startsWith("locked") }
+    }
+
+    @Test
+    fun `기본값을 계산하지 못하면 조용히 넘기지 않고 실패한다`() {
+        assertThatThrownBy { RequestSchemaWriter(mapper, validator).render(target<InitGuardProbe>(validated = true)) }
+            .isInstanceOf(IllegalStateException::class.java)
+    }
+
     private fun writer(): ResponseSchemaWriter = ResponseSchemaWriter(mapper)
 
     private inline fun <reified T> target(validated: Boolean): RequestTarget =
         RequestTarget("POST /probe body:json", typeOf<T>(), RequestBinding.JSON, validated)
 
     private companion object {
+        val GROUPS: List<Class<*>> = listOf(GroupProbe::class.java)
         const val LOWERCASE_ACCEPTED = "jackson-enum-lowercase=accepted"
         val PAGE_PROPERTY = Regex("""\$\.value\.[a-zA-Z]+ .*""")
     }
@@ -160,3 +197,29 @@ enum class LevelProbe { LOW, HIGH }
 value class IdProbe(val value: Long)
 
 data class EnumAndValueProbe(val level: LevelProbe, val id: IdProbe)
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
+data class ClassIncludeProbe(val hidden: String?, val shown: String)
+
+interface GroupProbe
+
+data class GroupedProbe(
+    @field:NotBlank(message = "기본") val plain: String,
+    @field:NotBlank(message = "그룹", groups = [GroupProbe::class]) val grouped: String
+)
+
+data class FieldPropertyProbe(val title: String) {
+    val normalized: String = title.trim()
+}
+
+class FormSetterProbe(val title: String) {
+    var editable: String = ""
+    var locked: String = ""
+        private set
+}
+
+data class InitGuardProbe(val name: String, val size: Int = 20) {
+    init {
+        require(name.length >= 2)
+    }
+}

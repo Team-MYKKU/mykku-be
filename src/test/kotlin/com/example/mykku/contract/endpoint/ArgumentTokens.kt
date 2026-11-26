@@ -48,7 +48,7 @@ class ArgumentTokens(private val resolvers: List<HandlerMethodArgumentResolver>)
 
     private fun frameworkToken(argument: HandlerArgument): String? = when (val resolver = resolverOf(argument)) {
         is ErrorsMethodArgumentResolver -> "errors"
-        is HttpEntityMethodProcessor -> "body:http-entity" + valid(argument)
+        is HttpEntityMethodProcessor -> "body:http-entity" + (if (argument.validated) " valid(무시됨)" else "")
         null -> named("framework:unresolved", argument)
         else -> if (BINDING_AGNOSTIC.any { it.isInstance(resolver) }) null else frameworkNamed(resolver, argument)
     }

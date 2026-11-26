@@ -5,6 +5,8 @@ import com.example.mykku.contract.endpoint.EndpointKeys
 import com.example.mykku.contract.support.ArgumentKind
 import com.example.mykku.contract.support.Endpoint
 import com.example.mykku.contract.support.HandlerArgument
+import jakarta.validation.Valid
+import org.springframework.validation.annotation.ValidationAnnotationUtils
 import org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor
 import kotlin.reflect.KType
 import kotlin.reflect.full.starProjectedType
@@ -15,7 +17,8 @@ data class RequestTarget(
     val header: String,
     val type: KType,
     val binding: RequestBinding,
-    val validated: Boolean
+    val validated: Boolean,
+    val groups: List<Class<*>> = emptyList()
 )
 
 class RequestTargets(private val tokens: ArgumentTokens) {
@@ -25,7 +28,7 @@ class RequestTargets(private val tokens: ArgumentTokens) {
     }
 
     private fun targetOf(endpoint: Endpoint, argument: HandlerArgument, binding: RequestBinding): RequestTarget =
-        RequestTarget(headerOf(endpoint, argument), typeOf(argument), binding, argument.validated)
+        RequestTarget(headerOf(endpoint, argument), typeOf(argument), binding, validated(argument), groupsOf(argument))
 
     private fun headerOf(endpoint: Endpoint, argument: HandlerArgument): String =
         "${EndpointKeys.of(endpoint)} ${tokens.of(argument)}"
@@ -38,8 +41,24 @@ class RequestTargets(private val tokens: ArgumentTokens) {
         else -> null
     }
 
+    private fun validated(argument: HandlerArgument): Boolean = when {
+        isHttpEntity(argument) -> false
+        isContainer(argument) -> argument.parameter.hasParameterAnnotation(Valid::class.java)
+        else -> argument.validated
+    }
+
+    private fun groupsOf(argument: HandlerArgument): List<Class<*>> = argument.parameter.parameterAnnotations
+        .firstNotNullOfOrNull { ValidationAnnotationUtils.determineValidationHints(it) }
+        .orEmpty()
+        .filterIsInstance<Class<*>>()
+
     private fun isHttpEntity(argument: HandlerArgument): Boolean =
         argument.kind == ArgumentKind.FRAMEWORK && tokens.resolverOf(argument) is HttpEntityMethodProcessor
+
+    private fun isContainer(argument: HandlerArgument): Boolean {
+        val type = argument.parameter.nestedIfOptional().nestedParameterType
+        return Collection::class.java.isAssignableFrom(type) || Map::class.java.isAssignableFrom(type) || type.isArray
+    }
 
     private fun typeOf(argument: HandlerArgument): KType {
         val declared = argument.kotlinType ?: argument.parameter.nestedParameterType.kotlin.starProjectedType

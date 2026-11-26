@@ -10,6 +10,8 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.context.ApplicationContext
+import org.springframework.web.method.ControllerAdviceBean
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
 
@@ -23,11 +25,15 @@ class EndpointContractTest : BaseControllerTest() {
     @Autowired
     private lateinit var handlerAdapter: RequestMappingHandlerAdapter
 
+    @Autowired
+    private lateinit var context: ApplicationContext
+
     @ParameterizedTest(name = "{0}")
     @EnumSource(EndpointArea::class)
     fun `영역별 엔드포인트 목록은 골든과 같다`(area: EndpointArea) {
         val tokens = ArgumentTokens(handlerAdapter.argumentResolvers.orEmpty())
-        val lines = EndpointLines(AdminSessionProbe(handlerMapping)::requires, tokens)
+        val advices = ControllerAdviceBean.findAnnotatedBeans(context)
+        val lines = EndpointLines(AdminSessionProbe(handlerMapping)::requires, tokens, advices)
         val entries = HandlerCatalog(handlerMapping, handlerAdapter).inArea(area).map {
             HintedEntry(EndpointKeys.of(it), lines.render(it) + "\n", it.handlerName)
         }

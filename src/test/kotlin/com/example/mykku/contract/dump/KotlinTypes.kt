@@ -29,8 +29,12 @@ object KotlinTypes {
     fun isProjectClass(klass: KClass<*>): Boolean =
         klass.qualifiedName.orEmpty().startsWith(PROJECT_PACKAGE) && isKotlin(klass)
 
-    fun valueClassUnderlying(klass: KClass<*>): KType? =
-        if (klass.isValue) klass.primaryConstructor?.parameters?.singleOrNull()?.type?.withNullability(false) else null
+    fun valueClassUnderlying(klass: KClass<*>): KType? {
+        if (!klass.isValue || !isProjectClass(klass)) {
+            return null
+        }
+        return klass.primaryConstructor?.parameters?.singleOrNull()?.type?.withNullability(false)
+    }
 
     fun isKotlin(klass: KClass<*>): Boolean = klass.java.isAnnotationPresent(Metadata::class.java)
 

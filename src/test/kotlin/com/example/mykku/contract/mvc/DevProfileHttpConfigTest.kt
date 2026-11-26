@@ -16,10 +16,11 @@ class DevProfileHttpConfigTest {
     private lateinit var root: Path
 
     @Test
-    fun `공통 파일 위에 dev 파일을 덮고 다른 프로필 문서·import·화이트리스트 밖 키는 버린다`() {
+    fun `공통 파일 위에 dev 파일을 덮고 다른 프로필 문서·import·다른 설정 파일·화이트리스트 밖 키는 버린다`() {
         write("application.yml", COMMON)
         write("application-dev.yml", DEV)
         write("dev-secret.yml", "server:\n  server-header: secret-value\n")
+        write("application-local.yml", "server:\n  server-header: local-value\n")
 
         assertThat(config().properties()).containsExactlyEntriesOf(
             sortedMapOf(
@@ -32,14 +33,16 @@ class DevProfileHttpConfigTest {
     }
 
     @Test
-    fun `목록형 on-profile과 on-cloud-platform 문서는 dev에서 빼고 relaxed 키와 목록은 Boot처럼 합친다`() {
+    fun `목록형 on-profile과 다른 클라우드 플랫폼 문서는 빼고 none 문서는 넣으며 relaxed 키와 목록은 Boot처럼 합친다`() {
         write("application.yml", RELAXED_COMMON)
         write("application-dev.yml", RELAXED_DEV)
 
         assertThat(config().properties()).containsExactlyEntriesOf(
             sortedMapOf(
+                "server.servlet.session.timeout" to "10m",
+                "server.tomcat.relaxed-path-chars" to "|",
                 "server.tomcat.relaxed-query-chars[0]" to "|",
-                "spring.servlet.multipart.max-file-size" to "10MB"
+                "spring.servlet.multipart.maxfilesize" to "10MB"
             )
         )
     }
@@ -54,17 +57,27 @@ class DevProfileHttpConfigTest {
     }
 
     @Test
-    fun `포트·경로·비밀성 키는 화이트리스트 접두 안이라도 남기지 않는다`() {
+    fun `실행 인자가 덮는 포트·운영 경로·비밀성 키는 빼고 다른 키는 낱말 단위로 판정해 남긴다`() {
         write("application-dev.yml", SENSITIVE)
 
-        assertThat(config().properties()).containsExactlyEntriesOf(sortedMapOf("server.shutdown" to "graceful"))
+        assertThat(config().properties()).containsExactlyEntriesOf(
+            sortedMapOf(
+                "server.address" to "0.0.0.0",
+                "server.shutdown" to "graceful",
+                "server.ssl.enabled" to "false",
+                "spring.jackson.deserialization.fail-on-trailing-tokens" to "true"
+            )
+        )
     }
 
     @Test
-    fun `spring profiles 키가 있으면 해석하지 않고 실패한다`() {
+    fun `spring profiles·cloud-platform 지정 키가 있으면 해석하지 않고 실패한다`() {
         write("application-dev.yml", "spring:\n  profiles:\n    group:\n      dev: extra\n")
+        write("application.yml", "spring:\n  main:\n    cloud-platform: kubernetes\n")
 
         assertThatThrownBy { config().properties() }.isInstanceOf(ContractViolationError::class.java)
+        assertThatThrownBy { DevProfileHttpConfig(root) { it.fileName.toString() == "application.yml" }.properties() }
+            .isInstanceOf(ContractViolationError::class.java)
     }
 
     @Test
@@ -119,10 +132,20 @@ class DevProfileHttpConfigTest {
             spring:
               servlet:
                 multipart:
-                  maxFileSize: 5MB
+                  max-file-size: 5MB
             server:
               tomcat:
                 relaxed-query-chars: ["[", "]"]
+                relaxed-path-chars: ["{", "}"]
+            ---
+            spring:
+              config:
+                activate:
+                  on-cloud-platform: none
+            server:
+              servlet:
+                session:
+                  timeout: 10m
             ---
             spring:
               config:
@@ -143,24 +166,32 @@ class DevProfileHttpConfigTest {
             spring:
               servlet:
                 multipart:
-                  max_file_size: 10MB
+                  maxfilesize: 10MB
             server:
               tomcat:
                 relaxedQueryChars: ["|"]
+                relaxed_path_chars: "|"
         """.trimIndent()
 
         val SENSITIVE = """
             server:
               port: 8080
+              address: 0.0.0.0
               shutdown: graceful
               ssl:
+                enabled: false
                 key-store: /etc/key.p12
+                key-store-password: abc
               tomcat:
                 basedir: /tmp/tomcat
               servlet:
                 session:
                   cookie:
                     secret-token: abc
+            spring:
+              jackson:
+                deserialization:
+                  fail-on-trailing-tokens: true
         """.trimIndent()
     }
 }

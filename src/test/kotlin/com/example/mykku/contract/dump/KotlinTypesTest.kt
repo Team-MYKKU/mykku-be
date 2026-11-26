@@ -17,6 +17,7 @@ class KotlinTypesTest {
         assertThat(KotlinTypes.render(typeOf<List<MultipartFile>>())).isEqualTo("List<file>")
         assertThat(KotlinTypes.render(typeOf<Map<String, KotlinTypesTest>>())).isEqualTo("Map<String, object>")
         assertThat(KotlinTypes.render(typeOf<List<ValueProbe>?>())).isEqualTo("List<String>?")
+        assertThat(KotlinTypes.render(typeOf<UInt>())).isEqualTo("UInt")
     }
 
     @Test

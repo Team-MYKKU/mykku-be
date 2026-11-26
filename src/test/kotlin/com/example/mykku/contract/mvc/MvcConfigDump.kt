@@ -5,6 +5,7 @@ import org.apache.catalina.util.ServerInfo
 import org.hibernate.validator.HibernateValidator
 import com.example.mykku.contract.dump.DumpSections
 import com.example.mykku.contract.dump.MvcBeans
+import com.example.mykku.contract.support.HandlerCatalog
 import org.springframework.boot.SpringBootVersion
 import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties
 import org.springframework.boot.autoconfigure.web.ServerProperties
@@ -40,8 +41,7 @@ class MvcConfigDump(private val context: ApplicationContext) {
         section("콘텐츠 협상", contentNegotiation()),
         section("경로 매칭", pathMatching()),
         section("핸들러 매핑(순서·URL 매핑·함수형 경로, /actuator·/docs 제외)", HandlerMappingLines(context).render()),
-        section("타입 변환기(프로젝트 Converter·Formatter 빈)", TypeConverterLines(context).render()),
-        section("컨트롤러 어드바이스(@ExceptionHandler 제외)", AdviceLines(context).render()),
+        section("타입 변환기(핸들러 인자 타입에 닿는 프로젝트 Converter·Formatter 빈)", typeConverters()),
         section("예외 리졸버", exceptionResolvers())
     )
 
@@ -66,6 +66,12 @@ class MvcConfigDump(private val context: ApplicationContext) {
             val charset = (converter as? AbstractHttpMessageConverter<*>)?.defaultCharset?.name() ?: "-"
             "${index + 1} ${converter.javaClass.simpleName} types=${converter.supportedMediaTypes} charset=$charset"
         }
+
+    private fun typeConverters(): List<String> {
+        val mapping = context.getBean("requestMappingHandlerMapping", RequestMappingHandlerMapping::class.java)
+        val catalog = HandlerCatalog(mapping, bean<RequestMappingHandlerAdapter>())
+        return TypeConverterLines(context, BoundTypes.of(catalog)).render()
+    }
 
     private fun adapterConverters(): List<HttpMessageConverter<*>> =
         bean<RequestMappingHandlerAdapter>().messageConverters

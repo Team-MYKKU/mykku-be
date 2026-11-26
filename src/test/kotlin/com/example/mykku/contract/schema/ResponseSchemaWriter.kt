@@ -20,7 +20,8 @@ data class SchemaTarget(
     val type: JavaType,
     val declared: KType?,
     val visitable: JsonFormatVisitable? = null,
-    val property: BeanProperty? = null
+    val property: BeanProperty? = null,
+    val owner: JavaType? = null
 )
 
 class ResponseSchemaWriter(private val mapper: ObjectMapper) {
@@ -77,7 +78,8 @@ class ResponseSchemaWriter(private val mapper: ObjectMapper) {
         val children = if (isUnordered(target.type)) shape.properties.sortedBy { it.name } else shape.properties
         return children.map {
             val declared = KotlinProperties.typeOf(owner, it.member)
-            SchemaTarget("${target.path}.${it.name}", it.type ?: unknownType(), declared, it.visitable, it.property)
+            val type = it.type ?: unknownType()
+            SchemaTarget("${target.path}.${it.name}", type, declared, it.visitable, it.property, target.type)
         }
     }
 
@@ -101,7 +103,8 @@ class ResponseSchemaWriter(private val mapper: ObjectMapper) {
 
     private fun inclusion(target: SchemaTarget): String? {
         val property = target.property ?: return null
-        val value = property.findPropertyInclusion(mapper.serializationConfig, target.type.rawClass)
+        val owner = target.owner ?: return null
+        val value = PropertyInclusions.effective(mapper.serializationConfig, owner, property)
         if (value.valueInclusion in DEFAULT_INCLUSIONS && value.contentInclusion in DEFAULT_INCLUSIONS) {
             return null
         }
