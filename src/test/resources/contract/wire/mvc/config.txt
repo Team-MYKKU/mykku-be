@@ -52,14 +52,9 @@ path-prefixes=[]
   /** -> resources [class path resource [META-INF/resources/], class path resource [resources/], class path resource [static/], class path resource [public/], ServletContext resource [/]]
   /webjars/** -> resources [class path resource [META-INF/resources/webjars/]]
 
-# 타입 변환기(프로젝트 Converter·Formatter 빈)
-String -> enum[ASC,DESC]
-
-# 컨트롤러 어드바이스(@ExceptionHandler 제외)
-request-body-advice=0
-response-body-advice=0
-init-binder-methods=0
-model-attribute-methods=0
+# 타입 변환기(핸들러 인자 타입에 닿는 프로젝트 Converter·Formatter 빈)
+(핸들러 인자 타입에 닿는 프로젝트 변환기 없음)
+add-formatters-overrides=0
 
 # 예외 리졸버
 -2147483648 DefaultErrorAttributes
