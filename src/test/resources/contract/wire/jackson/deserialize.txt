@@ -6,6 +6,8 @@ null → String?: {"value":null} -> 값 NullableTextProbe(value=null)
 null → 기본값 String: {"value":null} -> 오류 HttpMessageNotReadableException <- MissingKotlinParameterException
 is 접두 이름 → Boolean: {"isActive":true} -> 값 BooleanNameProbe(isActive=true)
 접두 없는 이름 → Boolean: {"active":true} -> 값 BooleanNameProbe(isActive=false)
+null → List<String>: {"values":null} -> 오류 HttpMessageNotReadableException <- MissingKotlinParameterException
+null 원소 → List<String>: {"values":["a",null]} -> 값 ListProbe(values=[a, null])
 누락 → Long: {} -> 값 LongProbe(value=0)
 null → Long: {"value":null} -> 값 LongProbe(value=0)
 1.5 → Long: {"value":1.5} -> 오류 HttpMessageNotReadableException <- InvalidFormatException

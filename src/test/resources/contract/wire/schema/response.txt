@@ -33,8 +33,8 @@ $.data.id integer non-null
 $.data.title string non-null
 $.data.subTitle string nullable
 $.data.description string nullable
-$.data.startedAt string non-null format=date-time
-$.data.expiredAt string non-null format=date-time
+$.data.startedAt string non-null format=date-time java=LocalDateTime
+$.data.expiredAt string non-null format=date-time java=LocalDateTime
 $.data.thumbnailUrl string non-null
 $.data.images array non-null
 $.data.images[] object non-null
@@ -42,7 +42,7 @@ $.data.images[].url string non-null
 $.data.images[].orderIndex integer non-null
 $.data.tags array non-null
 $.data.tags[] string non-null
-$.data.createdAt string non-null format=date-time
+$.data.createdAt string non-null format=date-time java=LocalDateTime
 
 ## DELETE /admin/api/v1/contests/{contestId}
 $ object non-null
@@ -62,7 +62,7 @@ $.data.contestId integer non-null
 $.data.contestTitle string non-null
 $.data.title string non-null
 $.data.content string non-null
-$.data.announcedAt string non-null format=date
+$.data.announcedAt string non-null format=date java=LocalDate
 
 ## POST /admin/api/v1/contests/{contestId}/winners
 $ object non-null
@@ -90,8 +90,8 @@ $.data object non-null
 $.data.id integer non-null
 $.data.title string non-null
 $.data.content string non-null
-$.data.date string non-null format=date
-$.data.createdAt string non-null format=date-time
+$.data.date string non-null format=date java=LocalDate
+$.data.createdAt string non-null format=date-time java=LocalDateTime
 
 ## DELETE /admin/api/v1/dailymessages/{id}
 $ object non-null
@@ -111,14 +111,14 @@ $.data.id integer non-null
 $.data.title string non-null
 $.data.subTitle string nullable
 $.data.description string nullable
-$.data.startedAt string non-null format=date-time
-$.data.expiredAt string non-null format=date-time
+$.data.startedAt string non-null format=date-time java=LocalDateTime
+$.data.expiredAt string non-null format=date-time java=LocalDateTime
 $.data.thumbnailUrl string non-null
 $.data.images array non-null
 $.data.images[] object non-null
 $.data.images[].url string non-null
 $.data.images[].orderIndex integer non-null
-$.data.createdAt string non-null format=date-time
+$.data.createdAt string non-null format=date-time java=LocalDateTime
 
 ## DELETE /admin/api/v1/events/{eventId}
 $ object non-null
@@ -138,7 +138,7 @@ $.data.eventId integer non-null
 $.data.eventTitle string non-null
 $.data.title string non-null
 $.data.content string non-null
-$.data.announcedAt string non-null format=date
+$.data.announcedAt string non-null format=date java=LocalDate
 
 ## PUT /admin/api/v1/events/{eventId}/winners
 $ object non-null
@@ -166,7 +166,7 @@ $.data.id integer non-null
 $.data.title string non-null
 $.data.subtitle string nullable
 $.data.content string nullable
-$.data.productionDate string non-null format=date
+$.data.productionDate string non-null format=date java=LocalDate
 $.data.coverImageUrl string nullable
 $.data.pages array non-null
 $.data.pages[] object non-null
@@ -210,8 +210,8 @@ $.data.reports[].reasonDescription string non-null
 $.data.reports[].detail string nullable
 $.data.reports[].status string non-null
 $.data.reports[].statusDescription string non-null
-$.data.reports[].processedAt string nullable format=date-time
-$.data.reports[].createdAt string non-null format=date-time
+$.data.reports[].processedAt string nullable format=date-time java=LocalDateTime
+$.data.reports[].createdAt string non-null format=date-time java=LocalDateTime
 $.data.currentPage integer non-null
 $.data.totalPages integer non-null
 $.data.totalElements integer non-null
@@ -234,8 +234,8 @@ $.data.reasonDescription string non-null
 $.data.detail string nullable
 $.data.status string non-null
 $.data.statusDescription string non-null
-$.data.processedAt string nullable format=date-time
-$.data.createdAt string non-null format=date-time
+$.data.processedAt string nullable format=date-time java=LocalDateTime
+$.data.createdAt string non-null format=date-time java=LocalDateTime
 
 ## GET /admin/api/v1/roles
 $ object non-null
@@ -277,7 +277,7 @@ $.data.role.id integer non-null
 $.data.role.name string non-null
 $.data.role.description string nullable
 $.data.isRepresentative boolean non-null
-$.data.earnedAt string non-null format=date-time
+$.data.earnedAt string non-null format=date-time java=LocalDateTime
 
 ## GET /admin/board
 $ view
@@ -413,7 +413,7 @@ $.data.blocks array non-null
 $.data.blocks[] object non-null
 $.data.blocks[].id integer non-null
 $.data.blocks[].keyword string non-null
-$.data.blocks[].blockedAt string non-null format=date-time
+$.data.blocks[].blockedAt string non-null format=date-time java=LocalDateTime
 $.data.totalCount integer non-null
 $.data.hasNext boolean non-null
 
@@ -423,7 +423,7 @@ $.message string non-null
 $.data object non-null
 $.data.id integer non-null
 $.data.keyword string non-null
-$.data.blockedAt string non-null format=date-time
+$.data.blockedAt string non-null format=date-time java=LocalDateTime
 
 ## DELETE /api/v1/blocks/keywords/{keyword}
 $ object non-null
@@ -440,7 +440,7 @@ $.data.blocks[].id integer non-null
 $.data.blocks[].blockedMemberId string nullable
 $.data.blocks[].blockedMemberNickname string nullable
 $.data.blocks[].blockedMemberProfileImage string non-null
-$.data.blocks[].blockedAt string non-null format=date-time
+$.data.blocks[].blockedAt string non-null format=date-time java=LocalDateTime
 $.data.totalCount integer non-null
 $.data.hasNext boolean non-null
 
@@ -452,7 +452,7 @@ $.data.id integer non-null
 $.data.blockedMemberId string nullable
 $.data.blockedMemberNickname string nullable
 $.data.blockedMemberProfileImage string non-null
-$.data.blockedAt string non-null format=date-time
+$.data.blockedAt string non-null format=date-time java=LocalDateTime
 
 ## DELETE /api/v1/blocks/members/{memberId}
 $ object non-null
@@ -485,7 +485,7 @@ $.data.feeds[].author.role.id integer non-null
 $.data.feeds[].author.role.name string non-null
 $.data.feeds[].author.role.description string nullable
 $.data.feeds[].board string non-null
-$.data.feeds[].createdAt string non-null format=date-time
+$.data.feeds[].createdAt string non-null format=date-time java=LocalDateTime
 $.data.feeds[].title string non-null
 $.data.feeds[].content string non-null
 $.data.feeds[].images array non-null
@@ -532,8 +532,8 @@ $.data.content[].id integer non-null
 $.data.content[].title string non-null
 $.data.content[].subTitle string nullable
 $.data.content[].description string nullable
-$.data.content[].startedAt string non-null format=date-time
-$.data.content[].expiredAt string non-null format=date-time
+$.data.content[].startedAt string non-null format=date-time java=LocalDateTime
+$.data.content[].expiredAt string non-null format=date-time java=LocalDateTime
 $.data.content[].status string non-null enum=[ACTIVE,EXPIRED,WINNER_SELECTING,WINNER_SELECTED,ALL]
 $.data.content[].thumbnailUrl string non-null
 $.data.content[].tags array non-null
@@ -583,7 +583,7 @@ $.data.feeds[].author.role.id integer non-null
 $.data.feeds[].author.role.name string non-null
 $.data.feeds[].author.role.description string nullable
 $.data.feeds[].board string non-null
-$.data.feeds[].createdAt string non-null format=date-time
+$.data.feeds[].createdAt string non-null format=date-time java=LocalDateTime
 $.data.feeds[].title string non-null
 $.data.feeds[].content string non-null
 $.data.feeds[].images array non-null
@@ -625,8 +625,8 @@ $.data.contests array non-null
 $.data.contests[] object non-null
 $.data.contests[].contestId integer non-null
 $.data.contests[].contestTitle string non-null
-$.data.contests[].startedAt string non-null format=date-time
-$.data.contests[].expiredAt string non-null format=date-time
+$.data.contests[].startedAt string non-null format=date-time java=LocalDateTime
+$.data.contests[].expiredAt string non-null format=date-time java=LocalDateTime
 $.data.contests[].winners array non-null
 $.data.contests[].winners[] object non-null
 $.data.contests[].winners[].winnerId integer non-null
@@ -648,8 +648,8 @@ $.data.id integer non-null
 $.data.title string non-null
 $.data.subTitle string nullable
 $.data.description string nullable
-$.data.startedAt string non-null format=date-time
-$.data.expiredAt string non-null format=date-time
+$.data.startedAt string non-null format=date-time java=LocalDateTime
+$.data.expiredAt string non-null format=date-time java=LocalDateTime
 $.data.status string non-null enum=[ACTIVE,EXPIRED,WINNER_SELECTING,WINNER_SELECTED,ALL]
 $.data.thumbnailUrl string non-null
 $.data.images array non-null
@@ -658,7 +658,7 @@ $.data.images[].url string non-null
 $.data.images[].orderIndex integer non-null
 $.data.tags array non-null
 $.data.tags[] string non-null
-$.data.createdAt string non-null format=date-time
+$.data.createdAt string non-null format=date-time java=LocalDateTime
 
 ## GET /api/v1/contests/{contestId}/my-winner-status
 $ object non-null
@@ -676,7 +676,7 @@ $.data.contestId integer non-null
 $.data.contestTitle string non-null
 $.data.title string non-null
 $.data.content string non-null
-$.data.announcedAt string non-null format=date
+$.data.announcedAt string non-null format=date java=LocalDate
 
 ## GET /api/v1/contests/{contestId}/winners
 $ object non-null
@@ -706,7 +706,7 @@ $.data.content[] object
 $.data.content[].id integer non-null
 $.data.content[].title string non-null
 $.data.content[].content string non-null
-$.data.content[].date string non-null format=date
+$.data.content[].date string non-null format=date java=LocalDate
 $.data.empty boolean
 $.data.first boolean
 $.data.last boolean
@@ -765,11 +765,11 @@ $.data.replies[].author.role.name string non-null
 $.data.replies[].author.role.description string nullable
 $.data.replies[].likeCount integer non-null
 $.data.replies[].isLiked boolean non-null
-$.data.replies[].createdAt string non-null format=date-time
-$.data.replies[].updatedAt string non-null format=date-time
+$.data.replies[].createdAt string non-null format=date-time java=LocalDateTime
+$.data.replies[].updatedAt string non-null format=date-time java=LocalDateTime
 $.data.replyCount integer non-null
-$.data.createdAt string non-null format=date-time
-$.data.updatedAt string non-null format=date-time
+$.data.createdAt string non-null format=date-time java=LocalDateTime
+$.data.updatedAt string non-null format=date-time java=LocalDateTime
 
 ## GET /api/v1/daily-messages/{dailyMessageId}/comments
 $ object non-null
@@ -803,11 +803,11 @@ $.data.comments[].replies[].author.role.name string non-null
 $.data.comments[].replies[].author.role.description string nullable
 $.data.comments[].replies[].likeCount integer non-null
 $.data.comments[].replies[].isLiked boolean non-null
-$.data.comments[].replies[].createdAt string non-null format=date-time
-$.data.comments[].replies[].updatedAt string non-null format=date-time
+$.data.comments[].replies[].createdAt string non-null format=date-time java=LocalDateTime
+$.data.comments[].replies[].updatedAt string non-null format=date-time java=LocalDateTime
 $.data.comments[].replyCount integer non-null
-$.data.comments[].createdAt string non-null format=date-time
-$.data.comments[].updatedAt string non-null format=date-time
+$.data.comments[].createdAt string non-null format=date-time java=LocalDateTime
+$.data.comments[].updatedAt string non-null format=date-time java=LocalDateTime
 $.data.totalElements integer non-null
 $.data.totalPages integer non-null
 $.data.currentPage integer non-null
@@ -844,11 +844,11 @@ $.data.replies[].author.role.name string non-null
 $.data.replies[].author.role.description string nullable
 $.data.replies[].likeCount integer non-null
 $.data.replies[].isLiked boolean non-null
-$.data.replies[].createdAt string non-null format=date-time
-$.data.replies[].updatedAt string non-null format=date-time
+$.data.replies[].createdAt string non-null format=date-time java=LocalDateTime
+$.data.replies[].updatedAt string non-null format=date-time java=LocalDateTime
 $.data.replyCount integer non-null
-$.data.createdAt string non-null format=date-time
-$.data.updatedAt string non-null format=date-time
+$.data.createdAt string non-null format=date-time java=LocalDateTime
+$.data.updatedAt string non-null format=date-time java=LocalDateTime
 
 ## GET /api/v1/daily-messages/{id}
 $ object non-null
@@ -857,8 +857,8 @@ $.data object non-null
 $.data.id integer non-null
 $.data.title string non-null
 $.data.content string non-null
-$.data.date string non-null format=date
-$.data.createdAt string non-null format=date-time
+$.data.date string non-null format=date java=LocalDate
+$.data.createdAt string non-null format=date-time java=LocalDateTime
 
 ## POST /api/v1/email-auth/login
 $ object non-null
@@ -924,8 +924,8 @@ $.data.content[].id integer non-null
 $.data.content[].title string non-null
 $.data.content[].subTitle string nullable
 $.data.content[].description string nullable
-$.data.content[].startedAt string non-null format=date-time
-$.data.content[].expiredAt string non-null format=date-time
+$.data.content[].startedAt string non-null format=date-time java=LocalDateTime
+$.data.content[].expiredAt string non-null format=date-time java=LocalDateTime
 $.data.content[].status string non-null enum=[ACTIVE,EXPIRED,WINNER_SELECTING,WINNER_SELECTED,ALL]
 $.data.content[].thumbnailUrl string non-null
 $.data.page integer non-null
@@ -943,8 +943,8 @@ $.data.content[] object non-null
 $.data.content[].eventId integer non-null
 $.data.content[].eventTitle string non-null
 $.data.content[].thumbnailUrl string non-null
-$.data.content[].startedAt string non-null format=date-time
-$.data.content[].expiredAt string non-null format=date-time
+$.data.content[].startedAt string non-null format=date-time java=LocalDateTime
+$.data.content[].expiredAt string non-null format=date-time java=LocalDateTime
 $.data.page integer non-null
 $.data.size integer non-null
 $.data.totalElements integer non-null
@@ -959,15 +959,15 @@ $.data.id integer non-null
 $.data.title string non-null
 $.data.subTitle string nullable
 $.data.description string nullable
-$.data.startedAt string non-null format=date-time
-$.data.expiredAt string non-null format=date-time
+$.data.startedAt string non-null format=date-time java=LocalDateTime
+$.data.expiredAt string non-null format=date-time java=LocalDateTime
 $.data.status string non-null enum=[ACTIVE,EXPIRED,WINNER_SELECTING,WINNER_SELECTED,ALL]
 $.data.thumbnailUrl string non-null
 $.data.images array non-null
 $.data.images[] object non-null
 $.data.images[].url string non-null
 $.data.images[].orderIndex integer non-null
-$.data.createdAt string non-null format=date-time
+$.data.createdAt string non-null format=date-time java=LocalDateTime
 $.data.isWinner boolean non-null
 
 ## GET /api/v1/events/{eventId}/my-winner-status
@@ -985,7 +985,7 @@ $.data.eventId integer non-null
 $.data.eventTitle string non-null
 $.data.title string non-null
 $.data.content string non-null
-$.data.announcedAt string non-null format=date
+$.data.announcedAt string non-null format=date java=LocalDate
 
 ## GET /api/v1/events/{eventId}/winners
 $ object non-null
@@ -1010,7 +1010,7 @@ $.data.content[].id integer non-null
 $.data.content[].title string non-null
 $.data.content[].subtitle string nullable
 $.data.content[].content string nullable
-$.data.content[].productionDate string non-null format=date
+$.data.content[].productionDate string non-null format=date java=LocalDate
 $.data.content[].coverImageUrl string nullable
 $.data.empty boolean
 $.data.first boolean
@@ -1043,7 +1043,7 @@ $.data.id integer non-null
 $.data.title string non-null
 $.data.subtitle string nullable
 $.data.content string nullable
-$.data.productionDate string non-null format=date
+$.data.productionDate string non-null format=date java=LocalDate
 $.data.coverImageUrl string nullable
 $.data.pages array non-null
 $.data.pages[] object non-null
@@ -1058,7 +1058,7 @@ $.data[] object non-null
 $.data[].id integer non-null
 $.data[].deviceId string non-null
 $.data[].deviceType string nullable
-$.data[].createdAt string non-null format=date-time
+$.data[].createdAt string non-null format=date-time java=LocalDateTime
 
 ## POST /api/v1/fcm-tokens
 $ object non-null
@@ -1067,7 +1067,7 @@ $.data object non-null
 $.data.id integer non-null
 $.data.deviceId string non-null
 $.data.deviceType string nullable
-$.data.createdAt string non-null format=date-time
+$.data.createdAt string non-null format=date-time java=LocalDateTime
 
 ## DELETE /api/v1/fcm-tokens/{deviceId}
 $ object non-null
@@ -1096,7 +1096,7 @@ $.data.tags array non-null
 $.data.tags[] string non-null
 $.data.likeCount integer non-null
 $.data.commentCount integer non-null
-$.data.createdAt string non-null format=date-time
+$.data.createdAt string non-null format=date-time java=LocalDateTime
 
 ## DELETE /api/v1/feeds/comments/{commentId}
 $ object non-null
@@ -1133,11 +1133,11 @@ $.data.replies[].author.role.name string non-null
 $.data.replies[].author.role.description string nullable
 $.data.replies[].likeCount integer non-null
 $.data.replies[].isLiked boolean non-null
-$.data.replies[].createdAt string non-null format=date-time
-$.data.replies[].updatedAt string non-null format=date-time
+$.data.replies[].createdAt string non-null format=date-time java=LocalDateTime
+$.data.replies[].updatedAt string non-null format=date-time java=LocalDateTime
 $.data.replyCount integer non-null
-$.data.createdAt string non-null format=date-time
-$.data.updatedAt string non-null format=date-time
+$.data.createdAt string non-null format=date-time java=LocalDateTime
+$.data.updatedAt string non-null format=date-time java=LocalDateTime
 
 ## DELETE /api/v1/feeds/{feedId}
 $ object non-null
@@ -1159,8 +1159,8 @@ $.data.author.role.name string non-null
 $.data.author.role.description string nullable
 $.data.boardId integer non-null
 $.data.boardTitle string non-null
-$.data.createdAt string non-null format=date-time
-$.data.updatedAt string non-null format=date-time
+$.data.createdAt string non-null format=date-time java=LocalDateTime
+$.data.updatedAt string non-null format=date-time java=LocalDateTime
 $.data.title string non-null
 $.data.content string non-null
 $.data.images array non-null
@@ -1192,8 +1192,8 @@ $.data.author.role.name string non-null
 $.data.author.role.description string nullable
 $.data.boardId integer non-null
 $.data.boardTitle string non-null
-$.data.createdAt string non-null format=date-time
-$.data.updatedAt string non-null format=date-time
+$.data.createdAt string non-null format=date-time java=LocalDateTime
+$.data.updatedAt string non-null format=date-time java=LocalDateTime
 $.data.title string non-null
 $.data.content string non-null
 $.data.images array non-null
@@ -1242,11 +1242,11 @@ $.data.comments[].replies[].author.role.name string non-null
 $.data.comments[].replies[].author.role.description string nullable
 $.data.comments[].replies[].likeCount integer non-null
 $.data.comments[].replies[].isLiked boolean non-null
-$.data.comments[].replies[].createdAt string non-null format=date-time
-$.data.comments[].replies[].updatedAt string non-null format=date-time
+$.data.comments[].replies[].createdAt string non-null format=date-time java=LocalDateTime
+$.data.comments[].replies[].updatedAt string non-null format=date-time java=LocalDateTime
 $.data.comments[].replyCount integer non-null
-$.data.comments[].createdAt string non-null format=date-time
-$.data.comments[].updatedAt string non-null format=date-time
+$.data.comments[].createdAt string non-null format=date-time java=LocalDateTime
+$.data.comments[].updatedAt string non-null format=date-time java=LocalDateTime
 $.data.totalElements integer non-null
 $.data.totalPages integer non-null
 $.data.currentPage integer non-null
@@ -1283,11 +1283,11 @@ $.data.replies[].author.role.name string non-null
 $.data.replies[].author.role.description string nullable
 $.data.replies[].likeCount integer non-null
 $.data.replies[].isLiked boolean non-null
-$.data.replies[].createdAt string non-null format=date-time
-$.data.replies[].updatedAt string non-null format=date-time
+$.data.replies[].createdAt string non-null format=date-time java=LocalDateTime
+$.data.replies[].updatedAt string non-null format=date-time java=LocalDateTime
 $.data.replyCount integer non-null
-$.data.createdAt string non-null format=date-time
-$.data.updatedAt string non-null format=date-time
+$.data.createdAt string non-null format=date-time java=LocalDateTime
+$.data.updatedAt string non-null format=date-time java=LocalDateTime
 
 ## GET /api/v1/likes/boards
 $ object non-null
@@ -1397,7 +1397,7 @@ $.data.role.name string non-null
 $.data.role.description string nullable
 $.data.provider string nullable
 $.data.emailVerified boolean non-null
-$.data.createdAt string non-null format=date-time
+$.data.createdAt string non-null format=date-time java=LocalDateTime
 
 ## PATCH /api/v1/members/me consumes=application/json
 $ object non-null
@@ -1413,7 +1413,7 @@ $.data.role.name string non-null
 $.data.role.description string nullable
 $.data.provider string nullable
 $.data.emailVerified boolean non-null
-$.data.createdAt string non-null format=date-time
+$.data.createdAt string non-null format=date-time java=LocalDateTime
 
 ## PATCH /api/v1/members/me consumes=multipart/form-data
 $ object non-null
@@ -1429,7 +1429,7 @@ $.data.role.name string non-null
 $.data.role.description string nullable
 $.data.provider string nullable
 $.data.emailVerified boolean non-null
-$.data.createdAt string non-null format=date-time
+$.data.createdAt string non-null format=date-time java=LocalDateTime
 
 ## GET /api/v1/members/me/contests
 $ object non-null
@@ -1441,8 +1441,8 @@ $.data.content[].id integer non-null
 $.data.content[].title string non-null
 $.data.content[].subTitle string nullable
 $.data.content[].description string nullable
-$.data.content[].startedAt string non-null format=date-time
-$.data.content[].expiredAt string non-null format=date-time
+$.data.content[].startedAt string non-null format=date-time java=LocalDateTime
+$.data.content[].expiredAt string non-null format=date-time java=LocalDateTime
 $.data.content[].status string non-null enum=[ACTIVE,EXPIRED,WINNER_SELECTING,WINNER_SELECTED,ALL]
 $.data.content[].thumbnailUrl string non-null
 $.data.content[].tags array non-null
@@ -1463,8 +1463,8 @@ $.data.content array non-null
 $.data.content[] object non-null
 $.data.content[].id integer non-null
 $.data.content[].title string non-null
-$.data.content[].startedAt string non-null format=date-time
-$.data.content[].expiredAt string non-null format=date-time
+$.data.content[].startedAt string non-null format=date-time java=LocalDateTime
+$.data.content[].expiredAt string non-null format=date-time java=LocalDateTime
 $.data.content[].status string non-null enum=[ACTIVE,EXPIRED,WINNER_SELECTING,WINNER_SELECTED,ALL]
 $.data.content[].thumbnailUrl string non-null
 $.data.content[].winnerStatus string non-null enum=[WON,LOST,PENDING]
@@ -1490,7 +1490,7 @@ $.data.feeds[].author.role.id integer non-null
 $.data.feeds[].author.role.name string non-null
 $.data.feeds[].author.role.description string nullable
 $.data.feeds[].board string non-null
-$.data.feeds[].createdAt string non-null format=date-time
+$.data.feeds[].createdAt string non-null format=date-time java=LocalDateTime
 $.data.feeds[].title string non-null
 $.data.feeds[].content string non-null
 $.data.feeds[].images array non-null
@@ -1530,7 +1530,7 @@ $.data.role.name string non-null
 $.data.role.description string nullable
 $.data.provider string nullable
 $.data.emailVerified boolean non-null
-$.data.createdAt string non-null format=date-time
+$.data.createdAt string non-null format=date-time java=LocalDateTime
 
 ## PUT /api/v1/members/password
 $ object non-null
@@ -1551,7 +1551,7 @@ $.data.role.name string non-null
 $.data.role.description string nullable
 $.data.provider string nullable
 $.data.emailVerified boolean non-null
-$.data.createdAt string non-null format=date-time
+$.data.createdAt string non-null format=date-time java=LocalDateTime
 
 ## GET /api/v1/notification-settings
 $ object non-null
@@ -1584,7 +1584,7 @@ $.data.content[].content string non-null
 $.data.content[].isRead boolean non-null
 $.data.content[].relatedResourceId integer nullable
 $.data.content[].relatedResourceType string nullable
-$.data.content[].createdAt string non-null format=date-time
+$.data.content[].createdAt string non-null format=date-time java=LocalDateTime
 $.data.empty boolean
 $.data.first boolean
 $.data.last boolean
@@ -1627,7 +1627,7 @@ $.data.content[].content string non-null
 $.data.content[].isRead boolean non-null
 $.data.content[].relatedResourceId integer nullable
 $.data.content[].relatedResourceType string nullable
-$.data.content[].createdAt string non-null format=date-time
+$.data.content[].createdAt string non-null format=date-time java=LocalDateTime
 $.data.empty boolean
 $.data.first boolean
 $.data.last boolean
@@ -1717,8 +1717,8 @@ $.data.reasonDescription string non-null
 $.data.detail string nullable
 $.data.status string non-null
 $.data.statusDescription string non-null
-$.data.processedAt string nullable format=date-time
-$.data.createdAt string non-null format=date-time
+$.data.processedAt string nullable format=date-time java=LocalDateTime
+$.data.createdAt string non-null format=date-time java=LocalDateTime
 
 ## GET /api/v1/reports/reasons
 $ object non-null
@@ -1748,7 +1748,7 @@ $.data[].role.id integer non-null
 $.data[].role.name string non-null
 $.data[].role.description string nullable
 $.data[].isRepresentative boolean non-null
-$.data[].earnedAt string non-null format=date-time
+$.data[].earnedAt string non-null format=date-time java=LocalDateTime
 
 ## GET /api/v1/roles/me/new
 $ object non-null
@@ -1761,7 +1761,7 @@ $.data[].role.id integer non-null
 $.data[].role.name string non-null
 $.data[].role.description string nullable
 $.data[].isRepresentative boolean non-null
-$.data[].earnedAt string non-null format=date-time
+$.data[].earnedAt string non-null format=date-time java=LocalDateTime
 
 ## PATCH /api/v1/roles/{memberRoleId}/representative
 $ object non-null
@@ -1787,7 +1787,7 @@ $.data.boards[].feeds[].boardTitle string non-null
 $.data.boards[].feeds[].title string non-null
 $.data.boards[].feeds[].content string non-null
 $.data.boards[].feeds[].thumbnailUrl string nullable
-$.data.boards[].feeds[].createdAt string non-null format=date-time
+$.data.boards[].feeds[].createdAt string non-null format=date-time java=LocalDateTime
 
 ## GET /api/v1/search/feeds/boards/{boardId}
 $ object non-null
@@ -1801,7 +1801,7 @@ $.data.feeds[].boardTitle string non-null
 $.data.feeds[].title string non-null
 $.data.feeds[].content string non-null
 $.data.feeds[].thumbnailUrl string nullable
-$.data.feeds[].createdAt string non-null format=date-time
+$.data.feeds[].createdAt string non-null format=date-time java=LocalDateTime
 $.data.currentPage integer non-null
 $.data.totalPages integer non-null
 $.data.totalElements integer non-null

@@ -4,31 +4,29 @@ spring-framework 6.2.6
 tomcat Apache Tomcat/10.1.40
 hibernate-validator 8.0.2.Final
 
-# 메시지 컨버터(핸들러 어댑터)
-1 ProjectingJackson2HttpMessageConverter types=[application/json, application/*+json] charset=-
-2 ByteArrayHttpMessageConverter types=[application/octet-stream, */*] charset=-
-3 StringHttpMessageConverter types=[text/plain, */*] charset=UTF-8
-4 StringHttpMessageConverter types=[text/plain, */*] charset=ISO-8859-1
-5 ResourceHttpMessageConverter types=[*/*] charset=-
-6 ResourceRegionHttpMessageConverter types=[*/*] charset=-
-7 AllEncompassingFormHttpMessageConverter types=[application/x-www-form-urlencoded, multipart/form-data, multipart/mixed, multipart/related] charset=-
+# 메시지 컨버터(핸들러 어댑터, 테스트 클래스패스 전용 ProjectingJackson2HttpMessageConverter 제외)
+1 ByteArrayHttpMessageConverter types=[application/octet-stream, */*] charset=-
+2 StringHttpMessageConverter types=[text/plain, */*] charset=UTF-8
+3 StringHttpMessageConverter types=[text/plain, */*] charset=ISO-8859-1
+4 ResourceHttpMessageConverter types=[*/*] charset=-
+5 ResourceRegionHttpMessageConverter types=[*/*] charset=-
+6 AllEncompassingFormHttpMessageConverter types=[application/x-www-form-urlencoded, multipart/form-data, multipart/mixed, multipart/related] charset=-
+7 MappingJackson2HttpMessageConverter types=[application/json, application/*+json] charset=-
 8 MappingJackson2HttpMessageConverter types=[application/json, application/*+json] charset=-
-9 MappingJackson2HttpMessageConverter types=[application/json, application/*+json] charset=-
-10 MappingJackson2YamlHttpMessageConverter types=[application/yaml] charset=-
-11 Jaxb2RootElementHttpMessageConverter types=[application/xml, text/xml, application/*+xml] charset=-
+9 MappingJackson2YamlHttpMessageConverter types=[application/yaml] charset=-
+10 Jaxb2RootElementHttpMessageConverter types=[application/xml, text/xml, application/*+xml] charset=-
 
-# 메시지 컨버터(@ExceptionHandler)
-1 ProjectingJackson2HttpMessageConverter types=[application/json, application/*+json] charset=-
-2 ByteArrayHttpMessageConverter types=[application/octet-stream, */*] charset=-
-3 StringHttpMessageConverter types=[text/plain, */*] charset=UTF-8
-4 StringHttpMessageConverter types=[text/plain, */*] charset=ISO-8859-1
-5 ResourceHttpMessageConverter types=[*/*] charset=-
-6 ResourceRegionHttpMessageConverter types=[*/*] charset=-
-7 AllEncompassingFormHttpMessageConverter types=[application/x-www-form-urlencoded, multipart/form-data, multipart/mixed, multipart/related] charset=-
+# 메시지 컨버터(@ExceptionHandler, 테스트 클래스패스 전용 ProjectingJackson2HttpMessageConverter 제외)
+1 ByteArrayHttpMessageConverter types=[application/octet-stream, */*] charset=-
+2 StringHttpMessageConverter types=[text/plain, */*] charset=UTF-8
+3 StringHttpMessageConverter types=[text/plain, */*] charset=ISO-8859-1
+4 ResourceHttpMessageConverter types=[*/*] charset=-
+5 ResourceRegionHttpMessageConverter types=[*/*] charset=-
+6 AllEncompassingFormHttpMessageConverter types=[application/x-www-form-urlencoded, multipart/form-data, multipart/mixed, multipart/related] charset=-
+7 MappingJackson2HttpMessageConverter types=[application/json, application/*+json] charset=-
 8 MappingJackson2HttpMessageConverter types=[application/json, application/*+json] charset=-
-9 MappingJackson2HttpMessageConverter types=[application/json, application/*+json] charset=-
-10 MappingJackson2YamlHttpMessageConverter types=[application/yaml] charset=-
-11 Jaxb2RootElementHttpMessageConverter types=[application/xml, text/xml, application/*+xml] charset=-
+9 MappingJackson2YamlHttpMessageConverter types=[application/yaml] charset=-
+10 Jaxb2RootElementHttpMessageConverter types=[application/xml, text/xml, application/*+xml] charset=-
 
 # 콘텐츠 협상
 strategy HeaderContentNegotiationStrategy
@@ -42,8 +40,9 @@ match-optional-trailing-separator=false
 trailing-slash-match=false
 path-prefixes=[]
 
-# 핸들러 매핑(순서·URL 매핑, /actuator·/docs 제외)
+# 핸들러 매핑(순서·URL 매핑·함수형 경로, /actuator·/docs 제외)
 -1 RouterFunctionMapping
+  route (없음)
 0 RequestMappingHandlerMapping
 1 SimpleUrlHandlerMapping
 2 WelcomePageHandlerMapping
@@ -52,6 +51,15 @@ path-prefixes=[]
 2147483646 SimpleUrlHandlerMapping
   /** -> resources [class path resource [META-INF/resources/], class path resource [resources/], class path resource [static/], class path resource [public/], ServletContext resource [/]]
   /webjars/** -> resources [class path resource [META-INF/resources/webjars/]]
+
+# 타입 변환기(프로젝트 Converter·Formatter 빈)
+String -> enum[ASC,DESC]
+
+# 컨트롤러 어드바이스(@ExceptionHandler 제외)
+request-body-advice=0
+response-body-advice=0
+init-binder-methods=0
+model-attribute-methods=0
 
 # 예외 리졸버
 -2147483648 DefaultErrorAttributes
@@ -147,3 +155,14 @@ spring.web.locale=null
 spring.web.locale-resolver=ACCEPT_HEADER
 spring.web.resources.add-mappings=true
 spring.web.resources.static-locations=["classpath:/META-INF/resources/", "classpath:/resources/", "classpath:/static/", "classpath:/public/"]
+
+# SpringDataWebProperties
+spring.data.web.pageable.page-parameter="page"
+spring.data.web.pageable.size-parameter="size"
+spring.data.web.pageable.one-indexed-parameters=false
+spring.data.web.pageable.prefix=""
+spring.data.web.pageable.qualifier-delimiter="_"
+spring.data.web.pageable.default-page-size=20
+spring.data.web.pageable.max-page-size=2000
+spring.data.web.pageable.serialization-mode=DIRECT
+spring.data.web.sort.sort-parameter="sort"
