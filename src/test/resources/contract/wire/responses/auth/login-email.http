@@ -1,0 +1,23 @@
+### POST /api/v1/email-auth/login [익명] {"email":"snap-email@example.com","password":"contract-login-1!"}
+HTTP 200
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "message" : "로그인 성공",
+  "data" : {
+    "accessToken" : "<JWT>",
+    "refreshToken" : "<JWT>",
+    "tokenType" : "Bearer",
+    "accessTokenExpiresIn" : 86400000,
+    "refreshTokenExpiresIn" : 1209600000,
+    "member" : {
+      "memberId" : "snapemail",
+      "email" : "snap-email@example.com",
+      "nickname" : "이메일회원",
+      "profileImage" : ""
+    },
+    "isExistingUser" : true,
+    "isProfileComplete" : true
+  }
+}

@@ -1,0 +1,26 @@
+### GET /api/v1/contests/my-awards [회원 1]
+HTTP 200
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "message" : "내 수상 콘테스트 목록을 성공적으로 조회했습니다.",
+  "data" : {
+    "content" : [ {
+      "contestId" : 1,
+      "contestTitle" : "지난 공모전",
+      "thumbnailUrl" : "https://cdn.example.com/contest/1.jpg",
+      "winnerRank" : 1,
+      "awardTitle" : "대상",
+      "acceptanceSpeech" : "감사합니다",
+      "feedId" : 1,
+      "feedTitle" : "첫 피드",
+      "feedImageUrl" : "https://cdn.example.com/feed/1-a.jpg"
+    } ],
+    "page" : 0,
+    "size" : 20,
+    "totalElements" : 1,
+    "totalPages" : 1,
+    "isLast" : true
+  }
+}

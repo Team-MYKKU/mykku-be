@@ -1,0 +1,13 @@
+### POST /api/v1/auth/refresh [익명] {"refreshToken":"<JWT>"} /data/accessToken
+header: {"alg":"HS512"}
+claims: sub, email, tokenType, iat, exp
+sub: "2"
+tokenType: "access"
+email: "snap-email@example.com"
+exp-iat: 86400
+### POST /api/v1/auth/refresh [익명] {"refreshToken":"<JWT>"} /data/refreshToken
+header: {"alg":"HS512"}
+claims: sub, tokenType, iat, exp
+sub: "2"
+tokenType: "refresh"
+exp-iat: 1209600

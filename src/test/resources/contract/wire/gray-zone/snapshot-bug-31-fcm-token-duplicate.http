@@ -1,0 +1,65 @@
+# BUG-31 · 승인된 B PR만 바꿈 · 같은 FCM 토큰을 다른 deviceId로 등록(지금 중복 행이 생긴 뒤 등록 500 C402)
+### POST /api/v1/fcm-tokens [회원 1] {"token":"snap-fcm-token","deviceId":"snap-device-1","deviceType":"ANDROID"}
+HTTP 200
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "message" : "FCM 토큰이 성공적으로 등록되었습니다.",
+  "data" : {
+    "id" : 2,
+    "deviceId" : "snap-device-1",
+    "deviceType" : "ANDROID",
+    "createdAt" : "<LDT.F>"
+  }
+}
+
+### POST /api/v1/fcm-tokens [회원 1] {"token":"snap-fcm-token","deviceId":"snap-device-2","deviceType":null}
+HTTP 200
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "message" : "FCM 토큰이 성공적으로 등록되었습니다.",
+  "data" : {
+    "id" : 3,
+    "deviceId" : "snap-device-2",
+    "deviceType" : null,
+    "createdAt" : "<LDT.F>"
+  }
+}
+
+### POST /api/v1/fcm-tokens [회원 1] {"token":"snap-fcm-token","deviceId":"snap-device-3","deviceType":null}
+HTTP 500
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "code" : "C402",
+  "message" : "서버 오류가 발생했습니다. 관리자에게 문의해주세요"
+}
+
+### GET /api/v1/fcm-tokens [회원 1]
+HTTP 200
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "message" : "FCM 토큰 목록을 성공적으로 조회했습니다.",
+  "data" : [ {
+    "id" : 1,
+    "deviceId" : "snap-device-0",
+    "deviceType" : "IOS",
+    "createdAt" : "2001-03-07T10:00:00"
+  }, {
+    "id" : 2,
+    "deviceId" : "snap-device-1",
+    "deviceType" : "ANDROID",
+    "createdAt" : "<LDT>"
+  }, {
+    "id" : 3,
+    "deviceId" : "snap-device-2",
+    "deviceType" : null,
+    "createdAt" : "<LDT>"
+  } ]
+}

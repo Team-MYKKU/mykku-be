@@ -1,0 +1,43 @@
+### GET /api/v1/events?status=ALL&sortType=OLDEST [회원 1]
+HTTP 200
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "message" : "이벤트 목록을 성공적으로 조회했습니다.",
+  "data" : {
+    "content" : [ {
+      "id" : 3,
+      "title" : "예정 이벤트",
+      "subTitle" : "예정 이벤트 부제",
+      "description" : "곧 시작하는 이벤트",
+      "startedAt" : "2098-01-01T00:00:00",
+      "expiredAt" : "2098-12-31T23:59:59",
+      "status" : "ACTIVE",
+      "thumbnailUrl" : "https://cdn.example.com/event/3.jpg"
+    }, {
+      "id" : 2,
+      "title" : "진행 이벤트",
+      "subTitle" : null,
+      "description" : null,
+      "startedAt" : "2001-01-01T00:00:00",
+      "expiredAt" : "2099-12-31T23:59:59",
+      "status" : "ACTIVE",
+      "thumbnailUrl" : "https://cdn.example.com/event/2.jpg"
+    }, {
+      "id" : 1,
+      "title" : "지난 이벤트",
+      "subTitle" : "지난 이벤트 부제",
+      "description" : "지난 이벤트 설명",
+      "startedAt" : "2000-12-01T00:00:00",
+      "expiredAt" : "2001-01-31T23:59:59",
+      "status" : "WINNER_SELECTED",
+      "thumbnailUrl" : "https://cdn.example.com/event/1.jpg"
+    } ],
+    "page" : 0,
+    "size" : 20,
+    "totalElements" : 3,
+    "totalPages" : 1,
+    "isLast" : true
+  }
+}

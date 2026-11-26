@@ -1,0 +1,15 @@
+### POST /api/v1/auth/refresh [익명] {"refreshToken":"<JWT>"}
+HTTP 200
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "message" : "토큰 갱신 성공",
+  "data" : {
+    "accessToken" : "<JWT>",
+    "refreshToken" : "<JWT>",
+    "tokenType" : "Bearer",
+    "expiresIn" : 86400000,
+    "refreshTokenExpiresIn" : 1209600000
+  }
+}

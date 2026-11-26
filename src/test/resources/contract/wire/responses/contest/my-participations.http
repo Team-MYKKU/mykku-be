@@ -1,0 +1,40 @@
+### GET /api/v1/members/me/contests [회원 1]
+HTTP 200
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "message" : "참여한 콘테스트 목록을 성공적으로 조회했습니다.",
+  "data" : {
+    "content" : [ {
+      "id" : 2,
+      "title" : "진행 공모전",
+      "subTitle" : null,
+      "description" : null,
+      "startedAt" : "2001-01-01T00:00:00",
+      "expiredAt" : "2099-12-31T23:59:59",
+      "status" : "ACTIVE",
+      "thumbnailUrl" : "https://cdn.example.com/contest/2.jpg",
+      "tags" : [ "공모태그" ],
+      "winnerStatus" : "PENDING",
+      "winnerRank" : null
+    }, {
+      "id" : 1,
+      "title" : "지난 공모전",
+      "subTitle" : "지난 공모전 부제",
+      "description" : "지난 공모전 설명",
+      "startedAt" : "2000-12-01T00:00:00",
+      "expiredAt" : "2001-01-31T23:59:59",
+      "status" : "EXPIRED",
+      "thumbnailUrl" : "https://cdn.example.com/contest/1.jpg",
+      "tags" : [ "지난태그" ],
+      "winnerStatus" : "WON",
+      "winnerRank" : 1
+    } ],
+    "page" : 0,
+    "size" : 20,
+    "totalElements" : 2,
+    "totalPages" : 1,
+    "isLast" : true
+  }
+}

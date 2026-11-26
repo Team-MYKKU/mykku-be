@@ -1,0 +1,48 @@
+### PATCH /api/v1/feeds/1 [회원 1] multipart request=application/json:{"title":"수정된 첫 피드","content":"수정된 본문","tags":["덕질","새태그"],"deleteImageIds":[2]} images=file(image.png, image/png)
+HTTP 200
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "message" : "피드가 성공적으로 수정되었습니다.",
+  "data" : {
+    "id" : 1,
+    "author" : {
+      "memberId" : "snapgoogle",
+      "nickname" : "구글회원",
+      "profileImage" : "https://cdn.example.com/profile/1.png",
+      "role" : {
+        "id" : 1,
+        "name" : "스냅샷 칭호",
+        "description" : "계약 스냅샷 칭호 설명"
+      }
+    },
+    "boardId" : 1,
+    "boardTitle" : "다솜",
+    "createdAt" : "2001-03-01T10:00:00.123456",
+    "updatedAt" : "2001-03-01T11:00:00.12",
+    "title" : "수정된 첫 피드",
+    "content" : "수정된 본문",
+    "images" : [ {
+      "id" : 1,
+      "url" : "https://cdn.example.com/feed/1-a.jpg",
+      "width" : 800,
+      "height" : 600
+    }, {
+      "id" : 5,
+      "url" : "https://test-bucket.s3.amazonaws.com/feed-images/test-image-<N>.jpg",
+      "width" : 800,
+      "height" : 600
+    } ],
+    "tags" : [ {
+      "title" : "덕질",
+      "isContest" : false
+    }, {
+      "title" : "새태그",
+      "isContest" : false
+    } ],
+    "likeCount" : 2,
+    "isLiked" : false,
+    "commentCount" : 4
+  }
+}

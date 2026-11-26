@@ -1,0 +1,13 @@
+### POST /api/v1/email-auth/login [익명] {"email":"snap-email@example.com","password":"contract-login-1!"} /data/accessToken
+header: {"alg":"HS512"}
+claims: sub, email, tokenType, iat, exp
+sub: "2"
+tokenType: "access"
+email: "snap-email@example.com"
+exp-iat: 86400
+### POST /api/v1/email-auth/login [익명] {"email":"snap-email@example.com","password":"contract-login-1!"} /data/refreshToken
+header: {"alg":"HS512"}
+claims: sub, tokenType, iat, exp
+sub: "2"
+tokenType: "refresh"
+exp-iat: 1209600

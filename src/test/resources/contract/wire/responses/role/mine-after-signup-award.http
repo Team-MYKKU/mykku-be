@@ -1,0 +1,18 @@
+### GET /api/v1/roles/me [회원 7]
+HTTP 200
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "message" : "내 칭호 목록 조회 성공",
+  "data" : [ {
+    "id" : 4,
+    "role" : {
+      "id" : 2,
+      "name" : "첫 만남",
+      "description" : null
+    },
+    "isRepresentative" : true,
+    "earnedAt" : "<LDT.F>"
+  } ]
+}

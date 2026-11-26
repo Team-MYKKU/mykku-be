@@ -1,0 +1,78 @@
+### GET /api/v1/daily-messages/1/comments [회원 1]
+HTTP 200
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "message" : "댓글 목록을 성공적으로 조회했습니다.",
+  "data" : {
+    "comments" : [ {
+      "id" : 5,
+      "content" : "프로필 미완료 덕담 댓글",
+      "author" : {
+        "memberId" : null,
+        "nickname" : "",
+        "profileImage" : "https://cdn.example.com/profile/4.png",
+        "role" : null
+      },
+      "likeCount" : 0,
+      "isLiked" : false,
+      "replies" : [ ],
+      "replyCount" : 0,
+      "createdAt" : "2001-01-01T10:40:00",
+      "updatedAt" : "2001-01-01T10:40:00"
+    }, {
+      "id" : 3,
+      "content" : "탈퇴한 회원 덕담 댓글",
+      "author" : {
+        "memberId" : null,
+        "nickname" : "탈퇴한 회원",
+        "profileImage" : null,
+        "role" : null
+      },
+      "likeCount" : 0,
+      "isLiked" : false,
+      "replies" : [ ],
+      "replyCount" : 0,
+      "createdAt" : "2001-01-01T10:20:00.12",
+      "updatedAt" : "2001-01-01T10:20:00.12"
+    }, {
+      "id" : 1,
+      "content" : "덕담 댓글",
+      "author" : {
+        "memberId" : "snapemail",
+        "nickname" : "이메일회원",
+        "profileImage" : "",
+        "role" : null
+      },
+      "likeCount" : 2,
+      "isLiked" : true,
+      "replies" : [ {
+        "id" : 2,
+        "content" : "덕담 답글",
+        "author" : {
+          "memberId" : "snapgoogle",
+          "nickname" : "구글회원",
+          "profileImage" : "https://cdn.example.com/profile/1.png",
+          "role" : {
+            "id" : 1,
+            "name" : "스냅샷 칭호",
+            "description" : "계약 스냅샷 칭호 설명"
+          }
+        },
+        "likeCount" : 0,
+        "isLiked" : false,
+        "createdAt" : "2001-01-01T10:10:00",
+        "updatedAt" : "2001-01-01T10:10:00"
+      } ],
+      "replyCount" : 1,
+      "createdAt" : "2001-01-01T10:00:00.123456",
+      "updatedAt" : "2001-01-01T10:05:00"
+    } ],
+    "totalElements" : 3,
+    "totalPages" : 1,
+    "currentPage" : 0,
+    "pageSize" : 20,
+    "hasNext" : false
+  }
+}

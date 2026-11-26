@@ -1,0 +1,58 @@
+### GET /api/v1/contests/my-awards/feeds [회원 1]
+HTTP 200
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "message" : "내 수상 피드 목록을 성공적으로 조회했습니다.",
+  "data" : {
+    "feeds" : [ {
+      "id" : 1,
+      "author" : {
+        "memberId" : "snapgoogle",
+        "nickname" : "구글회원",
+        "profileImage" : "https://cdn.example.com/profile/1.png",
+        "role" : {
+          "id" : 1,
+          "name" : "스냅샷 칭호",
+          "description" : "계약 스냅샷 칭호 설명"
+        }
+      },
+      "board" : "다솜",
+      "createdAt" : "2001-03-01T10:00:00.123456",
+      "title" : "첫 피드",
+      "content" : "스냅샷 본문 하나",
+      "images" : [ {
+        "id" : 1,
+        "url" : "https://cdn.example.com/feed/1-a.jpg",
+        "width" : 800,
+        "height" : 600
+      }, {
+        "id" : 2,
+        "url" : "https://cdn.example.com/feed/1-b.jpg",
+        "width" : 1080,
+        "height" : 1350
+      } ],
+      "tags" : [ {
+        "title" : "덕질",
+        "isContest" : false
+      }, {
+        "title" : "공모태그",
+        "isContest" : true
+      } ],
+      "likeCount" : 2,
+      "isLiked" : false,
+      "commentCount" : 4,
+      "comment" : {
+        "profileImage" : "",
+        "content" : "이메일회원 댓글"
+      }
+    } ],
+    "currentPage" : 0,
+    "totalPages" : 1,
+    "totalElements" : 1,
+    "size" : 20,
+    "hasNext" : false,
+    "hasPrevious" : false
+  }
+}

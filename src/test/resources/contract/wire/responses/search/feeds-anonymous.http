@@ -1,0 +1,72 @@
+### GET /api/v1/search/feeds?keyword=스냅샷 [익명]
+HTTP 200
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "message" : "피드 검색 결과를 성공적으로 조회했습니다.",
+  "data" : {
+    "boards" : [ {
+      "boardId" : 1,
+      "boardTitle" : "다솜",
+      "boardLogo" : "https://cdn.example.com/board/1.png",
+      "totalCount" : 3,
+      "hasMore" : false,
+      "feeds" : [ {
+        "id" : 4,
+        "boardId" : 1,
+        "boardTitle" : "다솜",
+        "title" : "키워드 스포 포함",
+        "content" : "스냅샷 스포 본문",
+        "thumbnailUrl" : "https://cdn.example.com/feed/4-a.jpg",
+        "createdAt" : "2001-03-04T10:00:00.123456"
+      }, {
+        "id" : 3,
+        "boardId" : 1,
+        "boardTitle" : "다솜",
+        "title" : "차단 대상 글",
+        "content" : "스냅샷 차단 대상 본문",
+        "thumbnailUrl" : null,
+        "createdAt" : "2001-03-03T10:00:00.12"
+      }, {
+        "id" : 1,
+        "boardId" : 1,
+        "boardTitle" : "다솜",
+        "title" : "첫 피드",
+        "content" : "스냅샷 본문 하나",
+        "thumbnailUrl" : "https://cdn.example.com/feed/1-a.jpg",
+        "createdAt" : "2001-03-01T10:00:00.123456"
+      } ]
+    }, {
+      "boardId" : 3,
+      "boardTitle" : "가람",
+      "boardLogo" : "https://cdn.example.com/board/3.png",
+      "totalCount" : 1,
+      "hasMore" : false,
+      "feeds" : [ {
+        "id" : 10,
+        "boardId" : 3,
+        "boardTitle" : "가람",
+        "title" : "가람 스냅샷 글",
+        "content" : "스냅샷 세번째 게시판",
+        "thumbnailUrl" : "https://cdn.example.com/feed/10-a.jpg",
+        "createdAt" : "2001-04-05T10:00:00.12"
+      } ]
+    }, {
+      "boardId" : 2,
+      "boardTitle" : "나무",
+      "boardLogo" : "https://cdn.example.com/board/2.png",
+      "totalCount" : 1,
+      "hasMore" : false,
+      "feeds" : [ {
+        "id" : 9,
+        "boardId" : 2,
+        "boardTitle" : "나무",
+        "title" : "지난 인기글",
+        "content" : "스냅샷 지난 인기 본문",
+        "thumbnailUrl" : null,
+        "createdAt" : "2001-04-04T10:00:00"
+      } ]
+    } ]
+  }
+}

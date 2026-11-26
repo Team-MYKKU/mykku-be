@@ -1,0 +1,27 @@
+### GET /api/v1/events/1 [회원 1]
+HTTP 200
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "message" : "이벤트 상세 정보를 성공적으로 조회했습니다.",
+  "data" : {
+    "id" : 1,
+    "title" : "지난 이벤트",
+    "subTitle" : "지난 이벤트 부제",
+    "description" : "지난 이벤트 설명",
+    "startedAt" : "2000-12-01T00:00:00",
+    "expiredAt" : "2001-01-31T23:59:59",
+    "status" : "WINNER_SELECTED",
+    "thumbnailUrl" : "https://cdn.example.com/event/1.jpg",
+    "images" : [ {
+      "url" : "https://cdn.example.com/event/1-a.jpg",
+      "orderIndex" : 1
+    }, {
+      "url" : "https://cdn.example.com/event/1-b.jpg",
+      "orderIndex" : 2
+    } ],
+    "createdAt" : "2000-11-01T10:00:00.123456",
+    "isWinner" : true
+  }
+}

@@ -1,0 +1,13 @@
+### GET /api/v1/contests/1/my-winner-status [회원 1]
+HTTP 200
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "message" : "수상 여부를 성공적으로 조회했습니다.",
+  "data" : {
+    "isWinner" : true,
+    "winnerId" : 1,
+    "winnerRank" : 1
+  }
+}

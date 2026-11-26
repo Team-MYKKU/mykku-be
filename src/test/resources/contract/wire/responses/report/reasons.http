@@ -1,0 +1,30 @@
+### GET /api/v1/reports/reasons [익명]
+HTTP 200
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "message" : "신고 사유 목록 조회 성공",
+  "data" : [ {
+    "reason" : "ABUSE",
+    "description" : "욕설 및 비방"
+  }, {
+    "reason" : "OBSCENE",
+    "description" : "음란하거나 부적절한 콘텐츠"
+  }, {
+    "reason" : "SPAM",
+    "description" : "반복 게시물, 광고 및 무분별한 홍보"
+  }, {
+    "reason" : "FRAUD",
+    "description" : "사칭 및 허위 정보"
+  }, {
+    "reason" : "PERSONAL_INFO",
+    "description" : "개인정보 노출"
+  }, {
+    "reason" : "COPYRIGHT",
+    "description" : "저작권 침해"
+  }, {
+    "reason" : "ETC",
+    "description" : "기타"
+  } ]
+}

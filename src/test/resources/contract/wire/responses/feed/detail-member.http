@@ -1,0 +1,48 @@
+### GET /api/v1/feeds/1 [회원 2]
+HTTP 200
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "message" : "피드 상세 정보를 성공적으로 조회했습니다.",
+  "data" : {
+    "id" : 1,
+    "author" : {
+      "memberId" : "snapgoogle",
+      "nickname" : "구글회원",
+      "profileImage" : "https://cdn.example.com/profile/1.png",
+      "role" : {
+        "id" : 1,
+        "name" : "스냅샷 칭호",
+        "description" : "계약 스냅샷 칭호 설명"
+      }
+    },
+    "boardId" : 1,
+    "boardTitle" : "다솜",
+    "createdAt" : "2001-03-01T10:00:00.123456",
+    "updatedAt" : "2001-03-01T11:00:00.12",
+    "title" : "첫 피드",
+    "content" : "스냅샷 본문 하나",
+    "images" : [ {
+      "id" : 1,
+      "url" : "https://cdn.example.com/feed/1-a.jpg",
+      "width" : 800,
+      "height" : 600
+    }, {
+      "id" : 2,
+      "url" : "https://cdn.example.com/feed/1-b.jpg",
+      "width" : 1080,
+      "height" : 1350
+    } ],
+    "tags" : [ {
+      "title" : "덕질",
+      "isContest" : false
+    }, {
+      "title" : "공모태그",
+      "isContest" : true
+    } ],
+    "likeCount" : 2,
+    "isLiked" : true,
+    "commentCount" : 6
+  }
+}

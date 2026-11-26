@@ -1,0 +1,25 @@
+### GET /api/v1/contests/winners [익명]
+HTTP 200
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "message" : "수상작 목록을 성공적으로 조회했습니다.",
+  "data" : {
+    "contests" : [ {
+      "contestId" : 1,
+      "contestTitle" : "지난 공모전",
+      "startedAt" : "2000-12-01T00:00:00",
+      "expiredAt" : "2001-01-31T23:59:59",
+      "winners" : [ {
+        "winnerId" : 1,
+        "winnerRank" : 1,
+        "feedImageUrl" : "https://cdn.example.com/feed/1-a.jpg"
+      }, {
+        "winnerId" : 2,
+        "winnerRank" : 2,
+        "feedImageUrl" : "https://cdn.example.com/contest/1.jpg"
+      } ]
+    } ]
+  }
+}

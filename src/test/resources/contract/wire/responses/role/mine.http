@@ -1,0 +1,27 @@
+### GET /api/v1/roles/me [회원 1]
+HTTP 200
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "message" : "내 칭호 목록 조회 성공",
+  "data" : [ {
+    "id" : 1,
+    "role" : {
+      "id" : 1,
+      "name" : "스냅샷 칭호",
+      "description" : "계약 스냅샷 칭호 설명"
+    },
+    "isRepresentative" : true,
+    "earnedAt" : "2001-02-05T10:00:00.123456"
+  }, {
+    "id" : 2,
+    "role" : {
+      "id" : 2,
+      "name" : "첫 만남",
+      "description" : null
+    },
+    "isRepresentative" : false,
+    "earnedAt" : "2001-02-06T10:00:00"
+  } ]
+}

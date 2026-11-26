@@ -1,0 +1,4 @@
+### GET /api/v1/events/101/winners [익명] 101~105(정렬 키 없음) (snapshot-ties-event-winners.sql)
+전체: 101, 102, 103, 104, 105
+중복(전체): 없음
+누락(전체): 없음
