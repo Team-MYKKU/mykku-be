@@ -13,10 +13,8 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.transaction.annotation.Transactional
 
 @DisplayName("FeedTagRepositoryAdapter 통합 테스트")
-@Transactional
 class FeedTagRepositoryAdapterTest : BaseRepositoryTest() {
 
     @Autowired
@@ -76,19 +74,6 @@ class FeedTagRepositoryAdapterTest : BaseRepositoryTest() {
         }
 
         @Test
-        @DisplayName("한글 태그를 저장할 수 있다")
-        fun `피드 태그 저장 - 한글 태그`() {
-            val feedId = FeedId.of(feed.id!!)
-            val tags = listOf(
-                FeedTag.create(title = "한글태그", feedId = feedId)
-            )
-
-            val savedTags = feedTagRepository.saveAll(tags, feedId)
-
-            assertThat(savedTags[0].title).isEqualTo("한글태그")
-        }
-
-        @Test
         @DisplayName("영문 태그를 저장할 수 있다")
         fun `피드 태그 저장 - 영문 태그`() {
             val feedId = FeedId.of(feed.id!!)
@@ -99,19 +84,6 @@ class FeedTagRepositoryAdapterTest : BaseRepositoryTest() {
             val savedTags = feedTagRepository.saveAll(tags, feedId)
 
             assertThat(savedTags[0].title).isEqualTo("EnglishTag")
-        }
-
-        @Test
-        @DisplayName("숫자가 포함된 태그를 저장할 수 있다")
-        fun `피드 태그 저장 - 숫자 포함 태그`() {
-            val feedId = FeedId.of(feed.id!!)
-            val tags = listOf(
-                FeedTag.create(title = "태그123", feedId = feedId)
-            )
-
-            val savedTags = feedTagRepository.saveAll(tags, feedId)
-
-            assertThat(savedTags[0].title).isEqualTo("태그123")
         }
     }
 

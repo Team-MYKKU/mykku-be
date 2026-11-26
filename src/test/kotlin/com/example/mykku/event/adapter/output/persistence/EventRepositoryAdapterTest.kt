@@ -10,12 +10,16 @@ import com.example.mykku.event.domain.vo.EventListFilter
 import com.example.mykku.event.domain.vo.EventSortType
 import com.example.mykku.event.domain.vo.EventStatusType
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.within
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Pageable
 import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 
 @DisplayName("EventRepositoryAdapter 통합 테스트")
 class EventRepositoryAdapterTest : BaseRepositoryTest() {
@@ -63,17 +67,26 @@ class EventRepositoryAdapterTest : BaseRepositoryTest() {
         @Test
         @DisplayName("기존 이벤트를 업데이트하면 createdAt이 보존되고 행이 추가되지 않는다")
         fun `이벤트 업데이트 - createdAt 보존`() {
+            val rowsBefore = eventJpaRepository.count()
             val saved = eventRepository.save(createEvent())
             eventJpaRepository.flush()
             Thread.sleep(5)
             saved.updateStatus(EventStatusType.WINNER_SELECTED)
 
             val updated = eventRepository.save(saved)
+            flushAndClear()
 
             assertThat(updated.id).isEqualTo(saved.id)
             assertThat(updated.status).isEqualTo(EventStatusType.WINNER_SELECTED)
             assertThat(updated.createdAt).isEqualTo(saved.createdAt)
-            assertThat(eventJpaRepository.count()).isEqualTo(1)
+            assertThat(eventJpaRepository.count()).isEqualTo(rowsBefore + 1)
+            assertPersistedUpdate(saved.id, saved.createdAt)
+        }
+
+        private fun assertPersistedUpdate(id: EventId, originalCreatedAt: LocalDateTime) {
+            val persisted = eventRepository.findById(id)!!
+            assertThat(persisted.status).isEqualTo(EventStatusType.WINNER_SELECTED)
+            assertThat(persisted.createdAt).isCloseTo(originalCreatedAt, within(1, ChronoUnit.MICROS))
         }
     }
 
@@ -114,12 +127,12 @@ class EventRepositoryAdapterTest : BaseRepositoryTest() {
             val now = LocalDateTime.now()
             val activeEvent = createEventWithExpiredAt(now.plusDays(7))
             val expiredEvent = createEventWithExpiredAt(now.minusDays(1))
-            eventRepository.save(activeEvent)
+            val savedActiveEvent = eventRepository.save(activeEvent)
             eventRepository.save(expiredEvent)
 
             val events = eventRepository.findByExpiredAtAfter(now)
 
-            assertThat(events).hasSize(1)
+            assertThat(events.map { it.id }).containsExactly(savedActiveEvent.id)
             assertThat(events[0].expiredAt).isAfter(now)
         }
 
@@ -139,13 +152,13 @@ class EventRepositoryAdapterTest : BaseRepositoryTest() {
         @DisplayName("여러 개의 활성 이벤트를 조회한다")
         fun `만료일 이후 이벤트 조회 - 여러 개`() {
             val now = LocalDateTime.now()
-            eventRepository.save(createEventWithExpiredAt(now.plusDays(1)))
-            eventRepository.save(createEventWithExpiredAt(now.plusDays(3)))
-            eventRepository.save(createEventWithExpiredAt(now.plusDays(7)))
+            val event1 = eventRepository.save(createEventWithExpiredAt(now.plusDays(1)))
+            val event2 = eventRepository.save(createEventWithExpiredAt(now.plusDays(3)))
+            val event3 = eventRepository.save(createEventWithExpiredAt(now.plusDays(7)))
 
             val events = eventRepository.findByExpiredAtAfter(now)
 
-            assertThat(events).hasSize(3)
+            assertThat(events.map { it.id }).containsExactlyInAnyOrder(event1.id, event2.id, event3.id)
         }
     }
 
@@ -173,7 +186,7 @@ class EventRepositoryAdapterTest : BaseRepositoryTest() {
                     currentTime = now
                 )
 
-                assertThat(page.content).hasSize(2)
+                assertThat(page.content.map { it.id }).containsExactlyInAnyOrder(event1.id, event2.id)
                 assertThat(page.content[0].id).isEqualTo(event2.id)
             }
 
@@ -193,7 +206,7 @@ class EventRepositoryAdapterTest : BaseRepositoryTest() {
                     currentTime = now
                 )
 
-                assertThat(page.content).hasSize(2)
+                assertThat(page.content.map { it.id }).containsExactlyInAnyOrder(event1.id, event2.id)
                 assertThat(page.content[0].id).isEqualTo(event1.id)
             }
 
@@ -213,7 +226,7 @@ class EventRepositoryAdapterTest : BaseRepositoryTest() {
                     currentTime = now
                 )
 
-                assertThat(page.content).hasSize(2)
+                assertThat(page.content.map { it.id }).containsExactlyInAnyOrder(event1.id, event2.id)
                 assertThat(page.content[0].id).isEqualTo(event2.id)
             }
         }
@@ -227,7 +240,7 @@ class EventRepositoryAdapterTest : BaseRepositoryTest() {
             fun `만료된 이벤트 조회`() {
                 val now = LocalDateTime.now()
                 eventRepository.save(createEventWithExpiredAt(now.plusDays(7)))
-                eventRepository.save(createEventWithExpiredAt(now.minusDays(1)))
+                val expiredEvent = eventRepository.save(createEventWithExpiredAt(now.minusDays(1)))
                 val pageable = PageRequest.of(0, 10)
 
                 val page = eventRepository.findWithPagination(
@@ -237,7 +250,7 @@ class EventRepositoryAdapterTest : BaseRepositoryTest() {
                     currentTime = now
                 )
 
-                assertThat(page.content).hasSize(1)
+                assertThat(page.content.map { it.id }).containsExactly(expiredEvent.id)
                 assertThat(page.content[0].expiredAt).isBefore(now)
             }
         }
@@ -250,8 +263,8 @@ class EventRepositoryAdapterTest : BaseRepositoryTest() {
             @DisplayName("모든 이벤트를 조회한다")
             fun `모든 이벤트 조회`() {
                 val now = LocalDateTime.now()
-                eventRepository.save(createEventWithExpiredAt(now.plusDays(7)))
-                eventRepository.save(createEventWithExpiredAt(now.minusDays(1)))
+                val activeEvent = eventRepository.save(createEventWithExpiredAt(now.plusDays(7)))
+                val expiredEvent = eventRepository.save(createEventWithExpiredAt(now.minusDays(1)))
                 val pageable = PageRequest.of(0, 10)
 
                 val page = eventRepository.findWithPagination(
@@ -261,7 +274,7 @@ class EventRepositoryAdapterTest : BaseRepositoryTest() {
                     currentTime = now
                 )
 
-                assertThat(page.content).hasSize(2)
+                assertThat(page.content.map { it.id }).containsExactlyInAnyOrder(activeEvent.id, expiredEvent.id)
             }
         }
 
@@ -285,8 +298,7 @@ class EventRepositoryAdapterTest : BaseRepositoryTest() {
                     currentTime = now
                 )
 
-                assertThat(page.content).hasSize(1)
-                assertThat(page.content[0].id).isEqualTo(selected.id)
+                assertThat(page.content.map { it.id }).containsExactly(selected.id)
             }
 
             @Test
@@ -306,8 +318,7 @@ class EventRepositoryAdapterTest : BaseRepositoryTest() {
                     currentTime = now
                 )
 
-                assertThat(page.content).hasSize(1)
-                assertThat(page.content[0].id).isEqualTo(pending.id)
+                assertThat(page.content.map { it.id }).containsExactly(pending.id)
             }
         }
 
@@ -340,20 +351,26 @@ class EventRepositoryAdapterTest : BaseRepositoryTest() {
             @DisplayName("두 번째 페이지를 조회한다")
             fun `페이징 - 두 번째 페이지`() {
                 val now = LocalDateTime.now()
-                repeat(5) {
-                    eventRepository.save(createEventWithExpiredAt(now.plusDays(7)))
+                val savedIds = List(5) {
+                    eventRepository.save(createEventWithExpiredAt(now.plusDays(7))).id
                 }
-                val pageable = PageRequest.of(1, 3)
 
-                val page = eventRepository.findWithPagination(
+                val firstPage = findAllSortedByLatest(PageRequest.of(0, 3), now)
+                val secondPage = findAllSortedByLatest(PageRequest.of(1, 3), now)
+
+                assertThat(firstPage.content).hasSize(3)
+                assertThat((firstPage.content + secondPage.content).map { it.id })
+                    .containsExactlyInAnyOrderElementsOf(savedIds)
+                assertThat(secondPage.number).isEqualTo(1)
+            }
+
+            private fun findAllSortedByLatest(pageable: Pageable, currentTime: LocalDateTime): Page<Event> {
+                return eventRepository.findWithPagination(
                     filter = EventListFilter.ALL,
                     sortType = EventSortType.LATEST,
                     pageable = pageable,
-                    currentTime = now
+                    currentTime = currentTime
                 )
-
-                assertThat(page.content).hasSize(2)
-                assertThat(page.number).isEqualTo(1)
             }
         }
     }

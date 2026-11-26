@@ -207,6 +207,8 @@ class MemberRoleRepositoryAdapterTest : BaseRepositoryTest() {
 
             val foundMemberRole = memberRoleRepository.findById(savedMemberRole.id)
             assertThat(foundMemberRole).isNull()
+            flushAndClear()
+            assertThat(memberRoleRepository.findById(savedMemberRole.id)).isNull()
         }
     }
 

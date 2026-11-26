@@ -93,21 +93,26 @@ class FanNotePageRepositoryAdapterTest : BaseRepositoryTest() {
         @DisplayName("기존 덕질노트 페이지를 수정한다")
         fun `기존 덕질노트 페이지를 수정한다`() {
             // given
-            val page = createFanNotePage()
-            val savedPage = fanNotePageRepository.save(page)
+            val savedPage = fanNotePageRepository.save(createFanNotePage())
 
-            val updatedPage = savedPage.updatePage(
-                pageNumber = 2,
-                imageUrl = "https://example.com/updated-page.jpg"
-            )
+            val updatedPage = savedPage.updatePage(pageNumber = 2, imageUrl = "https://example.com/updated-page.jpg")
 
             // when
             val result = fanNotePageRepository.save(updatedPage)
+            flushAndClear()
 
             // then
             assertThat(result.id).isEqualTo(savedPage.id)
             assertThat(result.pageNumber).isEqualTo(2)
             assertThat(result.imageUrl).isEqualTo("https://example.com/updated-page.jpg")
+            assertPersistedUpdate(savedPage.id)
+        }
+
+        private fun assertPersistedUpdate(id: FanNotePageId) {
+            val persisted = fanNotePageRepository.findById(id)!!
+            assertThat(persisted.fanNoteId).isEqualTo(savedFanNote.id.value)
+            assertThat(persisted.pageNumber).isEqualTo(2)
+            assertThat(persisted.imageUrl).isEqualTo("https://example.com/updated-page.jpg")
         }
     }
 

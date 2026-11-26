@@ -10,6 +10,10 @@ import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntit
 import com.example.mykku.member.domain.vo.SocialProvider
 import com.example.mykku.role.adapter.output.persistence.entity.RoleJpaEntity
 import com.example.mykku.role.adapter.output.persistence.repository.RoleJpaRepository
+import com.example.mykku.util.ClassLevelDatabaseCleaner
+import jakarta.persistence.EntityManager
+import jakarta.persistence.PersistenceContext
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
@@ -19,8 +23,12 @@ import org.springframework.transaction.annotation.Transactional
 @SpringBootTest
 @ActiveProfiles("test")
 @Import(TestEmailConfig::class, TestEmailSenderConfig::class, TestImageUploadConfig::class)
+@ExtendWith(ClassLevelDatabaseCleaner::class)
 @Transactional
 abstract class BaseRepositoryTest {
+
+    @PersistenceContext
+    private lateinit var entityManager: EntityManager
 
     @Autowired
     protected lateinit var memberJpaRepository: MemberJpaRepository
@@ -72,5 +80,10 @@ abstract class BaseRepositoryTest {
             description = description
         )
         return roleJpaRepository.save(role)
+    }
+
+    protected fun flushAndClear() {
+        entityManager.flush()
+        entityManager.clear()
     }
 }

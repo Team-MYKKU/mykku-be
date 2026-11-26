@@ -79,19 +79,18 @@ class FeedRepositoryAdapterTest : BaseRepositoryTest() {
         @Test
         @DisplayName("피드를 정상적으로 수정한다")
         fun `피드 수정 - 정상 케이스`() {
-            val feed = Feed.create(
-                title = "원본 제목",
-                content = "원본 내용",
-                boardId = board.id!!,
-                memberId = member.id
-            )
-            val savedFeed = feedRepository.save(feed, board.id!!, member.id)
+            val savedFeed = saveFeed(title = "원본 제목", content = "원본 내용")
 
             val updatedFeed = savedFeed.update(title = "수정된 제목", content = "수정된 내용")
             val result = feedRepository.update(updatedFeed)
+            flushAndClear()
 
             assertThat(result.title).isEqualTo("수정된 제목")
             assertThat(result.content).isEqualTo("수정된 내용")
+            val storedFeed = feedRepository.findByIdOrThrow(savedFeed.id!!)
+            assertThat(storedFeed.title).isEqualTo("수정된 제목")
+            assertThat(storedFeed.content).isEqualTo("수정된 내용")
+            assertThat(storedFeed.boardId).isEqualTo(board.id)
         }
 
         @Test
@@ -114,6 +113,16 @@ class FeedRepositoryAdapterTest : BaseRepositoryTest() {
             }
 
             assertThat(exception.errorCode).isEqualTo(FeedErrorCode.FEED_NOT_FOUND)
+        }
+
+        private fun saveFeed(title: String, content: String): Feed {
+            val feed = Feed.create(
+                title = title,
+                content = content,
+                boardId = board.id!!,
+                memberId = member.id
+            )
+            return feedRepository.save(feed, board.id!!, member.id)
         }
     }
 
@@ -349,6 +358,8 @@ class FeedRepositoryAdapterTest : BaseRepositoryTest() {
 
             val foundFeed = feedRepository.findById(savedFeed.id!!)
             assertThat(foundFeed).isNull()
+            flushAndClear()
+            assertThat(feedRepository.findById(savedFeed.id!!)).isNull()
         }
 
         @Test

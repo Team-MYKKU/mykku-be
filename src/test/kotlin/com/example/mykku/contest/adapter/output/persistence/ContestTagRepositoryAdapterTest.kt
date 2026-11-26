@@ -186,7 +186,7 @@ class ContestTagRepositoryAdapterTest : BaseRepositoryTest() {
         @DisplayName("태그 제목 목록으로 태그를 조회할 수 있다")
         fun findAllByTitleIn() {
             val contest = createAndSaveContest()
-            contestTagRepository.saveAll(
+            val (tagA, tagB) = contestTagRepository.saveAll(
                 listOf(
                     ContestTag.create("태그A", ContestId(contest.id!!)),
                     ContestTag.create("태그B", ContestId(contest.id!!)),
@@ -196,7 +196,7 @@ class ContestTagRepositoryAdapterTest : BaseRepositoryTest() {
 
             val tags = contestTagRepository.findAllByTitleIn(listOf("태그A", "태그B"))
 
-            assertThat(tags).hasSize(2)
+            assertThat(tags.map { it.id }).containsExactlyInAnyOrder(tagA.id, tagB.id)
             assertThat(tags.map { it.title }).containsExactlyInAnyOrder("태그A", "태그B")
         }
 
@@ -220,7 +220,7 @@ class ContestTagRepositoryAdapterTest : BaseRepositoryTest() {
         @DisplayName("일부만 존재하는 제목으로 조회하면 존재하는 것만 반환한다")
         fun findAllByTitleInPartial() {
             val contest = createAndSaveContest()
-            contestTagRepository.saveAll(
+            val savedTags = contestTagRepository.saveAll(
                 listOf(
                     ContestTag.create("존재하는태그", ContestId(contest.id!!))
                 )
@@ -228,7 +228,7 @@ class ContestTagRepositoryAdapterTest : BaseRepositoryTest() {
 
             val tags = contestTagRepository.findAllByTitleIn(listOf("존재하는태그", "없는태그"))
 
-            assertThat(tags).hasSize(1)
+            assertThat(tags.map { it.id }).containsExactly(savedTags.single().id)
             assertThat(tags[0].title).isEqualTo("존재하는태그")
         }
     }

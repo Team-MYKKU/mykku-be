@@ -291,6 +291,8 @@ class MemberBlockRepositoryAdapterTest : BaseRepositoryTest() {
 
             val foundMemberBlock = memberBlockRepository.findById(savedMemberBlock.id!!)
             assertThat(foundMemberBlock).isNull()
+            flushAndClear()
+            assertThat(memberBlockRepository.findById(savedMemberBlock.id!!)).isNull()
         }
     }
 

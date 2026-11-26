@@ -19,7 +19,7 @@ class DatabaseCleaner : BeforeEachCallback {
         cleanup(context)
     }
 
-    private fun cleanup(context: ApplicationContext) {
+    fun cleanup(context: ApplicationContext) {
         val em = context.getBean(EntityManager::class.java)
         val transactionTemplate = context.getBean(TransactionTemplate::class.java)
 
