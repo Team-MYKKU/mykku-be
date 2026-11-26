@@ -1,7 +1,5 @@
 package com.example.mykku.docs
 
-import org.springframework.restdocs.cookies.CookieDescriptor
-import org.springframework.restdocs.cookies.CookieDocumentation.requestCookies
 import org.springframework.restdocs.headers.HeaderDescriptor
 import org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders
 import org.springframework.restdocs.payload.FieldDescriptor
@@ -30,11 +28,6 @@ class RestDocumentationRequest {
 
     fun requestHeader(vararg descriptors: HeaderDescriptor): RestDocumentationRequest {
         snippets.add(requestHeaders(*descriptors))
-        return this
-    }
-
-    fun requestCookie(vararg descriptors: CookieDescriptor): RestDocumentationRequest {
-        snippets.add(requestCookies(*descriptors))
         return this
     }
 

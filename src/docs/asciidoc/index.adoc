@@ -15,7 +15,6 @@
 :operation-request-parts-title: 요청 파트
 :operation-request-part-request-fields-title: request 파트 필드
 :operation-http-response-title: 응답
-:operation-response-headers-title: 응답 헤더
 :operation-response-fields-title: 응답 필드
 
 [[overview]]
