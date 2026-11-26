@@ -4,7 +4,6 @@ import com.example.mykku.BaseControllerTest
 import com.example.mykku.contract.dump.HintedEntry
 import com.example.mykku.contract.dump.HintedGolden
 import com.example.mykku.contract.dump.MvcJackson
-import com.example.mykku.contract.dump.StaticDumpGoldens
 import com.example.mykku.contract.endpoint.ArgumentTokens
 import com.example.mykku.contract.support.HandlerCatalog
 import jakarta.validation.Validator
@@ -36,6 +35,12 @@ class RequestValidationContractTest : BaseControllerTest() {
             targets.of(endpoint).map { HintedEntry(it.header, writer.render(it), endpoint.handlerName) }
         }
 
-        HintedGolden.verify(StaticDumpGoldens.REQUEST_SCHEMA, entries)
+        HintedGolden.verify(GOLDEN, entries)
+    }
+
+    companion object {
+        private const val GOLDEN = "wire/schema/request.txt"
+
+        val GOLDENS: List<String> = listOf(GOLDEN)
     }
 }

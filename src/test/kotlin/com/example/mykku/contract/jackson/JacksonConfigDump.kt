@@ -1,5 +1,6 @@
 package com.example.mykku.contract.jackson
 
+import com.example.mykku.contract.dump.DumpSections
 import com.fasterxml.jackson.core.JsonFactory
 import com.fasterxml.jackson.core.JsonGenerator
 import com.fasterxml.jackson.core.JsonParser
@@ -25,7 +26,7 @@ class JacksonConfigDump(private val mapper: ObjectMapper) {
 
     fun render(): String = listOf(
         section("라이브러리 버전", versions()),
-        section("등록 모듈", mapper.registeredModuleIds.map { it.toString() }.sorted()),
+        section("등록 모듈", mapper.registeredModuleIds.map { moduleId(it) }.sorted()),
         section("포함 규칙·명명·날짜", settings()),
         section("SerializationFeature", states(enumValues<SerializationFeature>()) { serialization.isEnabled(it) }),
         section("DeserializationFeature", deserializationFeatures()),
@@ -101,6 +102,11 @@ class JacksonConfigDump(private val mapper: ObjectMapper) {
     private fun <T : Enum<T>> states(features: Array<T>, enabled: (T) -> Boolean): List<String> =
         features.map { "${it.name}=${enabled(it)}" }
 
-    private fun section(title: String, lines: List<String>): String =
-        (listOf("# $title") + lines).joinToString("\n", postfix = "\n")
+    private fun moduleId(id: Any): String = id.toString().replace(GENERATED_MODULE_NAME, "SimpleModule-(자동 번호)")
+
+    private fun section(title: String, lines: List<String>): String = DumpSections.render(title, lines)
+
+    private companion object {
+        val GENERATED_MODULE_NAME = Regex("^SimpleModule-\\d+$")
+    }
 }

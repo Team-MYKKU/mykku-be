@@ -16,6 +16,7 @@ class KotlinTypesTest {
         assertThat(KotlinTypes.render(typeOf<ProbeLevel>())).isEqualTo("enum[LOW,HIGH]")
         assertThat(KotlinTypes.render(typeOf<List<MultipartFile>>())).isEqualTo("List<file>")
         assertThat(KotlinTypes.render(typeOf<Map<String, KotlinTypesTest>>())).isEqualTo("Map<String, object>")
+        assertThat(KotlinTypes.render(typeOf<List<ValueProbe>?>())).isEqualTo("List<String>?")
     }
 
     @Test
@@ -24,5 +25,9 @@ class KotlinTypesTest {
         assertThat(AttributeValues.value(linkedMapOf("z" to 1, "a" to 2))).isEqualTo("{\"a\"=2, \"z\"=1}")
         assertThat(AttributeValues.value("a\"b\\c\nd")).isEqualTo("\"a\\\"b\\\\c\\nd\"")
         assertThat(AttributeValues.value(arrayOf(1, 2))).isEqualTo("[1, 2]")
+        assertThat(AttributeValues.value(intArrayOf(1, 3))).isEqualTo("[1, 3]")
     }
 }
+
+@JvmInline
+value class ValueProbe(val value: String)

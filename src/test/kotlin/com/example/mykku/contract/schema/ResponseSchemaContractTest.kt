@@ -4,7 +4,6 @@ import com.example.mykku.BaseControllerTest
 import com.example.mykku.contract.dump.HintedEntry
 import com.example.mykku.contract.dump.HintedGolden
 import com.example.mykku.contract.dump.MvcJackson
-import com.example.mykku.contract.dump.StaticDumpGoldens
 import com.example.mykku.contract.endpoint.EndpointKeys
 import com.example.mykku.contract.support.HandlerCatalog
 import org.junit.jupiter.api.DisplayName
@@ -33,6 +32,12 @@ class ResponseSchemaContractTest : BaseControllerTest() {
             HintedEntry(key, SchemaBlocks.render(key, bodies.describe(it)), it.handlerName)
         }
 
-        HintedGolden.verify(StaticDumpGoldens.RESPONSE_SCHEMA, entries)
+        HintedGolden.verify(GOLDEN, entries)
+    }
+
+    companion object {
+        private const val GOLDEN = "wire/schema/response.txt"
+
+        val GOLDENS: List<String> = listOf(GOLDEN)
     }
 }

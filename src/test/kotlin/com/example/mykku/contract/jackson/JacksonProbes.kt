@@ -73,7 +73,9 @@ object JacksonProbes {
         DeserializationProbe("누락 → 기본값 String", """{}""", DefaultTextProbe::class.java),
         DeserializationProbe("null → 기본값 String", """{"value":null}""", DefaultTextProbe::class.java),
         DeserializationProbe("is 접두 이름 → Boolean", """{"isActive":true}""", BooleanNameProbe::class.java),
-        DeserializationProbe("접두 없는 이름 → Boolean", """{"active":true}""", BooleanNameProbe::class.java)
+        DeserializationProbe("접두 없는 이름 → Boolean", """{"active":true}""", BooleanNameProbe::class.java),
+        DeserializationProbe("null → List<String>", """{"values":null}""", ListProbe::class.java),
+        DeserializationProbe("null 원소 → List<String>", """{"values":["a",null]}""", ListProbe::class.java)
     )
 
     private fun numberCoercions(): List<DeserializationProbe> = listOf(

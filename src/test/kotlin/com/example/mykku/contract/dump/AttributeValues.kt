@@ -1,6 +1,7 @@
 package com.example.mykku.contract.dump
 
 import org.springframework.core.annotation.AnnotationUtils
+import java.lang.reflect.Array as ReflectArray
 
 object AttributeValues {
 
@@ -11,23 +12,29 @@ object AttributeValues {
 
     fun attributes(name: String, attributes: Map<String, Any?>): String {
         val rendered = attributes.toSortedMap()
-            .filterNot { (key, value) -> key in OMITTED_WHEN_EMPTY && value is Array<*> && value.isEmpty() }
+            .filterNot { (key, value) -> key in OMITTED_WHEN_EMPTY && isEmptyArray(value) }
             .map { (key, value) -> "$key=${value(value)}" }
         return "@$name(${rendered.joinToString(", ")})"
     }
 
-    fun value(value: Any?): String = when (value) {
-        null -> "null"
-        is String -> quote(value)
-        is Array<*> -> value.joinToString(", ", "[", "]") { value(it) }
-        is Set<*> -> value.map { value(it) }.sorted().joinToString(", ", "[", "]")
-        is Collection<*> -> value.joinToString(", ", "[", "]") { value(it) }
-        is Map<*, *> -> mapValue(value)
-        is Class<*> -> value.simpleName
-        is Enum<*> -> value.name
-        is Annotation -> annotation(value)
+    fun value(value: Any?): String = when {
+        value == null -> "null"
+        value is String -> quote(value)
+        value is Set<*> -> value.map { value(it) }.sorted().joinToString(", ", "[", "]")
+        value is Collection<*> -> value.joinToString(", ", "[", "]") { value(it) }
+        value is Map<*, *> -> mapValue(value)
+        value.javaClass.isArray -> arrayValue(value)
+        value is Class<*> -> value.simpleName
+        value is Enum<*> -> value.name
+        value is Annotation -> annotation(value)
         else -> value.toString()
     }
+
+    private fun isEmptyArray(value: Any?): Boolean =
+        value != null && value.javaClass.isArray && ReflectArray.getLength(value) == 0
+
+    private fun arrayValue(array: Any): String =
+        (0 until ReflectArray.getLength(array)).joinToString(", ", "[", "]") { value(ReflectArray.get(array, it)) }
 
     private fun mapValue(map: Map<*, *>): String =
         map.entries.map { "${value(it.key)}=${value(it.value)}" }.sorted().joinToString(", ", "{", "}")

@@ -1,5 +1,7 @@
 package com.example.mykku.contract.schema
 
+import com.fasterxml.jackson.annotation.JsonFormat
+import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.BeanProperty
 import com.fasterxml.jackson.databind.JavaType
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -91,8 +93,26 @@ class ResponseSchemaWriter(private val mapper: ObjectMapper) {
         shape.jsonType,
         nullability(target.declared),
         shape.details.joinToString(" ").ifEmpty { null },
+        "java=${target.type.rawClass.simpleName}".takeIf { shape.details.any { it.startsWith(FORMAT_DETAIL) } },
+        inclusion(target),
+        jsonFormat(target),
         ORDER_UNFIXED.takeIf { isUnordered(target.type) }
     ).joinToString(" ")
+
+    private fun inclusion(target: SchemaTarget): String? {
+        val property = target.property ?: return null
+        val value = property.findPropertyInclusion(mapper.serializationConfig, target.type.rawClass)
+        if (value.valueInclusion in DEFAULT_INCLUSIONS && value.contentInclusion in DEFAULT_INCLUSIONS) {
+            return null
+        }
+        return "include=${value.valueInclusion}/${value.contentInclusion}"
+    }
+
+    private fun jsonFormat(target: SchemaTarget): String? {
+        val property = target.property ?: return null
+        val format = property.findPropertyFormat(mapper.serializationConfig, target.type.rawClass)
+        return if (format == JsonFormat.Value.empty()) null else "jsonformat=$format"
+    }
 
     private fun nullability(declared: KType?): String? = when {
         declared == null -> null
@@ -119,6 +139,8 @@ class ResponseSchemaWriter(private val mapper: ObjectMapper) {
         private const val MAP_VALUE_ARGUMENT = 1
         private val UNORDERED = listOf(Page::class.java, Pageable::class.java, Sort::class.java)
         private const val NULL_TYPE = "null"
+        private const val FORMAT_DETAIL = "format="
+        private val DEFAULT_INCLUSIONS = setOf(JsonInclude.Include.ALWAYS, JsonInclude.Include.USE_DEFAULTS)
         private val FIXED_TYPES = mapOf(Any::class.java to "any", Void::class.java to NULL_TYPE)
     }
 }

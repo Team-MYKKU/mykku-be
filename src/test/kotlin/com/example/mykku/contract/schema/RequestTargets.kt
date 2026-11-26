@@ -5,6 +5,7 @@ import com.example.mykku.contract.endpoint.EndpointKeys
 import com.example.mykku.contract.support.ArgumentKind
 import com.example.mykku.contract.support.Endpoint
 import com.example.mykku.contract.support.HandlerArgument
+import org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor
 import kotlin.reflect.KType
 import kotlin.reflect.full.starProjectedType
 
@@ -33,9 +34,18 @@ class RequestTargets(private val tokens: ArgumentTokens) {
         argument.kind == ArgumentKind.BODY -> RequestBinding.JSON
         argument.kind == ArgumentKind.PART && !argument.file -> RequestBinding.JSON
         argument.kind == ArgumentKind.MODEL -> RequestBinding.FORM
+        isHttpEntity(argument) -> RequestBinding.JSON
         else -> null
     }
 
-    private fun typeOf(argument: HandlerArgument): KType =
-        argument.kotlinType ?: argument.parameter.nestedParameterType.kotlin.starProjectedType
+    private fun isHttpEntity(argument: HandlerArgument): Boolean =
+        argument.kind == ArgumentKind.FRAMEWORK && tokens.resolverOf(argument) is HttpEntityMethodProcessor
+
+    private fun typeOf(argument: HandlerArgument): KType {
+        val declared = argument.kotlinType ?: argument.parameter.nestedParameterType.kotlin.starProjectedType
+        if (!isHttpEntity(argument)) {
+            return declared
+        }
+        return declared.arguments.firstOrNull()?.type ?: Any::class.starProjectedType
+    }
 }

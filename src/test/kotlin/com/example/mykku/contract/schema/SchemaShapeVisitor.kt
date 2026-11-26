@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.introspect.AnnotatedMember
 import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonAnyFormatVisitor
 import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonArrayFormatVisitor
 import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonBooleanFormatVisitor
-import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatTypes
 import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatVisitable
 import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonFormatVisitorWrapper
 import com.fasterxml.jackson.databind.jsonFormatVisitors.JsonIntegerFormatVisitor
@@ -39,7 +38,6 @@ class SchemaShape {
     val details: MutableList<String> = mutableListOf()
     val properties: MutableList<SchemaChild> = mutableListOf()
     var element: SchemaChild? = null
-    var elementFormat: JsonFormatTypes? = null
 }
 
 class SchemaShapeVisitor(
@@ -103,10 +101,6 @@ private class ElementCollector(
 
     override fun itemsFormat(handler: JsonFormatVisitable?, elementType: JavaType?) {
         shape.element = SchemaChild(ELEMENT, elementType, handler, null)
-    }
-
-    override fun itemsFormat(format: JsonFormatTypes?) {
-        shape.elementFormat = format
     }
 }
 

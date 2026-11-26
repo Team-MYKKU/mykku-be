@@ -1,7 +1,6 @@
 package com.example.mykku.contract.mvc
 
 import com.example.mykku.BaseControllerTest
-import com.example.mykku.contract.dump.StaticDumpGoldens
 import com.example.mykku.contract.support.ContractGolden
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -16,6 +15,12 @@ class MvcConfigContractTest : BaseControllerTest() {
 
     @Test
     fun `test 프로필 컨텍스트의 MVC·서블릿 설정은 골든과 같다`() {
-        ContractGolden.DEFAULT.verify(StaticDumpGoldens.MVC_CONFIG, MvcConfigDump(context).render())
+        ContractGolden.DEFAULT.verify(GOLDEN, MvcConfigDump(context).render())
+    }
+
+    companion object {
+        private const val GOLDEN = "wire/mvc/config.txt"
+
+        val GOLDENS: List<String> = listOf(GOLDEN)
     }
 }

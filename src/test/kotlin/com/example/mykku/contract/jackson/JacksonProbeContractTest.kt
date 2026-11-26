@@ -2,7 +2,6 @@ package com.example.mykku.contract.jackson
 
 import com.example.mykku.BaseControllerTest
 import com.example.mykku.contract.dump.MvcJackson
-import com.example.mykku.contract.dump.StaticDumpGoldens
 import com.example.mykku.contract.support.ContractGolden
 import com.example.mykku.contract.support.ContractJson
 import com.fasterxml.jackson.databind.node.JsonNodeFactory
@@ -23,7 +22,7 @@ class JacksonProbeContractTest : BaseControllerTest() {
         val tree = JsonNodeFactory.instance.objectNode()
         JacksonProbes.serialization().forEach { tree.replace(it.name, it.serialize(converter)) }
 
-        ContractGolden.DEFAULT.verify(StaticDumpGoldens.JACKSON_SERIALIZE, ContractJson.pretty(tree) + "\n")
+        ContractGolden.DEFAULT.verify(SERIALIZE, ContractJson.pretty(tree) + "\n")
     }
 
     @Test
@@ -31,6 +30,13 @@ class JacksonProbeContractTest : BaseControllerTest() {
         val converter = MvcJackson.converter(handlerAdapter)
         val lines = JacksonProbes.deserialization().map { it.describe(converter) }
 
-        ContractGolden.DEFAULT.verify(StaticDumpGoldens.JACKSON_DESERIALIZE, lines.joinToString("\n", postfix = "\n"))
+        ContractGolden.DEFAULT.verify(DESERIALIZE, lines.joinToString("\n", postfix = "\n"))
+    }
+
+    companion object {
+        private const val SERIALIZE = "wire/jackson/serialize.json"
+        private const val DESERIALIZE = "wire/jackson/deserialize.txt"
+
+        val GOLDENS: List<String> = listOf(SERIALIZE, DESERIALIZE)
     }
 }

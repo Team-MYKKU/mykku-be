@@ -6,6 +6,7 @@ import kotlin.reflect.KType
 import kotlin.reflect.KTypeParameter
 import kotlin.reflect.KTypeProjection
 import kotlin.reflect.full.createType
+import kotlin.reflect.full.primaryConstructor
 import kotlin.reflect.full.withNullability
 
 object KotlinTypes {
@@ -23,8 +24,13 @@ object KotlinTypes {
 
     fun enumConstants(klass: KClass<*>): List<String>? = klass.java.enumConstants?.map { (it as Enum<*>).name }
 
-    fun isProjectDto(klass: KClass<*>): Boolean =
-        klass.qualifiedName.orEmpty().startsWith(PROJECT_PACKAGE) && !klass.java.isEnum && isKotlin(klass)
+    fun isProjectDto(klass: KClass<*>): Boolean = isProjectClass(klass) && !klass.java.isEnum && !klass.isValue
+
+    fun isProjectClass(klass: KClass<*>): Boolean =
+        klass.qualifiedName.orEmpty().startsWith(PROJECT_PACKAGE) && isKotlin(klass)
+
+    fun valueClassUnderlying(klass: KClass<*>): KType? =
+        if (klass.isValue) klass.primaryConstructor?.parameters?.singleOrNull()?.type?.withNullability(false) else null
 
     fun isKotlin(klass: KClass<*>): Boolean = klass.java.isAnnotationPresent(Metadata::class.java)
 
@@ -58,6 +64,7 @@ object KotlinTypes {
     }
 
     private fun renderClass(klass: KClass<*>, arguments: List<KTypeProjection>): String {
+        valueClassUnderlying(klass)?.let { return render(it) }
         enumConstants(klass)?.let { return "enum[${it.joinToString(",")}]" }
         if (isFile(klass)) {
             return "file"
