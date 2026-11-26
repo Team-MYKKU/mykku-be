@@ -1,20 +1,17 @@
 package com.example.mykku.contract.errorcode
 
 import com.example.mykku.BaseControllerTest
-import com.example.mykku.contract.support.ContractManifestExtension
 import com.example.mykku.contract.support.HttpSnapshot
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.restassured.RestAssured
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 
 @DisplayName("에러 코드 조회 API 계약")
-@ExtendWith(ContractManifestExtension::class)
 class ErrorCodeApiContractTest : BaseControllerTest() {
 
     private val objectMapper = jacksonObjectMapper()
@@ -24,7 +21,7 @@ class ErrorCodeApiContractTest : BaseControllerTest() {
     fun `에러 코드 조회 응답은 골든과 같다`(golden: String, path: String) {
         val response = RestAssured.given().get(path)
 
-        HttpSnapshot.of("GET $path", response).verify("wire/error-codes/$golden.http")
+        HttpSnapshot.of("GET $path", response).verify(ErrorCodeGoldens.path("$golden.http"))
     }
 
     @Test
@@ -34,13 +31,14 @@ class ErrorCodeApiContractTest : BaseControllerTest() {
 
         assertThat(all).isSorted()
         assertThat(all).containsExactlyInAnyOrderElementsOf(byDomain)
-        assertThat(codesOf("/api/error-codes/domains")).containsExactlyElementsOf(DOMAINS.sorted())
+        assertThat(domainKeys()).containsExactlyElementsOf(DOMAINS.sorted())
     }
 
-    private fun codesOf(path: String): List<String> {
-        val data = objectMapper.readTree(RestAssured.given().get(path).asByteArray()).path("data")
-        return data.map { if (it.isTextual) it.asText() else it.path("code").asText() }
-    }
+    private fun codesOf(path: String): List<String> = dataOf(path).map { it.path("code").asText() }
+
+    private fun domainKeys(): List<String> = dataOf("/api/error-codes/domains").map { it.asText() }
+
+    private fun dataOf(path: String) = objectMapper.readTree(RestAssured.given().get(path).asByteArray()).path("data")
 
     companion object {
         private val DOMAINS = listOf(

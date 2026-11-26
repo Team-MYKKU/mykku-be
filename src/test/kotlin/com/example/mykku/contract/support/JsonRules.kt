@@ -47,7 +47,7 @@ class JsonRules(
 
     private fun sortObject(node: JsonNode, path: String) {
         if (node !is ObjectNode) {
-            throw AssertionError("[API 계약 위반] 키 순서 정규화 경로 $path 가 객체가 아닙니다: ${node.nodeType}")
+            throw ContractViolationError("[API 계약 위반] 키 순서 정규화 경로 $path 가 객체가 아닙니다: ${node.nodeType}")
         }
         val sorted = node.properties().map { it.key to it.value }.sortedBy { it.first }
         node.removeAll()

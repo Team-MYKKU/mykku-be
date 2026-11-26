@@ -47,7 +47,18 @@ class HttpSnapshotTest {
     }
 
     @Test
-    fun `verify는 렌더링한 결과를 계약 골든과 비교한다`(@TempDir tempDir: Path) {
+    fun `JSON 본문에는 선언한 규칙을 적용하고 본문이 없는데 규칙을 선언하면 실패한다`() {
+        val headers = listOf(HttpHeader("Content-Type", "application/json"))
+        val rules = JsonRules(masks = listOf(JsonMask("/data/token") { "<JWT>" }))
+        val body = """{"data":{"token":"a.b.c"}}""".toByteArray()
+
+        assertThat(HttpSnapshot("POST /login", 200, headers, body, rules).render()).contains("\"token\" : \"<JWT>\"")
+        assertThatThrownBy { HttpSnapshot("POST /login", 204, headers, ByteArray(0), rules).render() }
+            .isInstanceOf(ContractViolationError::class.java)
+    }
+
+    @Test
+    fun `verify는 렌더링 결과를 골든 경로에 넘긴다(갱신 모드)`(@TempDir tempDir: Path) {
         val mode = ContractUpdateMode(enabled = true, ci = false)
         val golden = ContractGolden(tempDir.resolve("golden"), tempDir.resolve("actual"), mode)
 

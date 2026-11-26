@@ -41,7 +41,7 @@ object ContractJson {
     fun parse(text: String): JsonNode = try {
         reader.readTree(text)
     } catch (exception: JsonProcessingException) {
-        throw AssertionError("[API 계약 위반] JSON으로 읽을 수 없습니다(중복 키 포함): ${exception.message}", exception)
+        throw ContractViolationError("[API 계약 위반] JSON으로 읽을 수 없습니다(중복 키 포함): ${exception.message}", exception)
     }
 
     fun pretty(tree: JsonNode): String = prettyWriter.writeValueAsString(tree)
@@ -53,7 +53,7 @@ object ContractJson {
             .decode(ByteBuffer.wrap(bytes))
             .toString()
     } catch (exception: CharacterCodingException) {
-        throw AssertionError("[API 계약 위반] 응답 본문이 UTF-8이 아닙니다: $exception", exception)
+        throw ContractViolationError("[API 계약 위반] 응답 본문이 UTF-8이 아닙니다: $exception", exception)
     }
 
     private fun requireCanonical(text: String, tree: JsonNode) {
@@ -63,7 +63,7 @@ object ContractJson {
         }
         val index = text.zip(canonical).indexOfFirst { it.first != it.second }
             .takeIf { it >= 0 } ?: minOf(text.length, canonical.length)
-        throw AssertionError(
+        throw ContractViolationError(
             "[API 계약 위반] 응답 원문이 compact 정규형과 다릅니다(공백·이스케이프·숫자 표기). " +
                 "첫 차이 위치 $index: 원문 '${excerpt(text, index)}' / 정규형 '${excerpt(canonical, index)}'"
         )

@@ -91,6 +91,28 @@ class SnippetGoldenTest {
             .hasMessageContaining("스니펫이 생성되지 않았습니다")
     }
 
+    @Test
+    fun `CRLF로 쓴 스니펫도 LF로 바꾼 뒤 정규화하고 골든 폴더의 점 파일은 무시한다`() {
+        writeSnippets("x/list/200", "body-v1")
+        snippetGolden(update = true).verify("x/list/200")
+        val dir = tempDir.resolve("snippets/x/list/200")
+        Files.list(dir).use { paths -> paths.toList() }.forEach { it.writeText(it.readText().replace("\n", "\r\n")) }
+        tempDir.resolve("golden/docs/snippets/x/list/200/.DS_Store").writeText("os")
+
+        assertThat(snippetGolden(update = false).violationsOf("x/list/200")).isEmpty()
+    }
+
+    @Test
+    fun `document()가 식별자를 기록할 때 지난 실행의 스니펫 파일을 지운다`() {
+        writeSnippets("x/list/200", "body-v1")
+
+        snippetGolden(update = false).discardGenerated("x/list/200")
+
+        assertThat(Files.list(tempDir.resolve("snippets/x/list/200")).use { it.toList() }).isEmpty()
+        assertThatThrownBy { snippetGolden(update = false).discardGenerated("../escape") }
+            .isInstanceOf(IllegalArgumentException::class.java)
+    }
+
     private fun snippetGolden(update: Boolean): SnippetGolden {
         val mode = ContractUpdateMode(enabled = update, ci = false)
         val golden = ContractGolden(tempDir.resolve("golden"), tempDir.resolve("actual"), mode)

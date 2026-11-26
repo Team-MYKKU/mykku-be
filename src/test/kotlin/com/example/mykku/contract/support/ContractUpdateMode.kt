@@ -7,7 +7,7 @@ class ContractUpdateMode(
 
     fun requireAllowed() {
         if (enabled && ci) {
-            throw AssertionError(CI_UPDATE_MESSAGE)
+            throw ContractViolationError(CI_UPDATE_MESSAGE)
         }
     }
 

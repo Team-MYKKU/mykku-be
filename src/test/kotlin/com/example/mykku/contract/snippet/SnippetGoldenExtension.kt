@@ -8,7 +8,7 @@ interface SnippetIdentifierSource {
 }
 
 class SnippetGoldenExtension(
-    private val snippetGolden: SnippetGolden = SnippetGolden()
+    private val snippetGolden: SnippetGolden = SnippetGolden.DEFAULT
 ) : AfterTestExecutionCallback {
 
     override fun afterTestExecution(context: ExtensionContext) {

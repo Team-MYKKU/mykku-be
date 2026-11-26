@@ -32,8 +32,8 @@ object JsonPath {
         return select(root, parentPath).flatMap { keys(it, segments.last(), path).map { key -> JsonSlot(it, key) } }
     }
 
-    fun missing(path: String): AssertionError =
-        AssertionError("[API 계약 위반] 선언한 JSON 경로 $path 가 응답에 없습니다.")
+    fun missing(path: String): ContractViolationError =
+        ContractViolationError("[API 계약 위반] 선언한 JSON 경로 $path 가 응답에 없습니다.")
 
     private fun segments(path: String): List<String> {
         require(path.isEmpty() || (path.startsWith("/") && !path.endsWith("/"))) {

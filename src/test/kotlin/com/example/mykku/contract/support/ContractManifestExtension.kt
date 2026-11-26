@@ -18,6 +18,7 @@ class ContractManifestExtension : BeforeAllCallback {
 class ManifestRefresh(
     private val manifest: GoldenManifest = GoldenManifest(),
     private val updateMode: ContractUpdateMode = ContractUpdateMode.fromEnvironment(),
+    private val touchedPaths: () -> Set<String> = { ContractGolden.DEFAULT.touchedPaths() },
     private val baseResolver: () -> String = { GoldenManifest.mergeBaseWithDevelop() }
 ) : ExtensionContext.Store.CloseableResource {
 
@@ -26,7 +27,8 @@ class ManifestRefresh(
             return
         }
         updateMode.requireAllowed()
-        val recordedBase = manifest.read()?.base?.takeIf { GoldenManifest.isCommit(it) }
-        manifest.write(recordedBase ?: baseResolver())
+        val recorded = manifest.read()
+        val base = recorded?.base?.takeIf { GoldenManifest.isCommit(it) } ?: baseResolver()
+        manifest.write(base, manifest.refreshed(recorded?.entries.orEmpty(), touchedPaths()))
     }
 }

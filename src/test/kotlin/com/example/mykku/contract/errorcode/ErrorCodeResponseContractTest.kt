@@ -4,14 +4,12 @@ import com.example.mykku.BaseControllerTest
 import com.example.mykku.common.exception.DomainErrorCode
 import com.example.mykku.common.exception.ErrorCodeRegistry
 import com.example.mykku.contract.support.ContractGolden
-import com.example.mykku.contract.support.ContractManifestExtension
 import com.example.mykku.contract.support.HandlerCatalog
 import com.example.mykku.event.exception.EventErrorCode
 import com.example.mykku.event.exception.InvalidWinnerMemberIdsException
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.mock.web.MockHttpServletRequest
@@ -23,7 +21,6 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import java.nio.charset.StandardCharsets.UTF_8
 
 @DisplayName("에러 코드별 에러 응답 계약")
-@ExtendWith(ContractManifestExtension::class)
 class ErrorCodeResponseContractTest : BaseControllerTest() {
 
     @Autowired
@@ -47,7 +44,8 @@ class ErrorCodeResponseContractTest : BaseControllerTest() {
             errorCodes.map { "${context.label} ${it.code} ${resolve(context, handler, exceptionOf(context, it))}" }
         }
 
-        ContractGolden.DEFAULT.verify("wire/error-codes/responses.txt", lines.joinToString("\n", postfix = "\n"))
+        val golden = ErrorCodeGoldens.path(ErrorCodeGoldens.RESPONSES)
+        ContractGolden.DEFAULT.verify(golden, lines.joinToString("\n", postfix = "\n"))
     }
 
     @Test

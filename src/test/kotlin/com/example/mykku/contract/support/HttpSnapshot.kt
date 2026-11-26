@@ -34,7 +34,7 @@ class HttpSnapshot(
             return header.value
         }
         if (!GENERATED_REQUEST_ID.matches(header.value)) {
-            throw AssertionError(
+            throw ContractViolationError(
                 "[API 계약 위반] $REQUEST_ID_HEADER 생성값이 8자리 소문자 16진수가 아닙니다: '${header.value}'"
             )
         }
@@ -42,16 +42,13 @@ class HttpSnapshot(
     }
 
     private fun renderedBody(): String? {
-        if (body.isEmpty()) {
-            return null
-        }
-        if (isJson()) {
+        if (body.isNotEmpty() && isJson()) {
             return ContractJson.render(body, rules)
         }
         if (!rules.isEmpty) {
-            throw AssertionError("[API 계약 위반] JSON 규칙을 선언했지만 응답이 JSON이 아닙니다: ${contentType()}")
+            throw ContractViolationError("[API 계약 위반] JSON 규칙을 선언했지만 응답 본문이 JSON이 아닙니다: ${contentType()}")
         }
-        return ContractJson.decodeUtf8(body)
+        return ContractJson.decodeUtf8(body).ifEmpty { null }
     }
 
     private fun isJson(): Boolean {

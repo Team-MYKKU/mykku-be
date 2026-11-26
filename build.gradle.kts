@@ -68,7 +68,7 @@ allOpen {
 tasks.withType<Test> {
     useJUnitPlatform()
     systemProperty("user.timezone", "Asia/Seoul")
-    systemProperty("contract.update", providers.gradleProperty("contract.update").getOrElse("false"))
+    systemProperty("contract.update", gradle.startParameter.projectProperties["contract.update"] ?: "false")
     outputs.dir("build/generated-snippets")
     inputs.files(fileTree("mykku-be-config/templates"))
         .withPropertyName("adminTemplates")

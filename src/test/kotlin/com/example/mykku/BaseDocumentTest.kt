@@ -92,6 +92,7 @@ import com.example.mykku.role.application.port.input.GetMyRolesUseCase
 import com.example.mykku.role.application.port.input.GetNewRolesUseCase
 import com.example.mykku.role.application.port.input.GetRolesUseCase
 import com.example.mykku.contest.application.port.input.GetMyParticipatedContestsUseCase
+import com.example.mykku.contract.snippet.SnippetGolden
 import com.example.mykku.contract.snippet.SnippetGoldenExtension
 import com.example.mykku.contract.snippet.SnippetIdentifierSource
 import com.example.mykku.contract.support.ContractManifestExtension
@@ -502,7 +503,12 @@ abstract class BaseDocumentTest : SnippetIdentifierSource {
         document(identifierPrefix, status.toString())
 
     protected fun document(identifierPrefix: String, errorCode: String): RestDocumentationFilterBuilder =
-        RestDocumentationFilterBuilder(identifierPrefix, errorCode).also { snippetIdentifiers.add(it.identifier) }
+        RestDocumentationFilterBuilder(identifierPrefix, errorCode).also { recordSnippetIdentifier(it.identifier) }
+
+    private fun recordSnippetIdentifier(identifier: String) {
+        SnippetGolden.DEFAULT.discardGenerated(identifier)
+        snippetIdentifiers.add(identifier)
+    }
 
     protected fun given(documentationFilter: RestDocumentationFilter): RequestSpecification =
         RestAssured.given(spec).filter(documentationFilter)

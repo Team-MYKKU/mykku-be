@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
+import java.util.Random
 
 @DisplayName("핸들러 분석")
 class HandlerCatalogTest : BaseControllerTest() {
@@ -29,14 +30,24 @@ class HandlerCatalogTest : BaseControllerTest() {
         assertThat(endpoint.area).isEqualTo(EndpointArea.APP)
         assertThat(endpoint.consumes).containsExactly("multipart/form-data")
         assertThat(endpoint.auth).isEqualTo(AuthLevel.REQUIRED)
-        assertThat(endpoint.arguments.map { listOf(it.kind, it.name, it.required, it.validated, it.file) })
-            .containsExactly(
-                listOf(ArgumentKind.PART, "request", true, true, false),
-                listOf(ArgumentKind.PART, "images", false, false, true),
-                listOf(ArgumentKind.MEMBER, "member", true, false, false)
-            )
+        assertThat(summaries(endpoint)).containsExactly(
+            listOf(ArgumentKind.PART, "request", true, true, false),
+            listOf(ArgumentKind.PART, "images", false, false, true),
+            listOf(ArgumentKind.MEMBER, "member", true, false, false)
+        )
         assertThat(endpoint.arguments.first().parameter.nestedParameterType.simpleName)
             .isEqualTo("CreateFeedRequestDto")
+    }
+
+    @Test
+    fun `@Valid 없는 JSON 본문과 본문을 회원보다 먼저 받는 순서를 판정한다`() {
+        val endpoint = catalog.find("POST", "/api/v1/feeds/{feedId}/comments")
+
+        assertThat(summaries(endpoint)).containsExactly(
+            listOf(ArgumentKind.PATH, "feedId", true, false, false),
+            listOf(ArgumentKind.BODY, "request", true, false, false),
+            listOf(ArgumentKind.MEMBER, "member", true, false, false)
+        )
     }
 
     @Test
@@ -48,46 +59,70 @@ class HandlerCatalogTest : BaseControllerTest() {
         assertThat(detail.pathArguments.map { "${it.name}:${it.kotlinType}" }).containsExactly("feedId:kotlin.Long")
         assertThat(detail.paged).isFalse()
         assertThat(comments.paged).isTrue()
-        assertThat(comments.arguments.filter { it.kind == ArgumentKind.QUERY }.map { it.name to it.defaultValue })
-            .containsExactly("page" to "0", "size" to "20")
-        assertThat(comments.arguments.filter { it.kind == ArgumentKind.QUERY }).noneMatch { it.required }
+        assertThat(queries(comments).map { it.name to it.defaultValue }).containsExactly("page" to "0", "size" to "20")
+        assertThat(queries(comments)).noneMatch { it.required }
     }
 
     @Test
-    fun `인자 없는 공개 엔드포인트와 어드민·그 밖의 영역을 나눈다`() {
-        val errorCodes = catalog.find("GET", "/api/error-codes")
-        val adminCreate = catalog.find("POST", "/admin/api/v1/events")
-        val adminEditPage = catalog.find("GET", "/admin/contest/{contestId}/edit")
+    fun `기본값 없는 필수 쿼리와 기본값 있는 enum 쿼리를 나눈다`() {
+        val keyword = queries(catalog.find("GET", "/api/v1/search/feeds")).single()
+        val status = queries(catalog.find("GET", "/api/v1/contests")).first()
 
-        assertThat(errorCodes.auth).isEqualTo(AuthLevel.NONE)
-        assertThat(errorCodes.arguments).isEmpty()
-        assertThat(adminCreate.area).isEqualTo(EndpointArea.ADMIN)
-        assertThat(adminCreate.arguments.map { it.kind to it.validated }).containsExactly(ArgumentKind.MODEL to true)
-        assertThat(adminEditPage.arguments.map { it.kind }).containsExactly(ArgumentKind.PATH, ArgumentKind.FRAMEWORK)
-        assertThat(catalog.inArea(EndpointArea.OTHER).map { it.pattern }).contains("/error")
+        assertThat(listOf(keyword.name, keyword.required, keyword.defaultValue)).containsExactly("keyword", true, null)
+        assertThat(listOf(status.name, status.required, status.defaultValue)).containsExactly("status", false, "ACTIVE")
+        assertThat(status.kotlinType.toString()).endsWith("ContestStatusFilter")
     }
 
     @Test
-    fun `같은 메서드·경로가 consumes로 갈리면 하나로 찾지 않는다`() {
+    fun `같은 메서드·경로가 consumes로 갈리고 nullable 파트는 선택으로 판정한다`() {
         val profileUpdates = catalog.endpoints.filter { it.method == "PATCH" && it.pattern == "/api/v1/members/me" }
+        val multipart = profileUpdates.single { it.consumes == listOf("multipart/form-data") }
 
         assertThat(profileUpdates.map { it.consumes })
             .containsExactly(listOf("application/json"), listOf("multipart/form-data"))
         assertThatThrownBy { catalog.find("PATCH", "/api/v1/members/me") }
             .isInstanceOf(IllegalStateException::class.java)
+        assertThat(summaries(multipart).drop(1)).containsExactly(
+            listOf(ArgumentKind.PART, "request", false, true, false),
+            listOf(ArgumentKind.PART, "profileImage", false, false, true)
+        )
     }
 
     @Test
-    fun `엔드포인트 목록은 실행마다 같은 순서이고 조건까지 겹치는 항목이 없다`() {
+    fun `어드민 폼·Pageable·화면 인자와 그 밖의 영역을 나눈다`() {
+        val adminCreate = catalog.find("POST", "/admin/api/v1/events")
+        val adminFanNotes = catalog.find("GET", "/admin/fannote")
+
+        assertThat(adminCreate.area).isEqualTo(EndpointArea.ADMIN)
+        assertThat(adminCreate.arguments.map { it.kind to it.validated }).containsExactly(ArgumentKind.MODEL to true)
+        assertThat(adminFanNotes.arguments.map { it.kind })
+            .containsExactly(ArgumentKind.PAGEABLE, ArgumentKind.FRAMEWORK)
+        assertThat(adminFanNotes.paged).isTrue()
+        assertThat(catalog.find("GET", "/api/error-codes").arguments).isEmpty()
+        assertThat(catalog.inArea(EndpointArea.OTHER).map { it.method to it.pattern }).containsOnly("*" to "/error")
+    }
+
+    @Test
+    fun `엔드포인트 정렬 키는 전순서라 입력 순서와 무관하게 같은 목록이 나온다`() {
         val keys = catalog.endpoints.map {
             listOf(it.method, it.pattern, it.consumes, it.produces, it.params, it.headers)
         }
+        val resorted = HandlerCatalog.sorted(catalog.endpoints.reversed().shuffled(Random(SEED)))
 
-        assertThat(HandlerCatalog(handlerMapping, handlerAdapter).endpoints.map { it.handlerName })
-            .containsExactlyElementsOf(catalog.endpoints.map { it.handlerName })
         assertThat(keys).doesNotHaveDuplicates()
+        assertThat(resorted.map { it.handlerName }).containsExactlyElementsOf(catalog.endpoints.map { it.handlerName })
         assertThat(catalog.inArea(EndpointArea.APP)).allMatch { endpoint ->
             endpoint.arguments.count { it.kind == ArgumentKind.MEMBER } <= 1
         }
+    }
+
+    private fun summaries(endpoint: Endpoint): List<List<Any>> =
+        endpoint.arguments.map { listOf(it.kind, it.name, it.required, it.validated, it.file) }
+
+    private fun queries(endpoint: Endpoint): List<HandlerArgument> =
+        endpoint.arguments.filter { it.kind == ArgumentKind.QUERY }
+
+    private companion object {
+        const val SEED = 20261125L
     }
 }

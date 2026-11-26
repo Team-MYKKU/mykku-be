@@ -33,7 +33,7 @@ data class Endpoint(
         }
 
     val paged: Boolean
-        get() = queryNames().containsAll(PAGE_PARAMETERS)
+        get() = queryNames().containsAll(PAGE_PARAMETERS) || arguments.any { it.kind == ArgumentKind.PAGEABLE }
 
     val pathArguments: List<HandlerArgument>
         get() = arguments.filter { it.kind == ArgumentKind.PATH }
@@ -55,9 +55,8 @@ class HandlerCatalog(
 
     private val argumentReader = HandlerArgumentReader(handlerAdapter.argumentResolvers.orEmpty())
 
-    val endpoints: List<Endpoint> = handlerMapping.handlerMethods
-        .flatMap { (info, handlerMethod) -> endpointsOf(info, handlerMethod) }
-        .sortedWith(ENDPOINT_ORDER)
+    val endpoints: List<Endpoint> =
+        sorted(handlerMapping.handlerMethods.flatMap { (info, handlerMethod) -> endpointsOf(info, handlerMethod) })
 
     fun find(method: String, pattern: String): Endpoint {
         val matches = endpoints.filter { it.method == method && it.pattern == pattern }
@@ -92,9 +91,9 @@ class HandlerCatalog(
         handlerMethod = handlerMethod
     )
 
-    private companion object {
-        const val ANY_METHOD = "*"
-        val ENDPOINT_ORDER: Comparator<Endpoint> = compareBy(
+    companion object {
+        private const val ANY_METHOD = "*"
+        private val ENDPOINT_ORDER: Comparator<Endpoint> = compareBy(
             { it.pattern },
             { it.method },
             { it.consumes.joinToString() },
@@ -102,5 +101,7 @@ class HandlerCatalog(
             { it.params.joinToString() },
             { it.headers.joinToString() }
         )
+
+        fun sorted(endpoints: List<Endpoint>): List<Endpoint> = endpoints.sortedWith(ENDPOINT_ORDER)
     }
 }

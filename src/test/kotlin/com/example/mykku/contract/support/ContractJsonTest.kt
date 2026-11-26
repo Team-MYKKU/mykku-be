@@ -43,12 +43,22 @@ class ContractJsonTest {
     }
 
     @Test
-    fun `중복 키와 뒤따르는 토큰과 UTF-8이 아닌 바이트는 실패한다`() {
-        val bodies = listOf("""{"a":1,"a":2}""", """{"a":1}{}""").map { it.toByteArray() } + byteArrayOf(0xC3.toByte())
+    fun `중복 키와 뒤따르는 토큰은 파서 단계에서 실패한다`() {
+        assertThatThrownBy { ContractJson.parse("""{"a":1,"a":2}""") }
+            .isInstanceOf(ContractViolationError::class.java)
+            .hasMessageContaining("Duplicate field 'a'")
+        assertThatThrownBy { ContractJson.parse("""{"a":1}{}""") }
+            .isInstanceOf(ContractViolationError::class.java)
+            .hasMessageContaining("Trailing token")
+    }
 
-        bodies.forEach { body ->
-            assertThatThrownBy { ContractJson.render(body) }.isInstanceOf(AssertionError::class.java)
-        }
+    @Test
+    fun `UTF-8이 아닌 바이트는 디코딩 단계에서 실패한다`() {
+        val body = "{\"a\":\"".toByteArray() + byteArrayOf(0xC3.toByte()) + "\"}".toByteArray()
+
+        assertThatThrownBy { ContractJson.decodeUtf8(body) }
+            .isInstanceOf(ContractViolationError::class.java)
+            .hasMessageContaining("UTF-8")
     }
 
     @Test
@@ -58,6 +68,24 @@ class ContractJsonTest {
         val rendered = ContractJson.render("""{"data":[{"at":"2026","n":1},{"at":"20","n":2}]}""".toByteArray(), rules)
 
         assertThat(rendered).contains("\"at\" : \"<T:4>\"", "\"at\" : \"<T:2>\"", "\"n\" : 1", "\"n\" : 2")
+    }
+
+    @Test
+    fun `숫자 색인과 객체 와일드카드 경로도 마스킹한다`() {
+        val rules = JsonRules(masks = listOf(JsonMask("/list/1/t") { "<B>" }, JsonMask("/map/*") { "<V>" }))
+        val body = """{"list":[{"t":"a"},{"t":"b"}],"map":{"x":"1","y":"2"}}"""
+
+        assertThat(compact(ContractJson.render(body.toByteArray(), rules)))
+            .isEqualTo("""{"list":[{"t":"a"},{"t":"<B>"}],"map":{"x":"<V>","y":"<V>"}}""")
+    }
+
+    @Test
+    fun `와일드카드로 고른 원소 중 하나라도 키가 없으면 실패한다`() {
+        val rules = JsonRules(masks = listOf(JsonMask("/list/*/t") { "<T>" }))
+
+        assertThatThrownBy { ContractJson.render("""{"list":[{"t":"a"},{"u":"b"}]}""".toByteArray(), rules) }
+            .isInstanceOf(ContractViolationError::class.java)
+            .hasMessageContaining("/list/*/t")
     }
 
     @Test

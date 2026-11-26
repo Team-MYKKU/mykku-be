@@ -33,8 +33,9 @@ class ContractGoldenTest {
         writeGolden("wire/a.txt", "same\nold\n")
 
         assertThatThrownBy { golden(update = false).verify("wire/a.txt", "same\nnew\n") }
-            .isInstanceOf(AssertionError::class.java)
+            .isInstanceOf(ContractViolationError::class.java)
             .hasMessageContaining("[API 계약 위반] wire/a.txt")
+            .hasMessageContaining(ContractGolden.UPDATE_COMMAND)
             .hasMessageContaining("-old")
             .hasMessageContaining("+new")
         assertThat(actualRoot.resolve("wire/a.txt").readText()).isEqualTo("same\nnew\n")
@@ -80,15 +81,28 @@ class ContractGoldenTest {
     }
 
     @Test
-    fun `골든 파일 목록과 삭제는 갱신 모드에서만 지운다`() {
+    fun `골든 목록은 점 파일을 빼고 읽고 골든 삭제는 갱신 모드에서만 한다`() {
         writeGolden("docs/x/a.adoc", "a")
         writeGolden("docs/x/b.adoc", "b")
+        writeGolden("docs/x/.DS_Store", "os")
 
         assertThat(golden(update = false).goldenFiles("docs/x")).containsExactlyInAnyOrder("a.adoc", "b.adoc")
         assertThatThrownBy { golden(update = false).removeGolden("docs/x/a.adoc") }
-            .isInstanceOf(IllegalArgumentException::class.java)
+            .isInstanceOf(IllegalStateException::class.java)
         golden(update = true).removeGolden("docs/x/a.adoc")
         assertThat(golden(update = false).goldenFiles("docs/x")).containsExactly("b.adoc")
+    }
+
+    @Test
+    fun `갱신 모드에서 쓰거나 지운 골든 경로를 기록한다`() {
+        writeGolden("docs/x/old.adoc", "old")
+        val golden = golden(update = true)
+
+        golden.verify("wire/./y/new.txt", "new")
+        golden.removeGolden("docs/x/old.adoc")
+
+        assertThat(golden.touchedPaths()).containsExactlyInAnyOrder("wire/y/new.txt", "docs/x/old.adoc")
+        assertThat(golden(update = false).touchedPaths()).isEmpty()
     }
 
     private fun golden(update: Boolean) =

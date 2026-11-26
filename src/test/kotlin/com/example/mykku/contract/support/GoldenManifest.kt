@@ -6,19 +6,20 @@ import java.nio.file.Path
 import java.security.MessageDigest
 import java.util.HexFormat
 import java.util.concurrent.TimeUnit
-import kotlin.io.path.isRegularFile
-import kotlin.io.path.name
 
 data class ManifestContent(val base: String, val entries: Map<String, String>)
 
-class GoldenManifest(private val root: Path = Path.of("src/test/resources/contract")) {
+class GoldenManifest(private val root: Path = ContractGolden.CONTRACT_ROOT) {
 
     fun current(): Map<String, String> = Files.walk(root).use { paths ->
-        paths.filter { it.isRegularFile() && !it.name.startsWith(".") && it != manifestPath() }
+        paths.filter { ContractGolden.isGoldenFile(it) && it != manifestPath() }
             .map { root.relativize(it).joinToString("/") to sha256(it) }
             .toList()
             .toMap(sortedMapOf())
     }
+
+    fun refreshed(recorded: Map<String, String>, touched: Set<String>): Map<String, String> =
+        current().mapValues { (path, hash) -> if (path in touched) hash else recorded[path] ?: hash }.toSortedMap()
 
     fun read(): ManifestContent? {
         if (Files.notExists(manifestPath())) {
@@ -31,8 +32,9 @@ class GoldenManifest(private val root: Path = Path.of("src/test/resources/contra
         return ManifestContent(base, entries)
     }
 
-    fun write(base: String) {
-        val lines = listOf(BASE_PREFIX + base) + current().map { (path, hash) -> "$hash$ENTRY_SEPARATOR$path" }
+    fun write(base: String, entries: Map<String, String> = current()) {
+        val lines = listOf(BASE_PREFIX + base) +
+            entries.toSortedMap().map { (path, hash) -> "$hash$ENTRY_SEPARATOR$path" }
         Files.write(manifestPath(), lines.joinToString("\n", postfix = "\n").toByteArray(UTF_8))
     }
 
@@ -54,9 +56,12 @@ class GoldenManifest(private val root: Path = Path.of("src/test/resources/contra
             val process = ProcessBuilder("git", "merge-base", "HEAD", "origin/develop")
                 .redirectErrorStream(true)
                 .start()
+            if (!process.waitFor(GIT_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
+                process.destroyForcibly()
+                error("MANIFEST 기준 커밋을 정하지 못했습니다: git merge-base가 ${GIT_TIMEOUT_SECONDS}초 안에 끝나지 않았습니다")
+            }
             val output = process.inputStream.bufferedReader().use { it.readText() }.trim()
-            val finished = process.waitFor(GIT_TIMEOUT_SECONDS, TimeUnit.SECONDS)
-            check(finished && process.exitValue() == 0 && isCommit(output)) {
+            check(process.exitValue() == 0 && isCommit(output)) {
                 "MANIFEST 기준 커밋을 정하지 못했습니다(git merge-base HEAD origin/develop): $output"
             }
             return output
