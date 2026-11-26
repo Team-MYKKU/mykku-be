@@ -1,0 +1,357 @@
+## POST /admin/api/v1/boards consumes=multipart/form-data model:form valid
+title kotlin=title type=String default=no
+  @NotBlank(message="제목은 필수입니다")
+  @Size(max=16, message="제목은 최대 16자입니다", min=0)
+logo kotlin=logo type=file default=no
+
+## PUT /admin/api/v1/boards/{boardId} consumes=multipart/form-data model:form valid
+title kotlin=title type=String default=no
+  @NotBlank(message="제목은 필수입니다")
+  @Size(max=16, message="제목은 최대 16자입니다", min=0)
+logo kotlin=logo type=file? default=yes
+
+## POST /admin/api/v1/contests consumes=multipart/form-data model:form valid
+title kotlin=title type=String default=no
+  @NotBlank(message="제목은 필수입니다")
+  @Size(max=255, message="제목은 255자 이하여야 합니다", min=0)
+subTitle kotlin=subTitle type=String? default=no
+  @Size(max=255, message="부제목은 255자 이하여야 합니다", min=0)
+description kotlin=description type=String? default=no
+startedAt kotlin=startedAt type=LocalDateTime default=no @DateTimeFormat(fallbackPatterns=["yyyy-MM-dd'T'HH:mm"], iso=NONE, pattern="yyyy-MM-dd'T'HH:mm:ss", style="SS")
+  @NotNull(message="시작일은 필수입니다")
+expiredAt kotlin=expiredAt type=LocalDateTime default=no @DateTimeFormat(fallbackPatterns=["yyyy-MM-dd'T'HH:mm"], iso=NONE, pattern="yyyy-MM-dd'T'HH:mm:ss", style="SS")
+  @NotNull(message="종료일은 필수입니다")
+thumbnailImage kotlin=thumbnailImage type=file default=no
+images kotlin=images type=List<file>? default=no
+tags kotlin=tags type=List<String>? default=no
+
+## PUT /admin/api/v1/contests/{contestId} consumes=multipart/form-data model:form valid
+title kotlin=title type=String default=no
+  @NotBlank(message="제목은 필수입니다")
+  @Size(max=255, message="제목은 255자 이하여야 합니다", min=0)
+subTitle kotlin=subTitle type=String? default=no
+  @Size(max=255, message="부제목은 255자 이하여야 합니다", min=0)
+description kotlin=description type=String? default=no
+startedAt kotlin=startedAt type=LocalDateTime default=no @DateTimeFormat(fallbackPatterns=["yyyy-MM-dd'T'HH:mm"], iso=NONE, pattern="yyyy-MM-dd'T'HH:mm:ss", style="SS")
+  @NotNull(message="시작일은 필수입니다")
+expiredAt kotlin=expiredAt type=LocalDateTime default=no @DateTimeFormat(fallbackPatterns=["yyyy-MM-dd'T'HH:mm"], iso=NONE, pattern="yyyy-MM-dd'T'HH:mm:ss", style="SS")
+  @NotNull(message="종료일은 필수입니다")
+thumbnailImage kotlin=thumbnailImage type=file? default=yes
+keepImageUrls kotlin=keepImageUrls type=List<String>? default=no
+  @NotNull(message="유지할 이미지 목록(_keepImageUrls)은 필수입니다")
+newImages kotlin=newImages type=List<file>? default=yes
+tags kotlin=tags type=List<String>? default=no
+
+## PUT /admin/api/v1/contests/{contestId}/winner-announcement body:json valid
+title kotlin=title type=String default=no jackson-required=true
+  @NotBlank(message="제목은 필수입니다")
+  @Size(max=255, message="제목은 최대 255자까지 가능합니다", min=0)
+content kotlin=content type=String default=no jackson-required=true
+  @NotBlank(message="본문은 필수입니다")
+announcedAt kotlin=announcedAt type=LocalDate default=no jackson-required=true @DateTimeFormat(fallbackPatterns=[], iso=NONE, pattern="yyyy-MM-dd", style="SS")
+  @NotNull(message="발표일은 필수입니다")
+
+## POST /admin/api/v1/contests/{contestId}/winners body:json valid
+winners kotlin=winners type=List<object> default=no jackson-required=true cascade
+  @NotEmpty(message="수상자 목록은 필수입니다")
+  @Size(max=3, message="수상자는 1~3명이어야 합니다", min=1)
+  element[0] cascade
+winners[].participationId kotlin=participationId type=Long default=no jackson-required=false
+winners[].winnerRank kotlin=winnerRank type=Int default=no jackson-required=false
+  @Max(message="순위는 3 이하여야 합니다", value=3)
+  @Min(message="순위는 1 이상이어야 합니다", value=1)
+winners[].awardTitle kotlin=awardTitle type=String? default=yes jackson-required=false
+  @Size(max=50, message="수상명은 50자 이하여야 합니다", min=0)
+winners[].description kotlin=description type=String default=yes jackson-required=false
+
+## POST /admin/api/v1/dailymessages body:json valid
+title kotlin=title type=String default=no jackson-required=true
+  @NotBlank(message="제목은 필수입니다")
+  @Size(max=255, message="제목은 255자 이하여야 합니다", min=0)
+content kotlin=content type=String default=no jackson-required=true
+  @NotBlank(message="내용은 필수입니다")
+  @Size(max=42, message="내용은 최대 42자까지 입력 가능합니다", min=0)
+date kotlin=date type=LocalDate default=no jackson-required=true
+  @NotNull(message="날짜는 필수입니다")
+
+## PUT /admin/api/v1/dailymessages/{id} body:json valid
+title kotlin=title type=String default=no jackson-required=true
+  @NotBlank(message="제목은 필수입니다")
+  @Size(max=255, message="제목은 255자 이하여야 합니다", min=0)
+content kotlin=content type=String default=no jackson-required=true
+  @NotBlank(message="내용은 필수입니다")
+  @Size(max=42, message="내용은 최대 42자까지 입력 가능합니다", min=0)
+date kotlin=date type=LocalDate default=no jackson-required=true
+  @NotNull(message="날짜는 필수입니다")
+
+## POST /admin/api/v1/events consumes=multipart/form-data model:form valid
+title kotlin=title type=String default=no
+  @NotBlank(message="제목은 필수입니다")
+  @Size(max=255, message="제목은 255자 이하여야 합니다", min=0)
+subTitle kotlin=subTitle type=String? default=no
+  @Size(max=255, message="부제목은 255자 이하여야 합니다", min=0)
+description kotlin=description type=String? default=no
+startedAt kotlin=startedAt type=LocalDateTime default=no @DateTimeFormat(fallbackPatterns=["yyyy-MM-dd'T'HH:mm"], iso=NONE, pattern="yyyy-MM-dd'T'HH:mm:ss", style="SS")
+  @NotNull(message="시작일은 필수입니다")
+expiredAt kotlin=expiredAt type=LocalDateTime default=no @DateTimeFormat(fallbackPatterns=["yyyy-MM-dd'T'HH:mm"], iso=NONE, pattern="yyyy-MM-dd'T'HH:mm:ss", style="SS")
+  @NotNull(message="종료일은 필수입니다")
+thumbnailImage kotlin=thumbnailImage type=file default=no
+images kotlin=images type=List<file>? default=no
+
+## PUT /admin/api/v1/events/{eventId} consumes=multipart/form-data model:form valid
+title kotlin=title type=String default=no
+  @NotBlank(message="제목은 필수입니다")
+  @Size(max=255, message="제목은 255자 이하여야 합니다", min=0)
+subTitle kotlin=subTitle type=String? default=no
+  @Size(max=255, message="부제목은 255자 이하여야 합니다", min=0)
+description kotlin=description type=String? default=no
+startedAt kotlin=startedAt type=LocalDateTime default=no @DateTimeFormat(fallbackPatterns=["yyyy-MM-dd'T'HH:mm"], iso=NONE, pattern="yyyy-MM-dd'T'HH:mm:ss", style="SS")
+  @NotNull(message="시작일은 필수입니다")
+expiredAt kotlin=expiredAt type=LocalDateTime default=no @DateTimeFormat(fallbackPatterns=["yyyy-MM-dd'T'HH:mm"], iso=NONE, pattern="yyyy-MM-dd'T'HH:mm:ss", style="SS")
+  @NotNull(message="종료일은 필수입니다")
+thumbnailImage kotlin=thumbnailImage type=file? default=yes
+keepImageUrls kotlin=keepImageUrls type=List<String>? default=no
+  @NotNull(message="유지할 이미지 목록(_keepImageUrls)은 필수입니다")
+newImages kotlin=newImages type=List<file>? default=yes
+
+## PUT /admin/api/v1/events/{eventId}/winner-announcement body:json valid
+title kotlin=title type=String default=no jackson-required=true
+  @NotBlank(message="제목은 필수입니다")
+  @Size(max=255, message="제목은 최대 255자까지 가능합니다", min=0)
+content kotlin=content type=String default=no jackson-required=true
+  @NotBlank(message="본문은 필수입니다")
+announcedAt kotlin=announcedAt type=LocalDate default=no jackson-required=true @DateTimeFormat(fallbackPatterns=[], iso=NONE, pattern="yyyy-MM-dd", style="SS")
+  @NotNull(message="발표일은 필수입니다")
+
+## PUT /admin/api/v1/events/{eventId}/winners body:json valid
+memberIds kotlin=memberIds type=List<String> default=no jackson-required=true
+  @Size(max=1000, message="당첨자는 한 번에 최대 1000명까지 지정할 수 있습니다", min=0)
+dryRun kotlin=dryRun type=Boolean default=yes jackson-required=false
+
+## POST /admin/api/v1/fannotes consumes=multipart/form-data model:form valid
+title kotlin=title type=String default=no
+  @NotBlank(message="제목은 필수입니다")
+  @Size(max=100, message="제목은 100자 이하여야 합니다", min=0)
+subtitle kotlin=subtitle type=String? default=no
+  @Size(max=200, message="부제목은 200자 이하여야 합니다", min=0)
+content kotlin=content type=String? default=no
+productionDate kotlin=productionDate type=LocalDate default=no @DateTimeFormat(fallbackPatterns=[], iso=NONE, pattern="yyyy-MM-dd", style="SS")
+  @NotNull(message="제작일은 필수입니다")
+coverImage kotlin=coverImage type=file? default=no
+pageImages kotlin=pageImages type=List<file>? default=no
+
+## PUT /admin/api/v1/fannotes/{id} consumes=multipart/form-data model:form valid
+title kotlin=title type=String default=no
+  @NotBlank(message="제목은 필수입니다")
+  @Size(max=100, message="제목은 100자 이하여야 합니다", min=0)
+subtitle kotlin=subtitle type=String? default=no
+  @Size(max=200, message="부제목은 200자 이하여야 합니다", min=0)
+content kotlin=content type=String? default=no
+productionDate kotlin=productionDate type=LocalDate default=no @DateTimeFormat(fallbackPatterns=[], iso=NONE, pattern="yyyy-MM-dd", style="SS")
+  @NotNull(message="제작일은 필수입니다")
+coverImage kotlin=coverImage type=file? default=yes
+removeCoverImage kotlin=removeCoverImage type=Boolean default=yes
+keepPageImageUrls kotlin=keepPageImageUrls type=List<String>? default=no
+  @NotNull(message="유지할 페이지 이미지 목록(_keepPageImageUrls)은 필수입니다")
+newPageImages kotlin=newPageImages type=List<file>? default=yes
+
+## PATCH /admin/api/v1/reports/{reportId} body:json valid
+status kotlin=status type=enum[PENDING,RESOLVED,REJECTED]? default=no jackson-required=false
+  @NotNull(message="처리 상태는 필수입니다")
+
+## POST /admin/api/v1/roles body:json valid
+name kotlin=name type=String default=no jackson-required=true
+  @NotBlank(message="칭호 이름은 필수입니다")
+  @Size(max=50, message="칭호 이름은 50자 이하여야 합니다", min=0)
+description kotlin=description type=String? default=yes jackson-required=false
+  @Size(max=200, message="칭호 설명은 200자 이하여야 합니다", min=0)
+
+## PUT /admin/api/v1/roles/{roleId} body:json valid
+name kotlin=name type=String default=no jackson-required=true
+  @NotBlank(message="칭호 이름은 필수입니다")
+  @Size(max=50, message="칭호 이름은 50자 이하여야 합니다", min=0)
+description kotlin=description type=String? default=yes jackson-required=false
+  @Size(max=200, message="칭호 설명은 200자 이하여야 합니다", min=0)
+
+## POST /api/v1/auth/logout body:json valid
+deviceId kotlin=deviceId type=String default=no jackson-required=true
+  @NotBlank(message="deviceId는 필수입니다")
+
+## POST /api/v1/auth/mobile/login body:json
+provider kotlin=provider type=enum[GOOGLE,KAKAO,NAVER,APPLE,EMAIL] default=no jackson-required=true
+accessToken kotlin=accessToken type=String? default=no jackson-required=false
+idToken kotlin=idToken type=String? default=yes jackson-required=false
+
+## POST /api/v1/auth/refresh body:json
+refreshToken kotlin=refreshToken type=String default=no jackson-required=true
+
+## POST /api/v1/blocks/keywords body:json
+keyword kotlin=keyword type=String default=no jackson-required=true
+
+## POST /api/v1/blocks/members body:json
+memberId kotlin=memberId type=String default=no jackson-required=true
+
+## PATCH /api/v1/contests/winners/{winnerId}/acceptance-speech body:json valid
+acceptanceSpeech kotlin=acceptanceSpeech type=String default=no jackson-required=true
+  @NotBlank(message="수상 소감은 필수입니다")
+  @Size(max=1000, message="수상 소감은 1000자 이하여야 합니다", min=0)
+
+## PUT /api/v1/daily-messages/comments/{commentId} body:json
+content kotlin=content type=String default=no jackson-required=true
+
+## POST /api/v1/daily-messages/{dailyMessageId}/comments body:json
+content kotlin=content type=String default=no jackson-required=true
+parentCommentId kotlin=parentCommentId type=Long? default=yes jackson-required=false
+
+## POST /api/v1/email-auth/login body:json valid
+email kotlin=email type=String default=no jackson-required=true
+  @Email(flags=[], message="올바른 이메일 형식이 아닙니다", regexp=".*")
+  @NotBlank(message="이메일은 필수입니다")
+password kotlin=password type=String default=no jackson-required=true
+  @NotBlank(message="비밀번호는 필수입니다")
+
+## POST /api/v1/email-auth/reset-password body:json valid
+email kotlin=email type=String default=no jackson-required=true
+  @Email(flags=[], message="올바른 이메일 형식이 아닙니다", regexp=".*")
+  @NotBlank(message="이메일은 필수입니다")
+code kotlin=code type=String default=no jackson-required=true
+  @NotBlank(message="인증 코드는 필수입니다")
+  @Pattern(flags=[], message="인증 코드는 6자리 숫자여야 합니다", regexp="^[0-9]{6}$")
+newPassword kotlin=newPassword type=String default=no jackson-required=true
+  @NotBlank(message="새 비밀번호는 필수입니다")
+  @Pattern(flags=[], message="비밀번호는 영문, 숫자, 특수문자를 모두 포함해야 합니다", regexp="^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]+$")
+  @Size(max=2147483647, message="비밀번호는 최소 8자 이상이어야 합니다", min=8)
+
+## POST /api/v1/email-auth/send-code body:json valid
+email kotlin=email type=String default=no jackson-required=true
+  @Email(flags=[], message="올바른 이메일 형식이 아닙니다", regexp=".*")
+  @NotBlank(message="이메일은 필수입니다")
+purpose kotlin=purpose type=enum[SIGNUP,PASSWORD_RESET] default=no jackson-required=true
+  @NotNull(message="인증 목적은 필수입니다")
+
+## POST /api/v1/email-auth/send-temporary-password body:json valid
+email kotlin=email type=String default=no jackson-required=true
+  @Email(flags=[], message="올바른 이메일 형식이 아닙니다", regexp=".*")
+  @NotBlank(message="이메일은 필수입니다")
+
+## POST /api/v1/email-auth/signup body:json valid
+email kotlin=email type=String default=no jackson-required=true
+  @Email(flags=[], message="올바른 이메일 형식이 아닙니다", regexp=".*")
+  @NotBlank(message="이메일은 필수입니다")
+password kotlin=password type=String default=no jackson-required=true
+  @NotBlank(message="비밀번호는 필수입니다")
+  @Pattern(flags=[], message="비밀번호는 영문, 숫자, 특수문자를 모두 포함해야 합니다", regexp="^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]+$")
+  @Size(max=2147483647, message="비밀번호는 최소 8자 이상이어야 합니다", min=8)
+
+## POST /api/v1/email-auth/verify-code body:json valid
+email kotlin=email type=String default=no jackson-required=true
+  @Email(flags=[], message="올바른 이메일 형식이 아닙니다", regexp=".*")
+  @NotBlank(message="이메일은 필수입니다")
+code kotlin=code type=String default=no jackson-required=true
+  @NotBlank(message="인증 코드는 필수입니다")
+  @Pattern(flags=[], message="인증 코드는 6자리 숫자여야 합니다", regexp="^[0-9]{6}$")
+purpose kotlin=purpose type=enum[SIGNUP,PASSWORD_RESET] default=no jackson-required=true
+  @NotNull(message="인증 목적은 필수입니다")
+
+## POST /api/v1/fcm-tokens body:json valid
+token kotlin=token type=String default=no jackson-required=true
+  @NotBlank(message="FCM 토큰은 필수입니다")
+deviceId kotlin=deviceId type=String default=no jackson-required=true
+  @NotBlank(message="디바이스 ID는 필수입니다")
+deviceType kotlin=deviceType type=String? default=yes jackson-required=false
+
+## POST /api/v1/feeds consumes=multipart/form-data part request:json valid
+title kotlin=title type=String default=no jackson-required=true
+  @NotBlank(message="제목은 필수입니다")
+content kotlin=content type=String default=no jackson-required=true
+  @NotBlank(message="내용은 필수입니다")
+  @Size(max=1000, message="내용은 1000자 이하여야 합니다", min=0)
+boardId kotlin=boardId type=Long default=no jackson-required=false
+tags kotlin=tags type=List<String> default=yes jackson-required=false
+  @Size(max=7, message="태그는 7개 이하여야 합니다", min=0)
+
+## PUT /api/v1/feeds/comments/{commentId} body:json
+content kotlin=content type=String default=no jackson-required=true
+
+## PATCH /api/v1/feeds/{feedId} consumes=multipart/form-data part request:json valid
+title kotlin=title type=String? default=no jackson-required=false
+content kotlin=content type=String? default=no jackson-required=false
+  @Size(max=1000, message="내용은 1000자 이하여야 합니다", min=0)
+boardId kotlin=boardId type=Long? default=no jackson-required=false
+tags kotlin=tags type=List<String>? default=no jackson-required=false
+  @Size(max=7, message="태그는 7개 이하여야 합니다", min=0)
+deleteImageIds kotlin=deleteImageIds type=List<Long>? default=no jackson-required=false
+
+## POST /api/v1/feeds/{feedId}/comments body:json
+content kotlin=content type=String default=no jackson-required=true
+parentCommentId kotlin=parentCommentId type=Long? default=yes jackson-required=false
+
+## POST /api/v1/members/check-id body:json valid
+memberId kotlin=memberId type=String default=no jackson-required=true
+  @NotBlank(message="아이디는 필수입니다")
+  @Pattern(flags=[], message="아이디는 영문과 숫자만 사용 가능합니다", regexp="^[a-zA-Z0-9]+$")
+  @Size(max=16, message="아이디는 최대 16자까지 가능합니다", min=0)
+
+## PATCH /api/v1/members/me consumes=application/json body:json valid
+nickname kotlin=nickname type=String? default=no jackson-required=false
+  @Size(max=10, message="닉네임은 10자 이하여야 합니다", min=0)
+profileImage kotlin=profileImage type=String? default=no jackson-required=false
+  @Pattern(flags=[], message="프로필 이미지는 http 또는 https로 시작하는 URL이어야 합니다", regexp="^$|^https?://.+$")
+  @Size(max=255, message="프로필 이미지 URL은 255자 이하여야 합니다", min=0)
+
+## PATCH /api/v1/members/me consumes=multipart/form-data part request:json valid optional
+nickname kotlin=nickname type=String? default=no jackson-required=false
+  @Size(max=10, message="닉네임은 10자 이하여야 합니다", min=0)
+profileImage kotlin=profileImage type=String? default=yes jackson-required=false
+  @Pattern(flags=[], message="프로필 이미지는 http 또는 https로 시작하는 URL이어야 합니다", regexp="^$|^https?://.+$")
+  @Size(max=255, message="프로필 이미지 URL은 255자 이하여야 합니다", min=0)
+
+## PATCH /api/v1/members/me/member-id body:json valid
+memberId kotlin=memberId type=String default=no jackson-required=true
+  @NotBlank(message="아이디는 필수입니다")
+  @Pattern(flags=[], message="아이디는 영문과 숫자만 사용 가능합니다", regexp="^[a-zA-Z0-9]+$")
+  @Size(max=16, message="아이디는 최대 16자까지 가능합니다", min=0)
+
+## PUT /api/v1/members/password body:json valid
+currentPassword kotlin=currentPassword type=String default=no jackson-required=true
+  @NotBlank(message="현재 비밀번호는 필수입니다")
+newPassword kotlin=newPassword type=String default=no jackson-required=true
+  @NotBlank(message="새 비밀번호는 필수입니다")
+  @Pattern(flags=[], message="비밀번호는 8자 이상, 영문, 숫자, 특수문자를 포함해야 합니다", regexp="^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,}$")
+
+## POST /api/v1/members/setup-profile body:json valid
+memberId kotlin=memberId type=String default=no jackson-required=true
+  @NotBlank(message="아이디는 필수입니다")
+  @Pattern(flags=[], message="아이디는 영문과 숫자만 사용 가능합니다", regexp="^[a-zA-Z0-9]+$")
+  @Size(max=16, message="아이디는 최대 16자까지 가능합니다", min=0)
+nickname kotlin=nickname type=String default=no jackson-required=true
+  @NotBlank(message="닉네임은 필수입니다")
+  @Pattern(flags=[], message="닉네임은 한글, 영문, 숫자만 사용 가능합니다", regexp="^[가-힣a-zA-Z0-9\\s]+$")
+  @Size(max=10, message="닉네임은 최대 10자까지 가능합니다", min=0)
+
+## PATCH /api/v1/notification-settings body:json valid
+notificationType kotlin=notificationType type=enum[FEED_LIKE,FEED_COMMENT] default=no jackson-required=true
+  @NotNull(message="알림 타입은 필수입니다")
+isEnabled kotlin=isEnabled type=Boolean default=no jackson-required=false
+  @NotNull(message="활성화 여부는 필수입니다")
+
+## POST /api/v1/preferences/genre body:json valid
+genreTypes kotlin=genreTypes type=List<enum[KPOP,WEBTOON_WEBNOVEL,MANGA_ANIME,GAME_ESPORTS,DRAMA_MOVIE,THEATER_MUSICAL,BAND_ROCK]> default=no jackson-required=true
+
+## POST /api/v1/preferences/goods body:json valid
+goodsTypes kotlin=goodsTypes type=List<enum[PHOTOCARD_HOLDER,DESK_TERIOR,LIGHT_STICK_DECO,ITABAG,UCHIWA,DIARY_DECO,NAME_BOARD,PHONE_ACCESSORY]> default=no jackson-required=true
+
+## POST /api/v1/preferences/mood body:json valid
+moodTypes kotlin=moodTypes type=List<enum[COZY,KITSCH,FRESH,DECADENT,SILLY,Y2K,PIXEL_ART,FUNNY]> default=no jackson-required=true
+
+## POST /api/v1/reports body:json valid
+targetType kotlin=targetType type=enum[FEED,FEED_COMMENT,DAILY_MESSAGE_COMMENT]? default=no jackson-required=false
+  @NotNull(message="신고 대상 종류는 필수입니다")
+targetId kotlin=targetId type=Long? default=no jackson-required=false
+  @NotNull(message="신고 대상 ID는 필수입니다")
+  @Positive(message="신고 대상 ID는 양수여야 합니다")
+reason kotlin=reason type=enum[ABUSE,OBSCENE,SPAM,FRAUD,PERSONAL_INFO,COPYRIGHT,ETC]? default=no jackson-required=false
+  @NotNull(message="신고 사유는 필수입니다")
+detail kotlin=detail type=String? default=yes jackson-required=false
+  @Size(max=500, message="상세 내용은 500자 이하여야 합니다", min=0)
+

@@ -1,0 +1,83 @@
+{
+  "booleanNames" : {
+    "isRead" : true,
+    "isActive" : null,
+    "isbn" : "isbn",
+    "hasNext" : false
+  },
+  "nulls" : {
+    "text" : null,
+    "number" : null,
+    "list" : null,
+    "nested" : null
+  },
+  "empties" : {
+    "list" : [ ],
+    "map" : { },
+    "text" : "",
+    "nested" : [ ]
+  },
+  "dateTimes" : {
+    "fraction0" : "2001-02-03T04:05:06",
+    "fraction2" : "2001-02-03T04:05:06.12",
+    "fraction6" : "2001-02-03T04:05:06.123456",
+    "fraction9" : "2001-02-03T04:05:06.123456789",
+    "secondsZero" : "2001-02-03T04:05:00",
+    "date" : "2001-02-03"
+  },
+  "enums" : {
+    "status" : "SECOND",
+    "statuses" : [ "FIRST", "SECOND" ],
+    "missing" : null
+  },
+  "numbers" : {
+    "longMax" : 9223372036854775807,
+    "longMin" : -9223372036854775808,
+    "intMax" : 2147483647,
+    "integralDouble" : 1.0,
+    "fractionDouble" : 0.1,
+    "scaledDecimal" : 1.50
+  },
+  "apiResponseUnit" : {
+    "message" : "메시지",
+    "data" : { }
+  },
+  "apiResponseNull" : {
+    "message" : "메시지",
+    "data" : null
+  },
+  "pageImpl" : {
+    "content" : [ {
+      "id" : 1,
+      "name" : "첫째"
+    }, {
+      "id" : 2,
+      "name" : "둘째"
+    } ],
+    "empty" : false,
+    "first" : true,
+    "last" : false,
+    "number" : 0,
+    "numberOfElements" : 2,
+    "pageable" : {
+      "offset" : 0,
+      "pageNumber" : 0,
+      "pageSize" : 2,
+      "paged" : true,
+      "sort" : {
+        "empty" : false,
+        "sorted" : true,
+        "unsorted" : false
+      },
+      "unpaged" : false
+    },
+    "size" : 2,
+    "sort" : {
+      "empty" : false,
+      "sorted" : true,
+      "unsorted" : false
+    },
+    "totalElements" : 5,
+    "totalPages" : 3
+  }
+}
