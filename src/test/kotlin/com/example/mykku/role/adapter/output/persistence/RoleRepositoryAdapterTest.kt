@@ -49,10 +49,14 @@ class RoleRepositoryAdapterTest : BaseRepositoryTest() {
             )
 
             val result = roleRepository.save(updatedRole)
+            flushAndClear()
 
             assertThat(result.id).isEqualTo(savedRole.id)
             assertThat(result.name).isEqualTo("SUPER_ADMIN")
             assertThat(result.description).isEqualTo("슈퍼 관리자")
+            val foundRole = roleRepository.findById(savedRole.id)!!
+            assertThat(foundRole.name).isEqualTo("SUPER_ADMIN")
+            assertThat(foundRole.description).isEqualTo("슈퍼 관리자")
         }
     }
 
@@ -168,6 +172,8 @@ class RoleRepositoryAdapterTest : BaseRepositoryTest() {
 
             val foundRole = roleRepository.findById(savedRole.id)
             assertThat(foundRole).isNull()
+            flushAndClear()
+            assertThat(roleRepository.findById(savedRole.id)).isNull()
         }
     }
 }

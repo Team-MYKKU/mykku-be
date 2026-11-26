@@ -9,12 +9,17 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.jdbc.core.JdbcTemplate
+import java.time.LocalDateTime
 
 @DisplayName("BoardRepositoryAdapter 통합 테스트")
 class BoardRepositoryAdapterTest : BaseRepositoryTest() {
 
     @Autowired
     private lateinit var boardRepository: BoardRepository
+
+    @Autowired
+    private lateinit var jdbcTemplate: JdbcTemplate
 
     private fun createTestBoard(
         title: String = "테스트 게시판",
@@ -62,24 +67,34 @@ class BoardRepositoryAdapterTest : BaseRepositoryTest() {
         @DisplayName("기존 게시판을 저장하면 제목이 갱신되고 createdAt이 보존된다")
         fun saveExistingBoardUpdatesInPlace() {
             val rowsBefore = boardJpaRepository.count()
-            val saved = boardRepository.save(createTestBoard(title = "원본"))
-            boardJpaRepository.flush()
-            Thread.sleep(5)
-            val changed = Board.reconstitute(
-                id = saved.id,
-                title = "변경됨",
-                logo = saved.logo,
-                createdAt = saved.createdAt,
-                updatedAt = saved.updatedAt
-            )
+            val stored = saveWithCreatedAt(createTestBoard(title = "원본"), PAST_CREATED_AT)
 
-            val updated = boardRepository.save(changed)
+            val updated = boardRepository.save(renamed(stored, "변경됨"))
+            flushAndClear()
 
-            assertThat(updated.id).isEqualTo(saved.id)
+            val reloaded = boardRepository.findById(stored.id)!!
+            assertThat(updated.id).isEqualTo(stored.id)
             assertThat(updated.title).isEqualTo("변경됨")
-            assertThat(updated.createdAt).isEqualTo(saved.createdAt)
+            assertThat(updated.createdAt).isEqualTo(PAST_CREATED_AT)
+            assertThat(reloaded.title).isEqualTo("변경됨")
+            assertThat(reloaded.createdAt).isEqualTo(PAST_CREATED_AT)
             assertThat(boardJpaRepository.count()).isEqualTo(rowsBefore + 1)
         }
+
+        private fun saveWithCreatedAt(board: Board, createdAt: LocalDateTime): Board {
+            val saved = boardRepository.save(board)
+            flushAndClear()
+            jdbcTemplate.update("UPDATE board SET created_at = ? WHERE id = ?", createdAt, saved.id.value)
+            return boardRepository.findById(saved.id)!!
+        }
+
+        private fun renamed(board: Board, title: String): Board = Board.reconstitute(
+            id = board.id,
+            title = title,
+            logo = board.logo,
+            createdAt = board.createdAt,
+            updatedAt = board.updatedAt
+        )
     }
 
     @Nested
@@ -152,6 +167,8 @@ class BoardRepositoryAdapterTest : BaseRepositoryTest() {
 
             val foundBoard = boardRepository.findById(savedBoard.id)
             assertThat(foundBoard).isNull()
+            flushAndClear()
+            assertThat(boardRepository.findById(savedBoard.id)).isNull()
         }
 
         @Test
@@ -204,5 +221,9 @@ class BoardRepositoryAdapterTest : BaseRepositoryTest() {
 
             assertThat(exists).isFalse()
         }
+    }
+
+    private companion object {
+        val PAST_CREATED_AT: LocalDateTime = LocalDateTime.of(2001, 1, 1, 0, 0, 0, 123_456_000)
     }
 }

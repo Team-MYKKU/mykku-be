@@ -11,7 +11,6 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.transaction.annotation.Transactional
 
 @DisplayName("NotificationSettingRepositoryAdapter 통합 테스트")
 class NotificationSettingRepositoryAdapterTest : BaseRepositoryTest() {
@@ -72,8 +71,12 @@ class NotificationSettingRepositoryAdapterTest : BaseRepositoryTest() {
             domain.disable()
 
             val updated = notificationSettingRepository.save(domain)
+            flushAndClear()
 
             assertThat(updated.isEnabled).isFalse()
+            val reloaded = notificationSettingRepository.findById(saved.id!!)!!
+            assertThat(reloaded.isEnabled).isFalse()
+            assertThat(reloaded.notificationType).isEqualTo(NotificationType.FEED_LIKE)
         }
     }
 
@@ -294,7 +297,6 @@ class NotificationSettingRepositoryAdapterTest : BaseRepositoryTest() {
     inner class Delete {
 
         @Test
-        @Transactional
         @DisplayName("알림 설정을 삭제할 수 있다")
         fun `삭제 - 정상 케이스`() {
             val saved = notificationSettingRepository.save(createNotificationSetting())
@@ -303,6 +305,8 @@ class NotificationSettingRepositoryAdapterTest : BaseRepositoryTest() {
 
             val found = notificationSettingRepository.findById(saved.id!!)
             assertThat(found).isNull()
+            flushAndClear()
+            assertThat(notificationSettingRepository.findById(saved.id!!)).isNull()
         }
     }
 
@@ -311,7 +315,6 @@ class NotificationSettingRepositoryAdapterTest : BaseRepositoryTest() {
     inner class DeleteAllByMemberId {
 
         @Test
-        @Transactional
         @DisplayName("회원의 모든 알림 설정을 삭제할 수 있다")
         fun `회원별 전체 삭제 - 정상 케이스`() {
             notificationSettingRepository.saveAll(
@@ -325,7 +328,6 @@ class NotificationSettingRepositoryAdapterTest : BaseRepositoryTest() {
         }
 
         @Test
-        @Transactional
         @DisplayName("다른 회원의 설정은 삭제되지 않는다")
         fun `회원별 전체 삭제 - 다른 회원`() {
             val otherMember = createAndSaveMember(
@@ -348,7 +350,6 @@ class NotificationSettingRepositoryAdapterTest : BaseRepositoryTest() {
         }
 
         @Test
-        @Transactional
         @DisplayName("설정이 없는 회원에 대해 삭제해도 에러가 발생하지 않는다")
         fun `회원별 전체 삭제 - 설정 없음`() {
             notificationSettingRepository.deleteAllByMemberId(memberId)
@@ -363,7 +364,6 @@ class NotificationSettingRepositoryAdapterTest : BaseRepositoryTest() {
     inner class EnableDisableIntegration {
 
         @Test
-        @Transactional
         @DisplayName("저장된 설정을 비활성화하고 다시 조회하면 비활성화 상태이다")
         fun `설정 비활성화 후 조회`() {
             val saved = notificationSettingRepository.save(createNotificationSetting())
@@ -377,18 +377,14 @@ class NotificationSettingRepositoryAdapterTest : BaseRepositoryTest() {
             )
 
             assertThat(found!!.isEnabled).isFalse()
+            flushAndClear()
+            assertThat(notificationSettingRepository.findById(saved.id!!)!!.isEnabled).isFalse()
         }
 
         @Test
-        @Transactional
         @DisplayName("비활성화된 설정을 다시 활성화할 수 있다")
         fun `설정 활성화 후 조회`() {
-            val setting = NotificationSetting.create(
-                memberId = memberId,
-                notificationType = NotificationType.FEED_LIKE,
-                isEnabled = false
-            )
-            val saved = notificationSettingRepository.save(setting)
+            val saved = notificationSettingRepository.save(createNotificationSetting(isEnabled = false))
             val domain = notificationSettingRepository.findById(saved.id!!)!!
             domain.enable()
             notificationSettingRepository.save(domain)
@@ -399,14 +395,16 @@ class NotificationSettingRepositoryAdapterTest : BaseRepositoryTest() {
             )
 
             assertThat(found!!.isEnabled).isTrue()
+            flushAndClear()
+            assertThat(notificationSettingRepository.findById(saved.id!!)!!.isEnabled).isTrue()
         }
     }
 
-    private fun createNotificationSetting(): NotificationSetting {
+    private fun createNotificationSetting(isEnabled: Boolean = true): NotificationSetting {
         return NotificationSetting.create(
             memberId = memberId,
             notificationType = NotificationType.FEED_LIKE,
-            isEnabled = true
+            isEnabled = isEnabled
         )
     }
 }

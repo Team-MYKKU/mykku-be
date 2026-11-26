@@ -97,14 +97,20 @@ class FanNoteRepositoryAdapterTest : BaseRepositoryTest() {
 
             // when
             val result = fanNoteRepository.save(updatedFanNote)
+            flushAndClear()
 
             // then
             assertThat(result.id).isEqualTo(savedFanNote.id)
-            assertThat(result.title).isEqualTo("수정된 제목")
-            assertThat(result.subtitle).isEqualTo("수정된 서브타이틀")
-            assertThat(result.content).isEqualTo("수정된 내용")
-            assertThat(result.productionDate).isEqualTo(LocalDate.of(2024, 6, 15))
-            assertThat(result.coverImageUrl).isEqualTo("https://example.com/updated-cover.jpg")
+            assertUpdatedFields(result)
+            assertUpdatedFields(fanNoteRepository.findById(savedFanNote.id)!!)
+        }
+
+        private fun assertUpdatedFields(fanNote: FanNote) {
+            assertThat(fanNote.title).isEqualTo("수정된 제목")
+            assertThat(fanNote.subtitle).isEqualTo("수정된 서브타이틀")
+            assertThat(fanNote.content).isEqualTo("수정된 내용")
+            assertThat(fanNote.productionDate).isEqualTo(LocalDate.of(2024, 6, 15))
+            assertThat(fanNote.coverImageUrl).isEqualTo("https://example.com/updated-cover.jpg")
         }
     }
 
@@ -273,6 +279,8 @@ class FanNoteRepositoryAdapterTest : BaseRepositoryTest() {
             // then
             val deletedFanNote = fanNoteRepository.findById(savedFanNote.id)
             assertThat(deletedFanNote).isNull()
+            flushAndClear()
+            assertThat(fanNoteRepository.findById(savedFanNote.id)).isNull()
         }
 
         @Test

@@ -43,17 +43,25 @@ class DailyMessageRepositoryAdapterTest : BaseRepositoryTest() {
             val dailyMessage = createDailyMessage()
             val savedMessage = dailyMessageRepository.save(dailyMessage)
 
-            val updatedMessage = savedMessage.update(
-                title = "수정된 제목",
-                content = "수정된 내용",
-                date = LocalDate.of(2025, 2, 1)
-            )
-            val result = dailyMessageRepository.save(updatedMessage)
+            val result = dailyMessageRepository.save(updateFields(savedMessage))
+            flushAndClear()
 
             assertThat(result.id).isEqualTo(savedMessage.id)
             assertThat(result.title).isEqualTo("수정된 제목")
             assertThat(result.content).isEqualTo("수정된 내용")
             assertThat(result.date).isEqualTo(LocalDate.of(2025, 2, 1))
+            val foundMessage = dailyMessageRepository.findById(savedMessage.id)!!
+            assertThat(foundMessage.title).isEqualTo("수정된 제목")
+            assertThat(foundMessage.content).isEqualTo("수정된 내용")
+            assertThat(foundMessage.date).isEqualTo(LocalDate.of(2025, 2, 1))
+        }
+
+        private fun updateFields(message: DailyMessage): DailyMessage {
+            return message.update(
+                title = "수정된 제목",
+                content = "수정된 내용",
+                date = LocalDate.of(2025, 2, 1)
+            )
         }
     }
 
@@ -327,6 +335,8 @@ class DailyMessageRepositoryAdapterTest : BaseRepositoryTest() {
 
             val foundMessage = dailyMessageRepository.findById(savedMessage.id)
             assertThat(foundMessage).isNull()
+            flushAndClear()
+            assertThat(dailyMessageRepository.findById(savedMessage.id)).isNull()
         }
 
         @Test

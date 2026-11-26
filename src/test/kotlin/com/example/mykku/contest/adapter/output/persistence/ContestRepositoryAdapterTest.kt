@@ -10,6 +10,7 @@ import com.example.mykku.contest.domain.vo.ContestListFilter
 import com.example.mykku.contest.domain.vo.ContestSortType
 import com.example.mykku.contest.domain.vo.ContestStatusType
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.within
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -18,6 +19,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 
 @DisplayName("ContestRepositoryAdapter 통합 테스트")
 class ContestRepositoryAdapterTest : BaseRepositoryTest() {
@@ -79,9 +81,13 @@ class ContestRepositoryAdapterTest : BaseRepositoryTest() {
             contest.updateStatus(ContestStatusType.WINNER_SELECTING)
 
             val updated = contestRepository.save(contest)
+            flushAndClear()
 
             assertThat(updated.id).isEqualTo(contest.id)
             assertThat(updated.status).isEqualTo(ContestStatusType.WINNER_SELECTING)
+            val persisted = contestRepository.findById(contest.id)!!
+            assertThat(persisted.status).isEqualTo(ContestStatusType.WINNER_SELECTING)
+            assertThat(persisted.title).isEqualTo("원본 제목")
         }
 
         @Test
@@ -96,10 +102,18 @@ class ContestRepositoryAdapterTest : BaseRepositoryTest() {
             contest.updateStatus(ContestStatusType.WINNER_SELECTED)
 
             val updated = contestRepository.save(contest)
+            flushAndClear()
 
             assertThat(updated.createdAt).isEqualTo(originalCreatedAt)
             assertThat(updated.status).isEqualTo(ContestStatusType.WINNER_SELECTED)
             assertThat(contestJpaRepository.count()).isEqualTo(rowsBefore + 1)
+            assertPersistedUpdate(contest.id, originalCreatedAt)
+        }
+
+        private fun assertPersistedUpdate(id: ContestId, originalCreatedAt: LocalDateTime) {
+            val persisted = contestRepository.findById(id)!!
+            assertThat(persisted.status).isEqualTo(ContestStatusType.WINNER_SELECTED)
+            assertThat(persisted.createdAt).isCloseTo(originalCreatedAt, within(1, ChronoUnit.MICROS))
         }
     }
 

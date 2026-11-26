@@ -237,6 +237,8 @@ class KeywordBlockRepositoryAdapterTest : BaseRepositoryTest() {
 
             val foundKeywordBlock = keywordBlockRepository.findById(savedKeywordBlock.id!!)
             assertThat(foundKeywordBlock).isNull()
+            flushAndClear()
+            assertThat(keywordBlockRepository.findById(savedKeywordBlock.id!!)).isNull()
         }
     }
 

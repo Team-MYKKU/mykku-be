@@ -10,6 +10,7 @@ import com.example.mykku.event.domain.vo.EventListFilter
 import com.example.mykku.event.domain.vo.EventSortType
 import com.example.mykku.event.domain.vo.EventStatusType
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.within
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -18,6 +19,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 
 @DisplayName("EventRepositoryAdapter 통합 테스트")
 class EventRepositoryAdapterTest : BaseRepositoryTest() {
@@ -72,11 +74,19 @@ class EventRepositoryAdapterTest : BaseRepositoryTest() {
             saved.updateStatus(EventStatusType.WINNER_SELECTED)
 
             val updated = eventRepository.save(saved)
+            flushAndClear()
 
             assertThat(updated.id).isEqualTo(saved.id)
             assertThat(updated.status).isEqualTo(EventStatusType.WINNER_SELECTED)
             assertThat(updated.createdAt).isEqualTo(saved.createdAt)
             assertThat(eventJpaRepository.count()).isEqualTo(rowsBefore + 1)
+            assertPersistedUpdate(saved.id, saved.createdAt)
+        }
+
+        private fun assertPersistedUpdate(id: EventId, originalCreatedAt: LocalDateTime) {
+            val persisted = eventRepository.findById(id)!!
+            assertThat(persisted.status).isEqualTo(EventStatusType.WINNER_SELECTED)
+            assertThat(persisted.createdAt).isCloseTo(originalCreatedAt, within(1, ChronoUnit.MICROS))
         }
     }
 

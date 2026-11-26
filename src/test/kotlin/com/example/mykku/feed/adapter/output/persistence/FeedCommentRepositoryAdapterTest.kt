@@ -19,10 +19,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
-import org.springframework.transaction.annotation.Transactional
 
 @DisplayName("FeedCommentRepositoryAdapter 통합 테스트")
-@Transactional
 class FeedCommentRepositoryAdapterTest : BaseRepositoryTest() {
 
     @Autowired
@@ -568,6 +566,8 @@ class FeedCommentRepositoryAdapterTest : BaseRepositoryTest() {
 
             val foundComment = feedCommentRepository.findById(comment.id!!)
             assertThat(foundComment).isNull()
+            flushAndClear()
+            assertThat(feedCommentRepository.findById(comment.id!!)).isNull()
         }
 
         @Test

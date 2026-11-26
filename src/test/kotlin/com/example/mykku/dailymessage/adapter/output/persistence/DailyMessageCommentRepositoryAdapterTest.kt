@@ -90,9 +90,14 @@ class DailyMessageCommentRepositoryAdapterTest : BaseRepositoryTest() {
             val updatedComment = comment.updateContent("수정된 내용")
 
             val result = dailyMessageCommentRepository.save(updatedComment)
+            flushAndClear()
 
             assertThat(result.id).isEqualTo(comment.id)
             assertThat(result.content).isEqualTo("수정된 내용")
+            val foundComment = dailyMessageCommentRepository.findById(comment.id)
+            assertThat(foundComment).isNotNull
+            assertThat(foundComment!!.content).isEqualTo("수정된 내용")
+            assertThat(foundComment.dailyMessageId).isEqualTo(savedDailyMessage.id.value)
         }
     }
 
@@ -337,6 +342,8 @@ class DailyMessageCommentRepositoryAdapterTest : BaseRepositoryTest() {
 
             val foundComment = dailyMessageCommentRepository.findById(comment.id)
             assertThat(foundComment).isNull()
+            flushAndClear()
+            assertThat(dailyMessageCommentRepository.findById(comment.id)).isNull()
         }
 
         @Test

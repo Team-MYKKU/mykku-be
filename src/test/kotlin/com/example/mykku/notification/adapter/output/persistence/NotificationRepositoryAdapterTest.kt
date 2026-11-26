@@ -13,10 +13,8 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
-import org.springframework.transaction.annotation.Transactional
 
 @DisplayName("NotificationRepositoryAdapter 통합 테스트")
-@Transactional
 class NotificationRepositoryAdapterTest : BaseRepositoryTest() {
 
     @Autowired
@@ -511,6 +509,8 @@ class NotificationRepositoryAdapterTest : BaseRepositoryTest() {
 
             val found = notificationRepository.findById(saved.id!!)
             assertThat(found).isNull()
+            flushAndClear()
+            assertThat(notificationRepository.findById(saved.id!!)).isNull()
         }
     }
 

@@ -10,7 +10,6 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.transaction.annotation.Transactional
 
 @DisplayName("FcmTokenRepositoryAdapter 통합 테스트")
 class FcmTokenRepositoryAdapterTest : BaseRepositoryTest() {
@@ -276,6 +275,8 @@ class FcmTokenRepositoryAdapterTest : BaseRepositoryTest() {
 
             val found = fcmTokenRepository.findById(saved.id!!)
             assertThat(found).isNull()
+            flushAndClear()
+            assertThat(fcmTokenRepository.findById(saved.id!!)).isNull()
         }
     }
 
@@ -284,7 +285,6 @@ class FcmTokenRepositoryAdapterTest : BaseRepositoryTest() {
     inner class DeleteByMemberIdAndDeviceId {
 
         @Test
-        @Transactional
         @DisplayName("회원 ID와 디바이스 ID로 토큰을 삭제할 수 있다")
         fun `회원ID_디바이스ID로 삭제 - 정상 케이스`() {
             fcmTokenRepository.save(createFcmToken())
@@ -296,7 +296,6 @@ class FcmTokenRepositoryAdapterTest : BaseRepositoryTest() {
         }
 
         @Test
-        @Transactional
         @DisplayName("다른 디바이스의 토큰은 삭제되지 않는다")
         fun `회원ID_디바이스ID로 삭제 - 다른 디바이스`() {
             fcmTokenRepository.save(
@@ -327,7 +326,6 @@ class FcmTokenRepositoryAdapterTest : BaseRepositoryTest() {
     inner class DeleteAllByMemberId {
 
         @Test
-        @Transactional
         @DisplayName("회원의 모든 FCM 토큰을 삭제할 수 있다")
         fun `회원별 전체 삭제 - 정상 케이스`() {
             fcmTokenRepository.save(
@@ -352,7 +350,6 @@ class FcmTokenRepositoryAdapterTest : BaseRepositoryTest() {
         }
 
         @Test
-        @Transactional
         @DisplayName("다른 회원의 토큰은 삭제되지 않는다")
         fun `회원별 전체 삭제 - 다른 회원`() {
             val otherMember = createAndSaveMember(
@@ -382,7 +379,6 @@ class FcmTokenRepositoryAdapterTest : BaseRepositoryTest() {
     inner class DeleteByToken {
 
         @Test
-        @Transactional
         @DisplayName("토큰 값으로 FCM 토큰을 삭제할 수 있다")
         fun `토큰으로 삭제 - 정상 케이스`() {
             fcmTokenRepository.save(createFcmToken())
@@ -394,7 +390,6 @@ class FcmTokenRepositoryAdapterTest : BaseRepositoryTest() {
         }
 
         @Test
-        @Transactional
         @DisplayName("다른 토큰은 삭제되지 않는다")
         fun `토큰으로 삭제 - 다른 토큰`() {
             fcmTokenRepository.save(
