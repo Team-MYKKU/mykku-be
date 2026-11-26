@@ -61,6 +61,7 @@ class BoardRepositoryAdapterTest : BaseRepositoryTest() {
         @Test
         @DisplayName("기존 게시판을 저장하면 제목이 갱신되고 createdAt이 보존된다")
         fun saveExistingBoardUpdatesInPlace() {
+            val rowsBefore = boardJpaRepository.count()
             val saved = boardRepository.save(createTestBoard(title = "원본"))
             boardJpaRepository.flush()
             Thread.sleep(5)
@@ -77,7 +78,7 @@ class BoardRepositoryAdapterTest : BaseRepositoryTest() {
             assertThat(updated.id).isEqualTo(saved.id)
             assertThat(updated.title).isEqualTo("변경됨")
             assertThat(updated.createdAt).isEqualTo(saved.createdAt)
-            assertThat(boardJpaRepository.count()).isEqualTo(1)
+            assertThat(boardJpaRepository.count()).isEqualTo(rowsBefore + 1)
         }
     }
 
@@ -118,13 +119,13 @@ class BoardRepositoryAdapterTest : BaseRepositoryTest() {
             val board1 = createTestBoard(title = "게시판A", logo = "logoA.png")
             val board2 = createTestBoard(title = "게시판B", logo = "logoB.png")
             val board3 = createTestBoard(title = "게시판C", logo = "logoC.png")
-            boardRepository.save(board1)
-            boardRepository.save(board2)
-            boardRepository.save(board3)
+            val saved1 = boardRepository.save(board1)
+            val saved2 = boardRepository.save(board2)
+            val saved3 = boardRepository.save(board3)
 
             val allBoards = boardRepository.findAll()
 
-            assertThat(allBoards).hasSize(3)
+            assertThat(allBoards.map { it.id }).containsExactlyInAnyOrder(saved1.id, saved2.id, saved3.id)
             assertThat(allBoards.map { it.title }).containsExactlyInAnyOrder("게시판A", "게시판B", "게시판C")
         }
 
@@ -164,7 +165,7 @@ class BoardRepositoryAdapterTest : BaseRepositoryTest() {
             boardRepository.delete(savedBoard2)
 
             val allBoards = boardRepository.findAll()
-            assertThat(allBoards).hasSize(1)
+            assertThat(allBoards.map { it.id }).containsExactly(savedBoard1.id)
             assertThat(allBoards[0].title).isEqualTo("남은 게시판")
         }
     }

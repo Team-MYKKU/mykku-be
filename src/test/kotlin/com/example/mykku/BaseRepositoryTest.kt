@@ -10,6 +10,8 @@ import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntit
 import com.example.mykku.member.domain.vo.SocialProvider
 import com.example.mykku.role.adapter.output.persistence.entity.RoleJpaEntity
 import com.example.mykku.role.adapter.output.persistence.repository.RoleJpaRepository
+import com.example.mykku.util.ClassLevelDatabaseCleaner
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
@@ -19,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional
 @SpringBootTest
 @ActiveProfiles("test")
 @Import(TestEmailConfig::class, TestEmailSenderConfig::class, TestImageUploadConfig::class)
+@ExtendWith(ClassLevelDatabaseCleaner::class)
 @Transactional
 abstract class BaseRepositoryTest {
 

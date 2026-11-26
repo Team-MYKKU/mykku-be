@@ -113,13 +113,13 @@ class RoleRepositoryAdapterTest : BaseRepositoryTest() {
         @Test
         @DisplayName("저장된 모든 역할을 반환한다")
         fun findAllRoles() {
-            roleRepository.save(createRole(name = "ADMIN"))
-            roleRepository.save(createRole(name = "USER"))
-            roleRepository.save(createRole(name = "MODERATOR"))
+            val savedAdmin = roleRepository.save(createRole(name = "ADMIN"))
+            val savedUser = roleRepository.save(createRole(name = "USER"))
+            val savedModerator = roleRepository.save(createRole(name = "MODERATOR"))
 
             val roles = roleRepository.findAll()
 
-            assertThat(roles).hasSize(3)
+            assertThat(roles.map { it.id }).containsExactlyInAnyOrder(savedAdmin.id, savedUser.id, savedModerator.id)
             assertThat(roles.map { it.name }).containsExactlyInAnyOrder("ADMIN", "USER", "MODERATOR")
         }
 

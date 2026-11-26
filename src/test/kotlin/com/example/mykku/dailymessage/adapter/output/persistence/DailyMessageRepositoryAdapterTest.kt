@@ -137,15 +137,15 @@ class DailyMessageRepositoryAdapterTest : BaseRepositoryTest() {
             val date2 = LocalDate.of(2025, 1, 24)
             val date3 = LocalDate.of(2025, 1, 25)
             val date4 = LocalDate.of(2025, 1, 26)
-            dailyMessageRepository.save(createDailyMessage(date = date1))
-            dailyMessageRepository.save(createDailyMessage(date = date2))
-            dailyMessageRepository.save(createDailyMessage(date = date3))
+            val message1 = dailyMessageRepository.save(createDailyMessage(date = date1))
+            val message2 = dailyMessageRepository.save(createDailyMessage(date = date2))
+            val message3 = dailyMessageRepository.save(createDailyMessage(date = date3))
             dailyMessageRepository.save(createDailyMessage(date = date4))
 
             val pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "date"))
             val result = dailyMessageRepository.findByDateBeforeOrEqual(date3, pageable)
 
-            assertThat(result.content).hasSize(3)
+            assertThat(result.content.map { it.id }).containsExactlyInAnyOrder(message1.id, message2.id, message3.id)
             assertThat(result.content.map { it.date }).allMatch { it <= date3 }
         }
 
@@ -186,9 +186,9 @@ class DailyMessageRepositoryAdapterTest : BaseRepositoryTest() {
             val date1 = LocalDate.of(2025, 1, 23)
             val date2 = LocalDate.of(2025, 1, 24)
             val date3 = LocalDate.of(2025, 1, 25)
-            dailyMessageRepository.save(createDailyMessage(date = date1))
-            dailyMessageRepository.save(createDailyMessage(date = date2))
-            dailyMessageRepository.save(createDailyMessage(date = date3))
+            val message1 = dailyMessageRepository.save(createDailyMessage(date = date1))
+            val message2 = dailyMessageRepository.save(createDailyMessage(date = date2))
+            val message3 = dailyMessageRepository.save(createDailyMessage(date = date3))
 
             val result = dailyMessageRepository.findByDateBeforeOrEqualWithSort(
                 date = LocalDate.of(2025, 1, 25),
@@ -196,7 +196,7 @@ class DailyMessageRepositoryAdapterTest : BaseRepositoryTest() {
                 sort = SortDirection.DESC
             )
 
-            assertThat(result).hasSize(3)
+            assertThat(result.map { it.id }).containsExactlyInAnyOrder(message1.id, message2.id, message3.id)
             assertThat(result[0].date).isEqualTo(date3)
             assertThat(result[1].date).isEqualTo(date2)
             assertThat(result[2].date).isEqualTo(date1)
@@ -208,9 +208,9 @@ class DailyMessageRepositoryAdapterTest : BaseRepositoryTest() {
             val date1 = LocalDate.of(2025, 1, 23)
             val date2 = LocalDate.of(2025, 1, 24)
             val date3 = LocalDate.of(2025, 1, 25)
-            dailyMessageRepository.save(createDailyMessage(date = date1))
-            dailyMessageRepository.save(createDailyMessage(date = date2))
-            dailyMessageRepository.save(createDailyMessage(date = date3))
+            val message1 = dailyMessageRepository.save(createDailyMessage(date = date1))
+            val message2 = dailyMessageRepository.save(createDailyMessage(date = date2))
+            val message3 = dailyMessageRepository.save(createDailyMessage(date = date3))
 
             val result = dailyMessageRepository.findByDateBeforeOrEqualWithSort(
                 date = LocalDate.of(2025, 1, 25),
@@ -218,7 +218,7 @@ class DailyMessageRepositoryAdapterTest : BaseRepositoryTest() {
                 sort = SortDirection.ASC
             )
 
-            assertThat(result).hasSize(3)
+            assertThat(result.map { it.id }).containsExactlyInAnyOrder(message1.id, message2.id, message3.id)
             assertThat(result[0].date).isEqualTo(date1)
             assertThat(result[1].date).isEqualTo(date2)
             assertThat(result[2].date).isEqualTo(date3)
@@ -262,14 +262,14 @@ class DailyMessageRepositoryAdapterTest : BaseRepositoryTest() {
         @Test
         @DisplayName("모든 일상 메시지를 페이지네이션하여 조회한다")
         fun `조회 - 정상 케이스`() {
-            for (i in 1..5) {
-                dailyMessageRepository.save(createDailyMessage(date = LocalDate.of(2025, 1, i)))
+            val savedIds = (1..5).map { i ->
+                dailyMessageRepository.save(createDailyMessage(date = LocalDate.of(2025, 1, i))).id
             }
 
             val pageable = PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "date"))
             val result = dailyMessageRepository.findAll(pageable)
 
-            assertThat(result.content).hasSize(5)
+            assertThat(result.content.map { it.id }).containsExactlyInAnyOrderElementsOf(savedIds)
             assertThat(result.totalElements).isEqualTo(5)
         }
 
