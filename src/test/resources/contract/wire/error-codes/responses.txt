@@ -1,0 +1,326 @@
+app AD001 404 application/json {"code":"AD001","message":"요청한 리소스를 찾을 수 없습니다"}
+app AD101 400 application/json {"code":"AD101","message":"잘못된 요청입니다"}
+app AD102 400 application/json {"code":"AD102","message":"필수 필드가 누락되었습니다"}
+app AD201 401 application/json {"code":"AD201","message":"유효하지 않은 관리자 토큰입니다"}
+app AD202 401 application/json {"code":"AD202","message":"관리자 인증이 필요합니다"}
+app AD401 500 application/json {"code":"AD401","message":"서버 내부 오류가 발생했습니다"}
+app AU101 400 application/json {"code":"AU101","message":"사용자 정보를 가져오는데 실패했습니다"}
+app AU102 400 application/json {"code":"AU102","message":"EMAIL 제공자는 모바일 로그인을 지원하지 않습니다"}
+app AU201 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+app AU202 401 application/json {"code":"AU202","message":"유효하지 않은 토큰입니다"}
+app AU203 401 application/json {"code":"AU203","message":"유효하지 않은 토큰입니다"}
+app AU204 403 application/json {"code":"AU204","message":"OAuth 접근이 거부되었습니다"}
+app AU401 503 application/json {"code":"AU401","message":"외부 서비스 오류가 발생했습니다"}
+app AU402 503 application/json {"code":"AU402","message":"OAuth 서버에서 오류가 발생했습니다"}
+app BL001 404 application/json {"code":"BL001","message":"차단 정보를 찾을 수 없습니다"}
+app BL002 404 application/json {"code":"BL002","message":"차단할 사용자를 찾을 수 없습니다"}
+app BL003 404 application/json {"code":"BL003","message":"키워드 차단 정보를 찾을 수 없습니다"}
+app BL101 400 application/json {"code":"BL101","message":"자기 자신을 차단할 수 없습니다"}
+app BL102 400 application/json {"code":"BL102","message":"키워드는 50자 이하여야 합니다"}
+app BL103 400 application/json {"code":"BL103","message":"키워드를 입력해주세요"}
+app BL104 400 application/json {"code":"BL104","message":"키워드는 최대 100개까지 등록할 수 있습니다"}
+app BL301 409 application/json {"code":"BL301","message":"이미 차단된 사용자입니다"}
+app BL302 409 application/json {"code":"BL302","message":"이미 차단된 키워드입니다"}
+app BO001 404 application/json {"code":"BO001","message":"게시판을 찾을 수 없습니다"}
+app BO101 400 application/json {"code":"BO101","message":"글을 옮길 게시판은 삭제할 게시판과 달라야 합니다"}
+app BO102 400 application/json {"code":"BO102","message":"글을 옮길 게시판을 지정하지 않았거나 찾을 수 없습니다"}
+app BO301 409 application/json {"code":"BO301","message":"게시글이 있는 게시판은 글 처리 방식을 정해야 삭제할 수 있습니다"}
+app C101 400 application/json {"code":"C101","message":"입력값이 올바르지 않습니다"}
+app C102 400 application/json {"code":"C102","message":"잘못된 정렬 방향입니다. 'asc' 또는 'desc'를 사용해주세요"}
+app C103 400 application/json {"code":"C103","message":"페이지 번호는 0 이상이어야 합니다"}
+app C104 400 application/json {"code":"C104","message":"페이지 크기는 1 이상 1000 이하여야 합니다"}
+app C105 400 application/json {"code":"C105","message":"필수 요청 값이 누락되었습니다"}
+app C106 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
+app C107 400 application/json {"code":"C107","message":"multipart 요청 형식이 올바르지 않습니다"}
+app C201 404 application/json {"code":"C201","message":"요청한 API를 찾을 수 없습니다"}
+app C202 405 application/json {"code":"C202","message":"지원하지 않는 HTTP 메서드입니다"}
+app C203 415 application/json {"code":"C203","message":"지원하지 않는 Content-Type입니다"}
+app C204 406 application/json {"code":"C204","message":"지원하지 않는 Accept 형식입니다"}
+app C205 413 application/json {"code":"C205","message":"업로드 가능한 파일 크기를 초과했습니다"}
+app C301 409 application/json {"code":"C301","message":"다른 요청이 처리 중입니다. 잠시 후 다시 시도해주세요"}
+app C302 409 application/json {"code":"C302","message":"이미 존재하는 값이거나 참조할 수 없는 값입니다"}
+app C401 500 application/json {"code":"C401","message":"Redis 연결에 실패했습니다. 잠시 후 다시 시도해주세요"}
+app C402 500 application/json {"code":"C402","message":"서버 오류가 발생했습니다. 관리자에게 문의해주세요"}
+app CN001 404 application/json {"code":"CN001","message":"콘테스트를 찾을 수 없습니다"}
+app CN002 404 application/json {"code":"CN002","message":"콘테스트 수상자를 찾을 수 없습니다"}
+app CN003 404 application/json {"code":"CN003","message":"콘테스트 참여 정보를 찾을 수 없습니다"}
+app CN004 404 application/json {"code":"CN004","message":"콘테스트 수상자 발표 공지를 찾을 수 없습니다"}
+app CN101 400 application/json {"code":"CN101","message":"콘테스트 이미지는 10개 이하여야 합니다"}
+app CN102 400 application/json {"code":"CN102","message":"콘테스트 태그는 7개 이하여야 합니다"}
+app CN104 400 application/json {"code":"CN104","message":"태그는 20자 이하여야 합니다"}
+app CN105 400 application/json {"code":"CN105","message":"태그는 한글, 영문, 숫자만 사용할 수 있습니다"}
+app CN106 400 application/json {"code":"CN106","message":"수상 순위는 1, 2, 3 중 하나여야 합니다"}
+app CN107 400 application/json {"code":"CN107","message":"수상자는 1~3명이어야 합니다"}
+app CN108 400 application/json {"code":"CN108","message":"중복된 수상 순위가 있습니다"}
+app CN109 400 application/json {"code":"CN109","message":"해당 참여작은 이 콘테스트에 속하지 않습니다"}
+app CN110 400 application/json {"code":"CN110","message":"종료되지 않은 콘테스트입니다"}
+app CN111 400 application/json {"code":"CN111","message":"아직 수상자가 발표되지 않았습니다"}
+app CN112 400 application/json {"code":"CN112","message":"유지할 이미지 목록에 이 콘테스트의 이미지가 아니거나 중복된 주소가 있습니다"}
+app CN113 400 application/json {"code":"CN113","message":"콘테스트 태그는 1개 이상이어야 합니다"}
+app CN114 400 application/json {"code":"CN114","message":"같은 참여작을 중복해서 선정할 수 없습니다"}
+app CN115 400 application/json {"code":"CN115","message":"한 회원은 한 콘테스트에서 한 번만 수상할 수 있습니다"}
+app CN116 400 application/json {"code":"CN116","message":"수상자를 선정한 뒤에는 콘테스트 기간과 태그를 바꿀 수 없습니다"}
+app CN117 400 application/json {"code":"CN117","message":"콘테스트 시작일은 종료일보다 늦을 수 없습니다"}
+app CN201 403 application/json {"code":"CN201","message":"수상 소감을 수정할 권한이 없습니다"}
+app CN301 409 application/json {"code":"CN301","message":"이 피드로 이미 참여한 콘테스트입니다"}
+app DM001 404 application/json {"code":"DM001","message":"일상 메시지를 찾을 수 없습니다"}
+app DM002 404 application/json {"code":"DM002","message":"일상 메시지 댓글을 찾을 수 없습니다"}
+app DM101 400 application/json {"code":"DM101","message":"일상 메시지 내용은 42자 이하여야 합니다"}
+app DM102 400 application/json {"code":"DM102","message":"일상 메시지 댓글은 1000자 이하여야 합니다"}
+app DM103 400 application/json {"code":"DM103","message":"답글에는 답글을 작성할 수 없습니다"}
+app DM201 403 application/json {"code":"DM201","message":"댓글에 접근할 권한이 없습니다"}
+app DM301 409 application/json {"code":"DM301","message":"해당 날짜의 일상 메시지가 이미 존재합니다"}
+app EM101 400 application/json {"code":"EM101","message":"인증 코드가 만료되었습니다"}
+app EM102 400 application/json {"code":"EM102","message":"유효하지 않은 인증 코드입니다"}
+app EM201 401 application/json {"code":"EM201","message":"이메일 또는 비밀번호가 올바르지 않습니다"}
+app EM301 409 application/json {"code":"EM301","message":"이미 사용 중인 이메일입니다"}
+app EM401 500 application/json {"code":"EM401","message":"이메일 발송에 실패했습니다"}
+app EM501 429 application/json {"code":"EM501","message":"너무 많은 요청이 발생했습니다. 잠시 후 다시 시도해주세요"}
+app EV001 404 application/json {"code":"EV001","message":"이벤트를 찾을 수 없습니다"}
+app EV101 400 application/json {"code":"EV101","message":"이벤트 이미지는 최대 10개까지 등록할 수 있습니다"}
+app EV102 400 application/json {"code":"EV102","message":"진행 중인 이벤트가 아닙니다"}
+app EV103 400 application/json {"code":"EV103","message":"아직 종료되지 않은 이벤트입니다"}
+app EV104 400 application/json {"code":"EV104","message":"유지할 이미지 목록에 이 이벤트의 이미지가 아니거나 중복된 주소가 있습니다"}
+app EV105 400 application/json {"code":"EV105","message":"당첨자를 선정한 뒤에는 이벤트 기간을 바꿀 수 없습니다"}
+app EV106 400 application/json {"code":"EV106","message":"당첨자로 지정할 수 없는 회원 아이디가 있습니다"}
+app EV107 400 application/json {"code":"EV107","message":"이벤트 시작일은 종료일보다 늦을 수 없습니다"}
+app EV301 409 application/json {"code":"EV301","message":"이미 참여한 이벤트입니다"}
+app EV302 404 application/json {"code":"EV302","message":"이벤트 참여 정보를 찾을 수 없습니다"}
+app EV303 400 application/json {"code":"EV303","message":"해당 이벤트의 참여 정보가 아닙니다"}
+app EV401 400 application/json {"code":"EV401","message":"당첨자 목록은 비어있을 수 없습니다"}
+app EV402 400 application/json {"code":"EV402","message":"중복된 당첨자가 있습니다"}
+app EV403 400 application/json {"code":"EV403","message":"아직 당첨자가 발표되지 않았습니다"}
+app EV404 404 application/json {"code":"EV404","message":"이벤트 당첨자 발표 공지를 찾을 수 없습니다"}
+app FD001 404 application/json {"code":"FD001","message":"피드를 찾을 수 없습니다"}
+app FD002 404 application/json {"code":"FD002","message":"피드 댓글을 찾을 수 없습니다"}
+app FD101 400 application/json {"code":"FD101","message":"피드 내용은 1000자 이하여야 합니다"}
+app FD102 400 application/json {"code":"FD102","message":"피드 이미지는 10개 이하여야 합니다"}
+app FD103 400 application/json {"code":"FD103","message":"삭제할 이미지를 찾을 수 없습니다"}
+app FD104 400 application/json {"code":"FD104","message":"피드 태그는 7개 이하여야 합니다"}
+app FD105 400 application/json {"code":"FD105","message":"피드 댓글은 1000자 이하여야 합니다"}
+app FD106 400 application/json {"code":"FD106","message":"태그는 20자 이하여야 합니다"}
+app FD107 400 application/json {"code":"FD107","message":"태그는 한글, 영문, 숫자만 사용할 수 있습니다"}
+app FD108 400 application/json {"code":"FD108","message":"이미지 크기가 유효하지 않습니다"}
+app FD109 400 application/json {"code":"FD109","message":"검색어를 입력해주세요"}
+app FD110 400 application/json {"code":"FD110","message":"검색어는 50자 이하여야 합니다"}
+app FD201 403 application/json {"code":"FD201","message":"피드에 접근할 권한이 없습니다"}
+app FD202 403 application/json {"code":"FD202","message":"피드 댓글에 접근할 권한이 없습니다"}
+app FN001 404 application/json {"code":"FN001","message":"덕질노트를 찾을 수 없습니다"}
+app FN002 404 application/json {"code":"FN002","message":"덕질노트 페이지를 찾을 수 없습니다"}
+app FN101 400 application/json {"code":"FN101","message":"유지할 페이지 이미지 목록에 이 덕질노트의 이미지가 아니거나 중복된 주소가 있습니다"}
+app FN102 400 application/json {"code":"FN102","message":"새 커버 이미지와 커버 삭제를 함께 지정할 수 없습니다"}
+app IM101 400 application/json {"code":"IM101","message":"이미지 파일이 비어있습니다"}
+app IM102 400 application/json {"code":"IM102","message":"이미지 파일 크기가 너무 큽니다"}
+app IM103 400 application/json {"code":"IM103","message":"지원하지 않는 이미지 형식입니다"}
+app IM104 400 application/json {"code":"IM104","message":"이미지 파일을 읽을 수 없습니다"}
+app IM105 400 application/json {"code":"IM105","message":"이미지 크기가 유효하지 않습니다"}
+app IM401 500 application/json {"code":"IM401","message":"이미지 크기를 추출할 수 없습니다"}
+app IM402 503 application/json {"code":"IM402","message":"이미지 업로드 서비스를 사용할 수 없습니다"}
+app LK001 404 application/json {"code":"LK001","message":"즐겨찾기한 게시판을 찾을 수 없습니다"}
+app LK002 404 application/json {"code":"LK002","message":"좋아요한 피드를 찾을 수 없습니다"}
+app LK003 404 application/json {"code":"LK003","message":"좋아요한 피드 댓글을 찾을 수 없습니다"}
+app LK004 404 application/json {"code":"LK004","message":"좋아요한 하루 덕담 댓글을 찾을 수 없습니다"}
+app LK101 400 application/json {"code":"LK101","message":"이미 즐겨찾기한 게시판입니다"}
+app LK102 400 application/json {"code":"LK102","message":"이미 좋아요한 피드입니다"}
+app LK103 400 application/json {"code":"LK103","message":"이미 좋아요한 피드 댓글입니다"}
+app LK104 400 application/json {"code":"LK104","message":"이미 좋아요한 하루 덕담 댓글입니다"}
+app MB001 404 application/json {"code":"MB001","message":"회원을 찾을 수 없습니다"}
+app MB101 400 application/json {"code":"MB101","message":"닉네임은 10자 이하여야 합니다"}
+app MB102 400 application/json {"code":"MB102","message":"닉네임은 한글, 영문, 숫자만 사용할 수 있습니다"}
+app MB103 400 application/json {"code":"MB103","message":"현재 비밀번호가 일치하지 않습니다"}
+app MB104 400 application/json {"code":"MB104","message":"아이디는 16자 이하여야 합니다"}
+app MB105 400 application/json {"code":"MB105","message":"아이디는 영문과 숫자만 사용할 수 있습니다"}
+app MB106 400 application/json {"code":"MB106","message":"아이디를 입력해주세요"}
+app MB201 403 application/json {"code":"MB201","message":"아이디와 닉네임을 설정한 후에 이용할 수 있습니다"}
+app MB301 409 application/json {"code":"MB301","message":"이미 사용 중인 닉네임입니다"}
+app MB302 409 application/json {"code":"MB302","message":"이미 사용 중인 아이디입니다"}
+app NF001 404 application/json {"code":"NF001","message":"알림을 찾을 수 없습니다"}
+app NF002 404 application/json {"code":"NF002","message":"FCM 토큰을 찾을 수 없습니다"}
+app NF003 404 application/json {"code":"NF003","message":"알림 설정을 찾을 수 없습니다"}
+app NF101 400 application/json {"code":"NF101","message":"유효하지 않은 FCM 토큰입니다"}
+app NF102 400 application/json {"code":"NF102","message":"유효하지 않은 알림 타입입니다"}
+app NF201 403 application/json {"code":"NF201","message":"알림에 대한 권한이 없습니다"}
+app NF401 500 application/json {"code":"NF401","message":"FCM 알림 발송에 실패했습니다"}
+app PR101 400 application/json {"code":"PR101","message":"유효하지 않은 장르입니다"}
+app PR102 400 application/json {"code":"PR102","message":"유효하지 않은 굿즈입니다"}
+app PR103 400 application/json {"code":"PR103","message":"유효하지 않은 분위기입니다"}
+app PR104 400 application/json {"code":"PR104","message":"취향 목록이 비어있습니다"}
+app RL001 404 application/json {"code":"RL001","message":"칭호를 찾을 수 없습니다"}
+app RL002 404 application/json {"code":"RL002","message":"보유하지 않은 칭호입니다"}
+app RL101 400 application/json {"code":"RL101","message":"이미 존재하는 칭호 이름입니다"}
+app RL102 400 application/json {"code":"RL102","message":"사용 중인 칭호는 삭제할 수 없습니다"}
+app RL103 400 application/json {"code":"RL103","message":"이미 보유한 칭호입니다"}
+app RL104 400 application/json {"code":"RL104","message":"대표 칭호는 필수입니다"}
+app RL105 400 application/json {"code":"RL105","message":"자동 획득 조건이 걸린 칭호는 이름을 변경하거나 삭제할 수 없습니다"}
+app RL201 403 application/json {"code":"RL201","message":"해당 칭호에 접근할 권한이 없습니다"}
+app RP001 404 application/json {"code":"RP001","message":"신고 내역을 찾을 수 없습니다"}
+app RP002 404 application/json {"code":"RP002","message":"신고 대상을 찾을 수 없습니다"}
+app RP101 400 application/json {"code":"RP101","message":"자신의 콘텐츠는 신고할 수 없습니다"}
+app RP102 400 application/json {"code":"RP102","message":"기타 사유는 상세 내용을 입력해주세요"}
+app RP103 400 application/json {"code":"RP103","message":"상세 내용은 500자 이하여야 합니다"}
+app RP104 400 application/json {"code":"RP104","message":"처리 상태는 RESOLVED 또는 REJECTED만 가능합니다"}
+app RP301 409 application/json {"code":"RP301","message":"이미 신고한 콘텐츠입니다"}
+app RP302 409 application/json {"code":"RP302","message":"이미 처리된 신고입니다"}
+admin-event AD001 404 application/json {"code":"AD001","message":"요청한 리소스를 찾을 수 없습니다"}
+admin-event AD101 400 application/json {"code":"AD101","message":"잘못된 요청입니다"}
+admin-event AD102 400 application/json {"code":"AD102","message":"필수 필드가 누락되었습니다"}
+admin-event AD201 401 application/json {"code":"AD201","message":"유효하지 않은 관리자 토큰입니다"}
+admin-event AD202 401 application/json {"code":"AD202","message":"관리자 인증이 필요합니다"}
+admin-event AD401 500 application/json {"code":"AD401","message":"서버 내부 오류가 발생했습니다"}
+admin-event AU101 400 application/json {"code":"AU101","message":"사용자 정보를 가져오는데 실패했습니다"}
+admin-event AU102 400 application/json {"code":"AU102","message":"EMAIL 제공자는 모바일 로그인을 지원하지 않습니다"}
+admin-event AU201 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+admin-event AU202 401 application/json {"code":"AU202","message":"유효하지 않은 토큰입니다"}
+admin-event AU203 401 application/json {"code":"AU203","message":"유효하지 않은 토큰입니다"}
+admin-event AU204 403 application/json {"code":"AU204","message":"OAuth 접근이 거부되었습니다"}
+admin-event AU401 503 application/json {"code":"AU401","message":"외부 서비스 오류가 발생했습니다"}
+admin-event AU402 503 application/json {"code":"AU402","message":"OAuth 서버에서 오류가 발생했습니다"}
+admin-event BL001 404 application/json {"code":"BL001","message":"차단 정보를 찾을 수 없습니다"}
+admin-event BL002 404 application/json {"code":"BL002","message":"차단할 사용자를 찾을 수 없습니다"}
+admin-event BL003 404 application/json {"code":"BL003","message":"키워드 차단 정보를 찾을 수 없습니다"}
+admin-event BL101 400 application/json {"code":"BL101","message":"자기 자신을 차단할 수 없습니다"}
+admin-event BL102 400 application/json {"code":"BL102","message":"키워드는 50자 이하여야 합니다"}
+admin-event BL103 400 application/json {"code":"BL103","message":"키워드를 입력해주세요"}
+admin-event BL104 400 application/json {"code":"BL104","message":"키워드는 최대 100개까지 등록할 수 있습니다"}
+admin-event BL301 409 application/json {"code":"BL301","message":"이미 차단된 사용자입니다"}
+admin-event BL302 409 application/json {"code":"BL302","message":"이미 차단된 키워드입니다"}
+admin-event BO001 404 application/json {"code":"BO001","message":"게시판을 찾을 수 없습니다"}
+admin-event BO101 400 application/json {"code":"BO101","message":"글을 옮길 게시판은 삭제할 게시판과 달라야 합니다"}
+admin-event BO102 400 application/json {"code":"BO102","message":"글을 옮길 게시판을 지정하지 않았거나 찾을 수 없습니다"}
+admin-event BO301 409 application/json {"code":"BO301","message":"게시글이 있는 게시판은 글 처리 방식을 정해야 삭제할 수 있습니다"}
+admin-event C101 400 application/json {"code":"C101","message":"입력값이 올바르지 않습니다"}
+admin-event C102 400 application/json {"code":"C102","message":"잘못된 정렬 방향입니다. 'asc' 또는 'desc'를 사용해주세요"}
+admin-event C103 400 application/json {"code":"C103","message":"페이지 번호는 0 이상이어야 합니다"}
+admin-event C104 400 application/json {"code":"C104","message":"페이지 크기는 1 이상 1000 이하여야 합니다"}
+admin-event C105 400 application/json {"code":"C105","message":"필수 요청 값이 누락되었습니다"}
+admin-event C106 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
+admin-event C107 400 application/json {"code":"C107","message":"multipart 요청 형식이 올바르지 않습니다"}
+admin-event C201 404 application/json {"code":"C201","message":"요청한 API를 찾을 수 없습니다"}
+admin-event C202 405 application/json {"code":"C202","message":"지원하지 않는 HTTP 메서드입니다"}
+admin-event C203 415 application/json {"code":"C203","message":"지원하지 않는 Content-Type입니다"}
+admin-event C204 406 application/json {"code":"C204","message":"지원하지 않는 Accept 형식입니다"}
+admin-event C205 413 application/json {"code":"C205","message":"업로드 가능한 파일 크기를 초과했습니다"}
+admin-event C301 409 application/json {"code":"C301","message":"다른 요청이 처리 중입니다. 잠시 후 다시 시도해주세요"}
+admin-event C302 409 application/json {"code":"C302","message":"이미 존재하는 값이거나 참조할 수 없는 값입니다"}
+admin-event C401 500 application/json {"code":"C401","message":"Redis 연결에 실패했습니다. 잠시 후 다시 시도해주세요"}
+admin-event C402 500 application/json {"code":"C402","message":"서버 오류가 발생했습니다. 관리자에게 문의해주세요"}
+admin-event CN001 404 application/json {"code":"CN001","message":"콘테스트를 찾을 수 없습니다"}
+admin-event CN002 404 application/json {"code":"CN002","message":"콘테스트 수상자를 찾을 수 없습니다"}
+admin-event CN003 404 application/json {"code":"CN003","message":"콘테스트 참여 정보를 찾을 수 없습니다"}
+admin-event CN004 404 application/json {"code":"CN004","message":"콘테스트 수상자 발표 공지를 찾을 수 없습니다"}
+admin-event CN101 400 application/json {"code":"CN101","message":"콘테스트 이미지는 10개 이하여야 합니다"}
+admin-event CN102 400 application/json {"code":"CN102","message":"콘테스트 태그는 7개 이하여야 합니다"}
+admin-event CN104 400 application/json {"code":"CN104","message":"태그는 20자 이하여야 합니다"}
+admin-event CN105 400 application/json {"code":"CN105","message":"태그는 한글, 영문, 숫자만 사용할 수 있습니다"}
+admin-event CN106 400 application/json {"code":"CN106","message":"수상 순위는 1, 2, 3 중 하나여야 합니다"}
+admin-event CN107 400 application/json {"code":"CN107","message":"수상자는 1~3명이어야 합니다"}
+admin-event CN108 400 application/json {"code":"CN108","message":"중복된 수상 순위가 있습니다"}
+admin-event CN109 400 application/json {"code":"CN109","message":"해당 참여작은 이 콘테스트에 속하지 않습니다"}
+admin-event CN110 400 application/json {"code":"CN110","message":"종료되지 않은 콘테스트입니다"}
+admin-event CN111 400 application/json {"code":"CN111","message":"아직 수상자가 발표되지 않았습니다"}
+admin-event CN112 400 application/json {"code":"CN112","message":"유지할 이미지 목록에 이 콘테스트의 이미지가 아니거나 중복된 주소가 있습니다"}
+admin-event CN113 400 application/json {"code":"CN113","message":"콘테스트 태그는 1개 이상이어야 합니다"}
+admin-event CN114 400 application/json {"code":"CN114","message":"같은 참여작을 중복해서 선정할 수 없습니다"}
+admin-event CN115 400 application/json {"code":"CN115","message":"한 회원은 한 콘테스트에서 한 번만 수상할 수 있습니다"}
+admin-event CN116 400 application/json {"code":"CN116","message":"수상자를 선정한 뒤에는 콘테스트 기간과 태그를 바꿀 수 없습니다"}
+admin-event CN117 400 application/json {"code":"CN117","message":"콘테스트 시작일은 종료일보다 늦을 수 없습니다"}
+admin-event CN201 403 application/json {"code":"CN201","message":"수상 소감을 수정할 권한이 없습니다"}
+admin-event CN301 409 application/json {"code":"CN301","message":"이 피드로 이미 참여한 콘테스트입니다"}
+admin-event DM001 404 application/json {"code":"DM001","message":"일상 메시지를 찾을 수 없습니다"}
+admin-event DM002 404 application/json {"code":"DM002","message":"일상 메시지 댓글을 찾을 수 없습니다"}
+admin-event DM101 400 application/json {"code":"DM101","message":"일상 메시지 내용은 42자 이하여야 합니다"}
+admin-event DM102 400 application/json {"code":"DM102","message":"일상 메시지 댓글은 1000자 이하여야 합니다"}
+admin-event DM103 400 application/json {"code":"DM103","message":"답글에는 답글을 작성할 수 없습니다"}
+admin-event DM201 403 application/json {"code":"DM201","message":"댓글에 접근할 권한이 없습니다"}
+admin-event DM301 409 application/json {"code":"DM301","message":"해당 날짜의 일상 메시지가 이미 존재합니다"}
+admin-event EM101 400 application/json {"code":"EM101","message":"인증 코드가 만료되었습니다"}
+admin-event EM102 400 application/json {"code":"EM102","message":"유효하지 않은 인증 코드입니다"}
+admin-event EM201 401 application/json {"code":"EM201","message":"이메일 또는 비밀번호가 올바르지 않습니다"}
+admin-event EM301 409 application/json {"code":"EM301","message":"이미 사용 중인 이메일입니다"}
+admin-event EM401 500 application/json {"code":"EM401","message":"이메일 발송에 실패했습니다"}
+admin-event EM501 429 application/json {"code":"EM501","message":"너무 많은 요청이 발생했습니다. 잠시 후 다시 시도해주세요"}
+admin-event EV001 404 application/json {"code":"EV001","message":"이벤트를 찾을 수 없습니다"}
+admin-event EV101 400 application/json {"code":"EV101","message":"이벤트 이미지는 최대 10개까지 등록할 수 있습니다"}
+admin-event EV102 400 application/json {"code":"EV102","message":"진행 중인 이벤트가 아닙니다"}
+admin-event EV103 400 application/json {"code":"EV103","message":"아직 종료되지 않은 이벤트입니다"}
+admin-event EV104 400 application/json {"code":"EV104","message":"유지할 이미지 목록에 이 이벤트의 이미지가 아니거나 중복된 주소가 있습니다"}
+admin-event EV105 400 application/json {"code":"EV105","message":"당첨자를 선정한 뒤에는 이벤트 기간을 바꿀 수 없습니다"}
+admin-event EV106 400 application/json {"code":"EV106","message":"당첨자로 지정할 수 없는 회원 아이디가 있습니다","invalidMemberIds":["contract-probe-1","contract-probe-2"]}
+admin-event EV107 400 application/json {"code":"EV107","message":"이벤트 시작일은 종료일보다 늦을 수 없습니다"}
+admin-event EV301 409 application/json {"code":"EV301","message":"이미 참여한 이벤트입니다"}
+admin-event EV302 404 application/json {"code":"EV302","message":"이벤트 참여 정보를 찾을 수 없습니다"}
+admin-event EV303 400 application/json {"code":"EV303","message":"해당 이벤트의 참여 정보가 아닙니다"}
+admin-event EV401 400 application/json {"code":"EV401","message":"당첨자 목록은 비어있을 수 없습니다"}
+admin-event EV402 400 application/json {"code":"EV402","message":"중복된 당첨자가 있습니다"}
+admin-event EV403 400 application/json {"code":"EV403","message":"아직 당첨자가 발표되지 않았습니다"}
+admin-event EV404 404 application/json {"code":"EV404","message":"이벤트 당첨자 발표 공지를 찾을 수 없습니다"}
+admin-event FD001 404 application/json {"code":"FD001","message":"피드를 찾을 수 없습니다"}
+admin-event FD002 404 application/json {"code":"FD002","message":"피드 댓글을 찾을 수 없습니다"}
+admin-event FD101 400 application/json {"code":"FD101","message":"피드 내용은 1000자 이하여야 합니다"}
+admin-event FD102 400 application/json {"code":"FD102","message":"피드 이미지는 10개 이하여야 합니다"}
+admin-event FD103 400 application/json {"code":"FD103","message":"삭제할 이미지를 찾을 수 없습니다"}
+admin-event FD104 400 application/json {"code":"FD104","message":"피드 태그는 7개 이하여야 합니다"}
+admin-event FD105 400 application/json {"code":"FD105","message":"피드 댓글은 1000자 이하여야 합니다"}
+admin-event FD106 400 application/json {"code":"FD106","message":"태그는 20자 이하여야 합니다"}
+admin-event FD107 400 application/json {"code":"FD107","message":"태그는 한글, 영문, 숫자만 사용할 수 있습니다"}
+admin-event FD108 400 application/json {"code":"FD108","message":"이미지 크기가 유효하지 않습니다"}
+admin-event FD109 400 application/json {"code":"FD109","message":"검색어를 입력해주세요"}
+admin-event FD110 400 application/json {"code":"FD110","message":"검색어는 50자 이하여야 합니다"}
+admin-event FD201 403 application/json {"code":"FD201","message":"피드에 접근할 권한이 없습니다"}
+admin-event FD202 403 application/json {"code":"FD202","message":"피드 댓글에 접근할 권한이 없습니다"}
+admin-event FN001 404 application/json {"code":"FN001","message":"덕질노트를 찾을 수 없습니다"}
+admin-event FN002 404 application/json {"code":"FN002","message":"덕질노트 페이지를 찾을 수 없습니다"}
+admin-event FN101 400 application/json {"code":"FN101","message":"유지할 페이지 이미지 목록에 이 덕질노트의 이미지가 아니거나 중복된 주소가 있습니다"}
+admin-event FN102 400 application/json {"code":"FN102","message":"새 커버 이미지와 커버 삭제를 함께 지정할 수 없습니다"}
+admin-event IM101 400 application/json {"code":"IM101","message":"이미지 파일이 비어있습니다"}
+admin-event IM102 400 application/json {"code":"IM102","message":"이미지 파일 크기가 너무 큽니다"}
+admin-event IM103 400 application/json {"code":"IM103","message":"지원하지 않는 이미지 형식입니다"}
+admin-event IM104 400 application/json {"code":"IM104","message":"이미지 파일을 읽을 수 없습니다"}
+admin-event IM105 400 application/json {"code":"IM105","message":"이미지 크기가 유효하지 않습니다"}
+admin-event IM401 500 application/json {"code":"IM401","message":"이미지 크기를 추출할 수 없습니다"}
+admin-event IM402 503 application/json {"code":"IM402","message":"이미지 업로드 서비스를 사용할 수 없습니다"}
+admin-event LK001 404 application/json {"code":"LK001","message":"즐겨찾기한 게시판을 찾을 수 없습니다"}
+admin-event LK002 404 application/json {"code":"LK002","message":"좋아요한 피드를 찾을 수 없습니다"}
+admin-event LK003 404 application/json {"code":"LK003","message":"좋아요한 피드 댓글을 찾을 수 없습니다"}
+admin-event LK004 404 application/json {"code":"LK004","message":"좋아요한 하루 덕담 댓글을 찾을 수 없습니다"}
+admin-event LK101 400 application/json {"code":"LK101","message":"이미 즐겨찾기한 게시판입니다"}
+admin-event LK102 400 application/json {"code":"LK102","message":"이미 좋아요한 피드입니다"}
+admin-event LK103 400 application/json {"code":"LK103","message":"이미 좋아요한 피드 댓글입니다"}
+admin-event LK104 400 application/json {"code":"LK104","message":"이미 좋아요한 하루 덕담 댓글입니다"}
+admin-event MB001 404 application/json {"code":"MB001","message":"회원을 찾을 수 없습니다"}
+admin-event MB101 400 application/json {"code":"MB101","message":"닉네임은 10자 이하여야 합니다"}
+admin-event MB102 400 application/json {"code":"MB102","message":"닉네임은 한글, 영문, 숫자만 사용할 수 있습니다"}
+admin-event MB103 400 application/json {"code":"MB103","message":"현재 비밀번호가 일치하지 않습니다"}
+admin-event MB104 400 application/json {"code":"MB104","message":"아이디는 16자 이하여야 합니다"}
+admin-event MB105 400 application/json {"code":"MB105","message":"아이디는 영문과 숫자만 사용할 수 있습니다"}
+admin-event MB106 400 application/json {"code":"MB106","message":"아이디를 입력해주세요"}
+admin-event MB201 403 application/json {"code":"MB201","message":"아이디와 닉네임을 설정한 후에 이용할 수 있습니다"}
+admin-event MB301 409 application/json {"code":"MB301","message":"이미 사용 중인 닉네임입니다"}
+admin-event MB302 409 application/json {"code":"MB302","message":"이미 사용 중인 아이디입니다"}
+admin-event NF001 404 application/json {"code":"NF001","message":"알림을 찾을 수 없습니다"}
+admin-event NF002 404 application/json {"code":"NF002","message":"FCM 토큰을 찾을 수 없습니다"}
+admin-event NF003 404 application/json {"code":"NF003","message":"알림 설정을 찾을 수 없습니다"}
+admin-event NF101 400 application/json {"code":"NF101","message":"유효하지 않은 FCM 토큰입니다"}
+admin-event NF102 400 application/json {"code":"NF102","message":"유효하지 않은 알림 타입입니다"}
+admin-event NF201 403 application/json {"code":"NF201","message":"알림에 대한 권한이 없습니다"}
+admin-event NF401 500 application/json {"code":"NF401","message":"FCM 알림 발송에 실패했습니다"}
+admin-event PR101 400 application/json {"code":"PR101","message":"유효하지 않은 장르입니다"}
+admin-event PR102 400 application/json {"code":"PR102","message":"유효하지 않은 굿즈입니다"}
+admin-event PR103 400 application/json {"code":"PR103","message":"유효하지 않은 분위기입니다"}
+admin-event PR104 400 application/json {"code":"PR104","message":"취향 목록이 비어있습니다"}
+admin-event RL001 404 application/json {"code":"RL001","message":"칭호를 찾을 수 없습니다"}
+admin-event RL002 404 application/json {"code":"RL002","message":"보유하지 않은 칭호입니다"}
+admin-event RL101 400 application/json {"code":"RL101","message":"이미 존재하는 칭호 이름입니다"}
+admin-event RL102 400 application/json {"code":"RL102","message":"사용 중인 칭호는 삭제할 수 없습니다"}
+admin-event RL103 400 application/json {"code":"RL103","message":"이미 보유한 칭호입니다"}
+admin-event RL104 400 application/json {"code":"RL104","message":"대표 칭호는 필수입니다"}
+admin-event RL105 400 application/json {"code":"RL105","message":"자동 획득 조건이 걸린 칭호는 이름을 변경하거나 삭제할 수 없습니다"}
+admin-event RL201 403 application/json {"code":"RL201","message":"해당 칭호에 접근할 권한이 없습니다"}
+admin-event RP001 404 application/json {"code":"RP001","message":"신고 내역을 찾을 수 없습니다"}
+admin-event RP002 404 application/json {"code":"RP002","message":"신고 대상을 찾을 수 없습니다"}
+admin-event RP101 400 application/json {"code":"RP101","message":"자신의 콘텐츠는 신고할 수 없습니다"}
+admin-event RP102 400 application/json {"code":"RP102","message":"기타 사유는 상세 내용을 입력해주세요"}
+admin-event RP103 400 application/json {"code":"RP103","message":"상세 내용은 500자 이하여야 합니다"}
+admin-event RP104 400 application/json {"code":"RP104","message":"처리 상태는 RESOLVED 또는 REJECTED만 가능합니다"}
+admin-event RP301 409 application/json {"code":"RP301","message":"이미 신고한 콘텐츠입니다"}
+admin-event RP302 409 application/json {"code":"RP302","message":"이미 처리된 신고입니다"}

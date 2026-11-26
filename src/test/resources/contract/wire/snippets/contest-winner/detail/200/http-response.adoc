@@ -1,0 +1,36 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "message" : "수상작 상세 정보를 성공적으로 조회했습니다.",
+  "data" : {
+    "contestId" : 1,
+    "contestTitle" : "테스트 콘테스트",
+    "winners" : [ {
+      "winnerId" : 1,
+      "winnerRank" : 1,
+      "awardTitle" : "최우수상",
+      "feedId" : 10,
+      "feedTitle" : "1등 작품",
+      "feedImageUrl" : "https://example.com/image1.jpg",
+      "authorNickname" : "user1",
+      "authorProfileImage" : "https://example.com/profile1.jpg",
+      "description" : "1등 수상 설명",
+      "acceptanceSpeech" : "감사합니다!"
+    }, {
+      "winnerId" : 2,
+      "winnerRank" : 2,
+      "awardTitle" : "우수상",
+      "feedId" : 20,
+      "feedTitle" : "2등 작품",
+      "feedImageUrl" : "https://example.com/image2.jpg",
+      "authorNickname" : "user2",
+      "authorProfileImage" : "",
+      "description" : "2등 수상 설명",
+      "acceptanceSpeech" : ""
+    } ]
+  }
+}
+----

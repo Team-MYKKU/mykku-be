@@ -1,0 +1,10 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 403 Forbidden
+Content-Type: application/json
+
+{
+  "code" : "RL201",
+  "message" : "해당 칭호에 접근할 권한이 없습니다"
+}
+----

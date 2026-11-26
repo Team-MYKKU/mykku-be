@@ -1,0 +1,41 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "message" : "참여한 콘테스트 목록을 성공적으로 조회했습니다.",
+  "data" : {
+    "content" : [ {
+      "id" : 1,
+      "title" : "첫 번째 콘테스트",
+      "subTitle" : "첫 번째 콘테스트 부제목",
+      "description" : "첫 번째 콘테스트 설명",
+      "startedAt" : "2025-01-01T00:00:00",
+      "expiredAt" : "2025-12-31T23:59:59",
+      "status" : "EXPIRED",
+      "thumbnailUrl" : "https://example.com/thumbnail1.jpg",
+      "tags" : [ "디자인", "개발" ],
+      "winnerStatus" : "WON",
+      "winnerRank" : 1
+    }, {
+      "id" : 2,
+      "title" : "두 번째 콘테스트",
+      "subTitle" : null,
+      "description" : null,
+      "startedAt" : "2025-01-01T00:00:00",
+      "expiredAt" : "2025-11-30T23:59:59",
+      "status" : "EXPIRED",
+      "thumbnailUrl" : "https://example.com/thumbnail2.jpg",
+      "tags" : [ "기획" ],
+      "winnerStatus" : "PENDING",
+      "winnerRank" : null
+    } ],
+    "page" : 0,
+    "size" : 20,
+    "totalElements" : 2,
+    "totalPages" : 1,
+    "isLast" : true
+  }
+}
+----

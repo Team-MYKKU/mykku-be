@@ -1,0 +1,14 @@
+[source,http,options="nowrap"]
+----
+POST /api/v1/fcm-tokens HTTP/1.1
+Authorization: Bearer test-access-token
+Content-Type: application/json
+Host: api.dev.mykku.kr
+Content-Length: 116
+
+{
+  "token" : "fGH8xK2mRxy4hN3qW1pLzA:APA91bF...",
+  "deviceId" : "device_android_001",
+  "deviceType" : "ANDROID"
+}
+----

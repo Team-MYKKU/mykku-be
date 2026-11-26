@@ -1,0 +1,23 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "message" : "내 당첨 이벤트 목록을 성공적으로 조회했습니다.",
+  "data" : {
+    "content" : [ {
+      "eventId" : 1,
+      "eventTitle" : "첫 번째 이벤트",
+      "thumbnailUrl" : "https://example.com/thumbnail1.jpg",
+      "startedAt" : "2025-09-01T10:00:00",
+      "expiredAt" : "2025-09-30T23:59:59"
+    } ],
+    "page" : 0,
+    "size" : 20,
+    "totalElements" : 1,
+    "totalPages" : 1,
+    "isLast" : true
+  }
+}
+----

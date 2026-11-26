@@ -1,0 +1,13 @@
+[source,http,options="nowrap"]
+----
+POST /api/v1/email-auth/reset-password HTTP/1.1
+Content-Type: application/json
+Host: api.dev.mykku.kr
+Content-Length: 95
+
+{
+  "email" : "unknown@example.com",
+  "code" : "123456",
+  "newPassword" : "newPassword123!"
+}
+----

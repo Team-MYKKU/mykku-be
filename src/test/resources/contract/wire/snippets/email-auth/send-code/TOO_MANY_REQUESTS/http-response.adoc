@@ -1,0 +1,10 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 429 Too Many Requests
+Content-Type: application/json
+
+{
+  "code" : "EM501",
+  "message" : "너무 많은 요청이 발생했습니다. 잠시 후 다시 시도해주세요"
+}
+----

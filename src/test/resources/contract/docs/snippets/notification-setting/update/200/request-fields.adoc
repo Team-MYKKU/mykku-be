@@ -1,0 +1,12 @@
+|===
+|필드|타입|필수
+
+|`+notificationType+`
+|`+String+`
+|O
+
+|`+isEnabled+`
+|`+Boolean+`
+|O
+
+|===

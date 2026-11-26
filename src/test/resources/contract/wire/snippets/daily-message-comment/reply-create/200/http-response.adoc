@@ -1,0 +1,25 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "message" : "댓글이 성공적으로 등록되었습니다.",
+  "data" : {
+    "id" : 2,
+    "content" : "저도 동감합니다!",
+    "author" : {
+      "memberId" : "kimchulsoo",
+      "nickname" : "김철수",
+      "profileImage" : "https://example.com/profile.jpg",
+      "role" : null
+    },
+    "likeCount" : 0,
+    "isLiked" : false,
+    "replies" : [ ],
+    "replyCount" : 0,
+    "createdAt" : "2026-10-01T12:00:00",
+    "updatedAt" : "2026-10-01T12:00:00"
+  }
+}
+----

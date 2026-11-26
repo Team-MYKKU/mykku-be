@@ -1,0 +1,14 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "message" : "댓글 좋아요가 성공적으로 처리되었습니다.",
+  "data" : {
+    "id" : 1,
+    "memberId" : "testmemberid",
+    "dailyMessageCommentId" : 30
+  }
+}
+----

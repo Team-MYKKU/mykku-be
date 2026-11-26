@@ -376,6 +376,10 @@ src/main/kotlin/com/example/mykku/
   - ENUM 필드는 모든 허용/반환 값과 의미를 `설명 (VALUE: 의미, ...)` 형식으로 기재 (라벨 프로퍼티가 있으면 `entries.joinToString`으로 생성)
   - null이 될 수 있는 응답 필드는 `.optional()` + null 조건 기재, 선택 인증 API는 `OPTIONAL_AUTH_HEADER_DESCRIPTOR` 사용
   - 없는 스니펫/파일을 참조하면 `asciidoctor` 태스크가 실패함 (`./gradlew asciidoctor`로 확인, 결과: `build/docs/asciidoc/index.html`, 배포 경로: `/docs/index.html`)
+- **스니펫 계약 골든**: `document()`로 만든 스니펫은 테스트가 끝나면 `src/test/resources/contract/{wire,docs}/snippets/<식별자>/` 골든과 비교된다 (아래 4. ContractTest)
+  - 목 결과·요청 예시의 시각은 `docs/DocumentFixtureTime`(`NOW`·`NOW_MICROS`·`NOW_SECONDS`·`TODAY`)을 쓰고 `now()`를 쓰지 않는다
+  - 기존 예시 값(목 결과·요청 예시)과 `document()` 식별자는 바꾸지 않는다. 설명 문구는 바꿔도 된다
+  - 새 식별자는 골든이 없어 '[새 계약 대상]'으로 실패한다. 0단계 PR이나 운영 코드를 바꾸기 전 커밋에서만 갱신 모드로 골든을 만든다
 - **참고**: Admin API (`/admin/**`)는 Document 테스트 작성하지 않음
 
 #### 3. UseCaseTest (단위 테스트)
@@ -386,6 +390,20 @@ src/main/kotlin/com/example/mykku/
   - `@Mock` Repository Port 주입
   - `@InjectMocks` UseCase 주입
   - 정상 케이스와 예외 케이스 테스트
+
+#### 4. ContractTest (API 계약 골든)
+- **위치**: `src/test/kotlin/com/example/mykku/contract/` (예외: 위 1~3처럼 도메인 패키지에 두지 않고 `contract/` 패키지에 둔다)
+- **목적**: 앱이 받는 HTTP 규약(상태·헤더·본문·에러 코드 목록)을 `src/test/resources/contract/`의 골든 파일과 바이트 단위로 비교해 고정
+  - 비교 전에 하는 일은 다음뿐이다: CRLF→LF, RestAssured multipart boundary 마스킹, 선언한 PageImpl 키 순서 정규화·마스크 경로, docs 등급의 설명 열 제외, `HttpSnapshot`의 전송 계층 헤더(Date·Keep-Alive·Connection·Transfer-Encoding·Content-Length) 제외·헤더 이름순 정렬·X-Request-ID 생성값 토큰화, JSON 본문 pretty 출력(원문이 compact 정규형인지 먼저 검사)
+  - REST Docs 스니펫에는 `RestDocumentationFilterBuilder`가 지우는 응답 헤더(Date, Cache-Control, X-Request-ID 등)가 없으므로 스니펫 골든은 그 헤더 변화를 잡지 못한다
+- **예외**: 응답 message 문자열 자체가 규약이므로 문자열 비교가 목적이다. 아래 'ErrorCode Enum 사용 필수' 규칙을 적용하지 않는다
+- **상속**: Spring 컨텍스트가 필요한 계약 테스트는 `BaseControllerTest`·`BaseDocumentTest`를 그대로 상속한다 (`@MockitoBean`·`@Import`를 더해 새 Spring 컨텍스트를 만들지 않는다). Spring 없이 골든을 쓰는 테스트는 `@ExtendWith(ContractManifestExtension::class)`를 단다
+- **골든 변경**: `contract/wire/**`·`contract/fixtures/**`의 기존 파일은 고치지 않는다. `contract/docs/**`는 wire 변경이 0인 문서 PR에서만 바꾼다. 승인된 규약 변경만 로컬에서 `./gradlew clean test -Pcontract.update=true`로 갱신한다 (CI에서는 갱신하면 실패)
+- **MANIFEST**: `contract/MANIFEST.sha256`의 해시 줄은 손으로 고치지 않는다. 갱신 모드가 끝날 때 그 실행이 쓰거나 지운 골든, 테스트가 읽은 픽스처, 새 파일의 해시를 다시 쓰고, 디스크에서 사라진 파일의 줄은 뺀다(지운 사실은 git diff로 리뷰한다). 손으로 고친 다른 파일은 기록이 그대로라 `GoldenManifestTest`가 잡는다
+  - 손으로 고치는 유일한 줄은 첫 줄 `base`다. 기존 골든을 바꾸는 승인된 PR이 그 PR이 기반한 develop 커밋으로 고친다
+  - 골든은 `ContractGolden.DEFAULT`·`SnippetGolden.DEFAULT`·`HttpSnapshot.verify`로만 쓴다
+- **새 골든 디렉터리**: 골든 파일 목록이 테스트가 비교하는 목록과 같은지 보는 완전성 테스트를 함께 둔다 (예: `SnippetGoldenCoverageTest`, `ErrorCodeGoldenCoverageTest`)
+- 주석 금지·메서드 15줄·들여쓰기 2단계 규칙은 계약 테스트에도 적용한다
 
 ### 테스트 작성 체크리스트
 - [ ] ControllerTest로 엔드포인트 검증
@@ -443,6 +461,7 @@ throw FeedException.feedNotFound()
 #### 예외 검증 시 ErrorCode Enum 사용 필수
 - **테스트에서 예외 검증 시 반드시 ErrorCode enum 사용**
 - **예외 메시지 문자열 직접 비교 금지**
+- 단, 계약 테스트(`contract/`)는 응답 message 문자열 비교가 목적이라 이 규칙의 예외다
 
 ```kotlin
 // ❌ 잘못된 예시 - 메시지 문자열 직접 비교

@@ -1,0 +1,23 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "message" : "프로필 조회 성공",
+  "data" : {
+    "memberId" : "testmemberid",
+    "email" : "test@example.com",
+    "nickname" : "testuser",
+    "profileImage" : "https://example.com/profile.jpg",
+    "role" : {
+      "id" : 1,
+      "name" : "테스트 칭호",
+      "description" : "테스트 칭호 설명"
+    },
+    "provider" : "GOOGLE",
+    "emailVerified" : true,
+    "createdAt" : "2026-11-24T15:52:36.744298"
+  }
+}
+----

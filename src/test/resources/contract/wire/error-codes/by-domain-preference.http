@@ -1,0 +1,33 @@
+### GET /api/error-codes/preference
+HTTP 200
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "message" : "success",
+  "data" : [ {
+    "code" : "PR101",
+    "domain" : "preference",
+    "name" : "INVALID_GENRE_TYPE",
+    "status" : 400,
+    "message" : "유효하지 않은 장르입니다"
+  }, {
+    "code" : "PR102",
+    "domain" : "preference",
+    "name" : "INVALID_GOODS_TYPE",
+    "status" : 400,
+    "message" : "유효하지 않은 굿즈입니다"
+  }, {
+    "code" : "PR103",
+    "domain" : "preference",
+    "name" : "INVALID_MOOD_TYPE",
+    "status" : 400,
+    "message" : "유효하지 않은 분위기입니다"
+  }, {
+    "code" : "PR104",
+    "domain" : "preference",
+    "name" : "EMPTY_PREFERENCE_LIST",
+    "status" : 400,
+    "message" : "취향 목록이 비어있습니다"
+  } ]
+}

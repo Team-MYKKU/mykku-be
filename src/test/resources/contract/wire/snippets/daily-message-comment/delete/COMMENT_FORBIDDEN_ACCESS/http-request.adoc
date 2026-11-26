@@ -1,0 +1,7 @@
+[source,http,options="nowrap"]
+----
+DELETE /api/v1/daily-messages/comments/1 HTTP/1.1
+Authorization: Bearer test-access-token
+Host: api.dev.mykku.kr
+
+----

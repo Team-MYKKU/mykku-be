@@ -1,0 +1,8 @@
+[source,http,options="nowrap"]
+----
+GET /api/v1/search/feeds/boards/2?keyword=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa&page=0&size=20 HTTP/1.1
+Authorization: Bearer test-access-token
+Content-Type: application/json
+Host: api.dev.mykku.kr
+
+----

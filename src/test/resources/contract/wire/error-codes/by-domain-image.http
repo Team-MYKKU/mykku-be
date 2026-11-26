@@ -1,0 +1,51 @@
+### GET /api/error-codes/image
+HTTP 200
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "message" : "success",
+  "data" : [ {
+    "code" : "IM101",
+    "domain" : "image",
+    "name" : "IMAGE_FILE_EMPTY",
+    "status" : 400,
+    "message" : "이미지 파일이 비어있습니다"
+  }, {
+    "code" : "IM102",
+    "domain" : "image",
+    "name" : "IMAGE_FILE_TOO_LARGE",
+    "status" : 400,
+    "message" : "이미지 파일 크기가 너무 큽니다"
+  }, {
+    "code" : "IM103",
+    "domain" : "image",
+    "name" : "IMAGE_INVALID_FORMAT",
+    "status" : 400,
+    "message" : "지원하지 않는 이미지 형식입니다"
+  }, {
+    "code" : "IM104",
+    "domain" : "image",
+    "name" : "IMAGE_UNREADABLE",
+    "status" : 400,
+    "message" : "이미지 파일을 읽을 수 없습니다"
+  }, {
+    "code" : "IM105",
+    "domain" : "image",
+    "name" : "IMAGE_INVALID_DIMENSIONS",
+    "status" : 400,
+    "message" : "이미지 크기가 유효하지 않습니다"
+  }, {
+    "code" : "IM401",
+    "domain" : "image",
+    "name" : "IMAGE_SIZE_EXTRACTION_FAILED",
+    "status" : 500,
+    "message" : "이미지 크기를 추출할 수 없습니다"
+  }, {
+    "code" : "IM402",
+    "domain" : "image",
+    "name" : "IMAGE_UPLOAD_SERVICE_UNAVAILABLE",
+    "status" : 503,
+    "message" : "이미지 업로드 서비스를 사용할 수 없습니다"
+  } ]
+}

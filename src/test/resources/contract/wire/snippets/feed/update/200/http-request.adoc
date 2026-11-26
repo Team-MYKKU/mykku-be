@@ -1,0 +1,25 @@
+[source,http,options="nowrap"]
+----
+PATCH /api/v1/feeds/1 HTTP/1.1
+Authorization: Bearer test-access-token
+Content-Type: multipart/form-data; boundary="<BOUNDARY>"; boundary=6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm
+Host: api.dev.mykku.kr
+
+--6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm
+Content-Disposition: form-data; name=request; filename=file
+Content-Type: application/json
+
+{
+                "title": "수정된 피드 제목",
+                "content": "수정된 피드 내용입니다.",
+                "boardId": null,
+                "tags": ["수정된태그"],
+                "deleteImageIds": [1]
+            }
+--6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm
+Content-Disposition: form-data; name=images; filename=new-image.jpg
+Content-Type: image/jpeg
+
+image data
+--6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm--
+----

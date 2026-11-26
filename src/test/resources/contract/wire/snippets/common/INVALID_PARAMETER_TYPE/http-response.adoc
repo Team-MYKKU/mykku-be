@@ -1,0 +1,10 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+
+{
+  "code" : "C106",
+  "message" : "요청 값의 형식이 올바르지 않습니다"
+}
+----

@@ -1,0 +1,24 @@
+[source,http,options="nowrap"]
+----
+POST /api/v1/feeds HTTP/1.1
+Authorization: Bearer test-access-token
+Content-Type: multipart/form-data; boundary="<BOUNDARY>"; boundary=6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm
+Host: api.dev.mykku.kr
+
+--6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm
+Content-Disposition: form-data; name=request; filename=file
+Content-Type: application/json
+
+{
+                "title": "새로운 피드 제목",
+                "content": "피드 내용입니다. 오늘은 날씨가 좋네요.",
+                "boardId": 1,
+                "tags": ["일상", "날씨", "행복"]
+            }
+--6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm
+Content-Disposition: form-data; name=images; filename=test-image.jpg
+Content-Type: image/jpeg
+
+image data
+--6o2knFse3p53ty9dmcQvWAIx1zInP11uCfbm--
+----

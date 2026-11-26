@@ -1,0 +1,93 @@
+### GET /api/error-codes/feed
+HTTP 200
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "message" : "success",
+  "data" : [ {
+    "code" : "FD001",
+    "domain" : "feed",
+    "name" : "FEED_NOT_FOUND",
+    "status" : 404,
+    "message" : "피드를 찾을 수 없습니다"
+  }, {
+    "code" : "FD002",
+    "domain" : "feed",
+    "name" : "FEED_COMMENT_NOT_FOUND",
+    "status" : 404,
+    "message" : "피드 댓글을 찾을 수 없습니다"
+  }, {
+    "code" : "FD101",
+    "domain" : "feed",
+    "name" : "FEED_CONTENT_TOO_LONG",
+    "status" : 400,
+    "message" : "피드 내용은 1000자 이하여야 합니다"
+  }, {
+    "code" : "FD102",
+    "domain" : "feed",
+    "name" : "FEED_IMAGE_LIMIT_EXCEEDED",
+    "status" : 400,
+    "message" : "피드 이미지는 10개 이하여야 합니다"
+  }, {
+    "code" : "FD103",
+    "domain" : "feed",
+    "name" : "FEED_IMAGE_NOT_FOUND",
+    "status" : 400,
+    "message" : "삭제할 이미지를 찾을 수 없습니다"
+  }, {
+    "code" : "FD104",
+    "domain" : "feed",
+    "name" : "FEED_TAG_LIMIT_EXCEEDED",
+    "status" : 400,
+    "message" : "피드 태그는 7개 이하여야 합니다"
+  }, {
+    "code" : "FD105",
+    "domain" : "feed",
+    "name" : "FEED_COMMENT_CONTENT_TOO_LONG",
+    "status" : 400,
+    "message" : "피드 댓글은 1000자 이하여야 합니다"
+  }, {
+    "code" : "FD106",
+    "domain" : "feed",
+    "name" : "TAG_TITLE_TOO_LONG",
+    "status" : 400,
+    "message" : "태그는 20자 이하여야 합니다"
+  }, {
+    "code" : "FD107",
+    "domain" : "feed",
+    "name" : "TAG_INVALID_FORMAT",
+    "status" : 400,
+    "message" : "태그는 한글, 영문, 숫자만 사용할 수 있습니다"
+  }, {
+    "code" : "FD108",
+    "domain" : "feed",
+    "name" : "IMAGE_INVALID_DIMENSIONS",
+    "status" : 400,
+    "message" : "이미지 크기가 유효하지 않습니다"
+  }, {
+    "code" : "FD109",
+    "domain" : "feed",
+    "name" : "SEARCH_KEYWORD_EMPTY",
+    "status" : 400,
+    "message" : "검색어를 입력해주세요"
+  }, {
+    "code" : "FD110",
+    "domain" : "feed",
+    "name" : "SEARCH_KEYWORD_TOO_LONG",
+    "status" : 400,
+    "message" : "검색어는 50자 이하여야 합니다"
+  }, {
+    "code" : "FD201",
+    "domain" : "feed",
+    "name" : "FEED_FORBIDDEN_ACCESS",
+    "status" : 403,
+    "message" : "피드에 접근할 권한이 없습니다"
+  }, {
+    "code" : "FD202",
+    "domain" : "feed",
+    "name" : "FEED_COMMENT_FORBIDDEN_ACCESS",
+    "status" : 403,
+    "message" : "피드 댓글에 접근할 권한이 없습니다"
+  } ]
+}

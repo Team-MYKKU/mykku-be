@@ -1,0 +1,16 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "message" : "수상자 발표 공지를 성공적으로 조회했습니다.",
+  "data" : {
+    "contestId" : 1,
+    "contestTitle" : "봄맞이 콘테스트",
+    "title" : "[봄맞이 콘테스트] 수상자 발표",
+    "content" : "참여해 주신 모든 분들께 감사드립니다.\n대상: OOO\n최우수상: OOO",
+    "announcedAt" : "2025-10-10"
+  }
+}
+----

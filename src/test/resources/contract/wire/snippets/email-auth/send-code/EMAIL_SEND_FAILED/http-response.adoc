@@ -1,0 +1,10 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 500 Internal Server Error
+Content-Type: application/json
+
+{
+  "code" : "EM401",
+  "message" : "이메일 발송에 실패했습니다"
+}
+----

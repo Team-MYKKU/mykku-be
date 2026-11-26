@@ -1,0 +1,105 @@
+### GET /api/error-codes/common
+HTTP 200
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "message" : "success",
+  "data" : [ {
+    "code" : "C101",
+    "domain" : "common",
+    "name" : "INVALID_INPUT",
+    "status" : 400,
+    "message" : "입력값이 올바르지 않습니다"
+  }, {
+    "code" : "C102",
+    "domain" : "common",
+    "name" : "INVALID_SORT_DIRECTION",
+    "status" : 400,
+    "message" : "잘못된 정렬 방향입니다. 'asc' 또는 'desc'를 사용해주세요"
+  }, {
+    "code" : "C103",
+    "domain" : "common",
+    "name" : "INVALID_PAGE_NUMBER",
+    "status" : 400,
+    "message" : "페이지 번호는 0 이상이어야 합니다"
+  }, {
+    "code" : "C104",
+    "domain" : "common",
+    "name" : "INVALID_PAGE_SIZE",
+    "status" : 400,
+    "message" : "페이지 크기는 1 이상 1000 이하여야 합니다"
+  }, {
+    "code" : "C105",
+    "domain" : "common",
+    "name" : "MISSING_REQUEST_PARAMETER",
+    "status" : 400,
+    "message" : "필수 요청 값이 누락되었습니다"
+  }, {
+    "code" : "C106",
+    "domain" : "common",
+    "name" : "INVALID_PARAMETER_TYPE",
+    "status" : 400,
+    "message" : "요청 값의 형식이 올바르지 않습니다"
+  }, {
+    "code" : "C107",
+    "domain" : "common",
+    "name" : "INVALID_MULTIPART_REQUEST",
+    "status" : 400,
+    "message" : "multipart 요청 형식이 올바르지 않습니다"
+  }, {
+    "code" : "C201",
+    "domain" : "common",
+    "name" : "ENDPOINT_NOT_FOUND",
+    "status" : 404,
+    "message" : "요청한 API를 찾을 수 없습니다"
+  }, {
+    "code" : "C202",
+    "domain" : "common",
+    "name" : "METHOD_NOT_ALLOWED",
+    "status" : 405,
+    "message" : "지원하지 않는 HTTP 메서드입니다"
+  }, {
+    "code" : "C203",
+    "domain" : "common",
+    "name" : "UNSUPPORTED_MEDIA_TYPE",
+    "status" : 415,
+    "message" : "지원하지 않는 Content-Type입니다"
+  }, {
+    "code" : "C204",
+    "domain" : "common",
+    "name" : "NOT_ACCEPTABLE",
+    "status" : 406,
+    "message" : "지원하지 않는 Accept 형식입니다"
+  }, {
+    "code" : "C205",
+    "domain" : "common",
+    "name" : "PAYLOAD_TOO_LARGE",
+    "status" : 413,
+    "message" : "업로드 가능한 파일 크기를 초과했습니다"
+  }, {
+    "code" : "C301",
+    "domain" : "common",
+    "name" : "RESOURCE_LOCK_CONFLICT",
+    "status" : 409,
+    "message" : "다른 요청이 처리 중입니다. 잠시 후 다시 시도해주세요"
+  }, {
+    "code" : "C302",
+    "domain" : "common",
+    "name" : "DATA_INTEGRITY_VIOLATION",
+    "status" : 409,
+    "message" : "이미 존재하는 값이거나 참조할 수 없는 값입니다"
+  }, {
+    "code" : "C401",
+    "domain" : "common",
+    "name" : "REDIS_CONNECTION_FAILURE",
+    "status" : 500,
+    "message" : "Redis 연결에 실패했습니다. 잠시 후 다시 시도해주세요"
+  }, {
+    "code" : "C402",
+    "domain" : "common",
+    "name" : "INTERNAL_SERVER_ERROR",
+    "status" : 500,
+    "message" : "서버 오류가 발생했습니다. 관리자에게 문의해주세요"
+  } ]
+}

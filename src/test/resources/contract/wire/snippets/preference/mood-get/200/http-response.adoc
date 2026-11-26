@@ -1,0 +1,12 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "message" : "분위기 취향을 성공적으로 조회했습니다.",
+  "data" : {
+    "moodTypes" : [ "KITSCH", "Y2K" ]
+  }
+}
+----

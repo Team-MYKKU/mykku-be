@@ -12,7 +12,7 @@ class RestDocumentationFilterBuilder(
     identifierPrefix: String,
     identifier: String
 ) {
-    private val identifier: String = "$identifierPrefix/$identifier"
+    val identifier: String = "$identifierPrefix/$identifier"
     private val snippets = mutableListOf<Snippet>()
 
     fun request(request: RestDocumentationRequest): RestDocumentationFilterBuilder {

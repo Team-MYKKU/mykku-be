@@ -1,0 +1,18 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "message" : "칭호 목록 조회 성공",
+  "data" : [ {
+    "id" : 1,
+    "name" : "첫 만남",
+    "description" : "로그인 하면 무조건 줌"
+  }, {
+    "id" : 11,
+    "name" : "이 몸 등장",
+    "description" : "게시글 1회 업로드"
+  } ]
+}
+----

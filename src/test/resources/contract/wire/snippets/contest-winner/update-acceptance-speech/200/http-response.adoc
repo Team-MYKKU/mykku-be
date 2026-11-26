@@ -1,0 +1,13 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "message" : "수상 소감이 성공적으로 등록되었습니다.",
+  "data" : {
+    "winnerId" : 1,
+    "acceptanceSpeech" : "정말 감사합니다. 이 영광을 가족에게 돌립니다."
+  }
+}
+----

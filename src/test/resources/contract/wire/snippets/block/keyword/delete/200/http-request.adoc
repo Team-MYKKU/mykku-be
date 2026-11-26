@@ -1,0 +1,7 @@
+[source,http,options="nowrap"]
+----
+DELETE /api/v1/blocks/keywords/%EC%8A%A4%ED%8F%AC%EC%9D%BC%EB%9F%AC HTTP/1.1
+Authorization: Bearer test-access-token
+Host: api.dev.mykku.kr
+
+----

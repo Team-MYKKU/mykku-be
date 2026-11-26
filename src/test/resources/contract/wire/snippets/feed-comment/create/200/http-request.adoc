@@ -1,0 +1,13 @@
+[source,http,options="nowrap"]
+----
+POST /api/v1/feeds/1/comments HTTP/1.1
+Authorization: Bearer test-access-token
+Content-Type: application/json
+Host: api.dev.mykku.kr
+Content-Length: 68
+
+{
+  "content" : "좋은 피드네요!",
+  "parentCommentId" : null
+}
+----

@@ -1,0 +1,10 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "message" : "피드가 성공적으로 삭제되었습니다.",
+  "data" : { }
+}
+----

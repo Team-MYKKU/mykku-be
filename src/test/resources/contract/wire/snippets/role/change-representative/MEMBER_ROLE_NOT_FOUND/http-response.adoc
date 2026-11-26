@@ -1,0 +1,10 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 404 Not Found
+Content-Type: application/json
+
+{
+  "code" : "RL002",
+  "message" : "보유하지 않은 칭호입니다"
+}
+----

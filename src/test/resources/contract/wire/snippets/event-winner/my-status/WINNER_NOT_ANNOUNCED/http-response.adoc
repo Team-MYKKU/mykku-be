@@ -1,0 +1,10 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+
+{
+  "code" : "EV403",
+  "message" : "아직 당첨자가 발표되지 않았습니다"
+}
+----

@@ -1,0 +1,12 @@
+[source,http,options="nowrap"]
+----
+POST /api/v1/preferences/genre HTTP/1.1
+Authorization: Bearer test-access-token
+Content-Type: application/json
+Host: api.dev.mykku.kr
+Content-Length: 44
+
+{
+  "genreTypes" : [ "KPOP", "BAND_ROCK" ]
+}
+----

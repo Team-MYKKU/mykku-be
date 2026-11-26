@@ -1,0 +1,16 @@
+|===
+|필드|타입|필수
+
+|`+message+`
+|`+String+`
+|O
+
+|`+data+`
+|`+Object+`
+|O
+
+|`+data.genreTypes+`
+|`+Array+`
+|O
+
+|===

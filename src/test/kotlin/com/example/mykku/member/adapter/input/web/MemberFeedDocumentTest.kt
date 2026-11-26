@@ -2,6 +2,7 @@ package com.example.mykku.member.adapter.input.web
 
 import com.example.mykku.BaseDocumentTest
 import com.example.mykku.docs.ApiRequestConfig
+import com.example.mykku.docs.DocumentFixtureTime
 import com.example.mykku.feed.application.dto.AuthorResult
 import com.example.mykku.feed.application.dto.CommentPreviewResult
 import com.example.mykku.feed.application.dto.FeedImageResult
@@ -18,7 +19,6 @@ import org.mockito.kotlin.whenever
 import org.springframework.restdocs.payload.JsonFieldType
 import org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath
 import org.springframework.restdocs.request.RequestDocumentation.parameterWithName
-import java.time.LocalDateTime
 
 class MemberFeedDocumentTest : BaseDocumentTest() {
 
@@ -47,7 +47,7 @@ class MemberFeedDocumentTest : BaseDocumentTest() {
                             role = RoleResult(1L, "아미", "BTS 팬클럽")
                         ),
                         board = "자유게시판",
-                        createdAt = LocalDateTime.now(),
+                        createdAt = DocumentFixtureTime.NOW_MICROS,
                         title = "내가 쓴 피드",
                         content = "피드 내용입니다.",
                         images = listOf(
@@ -73,7 +73,7 @@ class MemberFeedDocumentTest : BaseDocumentTest() {
                             role = null
                         ),
                         board = "콘테스트게시판",
-                        createdAt = LocalDateTime.now().minusDays(1),
+                        createdAt = DocumentFixtureTime.NOW_MICROS.minusDays(1),
                         title = "두 번째 피드",
                         content = "두 번째 피드 내용입니다.",
                         images = emptyList(),

@@ -1,0 +1,29 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "message" : "피드가 성공적으로 작성되었습니다.",
+  "data" : {
+    "id" : 1,
+    "title" : "새로운 피드 제목",
+    "content" : "피드 내용입니다. 오늘은 날씨가 좋네요.",
+    "boardId" : 1,
+    "boardTitle" : "자유게시판",
+    "authorId" : "member1",
+    "authorNickname" : "테스트유저",
+    "authorProfileUrl" : "https://example.com/profile.jpg",
+    "images" : [ {
+      "id" : 1,
+      "url" : "https://example.com/image1.jpg",
+      "width" : 1920,
+      "height" : 1080
+    } ],
+    "tags" : [ "일상", "날씨", "행복" ],
+    "likeCount" : 0,
+    "commentCount" : 0,
+    "createdAt" : "2024-01-01T12:00:00"
+  }
+}
+----

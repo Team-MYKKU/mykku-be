@@ -1,0 +1,8 @@
+.+/api/v1/blocks/keywords/{keyword}+
+|===
+|파라미터|필수
+
+|`+keyword+`
+|O
+
+|===

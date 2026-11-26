@@ -1,0 +1,8 @@
+.+/api/v1/fcm-tokens/{deviceId}+
+|===
+|파라미터|필수
+
+|`+deviceId+`
+|O
+
+|===

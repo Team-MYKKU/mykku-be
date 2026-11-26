@@ -1,0 +1,10 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 403 Forbidden
+Content-Type: application/json
+
+{
+  "code" : "FD202",
+  "message" : "피드 댓글에 접근할 권한이 없습니다"
+}
+----

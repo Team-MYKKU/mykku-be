@@ -1,0 +1,28 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "message" : "이벤트 상세 정보를 성공적으로 조회했습니다.",
+  "data" : {
+    "id" : 1,
+    "title" : "이벤트 제목",
+    "subTitle" : "부제목입니다.",
+    "description" : "이벤트 상세 설명입니다.",
+    "startedAt" : "2025-01-01T00:00:00",
+    "expiredAt" : "2025-12-31T23:59:59",
+    "status" : "WINNER_SELECTED",
+    "thumbnailUrl" : "https://example.com/thumbnail.jpg",
+    "images" : [ {
+      "url" : "https://example.com/image1.jpg",
+      "orderIndex" : 0
+    }, {
+      "url" : "https://example.com/image2.jpg",
+      "orderIndex" : 1
+    } ],
+    "createdAt" : "2024-12-20T10:30:15.123456",
+    "isWinner" : true
+  }
+}
+----

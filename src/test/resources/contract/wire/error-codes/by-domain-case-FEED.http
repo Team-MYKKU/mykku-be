@@ -1,0 +1,9 @@
+### GET /api/error-codes/FEED
+HTTP 200
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "message" : "success",
+  "data" : [ ]
+}

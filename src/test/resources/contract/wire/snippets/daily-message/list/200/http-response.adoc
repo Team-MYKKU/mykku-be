@@ -1,0 +1,47 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "message" : "하루 덕담 리스트 불러오기에 성공했습니다.",
+  "data" : {
+    "content" : [ {
+      "id" : 2,
+      "title" : "오늘의 덕담",
+      "content" : "좋은 하루 되세요!",
+      "date" : "2026-11-24"
+    }, {
+      "id" : 1,
+      "title" : "희망찬 하루",
+      "content" : "모든 소망이 이루어지길!",
+      "date" : "2026-11-23"
+    } ],
+    "empty" : false,
+    "first" : true,
+    "last" : true,
+    "number" : 0,
+    "numberOfElements" : 2,
+    "pageable" : {
+      "offset" : 0,
+      "pageNumber" : 0,
+      "pageSize" : 20,
+      "paged" : true,
+      "sort" : {
+        "empty" : false,
+        "sorted" : true,
+        "unsorted" : false
+      },
+      "unpaged" : false
+    },
+    "size" : 20,
+    "sort" : {
+      "empty" : false,
+      "sorted" : true,
+      "unsorted" : false
+    },
+    "totalElements" : 2,
+    "totalPages" : 1
+  }
+}
+----

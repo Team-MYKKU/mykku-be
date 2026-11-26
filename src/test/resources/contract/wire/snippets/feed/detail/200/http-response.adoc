@@ -1,0 +1,44 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "message" : "피드 상세 정보를 성공적으로 조회했습니다.",
+  "data" : {
+    "id" : 1,
+    "author" : {
+      "memberId" : "member1",
+      "nickname" : "작성자닉네임",
+      "profileImage" : "https://example.com/profile.jpg",
+      "role" : {
+        "id" : 1,
+        "name" : "일반 덕후",
+        "description" : "일반 덕후 칭호"
+      }
+    },
+    "boardId" : 1,
+    "boardTitle" : "자유게시판",
+    "createdAt" : "2024-01-01T12:00:00",
+    "updatedAt" : "2024-01-02T14:30:00",
+    "title" : "피드 제목입니다",
+    "content" : "피드의 상세 내용입니다. 자세한 설명이 포함되어 있습니다.",
+    "images" : [ {
+      "id" : 1,
+      "url" : "https://example.com/image1.jpg",
+      "width" : 1920,
+      "height" : 1080
+    } ],
+    "tags" : [ {
+      "title" : "일상",
+      "isContest" : false
+    }, {
+      "title" : "이벤트",
+      "isContest" : true
+    } ],
+    "likeCount" : 25,
+    "isLiked" : true,
+    "commentCount" : 10
+  }
+}
+----

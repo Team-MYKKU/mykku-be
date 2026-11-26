@@ -1,0 +1,51 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "message" : "내 수상 피드 목록을 성공적으로 조회했습니다.",
+  "data" : {
+    "feeds" : [ {
+      "id" : 1,
+      "author" : {
+        "memberId" : "testmemberid",
+        "nickname" : "testuser",
+        "profileImage" : "https://example.com/profile.jpg",
+        "role" : {
+          "id" : 1,
+          "name" : "아미",
+          "description" : "BTS 팬클럽"
+        }
+      },
+      "board" : "자유게시판",
+      "createdAt" : "2026-11-24T15:52:36.744298",
+      "title" : "수상작 피드",
+      "content" : "수상작 내용입니다.",
+      "images" : [ {
+        "id" : 1,
+        "url" : "https://example.com/feed-image.jpg",
+        "width" : 1080,
+        "height" : 1080
+      } ],
+      "tags" : [ {
+        "title" : "콘테스트태그",
+        "isContest" : true
+      } ],
+      "likeCount" : 10,
+      "isLiked" : false,
+      "commentCount" : 3,
+      "comment" : {
+        "profileImage" : "https://example.com/commenter.jpg",
+        "content" : "축하합니다!"
+      }
+    } ],
+    "currentPage" : 0,
+    "totalPages" : 1,
+    "totalElements" : 1,
+    "size" : 20,
+    "hasNext" : false,
+    "hasPrevious" : false
+  }
+}
+----

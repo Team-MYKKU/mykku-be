@@ -1,0 +1,19 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "message" : "새로 획득한 칭호 조회 성공",
+  "data" : [ {
+    "id" : 15,
+    "role" : {
+      "id" : 11,
+      "name" : "이 몸 등장",
+      "description" : "게시글 1회 업로드"
+    },
+    "isRepresentative" : false,
+    "earnedAt" : "2026-11-24T15:52:36.744298"
+  } ]
+}
+----

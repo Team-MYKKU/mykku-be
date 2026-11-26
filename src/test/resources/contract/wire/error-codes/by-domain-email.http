@@ -1,0 +1,45 @@
+### GET /api/error-codes/email
+HTTP 200
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "message" : "success",
+  "data" : [ {
+    "code" : "EM101",
+    "domain" : "email",
+    "name" : "VERIFICATION_CODE_EXPIRED",
+    "status" : 400,
+    "message" : "인증 코드가 만료되었습니다"
+  }, {
+    "code" : "EM102",
+    "domain" : "email",
+    "name" : "INVALID_VERIFICATION_CODE",
+    "status" : 400,
+    "message" : "유효하지 않은 인증 코드입니다"
+  }, {
+    "code" : "EM201",
+    "domain" : "email",
+    "name" : "INVALID_EMAIL_OR_PASSWORD",
+    "status" : 401,
+    "message" : "이메일 또는 비밀번호가 올바르지 않습니다"
+  }, {
+    "code" : "EM301",
+    "domain" : "email",
+    "name" : "EMAIL_ALREADY_EXISTS",
+    "status" : 409,
+    "message" : "이미 사용 중인 이메일입니다"
+  }, {
+    "code" : "EM401",
+    "domain" : "email",
+    "name" : "EMAIL_SEND_FAILED",
+    "status" : 500,
+    "message" : "이메일 발송에 실패했습니다"
+  }, {
+    "code" : "EM501",
+    "domain" : "email",
+    "name" : "TOO_MANY_REQUESTS",
+    "status" : 429,
+    "message" : "너무 많은 요청이 발생했습니다. 잠시 후 다시 시도해주세요"
+  } ]
+}

@@ -1,0 +1,10 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 401 Unauthorized
+Content-Type: application/json
+
+{
+  "code" : "EM201",
+  "message" : "이메일 또는 비밀번호가 올바르지 않습니다"
+}
+----

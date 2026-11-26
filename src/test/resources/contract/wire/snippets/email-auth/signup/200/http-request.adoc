@@ -1,0 +1,12 @@
+[source,http,options="nowrap"]
+----
+POST /api/v1/email-auth/signup HTTP/1.1
+Content-Type: application/json
+Host: api.dev.mykku.kr
+Content-Length: 68
+
+{
+  "email" : "newuser@example.com",
+  "password" : "password123!"
+}
+----

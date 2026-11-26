@@ -1,0 +1,8 @@
+.+/api/v1/feeds/comments/{commentId}+
+|===
+|파라미터|필수
+
+|`+commentId+`
+|O
+
+|===

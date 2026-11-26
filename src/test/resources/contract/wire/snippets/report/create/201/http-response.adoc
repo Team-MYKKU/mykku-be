@@ -1,0 +1,24 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 201 Created
+Content-Type: application/json
+
+{
+  "message" : "신고가 접수되었습니다",
+  "data" : {
+    "id" : 1,
+    "reporterMemberId" : "testmemberid",
+    "targetType" : "FEED",
+    "targetTypeDescription" : "게시글",
+    "targetId" : 1,
+    "targetMemberId" : "authorid",
+    "reason" : "SPAM",
+    "reasonDescription" : "반복 게시물, 광고 및 무분별한 홍보",
+    "detail" : "광고 도배입니다",
+    "status" : "PENDING",
+    "statusDescription" : "접수",
+    "processedAt" : null,
+    "createdAt" : "2026-11-24T15:52:36.744298456"
+  }
+}
+----

@@ -1,0 +1,40 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "message" : "수상작 목록을 성공적으로 조회했습니다.",
+  "data" : {
+    "contests" : [ {
+      "contestId" : 1,
+      "contestTitle" : "첫 번째 콘테스트",
+      "startedAt" : "2026-10-25T15:52:36.744298",
+      "expiredAt" : "2026-11-23T15:52:36.744298",
+      "winners" : [ {
+        "winnerId" : 1,
+        "winnerRank" : 1,
+        "feedImageUrl" : "https://example.com/image1.jpg"
+      }, {
+        "winnerId" : 2,
+        "winnerRank" : 2,
+        "feedImageUrl" : "https://example.com/image2.jpg"
+      }, {
+        "winnerId" : 3,
+        "winnerRank" : 3,
+        "feedImageUrl" : "https://example.com/contest-thumbnail1.jpg"
+      } ]
+    }, {
+      "contestId" : 2,
+      "contestTitle" : "두 번째 콘테스트",
+      "startedAt" : "2026-09-25T15:52:36.744298",
+      "expiredAt" : "2026-10-24T15:52:36.744298",
+      "winners" : [ {
+        "winnerId" : 4,
+        "winnerRank" : 1,
+        "feedImageUrl" : "https://example.com/image4.jpg"
+      } ]
+    } ]
+  }
+}
+----

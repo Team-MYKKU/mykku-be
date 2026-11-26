@@ -1,0 +1,10 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+
+{
+  "code" : "FD107",
+  "message" : "태그는 한글, 영문, 숫자만 사용할 수 있습니다"
+}
+----

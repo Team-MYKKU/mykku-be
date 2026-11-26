@@ -1,0 +1,13 @@
+[source,http,options="nowrap"]
+----
+POST /api/v1/daily-messages/999/comments HTTP/1.1
+Authorization: Bearer test-access-token
+Content-Type: application/json
+Host: api.dev.mykku.kr
+Content-Length: 78
+
+{
+  "content" : "좋은 덕담 감사합니다!",
+  "parentCommentId" : null
+}
+----

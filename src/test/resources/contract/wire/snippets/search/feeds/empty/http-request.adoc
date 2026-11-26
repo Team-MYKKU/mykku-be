@@ -1,0 +1,8 @@
+[source,http,options="nowrap"]
+----
+GET /api/v1/search/feeds?keyword=%EC%97%86%EB%8A%94%EA%B2%80%EC%83%89%EC%96%B4 HTTP/1.1
+Authorization: Bearer test-access-token
+Content-Type: application/json
+Host: api.dev.mykku.kr
+
+----

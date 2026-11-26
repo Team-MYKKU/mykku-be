@@ -1,0 +1,51 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "message" : "덕질노트 목록 조회 성공",
+  "data" : {
+    "content" : [ {
+      "id" : 1,
+      "title" : "첫 번째 덕질노트",
+      "subtitle" : "서브타이틀 1",
+      "content" : "덕질노트 내용입니다",
+      "productionDate" : "2024-01-15",
+      "coverImageUrl" : "https://s3.amazonaws.com/mykku/covers/cover1.jpg"
+    }, {
+      "id" : 2,
+      "title" : "두 번째 덕질노트",
+      "subtitle" : "서브타이틀 2",
+      "content" : "또 다른 덕질노트 내용",
+      "productionDate" : "2024-01-10",
+      "coverImageUrl" : "https://s3.amazonaws.com/mykku/covers/cover2.jpg"
+    } ],
+    "empty" : false,
+    "first" : true,
+    "last" : true,
+    "number" : 0,
+    "numberOfElements" : 2,
+    "pageable" : {
+      "offset" : 0,
+      "pageNumber" : 0,
+      "pageSize" : 20,
+      "paged" : true,
+      "sort" : {
+        "empty" : false,
+        "sorted" : true,
+        "unsorted" : false
+      },
+      "unpaged" : false
+    },
+    "size" : 20,
+    "sort" : {
+      "empty" : false,
+      "sorted" : true,
+      "unsorted" : false
+    },
+    "totalElements" : 2,
+    "totalPages" : 1
+  }
+}
+----

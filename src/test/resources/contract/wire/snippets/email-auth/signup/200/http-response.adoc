@@ -1,0 +1,24 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "message" : "회원가입이 완료되었습니다",
+  "data" : {
+    "accessToken" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "refreshToken" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.refresh...",
+    "tokenType" : "Bearer",
+    "accessTokenExpiresIn" : 86400000,
+    "refreshTokenExpiresIn" : 1209600000,
+    "member" : {
+      "memberId" : null,
+      "email" : "newuser@example.com",
+      "nickname" : null,
+      "profileImage" : ""
+    },
+    "isExistingUser" : false,
+    "isProfileComplete" : false
+  }
+}
+----

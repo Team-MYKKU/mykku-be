@@ -1,0 +1,64 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "message" : "댓글 목록을 성공적으로 조회했습니다.",
+  "data" : {
+    "comments" : [ {
+      "id" : 1,
+      "content" : "좋은 덕담이네요!",
+      "author" : {
+        "memberId" : "honggildong",
+        "nickname" : "홍길동",
+        "profileImage" : "https://example.com/profile.jpg",
+        "role" : {
+          "id" : 1,
+          "name" : "덕담왕",
+          "description" : "덕담을 많이 남긴 사람"
+        }
+      },
+      "likeCount" : 5,
+      "isLiked" : true,
+      "replies" : [ {
+        "id" : 2,
+        "content" : "저도 동감합니다!",
+        "author" : {
+          "memberId" : "kimchulsoo",
+          "nickname" : "김철수",
+          "profileImage" : "https://example.com/profile.jpg",
+          "role" : null
+        },
+        "likeCount" : 0,
+        "isLiked" : false,
+        "createdAt" : "2026-10-01T12:00:00",
+        "updatedAt" : "2026-10-01T12:00:00"
+      } ],
+      "replyCount" : 1,
+      "createdAt" : "2026-10-01T12:00:00",
+      "updatedAt" : "2026-10-01T12:00:00"
+    }, {
+      "id" : 3,
+      "content" : "오늘 하루도 힘내세요!",
+      "author" : {
+        "memberId" : null,
+        "nickname" : "탈퇴한 회원",
+        "profileImage" : null,
+        "role" : null
+      },
+      "likeCount" : 0,
+      "isLiked" : false,
+      "replies" : [ ],
+      "replyCount" : 0,
+      "createdAt" : "2026-10-01T12:00:00",
+      "updatedAt" : "2026-10-01T12:00:00"
+    } ],
+    "totalElements" : 2,
+    "totalPages" : 1,
+    "currentPage" : 0,
+    "pageSize" : 20,
+    "hasNext" : false
+  }
+}
+----

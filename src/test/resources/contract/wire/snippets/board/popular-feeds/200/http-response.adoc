@@ -1,0 +1,27 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "message" : "인기 피드 목록을 성공적으로 조회했습니다.",
+  "data" : {
+    "feeds" : [ {
+      "id" : 1,
+      "rank" : 1,
+      "title" : "인기 피드 1",
+      "content" : "인기 피드 내용 1"
+    }, {
+      "id" : 2,
+      "rank" : 2,
+      "title" : "인기 피드 2",
+      "content" : "인기 피드 내용 2"
+    }, {
+      "id" : 3,
+      "rank" : 3,
+      "title" : "인기 피드 3",
+      "content" : "인기 피드 내용 3"
+    } ]
+  }
+}
+----

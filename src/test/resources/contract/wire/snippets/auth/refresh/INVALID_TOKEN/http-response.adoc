@@ -1,0 +1,10 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 401 Unauthorized
+Content-Type: application/json
+
+{
+  "code" : "AU202",
+  "message" : "유효하지 않은 토큰입니다"
+}
+----

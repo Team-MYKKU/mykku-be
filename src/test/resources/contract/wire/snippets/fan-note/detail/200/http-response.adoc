@@ -1,0 +1,27 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "message" : "덕질노트 상세 조회 성공",
+  "data" : {
+    "id" : 1,
+    "title" : "웹툰 스타일 덕질노트",
+    "subtitle" : "좌우로 넘기면서 보는 만화",
+    "content" : "네이버 웹툰처럼 옆으로 넘기면서 볼 수 있는 덕질 콘텐츠입니다",
+    "productionDate" : "2024-01-15",
+    "coverImageUrl" : "https://s3.amazonaws.com/mykku/covers/cover1.jpg",
+    "pages" : [ {
+      "pageNumber" : 1,
+      "imageUrl" : "https://s3.amazonaws.com/mykku/pages/page1.jpg"
+    }, {
+      "pageNumber" : 2,
+      "imageUrl" : "https://s3.amazonaws.com/mykku/pages/page2.jpg"
+    }, {
+      "pageNumber" : 3,
+      "imageUrl" : "https://s3.amazonaws.com/mykku/pages/page3.jpg"
+    } ]
+  }
+}
+----

@@ -1,0 +1,51 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "message" : "보드별 피드 목록을 성공적으로 조회했습니다.",
+  "data" : {
+    "feeds" : [ {
+      "id" : 1,
+      "author" : {
+        "memberId" : "member1",
+        "nickname" : "닉네임1",
+        "profileImage" : "https://example.com/profile1.jpg",
+        "role" : {
+          "id" : 1,
+          "name" : "일반 덕후",
+          "description" : "일반 덕후 칭호"
+        }
+      },
+      "board" : "자유게시판",
+      "createdAt" : "2024-01-01T12:00:00",
+      "title" : "자유게시판 피드 제목",
+      "content" : "자유게시판 피드 내용입니다.",
+      "images" : [ {
+        "id" : 1,
+        "url" : "https://example.com/image1.jpg",
+        "width" : 1920,
+        "height" : 1080
+      } ],
+      "tags" : [ {
+        "title" : "자유",
+        "isContest" : false
+      } ],
+      "likeCount" : 15,
+      "isLiked" : true,
+      "commentCount" : 3,
+      "comment" : {
+        "profileImage" : "https://example.com/commenter1.jpg",
+        "content" : "좋은 글입니다."
+      }
+    } ],
+    "currentPage" : 0,
+    "totalPages" : 1,
+    "totalElements" : 1,
+    "size" : 20,
+    "hasNext" : false,
+    "hasPrevious" : false
+  }
+}
+----

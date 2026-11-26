@@ -1,0 +1,10 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 404 Not Found
+Content-Type: application/json
+
+{
+  "code" : "MB001",
+  "message" : "회원을 찾을 수 없습니다"
+}
+----

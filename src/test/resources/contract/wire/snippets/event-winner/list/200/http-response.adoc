@@ -1,0 +1,29 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "message" : "이벤트 당첨자 목록을 성공적으로 조회했습니다.",
+  "data" : {
+    "eventId" : 1,
+    "eventTitle" : "테스트 이벤트",
+    "winners" : [ {
+      "winnerId" : 1,
+      "memberId" : "winner1",
+      "nickname" : "당첨자1",
+      "profileImage" : "https://example.com/profile1.jpg"
+    }, {
+      "winnerId" : 2,
+      "memberId" : "winner2",
+      "nickname" : "당첨자2",
+      "profileImage" : "https://example.com/profile2.jpg"
+    }, {
+      "winnerId" : 3,
+      "memberId" : null,
+      "nickname" : null,
+      "profileImage" : ""
+    } ]
+  }
+}
+----

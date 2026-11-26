@@ -1,0 +1,8 @@
+.+/api/error-codes/{domain}+
+|===
+|파라미터|필수
+
+|`+domain+`
+|O
+
+|===

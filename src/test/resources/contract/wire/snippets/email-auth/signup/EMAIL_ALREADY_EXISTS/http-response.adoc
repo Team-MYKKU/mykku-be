@@ -1,0 +1,10 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 409 Conflict
+Content-Type: application/json
+
+{
+  "code" : "EM301",
+  "message" : "이미 사용 중인 이메일입니다"
+}
+----

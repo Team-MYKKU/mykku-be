@@ -6,6 +6,7 @@ import com.example.mykku.config.TestAsyncConfig
 import com.example.mykku.config.TestEmailConfig
 import com.example.mykku.config.TestEmailSenderConfig
 import com.example.mykku.config.TestImageUploadConfig
+import com.example.mykku.contract.support.ContractManifestExtension
 import com.example.mykku.member.adapter.output.persistence.MemberJpaRepository
 import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import com.example.mykku.member.domain.vo.SocialProvider
@@ -25,7 +26,7 @@ import org.springframework.test.context.ActiveProfiles
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @Import(TestEmailConfig::class, TestEmailSenderConfig::class, TestImageUploadConfig::class, TestAsyncConfig::class)
-@ExtendWith(DatabaseCleaner::class)
+@ExtendWith(DatabaseCleaner::class, ContractManifestExtension::class)
 abstract class BaseControllerTest {
 
     @LocalServerPort

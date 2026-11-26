@@ -1,0 +1,10 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "message" : "장르 취향이 성공적으로 저장되었습니다.",
+  "data" : { }
+}
+----

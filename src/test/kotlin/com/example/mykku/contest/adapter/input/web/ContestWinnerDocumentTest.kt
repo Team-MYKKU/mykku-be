@@ -12,6 +12,7 @@ import com.example.mykku.contest.application.dto.PagedMyAwardsResult
 import com.example.mykku.contest.application.dto.UpdateAcceptanceSpeechResult
 import com.example.mykku.contest.application.dto.WinnerDetailResult
 import com.example.mykku.contest.application.dto.WinnerThumbnailResult
+import com.example.mykku.docs.DocumentFixtureTime
 import com.example.mykku.feed.application.dto.AuthorResult
 import com.example.mykku.feed.application.dto.CommentPreviewResult
 import com.example.mykku.feed.application.dto.FeedImageResult
@@ -20,7 +21,6 @@ import com.example.mykku.feed.application.dto.PagedFeedsResult
 import com.example.mykku.feed.application.dto.TagResult
 import com.example.mykku.role.application.dto.RoleResult
 import java.time.LocalDate
-import java.time.LocalDateTime
 import com.example.mykku.docs.ApiRequestConfig
 import com.example.mykku.docs.RestDocumentationResponse
 import com.example.mykku.contest.exception.ContestErrorCode
@@ -50,8 +50,8 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
                     ContestWinnerPreviewResult(
                         contestId = 1L,
                         contestTitle = "첫 번째 콘테스트",
-                        startedAt = LocalDateTime.now().minusDays(30),
-                        expiredAt = LocalDateTime.now().minusDays(1),
+                        startedAt = DocumentFixtureTime.NOW_MICROS.minusDays(30),
+                        expiredAt = DocumentFixtureTime.NOW_MICROS.minusDays(1),
                         winners = listOf(
                             WinnerThumbnailResult(
                                 winnerId = 1L,
@@ -73,8 +73,8 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
                     ContestWinnerPreviewResult(
                         contestId = 2L,
                         contestTitle = "두 번째 콘테스트",
-                        startedAt = LocalDateTime.now().minusDays(60),
-                        expiredAt = LocalDateTime.now().minusDays(31),
+                        startedAt = DocumentFixtureTime.NOW_MICROS.minusDays(60),
+                        expiredAt = DocumentFixtureTime.NOW_MICROS.minusDays(31),
                         winners = listOf(
                             WinnerThumbnailResult(
                                 winnerId = 4L,
@@ -547,7 +547,7 @@ class ContestWinnerDocumentTest : BaseDocumentTest() {
                             role = RoleResult(1L, "아미", "BTS 팬클럽")
                         ),
                         board = "자유게시판",
-                        createdAt = LocalDateTime.now(),
+                        createdAt = DocumentFixtureTime.NOW_MICROS,
                         title = "수상작 피드",
                         content = "수상작 내용입니다.",
                         images = listOf(

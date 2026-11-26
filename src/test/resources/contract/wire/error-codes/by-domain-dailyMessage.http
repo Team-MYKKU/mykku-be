@@ -1,0 +1,51 @@
+### GET /api/error-codes/dailyMessage
+HTTP 200
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "message" : "success",
+  "data" : [ {
+    "code" : "DM001",
+    "domain" : "dailyMessage",
+    "name" : "DAILY_MESSAGE_NOT_FOUND",
+    "status" : 404,
+    "message" : "일상 메시지를 찾을 수 없습니다"
+  }, {
+    "code" : "DM002",
+    "domain" : "dailyMessage",
+    "name" : "DAILY_MESSAGE_COMMENT_NOT_FOUND",
+    "status" : 404,
+    "message" : "일상 메시지 댓글을 찾을 수 없습니다"
+  }, {
+    "code" : "DM101",
+    "domain" : "dailyMessage",
+    "name" : "DAILY_MESSAGE_CONTENT_TOO_LONG",
+    "status" : 400,
+    "message" : "일상 메시지 내용은 42자 이하여야 합니다"
+  }, {
+    "code" : "DM102",
+    "domain" : "dailyMessage",
+    "name" : "DAILY_MESSAGE_COMMENT_CONTENT_TOO_LONG",
+    "status" : 400,
+    "message" : "일상 메시지 댓글은 1000자 이하여야 합니다"
+  }, {
+    "code" : "DM103",
+    "domain" : "dailyMessage",
+    "name" : "REPLY_DEPTH_EXCEEDED",
+    "status" : 400,
+    "message" : "답글에는 답글을 작성할 수 없습니다"
+  }, {
+    "code" : "DM201",
+    "domain" : "dailyMessage",
+    "name" : "COMMENT_FORBIDDEN_ACCESS",
+    "status" : 403,
+    "message" : "댓글에 접근할 권한이 없습니다"
+  }, {
+    "code" : "DM301",
+    "domain" : "dailyMessage",
+    "name" : "DAILY_MESSAGE_DATE_ALREADY_EXISTS",
+    "status" : 409,
+    "message" : "해당 날짜의 일상 메시지가 이미 존재합니다"
+  } ]
+}

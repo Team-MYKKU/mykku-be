@@ -1,0 +1,8 @@
+.+/api/v1/fan-notes/{fanNoteId}+
+|===
+|파라미터|필수
+
+|`+fanNoteId+`
+|O
+
+|===
