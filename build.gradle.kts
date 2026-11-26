@@ -79,6 +79,11 @@ tasks.withType<Test> {
         "-Xmx1g",
         "-Xms512m"
     )
+
+    testLogging {
+        events(org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED)
+        exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+    }
 }
 
 tasks.asciidoctor {
