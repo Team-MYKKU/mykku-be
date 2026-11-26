@@ -4,6 +4,7 @@ object ConfigKeys {
 
     private val CAMEL_BOUNDARY = Regex("([a-z0-9])([A-Z])")
     private val LIST_INDEX = Regex("\\[\\d+]")
+    private val MAP_KEY = Regex("\\[([^\\]]*)]")
     private val EXCLUDED_KEYS = listOf(
         "server.port",
         "server.tomcat.basedir",
@@ -45,9 +46,12 @@ object ConfigKeys {
         EXCLUDED_KEYS.any { isUnderRoot(key, it) } || EXCLUDED_ROOTS.any { isAtOrBelow(key, it) } || isSecretLike(key)
 
     private fun isSecretLike(key: String): Boolean {
-        val id = identity(key)
-        return SAFE_KEYS.none { identity(it) == id } && SECRET_WORDS.any { id.contains(it) }
+        val id = elementIdentity(key)
+        return SAFE_KEYS.none { elementIdentity(it) == id } && SECRET_WORDS.any { id.contains(it) }
     }
+
+    private fun elementIdentity(key: String): String =
+        identity(key.replace(MAP_KEY) { ".${it.groupValues[1].lowercase()}" })
 
     private fun element(element: String): String {
         val base = element.substringBefore('[')

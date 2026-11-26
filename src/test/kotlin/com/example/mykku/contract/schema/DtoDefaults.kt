@@ -37,7 +37,7 @@ object DtoDefaults {
         }
         return runCatching { construct(constructor, setOf(klass), nulls = true) }.getOrElse {
             val message = "${klass.qualifiedName} 기본값을 계산하지 못했습니다. 필수 인자 더미 값을 보강합니다"
-            throw IllegalStateException(message, withDummies.exceptionOrNull())
+            throw IllegalStateException(message, withDummies.exceptionOrNull()).apply { addSuppressed(it) }
         }
     }
 

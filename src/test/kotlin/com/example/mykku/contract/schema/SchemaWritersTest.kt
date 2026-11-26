@@ -199,6 +199,18 @@ class SchemaWritersTest {
             .hasMessageContaining("ConvertGroupProbe.inner @ConvertGroup")
     }
 
+    @Test
+    fun `상위 클래스의 그룹 순서와 인터페이스 getter의 그룹 변환도 실패로 잡고 빈 검증이 보지 않는 생성자 인자는 넘긴다`() {
+        val writer = RequestSchemaWriter(mapper, validator)
+
+        assertThatThrownBy { writer.render(target<SequencedChildProbe>(validated = true)) }
+            .hasMessageContaining("SequencedBaseProbe @GroupSequence")
+        assertThatThrownBy { writer.render(target<InterfaceConvertProbe>(validated = true)) }
+            .hasMessageContaining("InterfaceConvertProbe.getInner @ConvertGroup")
+        assertThat(writer.render(target<ParameterConvertProbe>(validated = true)).lines())
+            .contains("  미적용 @NotBlank(message=\"안쪽\")")
+    }
+
     private fun writer(): ResponseSchemaWriter = ResponseSchemaWriter(mapper)
 
     private inline fun <reified T> target(validated: Boolean): RequestTarget =
@@ -301,5 +313,20 @@ data class ConditionalTokenProbe(val token: String?, val size: Int = 20) {
 
 @GroupSequence(Default::class, GroupProbe::class)
 interface OrderedGroupProbe
+
+@GroupSequence(SequencedBaseProbe::class, GroupProbe::class)
+open class SequencedBaseProbe
+
+data class SequencedChildProbe(val name: String) : SequencedBaseProbe()
+
+interface ConvertingInnerProbe {
+    @get:Valid
+    @get:ConvertGroup(to = GroupProbe::class)
+    val inner: InnerFormProbe
+}
+
+data class InterfaceConvertProbe(override val inner: InnerFormProbe) : ConvertingInnerProbe
+
+data class ParameterConvertProbe(@Valid @ConvertGroup(to = GroupProbe::class) val inner: InnerFormProbe)
 
 data class ConvertGroupProbe(@field:Valid @field:ConvertGroup(to = GroupProbe::class) val inner: InnerFormProbe)

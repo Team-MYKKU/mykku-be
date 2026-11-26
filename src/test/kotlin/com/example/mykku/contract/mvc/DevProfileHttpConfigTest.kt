@@ -72,6 +72,15 @@ class DevProfileHttpConfigTest {
     }
 
     @Test
+    fun `대괄호 맵 키 표기도 같은 키로 보고 안전 키는 남기며 대문자 비밀 낱말은 뺀다`() {
+        write("application-dev.yml", BRACKETED)
+
+        assertThat(config().properties()).containsExactlyEntriesOf(
+            sortedMapOf("spring.jackson.deserialization[fail-on-trailing-tokens]" to "true")
+        )
+    }
+
+    @Test
     fun `dev 파일에 spring profiles 키가 있으면 해석하지 않고 그 키를 알리며 실패한다`() {
         write("application-dev.yml", "spring:\n  profiles:\n    group:\n      dev: extra\n")
 
@@ -180,6 +189,17 @@ class DevProfileHttpConfigTest {
               tomcat:
                 relaxedQueryChars: ["|"]
                 relaxed_path_chars: "|"
+        """.trimIndent()
+
+        val BRACKETED = """
+            spring:
+              jackson:
+                deserialization:
+                  "[fail-on-trailing-tokens]": true
+            server:
+              servlet:
+                context-parameters:
+                  "[API_TOKEN]": abc
         """.trimIndent()
 
         val SENSITIVE = """
