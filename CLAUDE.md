@@ -396,6 +396,7 @@ src/main/kotlin/com/example/mykku/
 - **목적**: 앱이 받는 HTTP 규약(상태·헤더·본문·에러 코드 목록)을 `src/test/resources/contract/`의 골든 파일과 바이트 단위로 비교해 고정
   - 비교 전에 하는 일은 다음뿐이다: CRLF→LF, RestAssured multipart boundary 마스킹, 선언한 PageImpl 키 순서 정규화·마스크 경로, docs 등급의 설명 열 제외, `HttpSnapshot`의 전송 계층 헤더(Date·Keep-Alive·Connection·Transfer-Encoding·Content-Length) 제외·헤더 이름순 정렬·X-Request-ID 생성값 토큰화, JSON 본문 pretty 출력(원문이 compact 정규형인지 먼저 검사)
   - REST Docs 스니펫에는 `RestDocumentationFilterBuilder`가 지우는 응답 헤더(Date, Cache-Control, X-Request-ID 등)가 없으므로 스니펫 골든은 그 헤더 변화를 잡지 못한다
+  - P00c 골든은 여기에 더해 다음만 한다. `wire/errors/framework-mapping.txt`는 `handlerExceptionResolver`가 쓴 상태·Content-Type·본문을 그대로 한 줄에 쓴다(P00a `wire/error-codes/responses.txt`와 같은 형식). `wire/matrix/*`는 정규형 검사를 거친 JSON 본문을 compact 한 줄로 쓰고, JSON이 아닌 본문은 `\`·CR·LF를 이스케이프하고, 없는 Content-Type·본문은 `-`로 쓰고, 선택 인증 줄이 같은 엔드포인트의 익명 응답과 상태·Content-Type·본문이 같으면 `= none`으로 쓴다. `wire/headers/response-headers.txt`는 헤더 값 대신 상태, 전송 계층 헤더를 뺀 헤더 이름(대소문자 무시 이름순, 중복 유지), Content-Type 값, X-Request-ID 규칙(없음·보낸 값 그대로·생성값·보낸 값 대신 생성값, 보낸 값을 바꿔 돌려주면 그 값), 세션 ID만 `<SESSION:32HEX>`로 가린 Set-Cookie를 남긴다
 - **예외**: 응답 message 문자열 자체가 규약이므로 문자열 비교가 목적이다. 아래 'ErrorCode Enum 사용 필수' 규칙을 적용하지 않는다
 - **상속**: Spring 컨텍스트가 필요한 계약 테스트는 `BaseControllerTest`·`BaseDocumentTest`를 그대로 상속한다 (`@MockitoBean`·`@Import`를 더해 새 Spring 컨텍스트를 만들지 않는다). Spring 없이 골든을 쓰는 테스트는 `@ExtendWith(ContractManifestExtension::class)`를 단다
 - **골든 변경**: `contract/wire/**`·`contract/fixtures/**`의 기존 파일은 고치지 않는다. `contract/docs/**`는 wire 변경이 0인 문서 PR에서만 바꾼다. 승인된 규약 변경만 로컬에서 `./gradlew clean test -Pcontract.update=true`로 갱신한다 (CI에서는 갱신하면 실패)
@@ -403,6 +404,7 @@ src/main/kotlin/com/example/mykku/
   - 손으로 고치는 유일한 줄은 첫 줄 `base`다. 기존 골든을 바꾸는 승인된 PR이 그 PR이 기반한 develop 커밋으로 고친다
   - 골든은 `ContractGolden.DEFAULT`·`SnippetGolden.DEFAULT`·`HttpSnapshot.verify`로만 쓴다
 - **새 골든 디렉터리**: 골든 파일 목록이 테스트가 비교하는 목록과 같은지 보는 완전성 테스트를 함께 둔다 (예: `SnippetGoldenCoverageTest`, `ErrorCodeGoldenCoverageTest`)
+  - 여러 PR이 함께 쓰는 `wire/gray-zone/`은 파일 이름 접두(`framework-`·`matrix-` 등)로 소유를 나누고, 각 완전성 테스트는 자기 접두 파일만 본다
 - 주석 금지·메서드 15줄·들여쓰기 2단계 규칙은 계약 테스트에도 적용한다
 
 ### 테스트 작성 체크리스트

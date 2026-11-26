@@ -1,0 +1,9 @@
+### POST /api/v1/fcm-tokens deviceId 101자(컬럼 100자 초과)
+HTTP 409
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "code" : "C302",
+  "message" : "이미 존재하는 값이거나 참조할 수 없는 값입니다"
+}
