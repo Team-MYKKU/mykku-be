@@ -72,11 +72,14 @@ class DevProfileHttpConfigTest {
     }
 
     @Test
-    fun `대괄호 맵 키 표기도 같은 키로 보고 안전 키는 남기며 대문자 비밀 낱말은 뺀다`() {
+    fun `대괄호 맵 키도 대괄호 밖 요소처럼 맞춰 안전 키는 남기고 대문자·스네이크·카멜 비밀 낱말은 뺀다`() {
         write("application-dev.yml", BRACKETED)
 
         assertThat(config().properties()).containsExactlyEntriesOf(
-            sortedMapOf("spring.jackson.deserialization[fail-on-trailing-tokens]" to "true")
+            sortedMapOf(
+                "spring.jackson.deserialization[FAIL_ON_TRAILING_TOKENS]" to "false",
+                "spring.jackson.deserialization[fail-on-trailing-tokens]" to "true"
+            )
         )
     }
 
@@ -196,10 +199,13 @@ class DevProfileHttpConfigTest {
               jackson:
                 deserialization:
                   "[fail-on-trailing-tokens]": true
+                  "[FAIL_ON_TRAILING_TOKENS]": false
             server:
               servlet:
                 context-parameters:
                   "[API_TOKEN]": abc
+                  "[PRIVATE_KEY]": abc
+                  "[keyStore]": abc
         """.trimIndent()
 
         val SENSITIVE = """

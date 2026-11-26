@@ -207,6 +207,8 @@ class SchemaWritersTest {
             .hasMessageContaining("SequencedBaseProbe @GroupSequence")
         assertThatThrownBy { writer.render(target<InterfaceConvertProbe>(validated = true)) }
             .hasMessageContaining("InterfaceConvertProbe.getInner @ConvertGroup")
+        assertThatThrownBy { writer.render(target<GrandInterfaceConvertProbe>(validated = true)) }
+            .hasMessageContaining("GrandInterfaceConvertProbe.getInner @ConvertGroup")
         assertThat(writer.render(target<ParameterConvertProbe>(validated = true)).lines())
             .contains("  미적용 @NotBlank(message=\"안쪽\")")
     }
@@ -326,6 +328,10 @@ interface ConvertingInnerProbe {
 }
 
 data class InterfaceConvertProbe(override val inner: InnerFormProbe) : ConvertingInnerProbe
+
+interface ChildConvertingInnerProbe : ConvertingInnerProbe
+
+data class GrandInterfaceConvertProbe(override val inner: InnerFormProbe) : ChildConvertingInnerProbe
 
 data class ParameterConvertProbe(@Valid @ConvertGroup(to = GroupProbe::class) val inner: InnerFormProbe)
 

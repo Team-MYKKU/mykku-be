@@ -3,8 +3,8 @@ package com.example.mykku.contract.schema
 import jakarta.validation.GroupSequence
 import jakarta.validation.groups.ConvertGroup
 import org.hibernate.validator.group.GroupSequenceProvider
-import org.springframework.util.ClassUtils
 import java.lang.reflect.AnnotatedElement
+import kotlin.reflect.full.allSuperclasses
 
 object GroupFeatures {
 
@@ -32,7 +32,7 @@ object GroupFeatures {
         generateSequence(klass) { it.superclass }.takeWhile { it != Any::class.java }.toList()
 
     private fun beanTypes(klass: Class<*>): List<Class<*>> =
-        superclasses(klass).flatMap { listOf(it) + ClassUtils.getAllInterfacesForClassAsSet(it) }.distinct()
+        (listOf(klass) + klass.kotlin.allSuperclasses.map { it.java }).filter { it != Any::class.java }.distinct()
 
     private fun members(type: Class<*>): List<Pair<String, AnnotatedElement>> =
         type.declaredFields.map { it.name to it } + type.declaredMethods.map { it.name to it }

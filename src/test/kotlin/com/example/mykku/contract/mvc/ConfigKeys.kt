@@ -51,7 +51,7 @@ object ConfigKeys {
     }
 
     private fun elementIdentity(key: String): String =
-        identity(key.replace(MAP_KEY) { ".${it.groupValues[1].lowercase()}" })
+        identity(key.replace(MAP_KEY) { ".${element(it.groupValues[1])}" })
 
     private fun element(element: String): String {
         val base = element.substringBefore('[')
