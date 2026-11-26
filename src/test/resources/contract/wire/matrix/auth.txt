@@ -1,0 +1,517 @@
+required | none | POST /api/v1/auth/logout body={"deviceId":"matrix-device"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | POST /api/v1/auth/logout body={"deviceId":"matrix-device"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | POST /api/v1/auth/logout body={"deviceId":"matrix-device"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | POST /api/v1/auth/logout body={"deviceId":"matrix-device"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | POST /api/v1/auth/logout body={"deviceId":"matrix-device"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | POST /api/v1/auth/logout body={"deviceId":"matrix-device"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | GET /api/v1/blocks/keywords | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | GET /api/v1/blocks/keywords | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | GET /api/v1/blocks/keywords | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | GET /api/v1/blocks/keywords | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | GET /api/v1/blocks/keywords | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | GET /api/v1/blocks/keywords | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | POST /api/v1/blocks/keywords body={"keyword":"matrixkeyword"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | POST /api/v1/blocks/keywords body={"keyword":"matrixkeyword"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | POST /api/v1/blocks/keywords body={"keyword":"matrixkeyword"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | POST /api/v1/blocks/keywords body={"keyword":"matrixkeyword"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | POST /api/v1/blocks/keywords body={"keyword":"matrixkeyword"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | POST /api/v1/blocks/keywords body={"keyword":"matrixkeyword"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | DELETE /api/v1/blocks/keywords/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | DELETE /api/v1/blocks/keywords/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | DELETE /api/v1/blocks/keywords/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | DELETE /api/v1/blocks/keywords/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | DELETE /api/v1/blocks/keywords/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | DELETE /api/v1/blocks/keywords/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | GET /api/v1/blocks/members | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | GET /api/v1/blocks/members | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | GET /api/v1/blocks/members | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | GET /api/v1/blocks/members | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | GET /api/v1/blocks/members | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | GET /api/v1/blocks/members | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | POST /api/v1/blocks/members body={"memberId":"matrixabsent"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | POST /api/v1/blocks/members body={"memberId":"matrixabsent"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | POST /api/v1/blocks/members body={"memberId":"matrixabsent"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | POST /api/v1/blocks/members body={"memberId":"matrixabsent"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | POST /api/v1/blocks/members body={"memberId":"matrixabsent"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | POST /api/v1/blocks/members body={"memberId":"matrixabsent"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | DELETE /api/v1/blocks/members/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | DELETE /api/v1/blocks/members/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | DELETE /api/v1/blocks/members/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | DELETE /api/v1/blocks/members/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | DELETE /api/v1/blocks/members/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | DELETE /api/v1/blocks/members/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | GET /api/v1/contests | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | GET /api/v1/contests | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | GET /api/v1/contests | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | GET /api/v1/contests | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | GET /api/v1/contests | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | GET /api/v1/contests | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | GET /api/v1/contests/my-awards | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | GET /api/v1/contests/my-awards | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | GET /api/v1/contests/my-awards | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | GET /api/v1/contests/my-awards | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | GET /api/v1/contests/my-awards | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | GET /api/v1/contests/my-awards | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | GET /api/v1/contests/my-awards/feeds | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | GET /api/v1/contests/my-awards/feeds | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | GET /api/v1/contests/my-awards/feeds | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | GET /api/v1/contests/my-awards/feeds | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | GET /api/v1/contests/my-awards/feeds | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | GET /api/v1/contests/my-awards/feeds | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | GET /api/v1/contests/my-awards/preview | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | GET /api/v1/contests/my-awards/preview | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | GET /api/v1/contests/my-awards/preview | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | GET /api/v1/contests/my-awards/preview | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | GET /api/v1/contests/my-awards/preview | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | GET /api/v1/contests/my-awards/preview | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | PATCH /api/v1/contests/winners/999999/acceptance-speech body={"acceptanceSpeech":"matrix speech"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | PATCH /api/v1/contests/winners/999999/acceptance-speech body={"acceptanceSpeech":"matrix speech"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | PATCH /api/v1/contests/winners/999999/acceptance-speech body={"acceptanceSpeech":"matrix speech"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | PATCH /api/v1/contests/winners/999999/acceptance-speech body={"acceptanceSpeech":"matrix speech"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | PATCH /api/v1/contests/winners/999999/acceptance-speech body={"acceptanceSpeech":"matrix speech"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | PATCH /api/v1/contests/winners/999999/acceptance-speech body={"acceptanceSpeech":"matrix speech"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | GET /api/v1/contests/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | GET /api/v1/contests/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | GET /api/v1/contests/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | GET /api/v1/contests/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | GET /api/v1/contests/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | GET /api/v1/contests/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | GET /api/v1/contests/999999/my-winner-status | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | GET /api/v1/contests/999999/my-winner-status | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | GET /api/v1/contests/999999/my-winner-status | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | GET /api/v1/contests/999999/my-winner-status | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | GET /api/v1/contests/999999/my-winner-status | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | GET /api/v1/contests/999999/my-winner-status | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | DELETE /api/v1/daily-messages/comments/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | DELETE /api/v1/daily-messages/comments/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | DELETE /api/v1/daily-messages/comments/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | DELETE /api/v1/daily-messages/comments/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | DELETE /api/v1/daily-messages/comments/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | DELETE /api/v1/daily-messages/comments/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | PUT /api/v1/daily-messages/comments/999999 body={"content":"matrix comment"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | PUT /api/v1/daily-messages/comments/999999 body={"content":"matrix comment"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | PUT /api/v1/daily-messages/comments/999999 body={"content":"matrix comment"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | PUT /api/v1/daily-messages/comments/999999 body={"content":"matrix comment"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | PUT /api/v1/daily-messages/comments/999999 body={"content":"matrix comment"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | PUT /api/v1/daily-messages/comments/999999 body={"content":"matrix comment"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | POST /api/v1/daily-messages/999999/comments body={"content":"matrix comment"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | POST /api/v1/daily-messages/999999/comments body={"content":"matrix comment"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | POST /api/v1/daily-messages/999999/comments body={"content":"matrix comment"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | POST /api/v1/daily-messages/999999/comments body={"content":"matrix comment"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | POST /api/v1/daily-messages/999999/comments body={"content":"matrix comment"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | POST /api/v1/daily-messages/999999/comments body={"content":"matrix comment"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | GET /api/v1/events | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | GET /api/v1/events | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | GET /api/v1/events | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | GET /api/v1/events | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | GET /api/v1/events | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | GET /api/v1/events | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | GET /api/v1/events/my-awards | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | GET /api/v1/events/my-awards | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | GET /api/v1/events/my-awards | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | GET /api/v1/events/my-awards | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | GET /api/v1/events/my-awards | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | GET /api/v1/events/my-awards | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | GET /api/v1/events/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | GET /api/v1/events/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | GET /api/v1/events/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | GET /api/v1/events/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | GET /api/v1/events/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | GET /api/v1/events/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | GET /api/v1/events/999999/my-winner-status | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | GET /api/v1/events/999999/my-winner-status | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | GET /api/v1/events/999999/my-winner-status | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | GET /api/v1/events/999999/my-winner-status | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | GET /api/v1/events/999999/my-winner-status | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | GET /api/v1/events/999999/my-winner-status | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | GET /api/v1/fcm-tokens | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | GET /api/v1/fcm-tokens | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | GET /api/v1/fcm-tokens | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | GET /api/v1/fcm-tokens | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | GET /api/v1/fcm-tokens | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | GET /api/v1/fcm-tokens | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | POST /api/v1/fcm-tokens body={"token":"matrix-fcm-token","deviceId":"matrix-device"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | POST /api/v1/fcm-tokens body={"token":"matrix-fcm-token","deviceId":"matrix-device"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | POST /api/v1/fcm-tokens body={"token":"matrix-fcm-token","deviceId":"matrix-device"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | POST /api/v1/fcm-tokens body={"token":"matrix-fcm-token","deviceId":"matrix-device"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | POST /api/v1/fcm-tokens body={"token":"matrix-fcm-token","deviceId":"matrix-device"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | POST /api/v1/fcm-tokens body={"token":"matrix-fcm-token","deviceId":"matrix-device"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | DELETE /api/v1/fcm-tokens/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | DELETE /api/v1/fcm-tokens/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | DELETE /api/v1/fcm-tokens/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | DELETE /api/v1/fcm-tokens/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | DELETE /api/v1/fcm-tokens/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | DELETE /api/v1/fcm-tokens/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | POST /api/v1/feeds multipart[request={"title":"matrix","content":"matrix","boardId":9201,"tags":[]}] | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | POST /api/v1/feeds multipart[request={"title":"matrix","content":"matrix","boardId":9201,"tags":[]}] | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | POST /api/v1/feeds multipart[request={"title":"matrix","content":"matrix","boardId":9201,"tags":[]}] | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | POST /api/v1/feeds multipart[request={"title":"matrix","content":"matrix","boardId":9201,"tags":[]}] | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | POST /api/v1/feeds multipart[request={"title":"matrix","content":"matrix","boardId":9201,"tags":[]}] | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | POST /api/v1/feeds multipart[request={"title":"matrix","content":"matrix","boardId":9201,"tags":[]}] | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | DELETE /api/v1/feeds/comments/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | DELETE /api/v1/feeds/comments/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | DELETE /api/v1/feeds/comments/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | DELETE /api/v1/feeds/comments/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | DELETE /api/v1/feeds/comments/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | DELETE /api/v1/feeds/comments/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | PUT /api/v1/feeds/comments/999999 body={"content":"matrix comment"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | PUT /api/v1/feeds/comments/999999 body={"content":"matrix comment"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | PUT /api/v1/feeds/comments/999999 body={"content":"matrix comment"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | PUT /api/v1/feeds/comments/999999 body={"content":"matrix comment"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | PUT /api/v1/feeds/comments/999999 body={"content":"matrix comment"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | PUT /api/v1/feeds/comments/999999 body={"content":"matrix comment"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | DELETE /api/v1/feeds/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | DELETE /api/v1/feeds/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | DELETE /api/v1/feeds/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | DELETE /api/v1/feeds/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | DELETE /api/v1/feeds/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | DELETE /api/v1/feeds/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | PATCH /api/v1/feeds/999999 multipart[request={"title":"matrix"}] | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | PATCH /api/v1/feeds/999999 multipart[request={"title":"matrix"}] | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | PATCH /api/v1/feeds/999999 multipart[request={"title":"matrix"}] | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | PATCH /api/v1/feeds/999999 multipart[request={"title":"matrix"}] | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | PATCH /api/v1/feeds/999999 multipart[request={"title":"matrix"}] | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | PATCH /api/v1/feeds/999999 multipart[request={"title":"matrix"}] | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | POST /api/v1/feeds/999999/comments body={"content":"matrix comment"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | POST /api/v1/feeds/999999/comments body={"content":"matrix comment"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | POST /api/v1/feeds/999999/comments body={"content":"matrix comment"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | POST /api/v1/feeds/999999/comments body={"content":"matrix comment"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | POST /api/v1/feeds/999999/comments body={"content":"matrix comment"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | POST /api/v1/feeds/999999/comments body={"content":"matrix comment"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | GET /api/v1/likes/boards | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | GET /api/v1/likes/boards | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | GET /api/v1/likes/boards | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | GET /api/v1/likes/boards | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | GET /api/v1/likes/boards | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | GET /api/v1/likes/boards | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | DELETE /api/v1/likes/boards/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | DELETE /api/v1/likes/boards/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | DELETE /api/v1/likes/boards/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | DELETE /api/v1/likes/boards/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | DELETE /api/v1/likes/boards/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | DELETE /api/v1/likes/boards/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | POST /api/v1/likes/boards/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | POST /api/v1/likes/boards/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | POST /api/v1/likes/boards/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | POST /api/v1/likes/boards/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | POST /api/v1/likes/boards/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | POST /api/v1/likes/boards/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | DELETE /api/v1/likes/daily-message-comments/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | DELETE /api/v1/likes/daily-message-comments/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | DELETE /api/v1/likes/daily-message-comments/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | DELETE /api/v1/likes/daily-message-comments/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | DELETE /api/v1/likes/daily-message-comments/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | DELETE /api/v1/likes/daily-message-comments/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | POST /api/v1/likes/daily-message-comments/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | POST /api/v1/likes/daily-message-comments/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | POST /api/v1/likes/daily-message-comments/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | POST /api/v1/likes/daily-message-comments/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | POST /api/v1/likes/daily-message-comments/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | POST /api/v1/likes/daily-message-comments/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | DELETE /api/v1/likes/feed-comments/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | DELETE /api/v1/likes/feed-comments/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | DELETE /api/v1/likes/feed-comments/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | DELETE /api/v1/likes/feed-comments/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | DELETE /api/v1/likes/feed-comments/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | DELETE /api/v1/likes/feed-comments/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | POST /api/v1/likes/feed-comments/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | POST /api/v1/likes/feed-comments/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | POST /api/v1/likes/feed-comments/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | POST /api/v1/likes/feed-comments/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | POST /api/v1/likes/feed-comments/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | POST /api/v1/likes/feed-comments/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | DELETE /api/v1/likes/feeds/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | DELETE /api/v1/likes/feeds/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | DELETE /api/v1/likes/feeds/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | DELETE /api/v1/likes/feeds/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | DELETE /api/v1/likes/feeds/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | DELETE /api/v1/likes/feeds/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | POST /api/v1/likes/feeds/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | POST /api/v1/likes/feeds/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | POST /api/v1/likes/feeds/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | POST /api/v1/likes/feeds/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | POST /api/v1/likes/feeds/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | POST /api/v1/likes/feeds/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | DELETE /api/v1/members/me | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | DELETE /api/v1/members/me | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | DELETE /api/v1/members/me | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | DELETE /api/v1/members/me | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | DELETE /api/v1/members/me | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | DELETE /api/v1/members/me | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | GET /api/v1/members/me | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | GET /api/v1/members/me | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | GET /api/v1/members/me | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | GET /api/v1/members/me | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | GET /api/v1/members/me | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | GET /api/v1/members/me | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | PATCH /api/v1/members/me body={"nickname":"matrix"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | PATCH /api/v1/members/me body={"nickname":"matrix"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | PATCH /api/v1/members/me body={"nickname":"matrix"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | PATCH /api/v1/members/me body={"nickname":"matrix"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | PATCH /api/v1/members/me body={"nickname":"matrix"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | PATCH /api/v1/members/me body={"nickname":"matrix"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | PATCH /api/v1/members/me multipart[request={"nickname":"matrix"}] | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | PATCH /api/v1/members/me multipart[request={"nickname":"matrix"}] | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | PATCH /api/v1/members/me multipart[request={"nickname":"matrix"}] | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | PATCH /api/v1/members/me multipart[request={"nickname":"matrix"}] | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | PATCH /api/v1/members/me multipart[request={"nickname":"matrix"}] | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | PATCH /api/v1/members/me multipart[request={"nickname":"matrix"}] | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | GET /api/v1/members/me/contests | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | GET /api/v1/members/me/contests | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | GET /api/v1/members/me/contests | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | GET /api/v1/members/me/contests | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | GET /api/v1/members/me/contests | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | GET /api/v1/members/me/contests | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | GET /api/v1/members/me/events | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | GET /api/v1/members/me/events | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | GET /api/v1/members/me/events | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | GET /api/v1/members/me/events | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | GET /api/v1/members/me/events | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | GET /api/v1/members/me/events | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | GET /api/v1/members/me/feeds | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | GET /api/v1/members/me/feeds | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | GET /api/v1/members/me/feeds | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | GET /api/v1/members/me/feeds | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | GET /api/v1/members/me/feeds | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | GET /api/v1/members/me/feeds | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | PATCH /api/v1/members/me/member-id body={"memberId":"matrixchanged"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | PATCH /api/v1/members/me/member-id body={"memberId":"matrixchanged"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | PATCH /api/v1/members/me/member-id body={"memberId":"matrixchanged"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | PATCH /api/v1/members/me/member-id body={"memberId":"matrixchanged"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | PATCH /api/v1/members/me/member-id body={"memberId":"matrixchanged"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | PATCH /api/v1/members/me/member-id body={"memberId":"matrixchanged"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | PUT /api/v1/members/password body={"currentPassword":"matrix-current-1!","newPassword":"matrix123!"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | PUT /api/v1/members/password body={"currentPassword":"matrix-current-1!","newPassword":"matrix123!"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | PUT /api/v1/members/password body={"currentPassword":"matrix-current-1!","newPassword":"matrix123!"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | PUT /api/v1/members/password body={"currentPassword":"matrix-current-1!","newPassword":"matrix123!"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | PUT /api/v1/members/password body={"currentPassword":"matrix-current-1!","newPassword":"matrix123!"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | PUT /api/v1/members/password body={"currentPassword":"matrix-current-1!","newPassword":"matrix123!"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | POST /api/v1/members/setup-profile body={"memberId":"matrixsetup","nickname":"matrix"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | POST /api/v1/members/setup-profile body={"memberId":"matrixsetup","nickname":"matrix"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | POST /api/v1/members/setup-profile body={"memberId":"matrixsetup","nickname":"matrix"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | POST /api/v1/members/setup-profile body={"memberId":"matrixsetup","nickname":"matrix"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | POST /api/v1/members/setup-profile body={"memberId":"matrixsetup","nickname":"matrix"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | POST /api/v1/members/setup-profile body={"memberId":"matrixsetup","nickname":"matrix"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | GET /api/v1/notification-settings | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | GET /api/v1/notification-settings | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | GET /api/v1/notification-settings | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | GET /api/v1/notification-settings | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | GET /api/v1/notification-settings | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | GET /api/v1/notification-settings | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | PATCH /api/v1/notification-settings body={"notificationType":"FEED_LIKE","isEnabled":true} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | PATCH /api/v1/notification-settings body={"notificationType":"FEED_LIKE","isEnabled":true} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | PATCH /api/v1/notification-settings body={"notificationType":"FEED_LIKE","isEnabled":true} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | PATCH /api/v1/notification-settings body={"notificationType":"FEED_LIKE","isEnabled":true} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | PATCH /api/v1/notification-settings body={"notificationType":"FEED_LIKE","isEnabled":true} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | PATCH /api/v1/notification-settings body={"notificationType":"FEED_LIKE","isEnabled":true} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | GET /api/v1/notifications | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | GET /api/v1/notifications | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | GET /api/v1/notifications | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | GET /api/v1/notifications | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | GET /api/v1/notifications | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | GET /api/v1/notifications | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | PATCH /api/v1/notifications/read-all | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | PATCH /api/v1/notifications/read-all | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | PATCH /api/v1/notifications/read-all | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | PATCH /api/v1/notifications/read-all | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | PATCH /api/v1/notifications/read-all | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | PATCH /api/v1/notifications/read-all | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | GET /api/v1/notifications/unread | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | GET /api/v1/notifications/unread | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | GET /api/v1/notifications/unread | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | GET /api/v1/notifications/unread | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | GET /api/v1/notifications/unread | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | GET /api/v1/notifications/unread | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | GET /api/v1/notifications/unread/count | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | GET /api/v1/notifications/unread/count | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | GET /api/v1/notifications/unread/count | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | GET /api/v1/notifications/unread/count | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | GET /api/v1/notifications/unread/count | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | GET /api/v1/notifications/unread/count | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | DELETE /api/v1/notifications/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | DELETE /api/v1/notifications/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | DELETE /api/v1/notifications/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | DELETE /api/v1/notifications/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | DELETE /api/v1/notifications/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | DELETE /api/v1/notifications/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | PATCH /api/v1/notifications/999999/read | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | PATCH /api/v1/notifications/999999/read | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | PATCH /api/v1/notifications/999999/read | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | PATCH /api/v1/notifications/999999/read | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | PATCH /api/v1/notifications/999999/read | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | PATCH /api/v1/notifications/999999/read | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | GET /api/v1/preferences/genre | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | GET /api/v1/preferences/genre | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | GET /api/v1/preferences/genre | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | GET /api/v1/preferences/genre | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | GET /api/v1/preferences/genre | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | GET /api/v1/preferences/genre | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | POST /api/v1/preferences/genre body={"genreTypes":["KPOP"]} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | POST /api/v1/preferences/genre body={"genreTypes":["KPOP"]} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | POST /api/v1/preferences/genre body={"genreTypes":["KPOP"]} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | POST /api/v1/preferences/genre body={"genreTypes":["KPOP"]} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | POST /api/v1/preferences/genre body={"genreTypes":["KPOP"]} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | POST /api/v1/preferences/genre body={"genreTypes":["KPOP"]} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | GET /api/v1/preferences/goods | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | GET /api/v1/preferences/goods | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | GET /api/v1/preferences/goods | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | GET /api/v1/preferences/goods | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | GET /api/v1/preferences/goods | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | GET /api/v1/preferences/goods | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | POST /api/v1/preferences/goods body={"goodsTypes":["UCHIWA"]} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | POST /api/v1/preferences/goods body={"goodsTypes":["UCHIWA"]} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | POST /api/v1/preferences/goods body={"goodsTypes":["UCHIWA"]} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | POST /api/v1/preferences/goods body={"goodsTypes":["UCHIWA"]} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | POST /api/v1/preferences/goods body={"goodsTypes":["UCHIWA"]} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | POST /api/v1/preferences/goods body={"goodsTypes":["UCHIWA"]} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | GET /api/v1/preferences/mood | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | GET /api/v1/preferences/mood | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | GET /api/v1/preferences/mood | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | GET /api/v1/preferences/mood | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | GET /api/v1/preferences/mood | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | GET /api/v1/preferences/mood | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | POST /api/v1/preferences/mood body={"moodTypes":["COZY"]} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | POST /api/v1/preferences/mood body={"moodTypes":["COZY"]} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | POST /api/v1/preferences/mood body={"moodTypes":["COZY"]} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | POST /api/v1/preferences/mood body={"moodTypes":["COZY"]} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | POST /api/v1/preferences/mood body={"moodTypes":["COZY"]} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | POST /api/v1/preferences/mood body={"moodTypes":["COZY"]} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | POST /api/v1/reports body={"targetType":"FEED","targetId":999999,"reason":"SPAM"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | POST /api/v1/reports body={"targetType":"FEED","targetId":999999,"reason":"SPAM"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | POST /api/v1/reports body={"targetType":"FEED","targetId":999999,"reason":"SPAM"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | POST /api/v1/reports body={"targetType":"FEED","targetId":999999,"reason":"SPAM"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | POST /api/v1/reports body={"targetType":"FEED","targetId":999999,"reason":"SPAM"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | POST /api/v1/reports body={"targetType":"FEED","targetId":999999,"reason":"SPAM"} | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | GET /api/v1/roles | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | GET /api/v1/roles | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | GET /api/v1/roles | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | GET /api/v1/roles | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | GET /api/v1/roles | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | GET /api/v1/roles | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | GET /api/v1/roles/me | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | GET /api/v1/roles/me | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | GET /api/v1/roles/me | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | GET /api/v1/roles/me | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | GET /api/v1/roles/me | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | GET /api/v1/roles/me | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | GET /api/v1/roles/me/new | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | GET /api/v1/roles/me/new | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | GET /api/v1/roles/me/new | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | GET /api/v1/roles/me/new | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | GET /api/v1/roles/me/new | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | GET /api/v1/roles/me/new | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | PATCH /api/v1/roles/999999/representative | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | PATCH /api/v1/roles/999999/representative | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | PATCH /api/v1/roles/999999/representative | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | PATCH /api/v1/roles/999999/representative | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | PATCH /api/v1/roles/999999/representative | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | PATCH /api/v1/roles/999999/representative | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+optional | none | GET /api/v1/boards/9201/feeds | 200 application/json {"message":"보드별 피드 목록을 성공적으로 조회했습니다.","data":{"feeds":[],"currentPage":0,"totalPages":0,"totalElements":0,"size":20,"hasNext":false,"hasPrevious":false}}
+optional | bearer-x | GET /api/v1/boards/9201/feeds | = none
+optional | lowercase-bearer | GET /api/v1/boards/9201/feeds | = none
+optional | double-space | GET /api/v1/boards/9201/feeds | = none
+optional | refresh-token | GET /api/v1/boards/9201/feeds | = none
+optional | withdrawn-member | GET /api/v1/boards/9201/feeds | = none
+optional | none | GET /api/v1/boards/9201/feeds/popular | 200 application/json {"message":"인기 피드 목록을 성공적으로 조회했습니다.","data":{"feeds":[]}}
+optional | bearer-x | GET /api/v1/boards/9201/feeds/popular | = none
+optional | lowercase-bearer | GET /api/v1/boards/9201/feeds/popular | = none
+optional | double-space | GET /api/v1/boards/9201/feeds/popular | = none
+optional | refresh-token | GET /api/v1/boards/9201/feeds/popular | = none
+optional | withdrawn-member | GET /api/v1/boards/9201/feeds/popular | = none
+optional | none | GET /api/v1/daily-messages/9401/comments | 200 application/json {"message":"댓글 목록을 성공적으로 조회했습니다.","data":{"comments":[],"totalElements":0,"totalPages":0,"currentPage":0,"pageSize":20,"hasNext":false}}
+optional | bearer-x | GET /api/v1/daily-messages/9401/comments | = none
+optional | lowercase-bearer | GET /api/v1/daily-messages/9401/comments | = none
+optional | double-space | GET /api/v1/daily-messages/9401/comments | = none
+optional | refresh-token | GET /api/v1/daily-messages/9401/comments | = none
+optional | withdrawn-member | GET /api/v1/daily-messages/9401/comments | = none
+optional | none | GET /api/v1/daily-messages/9401 | 200 application/json {"message":"하루 덕담 데이터 불러오기에 성공했습니다.","data":{"id":9401,"title":"matrix daily message","content":"matrix daily content","date":"2001-02-03","createdAt":"2001-02-03T04:05:06.123456"}}
+optional | bearer-x | GET /api/v1/daily-messages/9401 | = none
+optional | lowercase-bearer | GET /api/v1/daily-messages/9401 | = none
+optional | double-space | GET /api/v1/daily-messages/9401 | = none
+optional | refresh-token | GET /api/v1/daily-messages/9401 | = none
+optional | withdrawn-member | GET /api/v1/daily-messages/9401 | = none
+optional | none | GET /api/v1/fan-notes/9501 | 200 application/json {"message":"덕질노트 상세 조회 성공","data":{"id":9501,"title":"matrix fan note","subtitle":null,"content":null,"productionDate":"2001-02-03","coverImageUrl":null,"pages":[]}}
+optional | bearer-x | GET /api/v1/fan-notes/9501 | = none
+optional | lowercase-bearer | GET /api/v1/fan-notes/9501 | = none
+optional | double-space | GET /api/v1/fan-notes/9501 | = none
+optional | refresh-token | GET /api/v1/fan-notes/9501 | = none
+optional | withdrawn-member | GET /api/v1/fan-notes/9501 | = none
+optional | none | GET /api/v1/feeds/9301 | 200 application/json {"message":"피드 상세 정보를 성공적으로 조회했습니다.","data":{"id":9301,"author":{"memberId":"matrixauthor","nickname":"매트릭스작성자","profileImage":"","role":null},"boardId":9202,"boardTitle":"matrix board 2","createdAt":"2001-02-03T04:05:06.123456","updatedAt":"2001-02-03T04:05:06.123456","title":"matrix feed","content":"matrix feed content","images":[],"tags":[],"likeCount":0,"isLiked":false,"commentCount":0}}
+optional | bearer-x | GET /api/v1/feeds/9301 | = none
+optional | lowercase-bearer | GET /api/v1/feeds/9301 | = none
+optional | double-space | GET /api/v1/feeds/9301 | = none
+optional | refresh-token | GET /api/v1/feeds/9301 | = none
+optional | withdrawn-member | GET /api/v1/feeds/9301 | = none
+optional | none | GET /api/v1/feeds/9301/comments | 200 application/json {"message":"댓글 목록을 성공적으로 조회했습니다.","data":{"comments":[],"totalElements":0,"totalPages":0,"currentPage":0,"pageSize":20,"hasNext":false}}
+optional | bearer-x | GET /api/v1/feeds/9301/comments | = none
+optional | lowercase-bearer | GET /api/v1/feeds/9301/comments | = none
+optional | double-space | GET /api/v1/feeds/9301/comments | = none
+optional | refresh-token | GET /api/v1/feeds/9301/comments | = none
+optional | withdrawn-member | GET /api/v1/feeds/9301/comments | = none
+optional | none | GET /api/v1/search/feeds?keyword=nomatch | 200 application/json {"message":"피드 검색 결과를 성공적으로 조회했습니다.","data":{"boards":[]}}
+optional | bearer-x | GET /api/v1/search/feeds?keyword=nomatch | = none
+optional | lowercase-bearer | GET /api/v1/search/feeds?keyword=nomatch | = none
+optional | double-space | GET /api/v1/search/feeds?keyword=nomatch | = none
+optional | refresh-token | GET /api/v1/search/feeds?keyword=nomatch | = none
+optional | withdrawn-member | GET /api/v1/search/feeds?keyword=nomatch | = none
+optional | none | GET /api/v1/search/feeds/boards/9201?keyword=nomatch | 200 application/json {"message":"게시판 피드 검색 결과를 성공적으로 조회했습니다.","data":{"feeds":[],"currentPage":0,"totalPages":0,"totalElements":0,"size":20,"hasNext":false,"hasPrevious":false}}
+optional | bearer-x | GET /api/v1/search/feeds/boards/9201?keyword=nomatch | = none
+optional | lowercase-bearer | GET /api/v1/search/feeds/boards/9201?keyword=nomatch | = none
+optional | double-space | GET /api/v1/search/feeds/boards/9201?keyword=nomatch | = none
+optional | refresh-token | GET /api/v1/search/feeds/boards/9201?keyword=nomatch | = none
+optional | withdrawn-member | GET /api/v1/search/feeds/boards/9201?keyword=nomatch | = none
+precedence | none+query:status | GET /api/v1/contests?status=abc | 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
+precedence | none+query:sortType | GET /api/v1/contests?sortType=abc | 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
+precedence | none+query:page | GET /api/v1/contests?page=abc | 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
+precedence | none+query:size | GET /api/v1/contests?size=abc | 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
+precedence | none+query:page | GET /api/v1/contests/my-awards?page=abc | 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
+precedence | none+query:size | GET /api/v1/contests/my-awards?size=abc | 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
+precedence | none+query:page | GET /api/v1/contests/my-awards/feeds?page=abc | 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
+precedence | none+query:size | GET /api/v1/contests/my-awards/feeds?size=abc | 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
+precedence | none+path:winnerId | PATCH /api/v1/contests/winners/abc/acceptance-speech body={"acceptanceSpeech":"matrix speech"} | 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
+precedence | none+path:contestId | GET /api/v1/contests/abc | 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
+precedence | none+path:contestId | GET /api/v1/contests/abc/my-winner-status | 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
+precedence | none+path:commentId | DELETE /api/v1/daily-messages/comments/abc | 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
+precedence | none+path:commentId | PUT /api/v1/daily-messages/comments/abc body={"content":"matrix comment"} | 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
+precedence | none+body:malformed | PUT /api/v1/daily-messages/comments/999999 body={ | 400 application/json {"code":"C101","message":"입력값이 올바르지 않습니다"}
+precedence | none+path:dailyMessageId | POST /api/v1/daily-messages/abc/comments body={"content":"matrix comment"} | 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
+precedence | none+body:malformed | POST /api/v1/daily-messages/999999/comments body={ | 400 application/json {"code":"C101","message":"입력값이 올바르지 않습니다"}
+precedence | none+query:status | GET /api/v1/events?status=abc | 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
+precedence | none+query:sortType | GET /api/v1/events?sortType=abc | 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
+precedence | none+query:page | GET /api/v1/events?page=abc | 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
+precedence | none+query:size | GET /api/v1/events?size=abc | 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
+precedence | none+query:page | GET /api/v1/events/my-awards?page=abc | 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
+precedence | none+query:size | GET /api/v1/events/my-awards?size=abc | 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
+precedence | none+path:eventId | GET /api/v1/events/abc | 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
+precedence | none+path:eventId | GET /api/v1/events/abc/my-winner-status | 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
+precedence | none+part:request:malformed | POST /api/v1/feeds multipart[request={] | 400 application/json {"code":"C101","message":"입력값이 올바르지 않습니다"}
+precedence | none+part:request:constraint | POST /api/v1/feeds multipart[request={"title":"","content":"matrix","boardId":9201,"tags":[]}] | 400 application/json {"code":"C101","message":"제목은 필수입니다"}
+precedence | none+path:commentId | DELETE /api/v1/feeds/comments/abc | 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
+precedence | none+path:commentId | PUT /api/v1/feeds/comments/abc body={"content":"matrix comment"} | 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
+precedence | none+body:malformed | PUT /api/v1/feeds/comments/999999 body={ | 400 application/json {"code":"C101","message":"입력값이 올바르지 않습니다"}
+precedence | none+path:feedId | DELETE /api/v1/feeds/abc | 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
+precedence | none+path:feedId | PATCH /api/v1/feeds/abc multipart[request={"title":"matrix"}] | 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
+precedence | none+part:request:malformed | PATCH /api/v1/feeds/999999 multipart[request={] | 400 application/json {"code":"C101","message":"입력값이 올바르지 않습니다"}
+precedence | none+part:request:constraint | PATCH /api/v1/feeds/999999 multipart[request={"tags":["t1","t2","t3","t4","t5","t6","t7","t8"]}] | 400 application/json {"code":"C101","message":"태그는 7개 이하여야 합니다"}
+precedence | none+path:feedId | POST /api/v1/feeds/abc/comments body={"content":"matrix comment"} | 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
+precedence | none+body:malformed | POST /api/v1/feeds/999999/comments body={ | 400 application/json {"code":"C101","message":"입력값이 올바르지 않습니다"}
+precedence | none+path:boardId | DELETE /api/v1/likes/boards/abc | 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
+precedence | none+path:boardId | POST /api/v1/likes/boards/abc | 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
+precedence | none+path:dailyMessageCommentId | DELETE /api/v1/likes/daily-message-comments/abc | 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
+precedence | none+path:dailyMessageCommentId | POST /api/v1/likes/daily-message-comments/abc | 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
+precedence | none+path:feedCommentId | DELETE /api/v1/likes/feed-comments/abc | 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
+precedence | none+path:feedCommentId | POST /api/v1/likes/feed-comments/abc | 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
+precedence | none+path:feedId | DELETE /api/v1/likes/feeds/abc | 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
+precedence | none+path:feedId | POST /api/v1/likes/feeds/abc | 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
+precedence | none+query:page | GET /api/v1/members/me/contests?page=abc | 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
+precedence | none+query:size | GET /api/v1/members/me/contests?size=abc | 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
+precedence | none+query:page | GET /api/v1/members/me/events?page=abc | 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
+precedence | none+query:size | GET /api/v1/members/me/events?size=abc | 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
+precedence | none+query:page | GET /api/v1/members/me/feeds?page=abc | 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
+precedence | none+query:size | GET /api/v1/members/me/feeds?size=abc | 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
+precedence | none+path:notificationId | DELETE /api/v1/notifications/abc | 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
+precedence | none+path:notificationId | PATCH /api/v1/notifications/abc/read | 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
+precedence | none+body:malformed | POST /api/v1/preferences/genre body={ | 400 application/json {"code":"C101","message":"입력값이 올바르지 않습니다"}
+precedence | none+body:malformed | POST /api/v1/preferences/goods body={ | 400 application/json {"code":"C101","message":"입력값이 올바르지 않습니다"}
+precedence | none+body:malformed | POST /api/v1/preferences/mood body={ | 400 application/json {"code":"C101","message":"입력값이 올바르지 않습니다"}
+precedence | none+path:memberRoleId | PATCH /api/v1/roles/abc/representative | 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}

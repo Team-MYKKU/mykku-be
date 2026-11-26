@@ -1,0 +1,40 @@
+excluded | GET /api/error-codes/{domain} | wire/error-codes 골든이 고정
+DELETE /api/v1/blocks/keywords/999999 | 404 application/json {"code":"BL003","message":"키워드 차단 정보를 찾을 수 없습니다"}
+DELETE /api/v1/blocks/members/999999 | 404 application/json {"code":"MB001","message":"회원을 찾을 수 없습니다"}
+GET /api/v1/boards/999999/feeds | 404 application/json {"code":"BO001","message":"게시판을 찾을 수 없습니다"}
+GET /api/v1/boards/999999/feeds/popular | 404 application/json {"code":"BO001","message":"게시판을 찾을 수 없습니다"}
+PATCH /api/v1/contests/winners/999999/acceptance-speech body={"acceptanceSpeech":"matrix speech"} | 404 application/json {"code":"CN002","message":"콘테스트 수상자를 찾을 수 없습니다"}
+GET /api/v1/contests/999999 | 404 application/json {"code":"CN001","message":"콘테스트를 찾을 수 없습니다"}
+GET /api/v1/contests/999999/my-winner-status | 404 application/json {"code":"CN001","message":"콘테스트를 찾을 수 없습니다"}
+GET /api/v1/contests/999999/winner-announcement | 404 application/json {"code":"CN001","message":"콘테스트를 찾을 수 없습니다"}
+GET /api/v1/contests/999999/winners | 404 application/json {"code":"CN001","message":"콘테스트를 찾을 수 없습니다"}
+DELETE /api/v1/daily-messages/comments/999999 | 404 application/json {"code":"DM002","message":"일상 메시지 댓글을 찾을 수 없습니다"}
+PUT /api/v1/daily-messages/comments/999999 body={"content":"matrix comment"} | 404 application/json {"code":"DM002","message":"일상 메시지 댓글을 찾을 수 없습니다"}
+GET /api/v1/daily-messages/999999/comments | 404 application/json {"code":"DM001","message":"일상 메시지를 찾을 수 없습니다"}
+POST /api/v1/daily-messages/999999/comments body={"content":"matrix comment"} | 404 application/json {"code":"DM001","message":"일상 메시지를 찾을 수 없습니다"}
+GET /api/v1/daily-messages/999999 | 404 application/json {"code":"DM001","message":"일상 메시지를 찾을 수 없습니다"}
+GET /api/v1/events/999999 | 404 application/json {"code":"EV001","message":"이벤트를 찾을 수 없습니다"}
+GET /api/v1/events/999999/my-winner-status | 404 application/json {"code":"EV001","message":"이벤트를 찾을 수 없습니다"}
+GET /api/v1/events/999999/winner-announcement | 404 application/json {"code":"EV001","message":"이벤트를 찾을 수 없습니다"}
+GET /api/v1/events/999999/winners | 404 application/json {"code":"EV001","message":"이벤트를 찾을 수 없습니다"}
+GET /api/v1/fan-notes/999999 | 404 application/json {"code":"FN001","message":"덕질노트를 찾을 수 없습니다"}
+DELETE /api/v1/fcm-tokens/999999 | 200 application/json {"message":"FCM 토큰이 삭제되었습니다.","data":{}}
+DELETE /api/v1/feeds/comments/999999 | 404 application/json {"code":"FD002","message":"피드 댓글을 찾을 수 없습니다"}
+PUT /api/v1/feeds/comments/999999 body={"content":"matrix comment"} | 404 application/json {"code":"FD002","message":"피드 댓글을 찾을 수 없습니다"}
+DELETE /api/v1/feeds/999999 | 404 application/json {"code":"FD001","message":"피드를 찾을 수 없습니다"}
+GET /api/v1/feeds/999999 | 404 application/json {"code":"FD001","message":"피드를 찾을 수 없습니다"}
+PATCH /api/v1/feeds/999999 multipart[request={"title":"matrix"}] | 404 application/json {"code":"FD001","message":"피드를 찾을 수 없습니다"}
+GET /api/v1/feeds/999999/comments | 404 application/json {"code":"FD001","message":"피드를 찾을 수 없습니다"}
+POST /api/v1/feeds/999999/comments body={"content":"matrix comment"} | 404 application/json {"code":"FD001","message":"피드를 찾을 수 없습니다"}
+DELETE /api/v1/likes/boards/999999 | 404 application/json {"code":"LK001","message":"즐겨찾기한 게시판을 찾을 수 없습니다"}
+POST /api/v1/likes/boards/999999 | 404 application/json {"code":"BO001","message":"게시판을 찾을 수 없습니다"}
+DELETE /api/v1/likes/daily-message-comments/999999 | 404 application/json {"code":"LK004","message":"좋아요한 하루 덕담 댓글을 찾을 수 없습니다"}
+POST /api/v1/likes/daily-message-comments/999999 | 404 application/json {"code":"DM002","message":"일상 메시지 댓글을 찾을 수 없습니다"}
+DELETE /api/v1/likes/feed-comments/999999 | 404 application/json {"code":"LK003","message":"좋아요한 피드 댓글을 찾을 수 없습니다"}
+POST /api/v1/likes/feed-comments/999999 | 404 application/json {"code":"FD002","message":"피드 댓글을 찾을 수 없습니다"}
+DELETE /api/v1/likes/feeds/999999 | 404 application/json {"code":"LK002","message":"좋아요한 피드를 찾을 수 없습니다"}
+POST /api/v1/likes/feeds/999999 | 404 application/json {"code":"FD001","message":"피드를 찾을 수 없습니다"}
+DELETE /api/v1/notifications/999999 | 404 application/json {"code":"NF001","message":"알림을 찾을 수 없습니다"}
+PATCH /api/v1/notifications/999999/read | 404 application/json {"code":"NF001","message":"알림을 찾을 수 없습니다"}
+PATCH /api/v1/roles/999999/representative | 404 application/json {"code":"RL002","message":"보유하지 않은 칭호입니다"}
+GET /api/v1/search/feeds/boards/999999?keyword=nomatch | 404 application/json {"code":"BO001","message":"게시판을 찾을 수 없습니다"}

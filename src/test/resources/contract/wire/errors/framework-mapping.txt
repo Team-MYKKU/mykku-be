@@ -1,0 +1,75 @@
+app http-message-not-readable 400 application/json {"code":"C101","message":"입력값이 올바르지 않습니다"}
+app http-message-not-readable<-value-instantiation<-auth-exception 400 application/json {"code":"AU102","message":"EMAIL 제공자는 모바일 로그인을 지원하지 않습니다"}
+app method-argument-not-valid(field) 400 application/json {"code":"C101","message":"필드 메시지"}
+app method-argument-not-valid(field-without-message) 400 application/json {"code":"C101","message":"입력값이 올바르지 않습니다"}
+app method-argument-not-valid(global-only) 400 application/json {"code":"C101","message":""}
+app missing-servlet-request-parameter 400 application/json {"code":"C105","message":"필수 요청 값이 누락되었습니다"}
+app missing-servlet-request-part 400 application/json {"code":"C105","message":"필수 요청 값이 누락되었습니다"}
+app method-argument-type-mismatch 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
+app no-resource-found 404 application/json {"code":"C201","message":"요청한 API를 찾을 수 없습니다"}
+app no-handler-found 404 application/json {"code":"C201","message":"요청한 API를 찾을 수 없습니다"}
+app http-request-method-not-supported 405 application/json {"code":"C202","message":"지원하지 않는 HTTP 메서드입니다"}
+app http-media-type-not-supported 415 application/json {"code":"C203","message":"지원하지 않는 Content-Type입니다"}
+app http-media-type-not-acceptable 406 application/json {"code":"C204","message":"지원하지 않는 Accept 형식입니다"}
+app max-upload-size-exceeded 413 application/json {"code":"C205","message":"업로드 가능한 파일 크기를 초과했습니다"}
+app multipart 400 application/json {"code":"C107","message":"multipart 요청 형식이 올바르지 않습니다"}
+app data-integrity-violation 409 application/json {"code":"C302","message":"이미 존재하는 값이거나 참조할 수 없는 값입니다"}
+app pessimistic-locking-failure 409 application/json {"code":"C301","message":"다른 요청이 처리 중입니다. 잠시 후 다시 시도해주세요"}
+app query-timeout 409 application/json {"code":"C301","message":"다른 요청이 처리 중입니다. 잠시 후 다시 시도해주세요"}
+app object-optimistic-locking-failure 500 application/json {"code":"C402","message":"서버 오류가 발생했습니다. 관리자에게 문의해주세요"}
+app redis 500 application/json {"code":"C401","message":"Redis 연결에 실패했습니다. 잠시 후 다시 시도해주세요"}
+app runtime 500 application/json {"code":"C402","message":"서버 오류가 발생했습니다. 관리자에게 문의해주세요"}
+app illegal-argument 500 application/json {"code":"C402","message":"서버 오류가 발생했습니다. 관리자에게 문의해주세요"}
+app illegal-state 500 application/json {"code":"C402","message":"서버 오류가 발생했습니다. 관리자에게 문의해주세요"}
+app null-pointer 500 application/json {"code":"C402","message":"서버 오류가 발생했습니다. 관리자에게 문의해주세요"}
+app constraint-violation 500 application/json {"code":"C402","message":"서버 오류가 발생했습니다. 관리자에게 문의해주세요"}
+admin-event http-message-not-readable 400 application/json {"code":"C101","message":"입력값이 올바르지 않습니다"}
+admin-event http-message-not-readable<-value-instantiation<-auth-exception 400 application/json {"code":"AU102","message":"EMAIL 제공자는 모바일 로그인을 지원하지 않습니다"}
+admin-event method-argument-not-valid(field) 400 application/json {"code":"C101","message":"필드 메시지"}
+admin-event method-argument-not-valid(field-without-message) 400 application/json {"code":"C101","message":"입력값이 올바르지 않습니다"}
+admin-event method-argument-not-valid(global-only) 400 application/json {"code":"C101","message":""}
+admin-event missing-servlet-request-parameter 400 application/json {"code":"C105","message":"필수 요청 값이 누락되었습니다"}
+admin-event missing-servlet-request-part 400 application/json {"code":"C105","message":"필수 요청 값이 누락되었습니다"}
+admin-event method-argument-type-mismatch 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
+admin-event no-resource-found 404 application/json {"code":"C201","message":"요청한 API를 찾을 수 없습니다"}
+admin-event no-handler-found 404 application/json {"code":"C201","message":"요청한 API를 찾을 수 없습니다"}
+admin-event http-request-method-not-supported 405 application/json {"code":"C202","message":"지원하지 않는 HTTP 메서드입니다"}
+admin-event http-media-type-not-supported 415 application/json {"code":"C203","message":"지원하지 않는 Content-Type입니다"}
+admin-event http-media-type-not-acceptable 406 application/json {"code":"C204","message":"지원하지 않는 Accept 형식입니다"}
+admin-event max-upload-size-exceeded 413 application/json {"code":"C205","message":"업로드 가능한 파일 크기를 초과했습니다"}
+admin-event multipart 400 application/json {"code":"C107","message":"multipart 요청 형식이 올바르지 않습니다"}
+admin-event data-integrity-violation 409 application/json {"code":"C302","message":"이미 존재하는 값이거나 참조할 수 없는 값입니다"}
+admin-event pessimistic-locking-failure 409 application/json {"code":"C301","message":"다른 요청이 처리 중입니다. 잠시 후 다시 시도해주세요"}
+admin-event query-timeout 409 application/json {"code":"C301","message":"다른 요청이 처리 중입니다. 잠시 후 다시 시도해주세요"}
+admin-event object-optimistic-locking-failure 500 application/json {"code":"C402","message":"서버 오류가 발생했습니다. 관리자에게 문의해주세요"}
+admin-event redis 500 application/json {"code":"C401","message":"Redis 연결에 실패했습니다. 잠시 후 다시 시도해주세요"}
+admin-event runtime 500 application/json {"code":"C402","message":"서버 오류가 발생했습니다. 관리자에게 문의해주세요"}
+admin-event illegal-argument 500 application/json {"code":"C402","message":"서버 오류가 발생했습니다. 관리자에게 문의해주세요"}
+admin-event illegal-state 500 application/json {"code":"C402","message":"서버 오류가 발생했습니다. 관리자에게 문의해주세요"}
+admin-event null-pointer 500 application/json {"code":"C402","message":"서버 오류가 발생했습니다. 관리자에게 문의해주세요"}
+admin-event constraint-violation 500 application/json {"code":"C402","message":"서버 오류가 발생했습니다. 관리자에게 문의해주세요"}
+no-handler http-message-not-readable 400 application/json {"code":"C101","message":"입력값이 올바르지 않습니다"}
+no-handler http-message-not-readable<-value-instantiation<-auth-exception 400 application/json {"code":"AU102","message":"EMAIL 제공자는 모바일 로그인을 지원하지 않습니다"}
+no-handler method-argument-not-valid(field) 400 application/json {"code":"C101","message":"필드 메시지"}
+no-handler method-argument-not-valid(field-without-message) 400 application/json {"code":"C101","message":"입력값이 올바르지 않습니다"}
+no-handler method-argument-not-valid(global-only) 400 application/json {"code":"C101","message":""}
+no-handler missing-servlet-request-parameter 400 application/json {"code":"C105","message":"필수 요청 값이 누락되었습니다"}
+no-handler missing-servlet-request-part 400 application/json {"code":"C105","message":"필수 요청 값이 누락되었습니다"}
+no-handler method-argument-type-mismatch 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
+no-handler no-resource-found 404 application/json {"code":"C201","message":"요청한 API를 찾을 수 없습니다"}
+no-handler no-handler-found 404 application/json {"code":"C201","message":"요청한 API를 찾을 수 없습니다"}
+no-handler http-request-method-not-supported 405 application/json {"code":"C202","message":"지원하지 않는 HTTP 메서드입니다"}
+no-handler http-media-type-not-supported 415 application/json {"code":"C203","message":"지원하지 않는 Content-Type입니다"}
+no-handler http-media-type-not-acceptable 406 application/json {"code":"C204","message":"지원하지 않는 Accept 형식입니다"}
+no-handler max-upload-size-exceeded 413 application/json {"code":"C205","message":"업로드 가능한 파일 크기를 초과했습니다"}
+no-handler multipart 400 application/json {"code":"C107","message":"multipart 요청 형식이 올바르지 않습니다"}
+no-handler data-integrity-violation 409 application/json {"code":"C302","message":"이미 존재하는 값이거나 참조할 수 없는 값입니다"}
+no-handler pessimistic-locking-failure 409 application/json {"code":"C301","message":"다른 요청이 처리 중입니다. 잠시 후 다시 시도해주세요"}
+no-handler query-timeout 409 application/json {"code":"C301","message":"다른 요청이 처리 중입니다. 잠시 후 다시 시도해주세요"}
+no-handler object-optimistic-locking-failure 500 application/json {"code":"C402","message":"서버 오류가 발생했습니다. 관리자에게 문의해주세요"}
+no-handler redis 500 application/json {"code":"C401","message":"Redis 연결에 실패했습니다. 잠시 후 다시 시도해주세요"}
+no-handler runtime 500 application/json {"code":"C402","message":"서버 오류가 발생했습니다. 관리자에게 문의해주세요"}
+no-handler illegal-argument 500 application/json {"code":"C402","message":"서버 오류가 발생했습니다. 관리자에게 문의해주세요"}
+no-handler illegal-state 500 application/json {"code":"C402","message":"서버 오류가 발생했습니다. 관리자에게 문의해주세요"}
+no-handler null-pointer 500 application/json {"code":"C402","message":"서버 오류가 발생했습니다. 관리자에게 문의해주세요"}
+no-handler constraint-violation 500 application/json {"code":"C402","message":"서버 오류가 발생했습니다. 관리자에게 문의해주세요"}
