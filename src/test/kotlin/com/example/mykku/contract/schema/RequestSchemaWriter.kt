@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonSetter
-import com.fasterxml.jackson.databind.MapperFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.introspect.BeanPropertyDefinition
 import jakarta.validation.Validator
@@ -47,6 +46,7 @@ private data class FieldContext(
 class RequestSchemaWriter(private val mapper: ObjectMapper, private val validator: Validator) {
 
     private val enumTraits = JacksonEnumTraits(mapper)
+    private val settables = JacksonSettables(mapper)
 
     fun render(target: RequestTarget): String {
         val nested = nestedDto(target.type)
@@ -67,6 +67,7 @@ class RequestSchemaWriter(private val mapper: ObjectMapper, private val validato
 
     private fun describe(scope: DtoScope, lines: MutableList<String>) {
         val bean = validator.getConstraintsForClass(scope.klass.java)
+        GroupFeatures.requireSupported(scope.klass.java, scope.groups)
         lines += bean.constraintDescriptors
             .map { ConstraintLines.classLine(scope.prefix, it, scope.applied, scope.groups) }
             .sorted()
@@ -154,28 +155,7 @@ class RequestSchemaWriter(private val mapper: ObjectMapper, private val validato
                 .filter { it.writeMethod != null && it.name !in constructorNames }
                 .associate { it.name to "setter type=${it.propertyType.simpleName}" }
         }
-        return jacksonProperties(scope.klass)
-            .filter { it.constructorParameter == null }
-            .mapNotNull { property -> jacksonMutator(property)?.let { property.name to it } }
-            .toMap()
-    }
-
-    private fun jacksonMutator(property: BeanPropertyDefinition): String? {
-        val kind = when {
-            property.hasSetter() -> "setter"
-            property.hasField() -> "field"
-            isSetterlessContainer(property) -> "getter-as-setter"
-            else -> return null
-        }
-        return "$kind type=${property.rawPrimaryType.simpleName}"
-    }
-
-    private fun isSetterlessContainer(property: BeanPropertyDefinition): Boolean {
-        if (!mapper.isEnabled(MapperFeature.USE_GETTERS_AS_SETTERS) || !property.hasGetter()) {
-            return false
-        }
-        val type = property.getter.rawType
-        return Collection::class.java.isAssignableFrom(type) || Map::class.java.isAssignableFrom(type)
+        return settables.outsideConstructor(scope.klass.java)
     }
 
     private fun creatorsOf(scope: DtoScope): Map<Int, BeanPropertyDefinition> {

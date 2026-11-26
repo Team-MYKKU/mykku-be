@@ -57,13 +57,14 @@ class DevProfileHttpConfigTest {
     }
 
     @Test
-    fun `실행 인자가 덮는 포트·운영 경로·비밀성 키는 빼고 다른 키는 낱말 단위로 판정해 남긴다`() {
+    fun `실행 인자가 덮는 포트·운영 경로·비밀성 키는 relaxed 철자여도 빼고 다른 키는 남긴다`() {
         write("application-dev.yml", SENSITIVE)
 
         assertThat(config().properties()).containsExactlyEntriesOf(
             sortedMapOf(
                 "server.address" to "0.0.0.0",
                 "server.shutdown" to "graceful",
+                "server.ssl.client-auth" to "none",
                 "server.ssl.enabled" to "false",
                 "spring.jackson.deserialization.fail-on-trailing-tokens" to "true"
             )
@@ -71,13 +72,21 @@ class DevProfileHttpConfigTest {
     }
 
     @Test
-    fun `spring profiles·cloud-platform 지정 키가 있으면 해석하지 않고 실패한다`() {
+    fun `dev 파일에 spring profiles 키가 있으면 해석하지 않고 그 키를 알리며 실패한다`() {
         write("application-dev.yml", "spring:\n  profiles:\n    group:\n      dev: extra\n")
-        write("application.yml", "spring:\n  main:\n    cloud-platform: kubernetes\n")
 
-        assertThatThrownBy { config().properties() }.isInstanceOf(ContractViolationError::class.java)
-        assertThatThrownBy { DevProfileHttpConfig(root) { it.fileName.toString() == "application.yml" }.properties() }
+        assertThatThrownBy { config().properties() }
             .isInstanceOf(ContractViolationError::class.java)
+            .hasMessageContaining("spring.profiles.group.dev")
+    }
+
+    @Test
+    fun `대시 없는 relaxed 철자의 cloud-platform 지정 키도 해석하지 않고 실패한다`() {
+        write("application.yml", "spring:\n  main:\n    cloudplatform: kubernetes\n")
+
+        assertThatThrownBy { config().properties() }
+            .isInstanceOf(ContractViolationError::class.java)
+            .hasMessageContaining("spring.main.cloudplatform")
     }
 
     @Test
@@ -157,7 +166,7 @@ class DevProfileHttpConfigTest {
             spring:
               config:
                 activate:
-                  on-cloud-platform: kubernetes
+                  oncloudplatform: kubernetes
             server:
               shutdown: cloud-only
         """.trimIndent()
@@ -180,10 +189,15 @@ class DevProfileHttpConfigTest {
               shutdown: graceful
               ssl:
                 enabled: false
+                client-auth: none
                 key-store: /etc/key.p12
                 key-store-password: abc
+                keystorepassword: abc
+                truststore: /etc/trust.p12
+                certificate: /etc/cert.pem
+                trustCertificate: /etc/ca.pem
               tomcat:
-                basedir: /tmp/tomcat
+                baseDir: /tmp/tomcat
               servlet:
                 session:
                   cookie:

@@ -40,7 +40,7 @@ class DevProfileHttpConfig(
         ConfigKeys.canonical(name) to "${source.getProperty(name)}"
 
     private fun activeForDev(document: Map<String, String>): Boolean {
-        val platform = document[CLOUD_PLATFORM_KEY]
+        val platform = document.entries.firstOrNull { ConfigKeys.isUnderRoot(it.key, CLOUD_PLATFORM_KEY) }?.value
         if (platform != null && !platform.equals(NO_CLOUD_PLATFORM, ignoreCase = true)) {
             return false
         }
@@ -53,7 +53,7 @@ class DevProfileHttpConfig(
     }
 
     private fun requireNoProfileKeys(document: Map<String, String>) {
-        val keys = document.keys.filter { key -> UNSUPPORTED_KEYS.any { key.startsWith(it) } }
+        val keys = document.keys.filter { key -> UNSUPPORTED_ROOTS.any { ConfigKeys.isAtOrBelow(key, it) } }
         if (keys.isNotEmpty()) {
             throw ContractViolationError("[API 계약] dev 프로필 덤프는 프로필·클라우드 플랫폼 지정 키를 해석하지 않습니다: $keys")
         }
@@ -66,7 +66,7 @@ class DevProfileHttpConfig(
     }
 
     private fun whitelisted(document: Map<String, String>): Map<String, String> =
-        document.filterKeys { key -> PREFIXES.any { key.startsWith(it) } && !ConfigKeys.isExcluded(key) }
+        document.filterKeys { key -> PREFIXES.any { ConfigKeys.hasPrefix(key, it) } && !ConfigKeys.isExcluded(key) }
 
     companion object {
         val SOURCES = listOf("application.yml", "application-dev.yml")
@@ -82,7 +82,7 @@ class DevProfileHttpConfig(
         private const val PROFILE_KEY = "spring.config.activate.on-profile"
         private const val CLOUD_PLATFORM_KEY = "spring.config.activate.on-cloud-platform"
         private const val NO_CLOUD_PLATFORM = "none"
-        private val UNSUPPORTED_KEYS = listOf("spring.profiles.", "spring.main.cloud-platform")
+        private val UNSUPPORTED_ROOTS = listOf("spring.profiles", "spring.main.cloud-platform")
         private const val DEV_PROFILE = "dev"
         private val UNSUPPORTED_SOURCES = listOf(
             "application.yaml",

@@ -6,6 +6,8 @@ import com.example.mykku.contract.support.ArgumentKind
 import com.example.mykku.contract.support.Endpoint
 import com.example.mykku.contract.support.HandlerArgument
 import jakarta.validation.Valid
+import org.springframework.core.annotation.AnnotatedElementUtils
+import org.springframework.validation.annotation.Validated
 import org.springframework.validation.annotation.ValidationAnnotationUtils
 import org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor
 import kotlin.reflect.KType
@@ -27,8 +29,10 @@ class RequestTargets(private val tokens: ArgumentTokens) {
         bindingOf(argument)?.let { targetOf(endpoint, argument, it) }
     }
 
-    private fun targetOf(endpoint: Endpoint, argument: HandlerArgument, binding: RequestBinding): RequestTarget =
-        RequestTarget(headerOf(endpoint, argument), typeOf(argument), binding, validated(argument), groupsOf(argument))
+    private fun targetOf(endpoint: Endpoint, argument: HandlerArgument, binding: RequestBinding): RequestTarget {
+        val validated = validated(endpoint, argument)
+        return RequestTarget(headerOf(endpoint, argument), typeOf(argument), binding, validated, groupsOf(argument))
+    }
 
     private fun headerOf(endpoint: Endpoint, argument: HandlerArgument): String =
         "${EndpointKeys.of(endpoint)} ${tokens.of(argument)}"
@@ -41,10 +45,19 @@ class RequestTargets(private val tokens: ArgumentTokens) {
         else -> null
     }
 
-    private fun validated(argument: HandlerArgument): Boolean = when {
+    private fun validated(endpoint: Endpoint, argument: HandlerArgument): Boolean = when {
         isHttpEntity(argument) -> false
-        isContainer(argument) -> argument.parameter.hasParameterAnnotation(Valid::class.java)
+        isContainer(argument) -> hasValid(argument) && methodValidated(endpoint)
         else -> argument.validated
+    }
+
+    private fun hasValid(argument: HandlerArgument): Boolean =
+        argument.parameter.hasParameterAnnotation(Valid::class.java)
+
+    private fun methodValidated(endpoint: Endpoint): Boolean {
+        val handler = endpoint.handlerMethod
+        val validatedBean = AnnotatedElementUtils.hasAnnotation(handler.beanType, Validated::class.java)
+        return handler.shouldValidateArguments() || validatedBean
     }
 
     private fun groupsOf(argument: HandlerArgument): List<Class<*>> = argument.parameter.parameterAnnotations

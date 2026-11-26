@@ -6,10 +6,10 @@ import org.springframework.core.MethodIntrospector
 import org.springframework.core.annotation.AnnotatedElementUtils
 import org.springframework.util.ReflectionUtils
 import org.springframework.validation.annotation.Validated
-import org.springframework.web.bind.annotation.InitBinder
-import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.method.ControllerAdviceBean
 import org.springframework.web.servlet.mvc.method.annotation.RequestBodyAdvice
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.INIT_BINDER_METHODS
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter.MODEL_ATTRIBUTE_METHODS
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice
 
 class EndpointLines(
@@ -41,16 +41,15 @@ class EndpointLines(
             "method-validation".takeIf { handler.shouldValidateArguments() },
             "return-validation".takeIf { handler.shouldValidateReturnValue() },
             "validated-bean".takeIf { AnnotatedElementUtils.hasAnnotation(handler.beanType, Validated::class.java) },
-            "init-binder".takeIf { types.any { hasMethods(it, InitBinder::class.java) } },
-            "model-attribute-method".takeIf { types.any { hasMethods(it, ModelAttribute::class.java) } },
+            "init-binder".takeIf { types.any { hasMethods(it, INIT_BINDER_METHODS) } },
+            "model-attribute-method".takeIf { types.any { hasMethods(it, MODEL_ATTRIBUTE_METHODS) } },
             "request-body-advice".takeIf { types.drop(1).any { RequestBodyAdvice::class.java.isAssignableFrom(it) } },
             "response-body-advice".takeIf { types.drop(1).any { ResponseBodyAdvice::class.java.isAssignableFrom(it) } }
         )
     }
 
-    private fun hasMethods(type: Class<*>, annotation: Class<out Annotation>): Boolean = MethodIntrospector
-        .selectMethods(type, ReflectionUtils.MethodFilter { AnnotatedElementUtils.hasAnnotation(it, annotation) })
-        .isNotEmpty()
+    private fun hasMethods(type: Class<*>, filter: ReflectionUtils.MethodFilter): Boolean =
+        MethodIntrospector.selectMethods(type, filter).isNotEmpty()
 
     private companion object {
         const val ADMIN_SESSION = "admin-session"

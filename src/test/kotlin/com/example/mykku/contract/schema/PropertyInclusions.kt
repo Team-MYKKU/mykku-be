@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.BeanProperty
 import com.fasterxml.jackson.databind.JavaType
 import com.fasterxml.jackson.databind.SerializationConfig
+import com.fasterxml.jackson.databind.ser.BeanPropertyWriter
 
 object PropertyInclusions {
 
@@ -13,9 +14,10 @@ object PropertyInclusions {
             config.getDefaultPropertyInclusion(owner.rawClass, JsonInclude.Value.empty())
         )
         val defaults = JsonInclude.Value.merge(config.defaultPropertyInclusion, perType)
-        val rawType = property.type.rawClass
+        val actualType = ((property as? BeanPropertyWriter)?.serializationType ?: property.type).rawClass
+        val accessorType = property.member?.rawType ?: property.type.rawClass
         val annotated = property.member?.let { config.annotationIntrospector.findPropertyInclusion(it) }
             ?: JsonInclude.Value.empty()
-        return config.getDefaultInclusion(rawType, rawType, defaults).withOverrides(annotated)
+        return config.getDefaultInclusion(actualType, accessorType, defaults).withOverrides(annotated)
     }
 }

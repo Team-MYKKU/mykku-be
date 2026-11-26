@@ -4,6 +4,7 @@ import com.example.mykku.contract.dump.KotlinTypes
 import com.example.mykku.contract.support.ArgumentKind
 import com.example.mykku.contract.support.HandlerArgument
 import com.example.mykku.contract.support.HandlerCatalog
+import org.springframework.util.ClassUtils
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 import kotlin.reflect.full.memberProperties
@@ -19,7 +20,7 @@ object BoundTypes {
 
     private fun typesOf(argument: HandlerArgument): List<Class<*>> = when (argument.kind) {
         in CONVERTED_KINDS -> argument.kotlinType?.let { classesOf(it) }
-            ?: listOf(argument.parameter.nestedParameterType)
+            ?: listOf(ClassUtils.resolvePrimitiveIfNecessary(argument.parameter.nestedParameterType))
         ArgumentKind.MODEL -> argument.kotlinType?.let { formFieldTypes(it, emptySet()) }.orEmpty()
         else -> emptyList()
     }
@@ -40,7 +41,7 @@ object BoundTypes {
     }
 
     private fun classesOf(type: KType): List<Class<*>> {
-        val own = listOfNotNull((type.classifier as? KClass<*>)?.java)
+        val own = listOfNotNull((type.classifier as? KClass<*>)?.javaObjectType)
         return own + type.arguments.mapNotNull { it.type }.flatMap { classesOf(it) }
     }
 }

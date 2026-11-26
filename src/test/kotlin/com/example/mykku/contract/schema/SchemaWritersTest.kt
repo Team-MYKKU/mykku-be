@@ -3,6 +3,7 @@ package com.example.mykku.contract.schema
 import com.fasterxml.jackson.annotation.JsonFormat
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.MapperFeature
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -10,10 +11,13 @@ import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonMapperBuilder
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import jakarta.validation.GroupSequence
 import jakarta.validation.Valid
 import jakarta.validation.Validation
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
+import jakarta.validation.groups.ConvertGroup
+import jakarta.validation.groups.Default
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.DisplayName
@@ -152,6 +156,49 @@ class SchemaWritersTest {
             .isInstanceOf(IllegalStateException::class.java)
     }
 
+    @Test
+    fun `타입별 포함 규칙 재정의는 직렬화기처럼 선언 타입과 접근자 타입 기준으로 적는다`() {
+        val overriding = jacksonObjectMapper()
+        overriding.configOverride(List::class.java).setIncludeAsProperty(NON_EMPTY)
+        val holder = overriding.typeFactory.constructType(object : TypeReference<HolderProbe<List<String>>>() {})
+        val generic = ResponseSchemaWriter(overriding).lines(holder, typeOf<HolderProbe<List<String>>>())
+        val listType = overriding.constructType(ListProbe::class.java)
+        val declared = ResponseSchemaWriter(overriding).lines(listType, typeOf<ListProbe>())
+
+        assertThat(overriding.writeValueAsString(HolderProbe(emptyList<String>(), "x"))).contains("\"value\":[]")
+        assertThat(overriding.writeValueAsString(ListProbe(emptyList()))).isEqualTo("{}")
+        assertThat(generic.single { it.startsWith("$.value ") }).doesNotContain("include=")
+        assertThat(declared.single { it.startsWith("$.tags ") }).contains("include=NON_EMPTY/")
+    }
+
+    @Test
+    fun `생성자 밖 프로퍼티는 실제 역직렬화기처럼 무시 목록과 읽기 전용을 빼고 getter-as-setter를 적는다`() {
+        val lines = RequestSchemaWriter(mapper, validator).render(target<JacksonIgnoralProbe>(validated = true)).lines()
+
+        assertThat(lines).contains("tags (생성자 밖 프로퍼티: getter-as-setter type=List)")
+            .noneMatch { it.startsWith("normalized") || it.startsWith("readOnlyTags") }
+    }
+
+    @Test
+    fun `nullable 필수 인자는 더미 값으로 먼저 만들고 실패하면 null로 채워 나머지 기본값을 계산한다`() {
+        val writer = RequestSchemaWriter(mapper, validator)
+        val nested = writer.render(target<NullableNestedProbe>(validated = true)).lines()
+        val conditional = writer.render(target<ConditionalTokenProbe>(validated = true)).lines()
+
+        assertThat(nested).anyMatch { it.startsWith("size kotlin=size type=Int default=20 ") }
+        assertThat(conditional).anyMatch { it.startsWith("size kotlin=size type=Int default=20 ") }
+    }
+
+    @Test
+    fun `검증 그룹 순서와 그룹 변환은 해석하지 않고 실패한다`() {
+        val writer = RequestSchemaWriter(mapper, validator)
+        val ordered = RequestTarget("POST /probe body:json", typeOf<GroupedProbe>(), RequestBinding.JSON, true, ORDERED)
+
+        assertThatThrownBy { writer.render(ordered) }.hasMessageContaining("OrderedGroupProbe @GroupSequence")
+        assertThatThrownBy { writer.render(target<ConvertGroupProbe>(validated = true)) }
+            .hasMessageContaining("ConvertGroupProbe.inner @ConvertGroup")
+    }
+
     private fun writer(): ResponseSchemaWriter = ResponseSchemaWriter(mapper)
 
     private inline fun <reified T> target(validated: Boolean): RequestTarget =
@@ -159,6 +206,8 @@ class SchemaWritersTest {
 
     private companion object {
         val GROUPS: List<Class<*>> = listOf(GroupProbe::class.java)
+        val ORDERED: List<Class<*>> = listOf(OrderedGroupProbe::class.java)
+        val NON_EMPTY: JsonInclude.Value = JsonInclude.Value.construct(JsonInclude.Include.NON_EMPTY, null)
         const val LOWERCASE_ACCEPTED = "jackson-enum-lowercase=accepted"
         val PAGE_PROPERTY = Regex("""\$\.value\.[a-zA-Z]+ .*""")
     }
@@ -223,3 +272,34 @@ data class InitGuardProbe(val name: String, val size: Int = 20) {
         require(name.length >= 2)
     }
 }
+
+data class ListProbe(val tags: List<String>)
+
+@JsonIgnoreProperties("normalized")
+data class JacksonIgnoralProbe(val title: String) {
+    private val store = mutableListOf<String>()
+    val normalized: String = title.trim()
+    val tags: MutableList<String> get() = store
+
+    @get:JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    val readOnlyTags: MutableList<String> get() = store
+}
+
+data class GuardedFilterProbe(val keyword: String) {
+    init {
+        require(keyword.length >= 2)
+    }
+}
+
+data class NullableNestedProbe(val filter: GuardedFilterProbe?, val size: Int = 20)
+
+data class ConditionalTokenProbe(val token: String?, val size: Int = 20) {
+    init {
+        require(!token.isNullOrBlank())
+    }
+}
+
+@GroupSequence(Default::class, GroupProbe::class)
+interface OrderedGroupProbe
+
+data class ConvertGroupProbe(@field:Valid @field:ConvertGroup(to = GroupProbe::class) val inner: InnerFormProbe)

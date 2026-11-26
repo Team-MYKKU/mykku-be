@@ -26,16 +26,25 @@ object DtoDefaults {
         if (optional.isEmpty()) {
             return emptyMap()
         }
-        val instance = runCatching { construct(constructor, setOf(klass)) }.getOrElse {
-            throw IllegalStateException("${klass.qualifiedName} 기본값을 계산하지 못했습니다. 필수 인자 더미 값을 보강합니다", it)
-        }
+        val instance = instanceOf(klass, constructor)
         return optional.associate { it.name.orEmpty() to rendered(klass, instance, it) }
     }
 
-    private fun construct(constructor: KFunction<*>, visiting: Set<KClass<*>>): Any? {
+    private fun instanceOf(klass: KClass<*>, constructor: KFunction<*>): Any? {
+        val withDummies = runCatching { construct(constructor, setOf(klass), nulls = false) }
+        if (withDummies.isSuccess) {
+            return withDummies.getOrNull()
+        }
+        return runCatching { construct(constructor, setOf(klass), nulls = true) }.getOrElse {
+            val message = "${klass.qualifiedName} 기본값을 계산하지 못했습니다. 필수 인자 더미 값을 보강합니다"
+            throw IllegalStateException(message, withDummies.exceptionOrNull())
+        }
+    }
+
+    private fun construct(constructor: KFunction<*>, visiting: Set<KClass<*>>, nulls: Boolean): Any? {
         constructor.isAccessible = true
         val required = constructor.parameters.filterNot { it.isOptional }
-        return constructor.callBy(required.associateWith { dummy(it.type, visiting) })
+        return constructor.callBy(required.associateWith { dummy(it.type, visiting, nulls) })
     }
 
     private fun rendered(klass: KClass<*>, instance: Any?, parameter: KParameter): String {
@@ -46,15 +55,20 @@ object DtoDefaults {
         return AttributeValues.value(property.getter.call(instance))
     }
 
-    private fun dummy(type: KType, visiting: Set<KClass<*>>): Any? {
+    private fun dummy(type: KType, visiting: Set<KClass<*>>, nulls: Boolean): Any? {
+        if (nulls && type.isMarkedNullable) {
+            return null
+        }
         val klass = type.classifier as? KClass<*> ?: return null
-        KotlinTypes.valueClassUnderlying(klass)?.let { return klass.primaryConstructor?.call(dummy(it, visiting)) }
+        KotlinTypes.valueClassUnderlying(klass)?.let { return valueOf(klass, dummy(it, visiting, nulls)) }
         klass.java.enumConstants?.let { return it.firstOrNull() }
         if (KotlinTypes.isProjectDto(klass) && klass !in visiting) {
-            return klass.primaryConstructor?.let { construct(it, visiting + klass) }
+            return klass.primaryConstructor?.let { construct(it, visiting + klass, nulls) }
         }
         return SIMPLE[klass] ?: COLLECTIONS[klass]
     }
+
+    private fun valueOf(klass: KClass<*>, underlying: Any?): Any? = klass.primaryConstructor?.call(underlying)
 
     private val SIMPLE: Map<KClass<*>, Any> = mapOf(
         String::class to "x",
