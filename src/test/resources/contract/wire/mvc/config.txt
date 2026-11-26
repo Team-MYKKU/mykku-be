@@ -1,0 +1,163 @@
+# 라이브러리 버전
+spring-boot 3.4.5
+spring-framework 6.2.6
+tomcat Apache Tomcat/10.1.40
+hibernate-validator 8.0.2.Final
+
+# 메시지 컨버터(핸들러 어댑터, 테스트 클래스패스 전용 ProjectingJackson2HttpMessageConverter 제외)
+1 ByteArrayHttpMessageConverter types=[application/octet-stream, */*] charset=-
+2 StringHttpMessageConverter types=[text/plain, */*] charset=UTF-8
+3 StringHttpMessageConverter types=[text/plain, */*] charset=ISO-8859-1
+4 ResourceHttpMessageConverter types=[*/*] charset=-
+5 ResourceRegionHttpMessageConverter types=[*/*] charset=-
+6 AllEncompassingFormHttpMessageConverter types=[application/x-www-form-urlencoded, multipart/form-data, multipart/mixed, multipart/related] charset=-
+7 MappingJackson2HttpMessageConverter types=[application/json, application/*+json] charset=-
+8 MappingJackson2HttpMessageConverter types=[application/json, application/*+json] charset=-
+9 MappingJackson2YamlHttpMessageConverter types=[application/yaml] charset=-
+10 Jaxb2RootElementHttpMessageConverter types=[application/xml, text/xml, application/*+xml] charset=-
+
+# 메시지 컨버터(@ExceptionHandler, 테스트 클래스패스 전용 ProjectingJackson2HttpMessageConverter 제외)
+1 ByteArrayHttpMessageConverter types=[application/octet-stream, */*] charset=-
+2 StringHttpMessageConverter types=[text/plain, */*] charset=UTF-8
+3 StringHttpMessageConverter types=[text/plain, */*] charset=ISO-8859-1
+4 ResourceHttpMessageConverter types=[*/*] charset=-
+5 ResourceRegionHttpMessageConverter types=[*/*] charset=-
+6 AllEncompassingFormHttpMessageConverter types=[application/x-www-form-urlencoded, multipart/form-data, multipart/mixed, multipart/related] charset=-
+7 MappingJackson2HttpMessageConverter types=[application/json, application/*+json] charset=-
+8 MappingJackson2HttpMessageConverter types=[application/json, application/*+json] charset=-
+9 MappingJackson2YamlHttpMessageConverter types=[application/yaml] charset=-
+10 Jaxb2RootElementHttpMessageConverter types=[application/xml, text/xml, application/*+xml] charset=-
+
+# 콘텐츠 협상
+strategy HeaderContentNegotiationStrategy
+file-extensions=[json, xml, yaml]
+media-type-mappings={json=application/json, xml=application/xml, yaml=application/yaml}
+
+# 경로 매칭
+uses-path-patterns=true
+case-sensitive=true
+match-optional-trailing-separator=false
+trailing-slash-match=false
+path-prefixes=[]
+
+# 핸들러 매핑(순서·URL 매핑·함수형 경로, /actuator·/docs 제외)
+-1 RouterFunctionMapping
+  route (없음)
+0 RequestMappingHandlerMapping
+1 SimpleUrlHandlerMapping
+2 WelcomePageHandlerMapping
+2 BeanNameUrlHandlerMapping
+2147483637 WelcomePageNotAcceptableHandlerMapping
+2147483646 SimpleUrlHandlerMapping
+  /** -> resources [class path resource [META-INF/resources/], class path resource [resources/], class path resource [static/], class path resource [public/], ServletContext resource [/]]
+  /webjars/** -> resources [class path resource [META-INF/resources/webjars/]]
+
+# 타입 변환기(핸들러 인자 타입에 닿는 프로젝트 Converter·Formatter 빈)
+(핸들러 인자 타입에 닿는 프로젝트 변환기 없음)
+add-formatters-overrides=0
+
+# 예외 리졸버
+-2147483648 DefaultErrorAttributes
+0 HandlerExceptionResolverComposite
+  ExceptionHandlerExceptionResolver
+  ResponseStatusExceptionResolver
+  DefaultHandlerExceptionResolver
+
+# multipart
+config-element.max-file-size=10485760
+config-element.max-request-size=52428800
+config-element.file-size-threshold=0
+config-element.location=(없음)
+resolver=StandardServletMultipartResolver
+spring.servlet.multipart.enabled=true
+spring.servlet.multipart.max-file-size=10485760B
+spring.servlet.multipart.max-request-size=52428800B
+spring.servlet.multipart.file-size-threshold=0B
+spring.servlet.multipart.resolve-lazily=false
+spring.servlet.multipart.strict-servlet-compliance=false
+
+# CharacterEncodingFilter
+encoding=UTF-8
+force-request-encoding=true
+force-response-encoding=false
+
+# ServerProperties
+server.servlet.context-path=null
+server.servlet.encoding.charset=UTF-8
+server.servlet.encoding.force=false
+server.servlet.encoding.force-request=false
+server.servlet.encoding.force-response=false
+server.servlet.encoding.mapping=null
+server.servlet.session.timeout=PT30M
+server.servlet.session.tracking-modes=null
+server.servlet.session.cookie.name=null
+server.servlet.session.cookie.domain=null
+server.servlet.session.cookie.path=null
+server.servlet.session.cookie.http-only=null
+server.servlet.session.cookie.secure=null
+server.servlet.session.cookie.max-age=null
+server.servlet.session.cookie.same-site=null
+server.servlet.session.cookie.partitioned=null
+server.error.path="/error"
+server.error.include-exception=false
+server.error.include-stacktrace=NEVER
+server.error.include-message=NEVER
+server.error.include-binding-errors=NEVER
+server.error.include-path=ALWAYS
+server.error.whitelabel.enabled=true
+server.compression.enabled=false
+server.compression.mime-types=["text/html", "text/xml", "text/plain", "text/css", "text/javascript", "application/javascript", "application/json", "application/xml"]
+server.compression.excluded-user-agents=null
+server.compression.min-response-size=2048B
+server.http2.enabled=false
+server.max-http-request-header-size=8192B
+server.forward-headers-strategy=null
+server.server-header=null
+server.tomcat.uri-encoding=UTF-8
+server.tomcat.max-http-form-post-size=2097152B
+server.tomcat.max-swallow-size=2097152B
+server.tomcat.max-http-response-header-size=8192B
+server.tomcat.relaxed-path-chars=[]
+server.tomcat.relaxed-query-chars=[]
+server.tomcat.redirect-context-root=true
+server.tomcat.use-relative-redirects=false
+server.tomcat.remoteip.internal-proxies="10\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|192\\.168\\.\\d{1,3}\\.\\d{1,3}|169\\.254\\.\\d{1,3}\\.\\d{1,3}|127\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}|100\\.6[4-9]{1}\\.\\d{1,3}\\.\\d{1,3}|100\\.[7-9]{1}\\d{1}\\.\\d{1,3}\\.\\d{1,3}|100\\.1[0-1]{1}\\d{1}\\.\\d{1,3}\\.\\d{1,3}|100\\.12[0-7]{1}\\.\\d{1,3}\\.\\d{1,3}|172\\.1[6-9]{1}\\.\\d{1,3}\\.\\d{1,3}|172\\.2[0-9]{1}\\.\\d{1,3}\\.\\d{1,3}|172\\.3[0-1]{1}\\.\\d{1,3}\\.\\d{1,3}|0:0:0:0:0:0:0:1|::1|fe[89ab]\\p{XDigit}:.*|f[cd]\\p{XDigit}{2}+:.*"
+server.tomcat.remoteip.protocol-header=null
+server.tomcat.remoteip.protocol-header-https-value="https"
+server.tomcat.remoteip.host-header="X-Forwarded-Host"
+server.tomcat.remoteip.port-header="X-Forwarded-Port"
+server.tomcat.remoteip.remote-ip-header=null
+server.tomcat.remoteip.trusted-proxies=null
+
+# WebMvcProperties
+spring.mvc.servlet.path="/"
+spring.mvc.static-path-pattern="/**"
+spring.mvc.webjars-path-pattern="/webjars/**"
+spring.mvc.dispatch-options-request=true
+spring.mvc.dispatch-trace-request=false
+spring.mvc.message-codes-resolver-format=null
+spring.mvc.format.date=null
+spring.mvc.format.time=null
+spring.mvc.format.date-time=null
+spring.mvc.contentnegotiation.favor-parameter=false
+spring.mvc.contentnegotiation.parameter-name=null
+spring.mvc.contentnegotiation.media-types={}
+spring.mvc.pathmatch.matching-strategy=PATH_PATTERN_PARSER
+spring.mvc.problemdetails.enabled=false
+
+# WebProperties
+spring.web.locale=null
+spring.web.locale-resolver=ACCEPT_HEADER
+spring.web.resources.add-mappings=true
+spring.web.resources.static-locations=["classpath:/META-INF/resources/", "classpath:/resources/", "classpath:/static/", "classpath:/public/"]
+
+# SpringDataWebProperties
+spring.data.web.pageable.page-parameter="page"
+spring.data.web.pageable.size-parameter="size"
+spring.data.web.pageable.one-indexed-parameters=false
+spring.data.web.pageable.prefix=""
+spring.data.web.pageable.qualifier-delimiter="_"
+spring.data.web.pageable.default-page-size=20
+spring.data.web.pageable.max-page-size=2000
+spring.data.web.pageable.serialization-mode=DIRECT
+spring.data.web.sort.sort-parameter="sort"

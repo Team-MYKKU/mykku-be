@@ -1,0 +1,1818 @@
+## GET /admin
+$ view
+
+## POST /admin/api/login
+$ view
+
+## POST /admin/api/v1/boards consumes=multipart/form-data
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.id integer non-null
+$.data.title string non-null
+$.data.logo string non-null
+
+## DELETE /admin/api/v1/boards/{boardId}
+$ object non-null
+$.message string non-null
+$.data null nullable
+
+## PUT /admin/api/v1/boards/{boardId} consumes=multipart/form-data
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.id integer non-null
+$.data.title string non-null
+$.data.logo string non-null
+
+## POST /admin/api/v1/contests consumes=multipart/form-data
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.id integer non-null
+$.data.title string non-null
+$.data.subTitle string nullable
+$.data.description string nullable
+$.data.startedAt string non-null format=date-time java=LocalDateTime
+$.data.expiredAt string non-null format=date-time java=LocalDateTime
+$.data.thumbnailUrl string non-null
+$.data.images array non-null
+$.data.images[] object non-null
+$.data.images[].url string non-null
+$.data.images[].orderIndex integer non-null
+$.data.tags array non-null
+$.data.tags[] string non-null
+$.data.createdAt string non-null format=date-time java=LocalDateTime
+
+## DELETE /admin/api/v1/contests/{contestId}
+$ object non-null
+$.message string non-null
+$.data null nullable
+
+## PUT /admin/api/v1/contests/{contestId} consumes=multipart/form-data
+$ object non-null
+$.message string non-null
+$.data null nullable
+
+## PUT /admin/api/v1/contests/{contestId}/winner-announcement
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.contestId integer non-null
+$.data.contestTitle string non-null
+$.data.title string non-null
+$.data.content string non-null
+$.data.announcedAt string non-null format=date java=LocalDate
+
+## POST /admin/api/v1/contests/{contestId}/winners
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.contestId integer non-null
+$.data.contestTitle string non-null
+$.data.winners array non-null
+$.data.winners[] object non-null
+$.data.winners[].winnerId integer non-null
+$.data.winners[].winnerRank integer non-null
+$.data.winners[].feedId integer non-null
+$.data.winners[].feedTitle string non-null
+$.data.winners[].authorNickname string non-null
+
+## DELETE /admin/api/v1/daily-message-comments/{commentId}
+$ object non-null
+$.message string non-null
+$.data null nullable
+
+## POST /admin/api/v1/dailymessages
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.id integer non-null
+$.data.title string non-null
+$.data.content string non-null
+$.data.date string non-null format=date java=LocalDate
+$.data.createdAt string non-null format=date-time java=LocalDateTime
+
+## DELETE /admin/api/v1/dailymessages/{id}
+$ object non-null
+$.message string non-null
+$.data null nullable
+
+## PUT /admin/api/v1/dailymessages/{id}
+$ object non-null
+$.message string non-null
+$.data null nullable
+
+## POST /admin/api/v1/events consumes=multipart/form-data
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.id integer non-null
+$.data.title string non-null
+$.data.subTitle string nullable
+$.data.description string nullable
+$.data.startedAt string non-null format=date-time java=LocalDateTime
+$.data.expiredAt string non-null format=date-time java=LocalDateTime
+$.data.thumbnailUrl string non-null
+$.data.images array non-null
+$.data.images[] object non-null
+$.data.images[].url string non-null
+$.data.images[].orderIndex integer non-null
+$.data.createdAt string non-null format=date-time java=LocalDateTime
+
+## DELETE /admin/api/v1/events/{eventId}
+$ object non-null
+$.message string non-null
+$.data null nullable
+
+## PUT /admin/api/v1/events/{eventId} consumes=multipart/form-data
+$ object non-null
+$.message string non-null
+$.data null nullable
+
+## PUT /admin/api/v1/events/{eventId}/winner-announcement
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.eventId integer non-null
+$.data.eventTitle string non-null
+$.data.title string non-null
+$.data.content string non-null
+$.data.announcedAt string non-null format=date java=LocalDate
+
+## PUT /admin/api/v1/events/{eventId}/winners
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.eventId integer non-null
+$.data.eventTitle string non-null
+$.data.dryRun boolean non-null
+$.data.entries array non-null
+$.data.entries[] object non-null
+$.data.entries[].input string non-null
+$.data.entries[].memberId string nullable
+$.data.entries[].nickname string nullable
+$.data.entries[].result string non-null enum=[OK,NOT_FOUND,PROFILE_INCOMPLETE,DUPLICATE]
+$.data.addedCount integer non-null
+$.data.keptCount integer non-null
+$.data.removedCount integer non-null
+$.data.withdrawnKeptCount integer non-null
+
+## POST /admin/api/v1/fannotes consumes=multipart/form-data
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.id integer non-null
+$.data.title string non-null
+$.data.subtitle string nullable
+$.data.content string nullable
+$.data.productionDate string non-null format=date java=LocalDate
+$.data.coverImageUrl string nullable
+$.data.pages array non-null
+$.data.pages[] object non-null
+$.data.pages[].pageNumber integer non-null
+$.data.pages[].imageUrl string non-null
+
+## DELETE /admin/api/v1/fannotes/{id}
+$ object non-null
+$.message string non-null
+$.data null nullable
+
+## PUT /admin/api/v1/fannotes/{id} consumes=multipart/form-data
+$ object non-null
+$.message string non-null
+$.data null nullable
+
+## DELETE /admin/api/v1/feed-comments/{commentId}
+$ object non-null
+$.message string non-null
+$.data null nullable
+
+## DELETE /admin/api/v1/feeds/{feedId}
+$ object non-null
+$.message string non-null
+$.data null nullable
+
+## GET /admin/api/v1/reports
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.reports array non-null
+$.data.reports[] object non-null
+$.data.reports[].id integer non-null
+$.data.reports[].reporterMemberId string nullable
+$.data.reports[].targetType string non-null
+$.data.reports[].targetTypeDescription string non-null
+$.data.reports[].targetId integer non-null
+$.data.reports[].targetMemberId string nullable
+$.data.reports[].reason string non-null
+$.data.reports[].reasonDescription string non-null
+$.data.reports[].detail string nullable
+$.data.reports[].status string non-null
+$.data.reports[].statusDescription string non-null
+$.data.reports[].processedAt string nullable format=date-time java=LocalDateTime
+$.data.reports[].createdAt string non-null format=date-time java=LocalDateTime
+$.data.currentPage integer non-null
+$.data.totalPages integer non-null
+$.data.totalElements integer non-null
+$.data.size integer non-null
+$.data.hasNext boolean non-null
+$.data.hasPrevious boolean non-null
+
+## PATCH /admin/api/v1/reports/{reportId}
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.id integer non-null
+$.data.reporterMemberId string nullable
+$.data.targetType string non-null
+$.data.targetTypeDescription string non-null
+$.data.targetId integer non-null
+$.data.targetMemberId string nullable
+$.data.reason string non-null
+$.data.reasonDescription string non-null
+$.data.detail string nullable
+$.data.status string non-null
+$.data.statusDescription string non-null
+$.data.processedAt string nullable format=date-time java=LocalDateTime
+$.data.createdAt string non-null format=date-time java=LocalDateTime
+
+## GET /admin/api/v1/roles
+$ object non-null
+$.message string non-null
+$.data array non-null
+$.data[] object non-null
+$.data[].id integer non-null
+$.data[].name string non-null
+$.data[].description string nullable
+
+## POST /admin/api/v1/roles
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.id integer non-null
+$.data.name string non-null
+$.data.description string nullable
+
+## DELETE /admin/api/v1/roles/{roleId}
+$ object non-null
+$.message string non-null
+$.data object non-null
+
+## PUT /admin/api/v1/roles/{roleId}
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.id integer non-null
+$.data.name string non-null
+$.data.description string nullable
+
+## POST /admin/api/v1/roles/{roleId}/members/{memberId}
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.id integer non-null
+$.data.role object non-null
+$.data.role.id integer non-null
+$.data.role.name string non-null
+$.data.role.description string nullable
+$.data.isRepresentative boolean non-null
+$.data.earnedAt string non-null format=date-time java=LocalDateTime
+
+## GET /admin/board
+$ view
+
+## GET /admin/board/create
+$ view
+
+## GET /admin/board/{boardId}/edit
+$ view
+
+## GET /admin/contest
+$ view
+
+## GET /admin/contest/create
+$ view
+
+## GET /admin/contest/{contestId}/edit
+$ view
+
+## GET /admin/contest/{contestId}/participants
+$ view
+
+## GET /admin/dailymessage
+$ view
+
+## GET /admin/dailymessage/create
+$ view
+
+## GET /admin/dailymessage/{id}/edit
+$ view
+
+## GET /admin/event
+$ view
+
+## GET /admin/event/create
+$ view
+
+## GET /admin/event/{eventId}/edit
+$ view
+
+## GET /admin/event/{eventId}/winners
+$ view
+
+## GET /admin/fannote
+$ view
+
+## GET /admin/fannote/create
+$ view
+
+## GET /admin/fannote/{id}/edit
+$ view
+
+## GET /admin/login
+$ view
+
+## POST /admin/logout
+$ view
+
+## GET /admin/member
+$ view
+
+## GET /admin/report
+$ view
+
+## GET /admin/report/{reportId}
+$ view
+
+## GET /api/error-codes
+$ object non-null
+$.message string non-null
+$.data array non-null
+$.data[] object non-null
+$.data[].code string non-null
+$.data[].domain string non-null
+$.data[].name string non-null
+$.data[].status integer non-null
+$.data[].message string non-null
+
+## GET /api/error-codes/domains
+$ object non-null
+$.message string non-null
+$.data array non-null
+$.data[] string non-null
+
+## GET /api/error-codes/{domain}
+$ object non-null
+$.message string non-null
+$.data array non-null
+$.data[] object non-null
+$.data[].code string non-null
+$.data[].domain string non-null
+$.data[].name string non-null
+$.data[].status integer non-null
+$.data[].message string non-null
+
+## POST /api/v1/auth/logout
+$ object non-null
+$.message string non-null
+$.data object non-null
+
+## POST /api/v1/auth/mobile/login
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.accessToken string non-null
+$.data.refreshToken string non-null
+$.data.tokenType string non-null
+$.data.accessTokenExpiresIn integer non-null
+$.data.refreshTokenExpiresIn integer non-null
+$.data.member object non-null
+$.data.member.memberId string nullable
+$.data.member.email string non-null
+$.data.member.nickname string nullable
+$.data.member.profileImage string nullable
+$.data.isExistingUser boolean non-null
+$.data.isProfileComplete boolean non-null
+
+## POST /api/v1/auth/refresh
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.accessToken string non-null
+$.data.refreshToken string non-null
+$.data.tokenType string non-null
+$.data.expiresIn integer non-null
+$.data.refreshTokenExpiresIn integer non-null
+
+## GET /api/v1/blocks/keywords
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.blocks array non-null
+$.data.blocks[] object non-null
+$.data.blocks[].id integer non-null
+$.data.blocks[].keyword string non-null
+$.data.blocks[].blockedAt string non-null format=date-time java=LocalDateTime
+$.data.totalCount integer non-null
+$.data.hasNext boolean non-null
+
+## POST /api/v1/blocks/keywords
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.id integer non-null
+$.data.keyword string non-null
+$.data.blockedAt string non-null format=date-time java=LocalDateTime
+
+## DELETE /api/v1/blocks/keywords/{keyword}
+$ object non-null
+$.message string non-null
+$.data object non-null
+
+## GET /api/v1/blocks/members
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.blocks array non-null
+$.data.blocks[] object non-null
+$.data.blocks[].id integer non-null
+$.data.blocks[].blockedMemberId string nullable
+$.data.blocks[].blockedMemberNickname string nullable
+$.data.blocks[].blockedMemberProfileImage string non-null
+$.data.blocks[].blockedAt string non-null format=date-time java=LocalDateTime
+$.data.totalCount integer non-null
+$.data.hasNext boolean non-null
+
+## POST /api/v1/blocks/members
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.id integer non-null
+$.data.blockedMemberId string nullable
+$.data.blockedMemberNickname string nullable
+$.data.blockedMemberProfileImage string non-null
+$.data.blockedAt string non-null format=date-time java=LocalDateTime
+
+## DELETE /api/v1/blocks/members/{memberId}
+$ object non-null
+$.message string non-null
+$.data object non-null
+
+## GET /api/v1/boards
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.boards array non-null
+$.data.boards[] object non-null
+$.data.boards[].id integer non-null
+$.data.boards[].title string non-null
+$.data.boards[].logo string non-null
+
+## GET /api/v1/boards/{boardId}/feeds
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.feeds array non-null
+$.data.feeds[] object non-null
+$.data.feeds[].id integer non-null
+$.data.feeds[].author object nullable
+$.data.feeds[].author.memberId string nullable
+$.data.feeds[].author.nickname string nullable
+$.data.feeds[].author.profileImage string non-null
+$.data.feeds[].author.role object nullable
+$.data.feeds[].author.role.id integer non-null
+$.data.feeds[].author.role.name string non-null
+$.data.feeds[].author.role.description string nullable
+$.data.feeds[].board string non-null
+$.data.feeds[].createdAt string non-null format=date-time java=LocalDateTime
+$.data.feeds[].title string non-null
+$.data.feeds[].content string non-null
+$.data.feeds[].images array non-null
+$.data.feeds[].images[] object non-null
+$.data.feeds[].images[].id integer non-null
+$.data.feeds[].images[].url string non-null
+$.data.feeds[].images[].width integer non-null
+$.data.feeds[].images[].height integer non-null
+$.data.feeds[].tags array non-null
+$.data.feeds[].tags[] object non-null
+$.data.feeds[].tags[].title string non-null
+$.data.feeds[].tags[].isContest boolean non-null
+$.data.feeds[].likeCount integer non-null
+$.data.feeds[].isLiked boolean non-null
+$.data.feeds[].commentCount integer non-null
+$.data.feeds[].comment object non-null
+$.data.feeds[].comment.profileImage string nullable
+$.data.feeds[].comment.content string non-null
+$.data.currentPage integer non-null
+$.data.totalPages integer non-null
+$.data.totalElements integer non-null
+$.data.size integer non-null
+$.data.hasNext boolean non-null
+$.data.hasPrevious boolean non-null
+
+## GET /api/v1/boards/{boardId}/feeds/popular
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.feeds array non-null
+$.data.feeds[] object non-null
+$.data.feeds[].id integer non-null
+$.data.feeds[].rank integer non-null
+$.data.feeds[].title string non-null
+$.data.feeds[].content string non-null
+
+## GET /api/v1/contests
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.content array non-null
+$.data.content[] object non-null
+$.data.content[].id integer non-null
+$.data.content[].title string non-null
+$.data.content[].subTitle string nullable
+$.data.content[].description string nullable
+$.data.content[].startedAt string non-null format=date-time java=LocalDateTime
+$.data.content[].expiredAt string non-null format=date-time java=LocalDateTime
+$.data.content[].status string non-null enum=[ACTIVE,EXPIRED,WINNER_SELECTING,WINNER_SELECTED,ALL]
+$.data.content[].thumbnailUrl string non-null
+$.data.content[].tags array non-null
+$.data.content[].tags[] string non-null
+$.data.content[].winnerStatus string non-null enum=[WON,LOST,PENDING]
+$.data.content[].winnerRank integer nullable
+$.data.page integer non-null
+$.data.size integer non-null
+$.data.totalElements integer non-null
+$.data.totalPages integer non-null
+$.data.isLast boolean non-null
+
+## GET /api/v1/contests/my-awards
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.content array non-null
+$.data.content[] object non-null
+$.data.content[].contestId integer non-null
+$.data.content[].contestTitle string non-null
+$.data.content[].thumbnailUrl string non-null
+$.data.content[].winnerRank integer non-null
+$.data.content[].awardTitle string nullable
+$.data.content[].acceptanceSpeech string non-null
+$.data.content[].feedId integer non-null
+$.data.content[].feedTitle string non-null
+$.data.content[].feedImageUrl string nullable
+$.data.page integer non-null
+$.data.size integer non-null
+$.data.totalElements integer non-null
+$.data.totalPages integer non-null
+$.data.isLast boolean non-null
+
+## GET /api/v1/contests/my-awards/feeds
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.feeds array non-null
+$.data.feeds[] object non-null
+$.data.feeds[].id integer non-null
+$.data.feeds[].author object nullable
+$.data.feeds[].author.memberId string nullable
+$.data.feeds[].author.nickname string nullable
+$.data.feeds[].author.profileImage string non-null
+$.data.feeds[].author.role object nullable
+$.data.feeds[].author.role.id integer non-null
+$.data.feeds[].author.role.name string non-null
+$.data.feeds[].author.role.description string nullable
+$.data.feeds[].board string non-null
+$.data.feeds[].createdAt string non-null format=date-time java=LocalDateTime
+$.data.feeds[].title string non-null
+$.data.feeds[].content string non-null
+$.data.feeds[].images array non-null
+$.data.feeds[].images[] object non-null
+$.data.feeds[].images[].id integer non-null
+$.data.feeds[].images[].url string non-null
+$.data.feeds[].images[].width integer non-null
+$.data.feeds[].images[].height integer non-null
+$.data.feeds[].tags array non-null
+$.data.feeds[].tags[] object non-null
+$.data.feeds[].tags[].title string non-null
+$.data.feeds[].tags[].isContest boolean non-null
+$.data.feeds[].likeCount integer non-null
+$.data.feeds[].isLiked boolean non-null
+$.data.feeds[].commentCount integer non-null
+$.data.feeds[].comment object non-null
+$.data.feeds[].comment.profileImage string nullable
+$.data.feeds[].comment.content string non-null
+$.data.currentPage integer non-null
+$.data.totalPages integer non-null
+$.data.totalElements integer non-null
+$.data.size integer non-null
+$.data.hasNext boolean non-null
+$.data.hasPrevious boolean non-null
+
+## GET /api/v1/contests/my-awards/preview
+$ object non-null
+$.message string non-null
+$.data array non-null
+$.data[] object non-null
+$.data[].contestId integer non-null
+$.data[].thumbnailUrl string non-null
+
+## GET /api/v1/contests/winners
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.contests array non-null
+$.data.contests[] object non-null
+$.data.contests[].contestId integer non-null
+$.data.contests[].contestTitle string non-null
+$.data.contests[].startedAt string non-null format=date-time java=LocalDateTime
+$.data.contests[].expiredAt string non-null format=date-time java=LocalDateTime
+$.data.contests[].winners array non-null
+$.data.contests[].winners[] object non-null
+$.data.contests[].winners[].winnerId integer non-null
+$.data.contests[].winners[].winnerRank integer non-null
+$.data.contests[].winners[].feedImageUrl string non-null
+
+## PATCH /api/v1/contests/winners/{winnerId}/acceptance-speech
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.winnerId integer non-null
+$.data.acceptanceSpeech string non-null
+
+## GET /api/v1/contests/{contestId}
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.id integer non-null
+$.data.title string non-null
+$.data.subTitle string nullable
+$.data.description string nullable
+$.data.startedAt string non-null format=date-time java=LocalDateTime
+$.data.expiredAt string non-null format=date-time java=LocalDateTime
+$.data.status string non-null enum=[ACTIVE,EXPIRED,WINNER_SELECTING,WINNER_SELECTED,ALL]
+$.data.thumbnailUrl string non-null
+$.data.images array non-null
+$.data.images[] object non-null
+$.data.images[].url string non-null
+$.data.images[].orderIndex integer non-null
+$.data.tags array non-null
+$.data.tags[] string non-null
+$.data.createdAt string non-null format=date-time java=LocalDateTime
+
+## GET /api/v1/contests/{contestId}/my-winner-status
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.isWinner boolean non-null
+$.data.winnerId integer nullable
+$.data.winnerRank integer nullable
+
+## GET /api/v1/contests/{contestId}/winner-announcement
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.contestId integer non-null
+$.data.contestTitle string non-null
+$.data.title string non-null
+$.data.content string non-null
+$.data.announcedAt string non-null format=date java=LocalDate
+
+## GET /api/v1/contests/{contestId}/winners
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.contestId integer non-null
+$.data.contestTitle string non-null
+$.data.winners array non-null
+$.data.winners[] object non-null
+$.data.winners[].winnerId integer non-null
+$.data.winners[].winnerRank integer non-null
+$.data.winners[].awardTitle string nullable
+$.data.winners[].feedId integer non-null
+$.data.winners[].feedTitle string non-null
+$.data.winners[].feedImageUrl string non-null
+$.data.winners[].authorNickname string non-null
+$.data.winners[].authorProfileImage string non-null
+$.data.winners[].description string non-null
+$.data.winners[].acceptanceSpeech string non-null
+
+## GET /api/v1/daily-messages
+$ object non-null
+$.message string non-null
+$.data object non-null 순서비고정(이름순)
+$.data.content array
+$.data.content[] object
+$.data.content[].id integer non-null
+$.data.content[].title string non-null
+$.data.content[].content string non-null
+$.data.content[].date string non-null format=date java=LocalDate
+$.data.empty boolean
+$.data.first boolean
+$.data.last boolean
+$.data.number integer
+$.data.numberOfElements integer
+$.data.pageable object 순서비고정(이름순)
+$.data.pageable.offset integer
+$.data.pageable.pageNumber integer
+$.data.pageable.pageSize integer
+$.data.pageable.paged boolean
+$.data.pageable.sort object 순서비고정(이름순)
+$.data.pageable.sort.empty boolean
+$.data.pageable.sort.sorted boolean
+$.data.pageable.sort.unsorted boolean
+$.data.pageable.unpaged boolean
+$.data.size integer
+$.data.sort object 순서비고정(이름순)
+$.data.sort.empty boolean
+$.data.sort.sorted boolean
+$.data.sort.unsorted boolean
+$.data.totalElements integer
+$.data.totalPages integer
+
+## DELETE /api/v1/daily-messages/comments/{commentId}
+$ object non-null
+$.message string non-null
+$.data object non-null
+
+## PUT /api/v1/daily-messages/comments/{commentId}
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.id integer non-null
+$.data.content string non-null
+$.data.author object non-null
+$.data.author.memberId string nullable
+$.data.author.nickname string non-null
+$.data.author.profileImage string nullable
+$.data.author.role object nullable
+$.data.author.role.id integer non-null
+$.data.author.role.name string non-null
+$.data.author.role.description string nullable
+$.data.likeCount integer non-null
+$.data.isLiked boolean non-null
+$.data.replies array non-null
+$.data.replies[] object non-null
+$.data.replies[].id integer non-null
+$.data.replies[].content string non-null
+$.data.replies[].author object non-null
+$.data.replies[].author.memberId string nullable
+$.data.replies[].author.nickname string non-null
+$.data.replies[].author.profileImage string nullable
+$.data.replies[].author.role object nullable
+$.data.replies[].author.role.id integer non-null
+$.data.replies[].author.role.name string non-null
+$.data.replies[].author.role.description string nullable
+$.data.replies[].likeCount integer non-null
+$.data.replies[].isLiked boolean non-null
+$.data.replies[].createdAt string non-null format=date-time java=LocalDateTime
+$.data.replies[].updatedAt string non-null format=date-time java=LocalDateTime
+$.data.replyCount integer non-null
+$.data.createdAt string non-null format=date-time java=LocalDateTime
+$.data.updatedAt string non-null format=date-time java=LocalDateTime
+
+## GET /api/v1/daily-messages/{dailyMessageId}/comments
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.comments array non-null
+$.data.comments[] object non-null
+$.data.comments[].id integer non-null
+$.data.comments[].content string non-null
+$.data.comments[].author object non-null
+$.data.comments[].author.memberId string nullable
+$.data.comments[].author.nickname string non-null
+$.data.comments[].author.profileImage string nullable
+$.data.comments[].author.role object nullable
+$.data.comments[].author.role.id integer non-null
+$.data.comments[].author.role.name string non-null
+$.data.comments[].author.role.description string nullable
+$.data.comments[].likeCount integer non-null
+$.data.comments[].isLiked boolean non-null
+$.data.comments[].replies array non-null
+$.data.comments[].replies[] object non-null
+$.data.comments[].replies[].id integer non-null
+$.data.comments[].replies[].content string non-null
+$.data.comments[].replies[].author object non-null
+$.data.comments[].replies[].author.memberId string nullable
+$.data.comments[].replies[].author.nickname string non-null
+$.data.comments[].replies[].author.profileImage string nullable
+$.data.comments[].replies[].author.role object nullable
+$.data.comments[].replies[].author.role.id integer non-null
+$.data.comments[].replies[].author.role.name string non-null
+$.data.comments[].replies[].author.role.description string nullable
+$.data.comments[].replies[].likeCount integer non-null
+$.data.comments[].replies[].isLiked boolean non-null
+$.data.comments[].replies[].createdAt string non-null format=date-time java=LocalDateTime
+$.data.comments[].replies[].updatedAt string non-null format=date-time java=LocalDateTime
+$.data.comments[].replyCount integer non-null
+$.data.comments[].createdAt string non-null format=date-time java=LocalDateTime
+$.data.comments[].updatedAt string non-null format=date-time java=LocalDateTime
+$.data.totalElements integer non-null
+$.data.totalPages integer non-null
+$.data.currentPage integer non-null
+$.data.pageSize integer non-null
+$.data.hasNext boolean non-null
+
+## POST /api/v1/daily-messages/{dailyMessageId}/comments
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.id integer non-null
+$.data.content string non-null
+$.data.author object non-null
+$.data.author.memberId string nullable
+$.data.author.nickname string non-null
+$.data.author.profileImage string nullable
+$.data.author.role object nullable
+$.data.author.role.id integer non-null
+$.data.author.role.name string non-null
+$.data.author.role.description string nullable
+$.data.likeCount integer non-null
+$.data.isLiked boolean non-null
+$.data.replies array non-null
+$.data.replies[] object non-null
+$.data.replies[].id integer non-null
+$.data.replies[].content string non-null
+$.data.replies[].author object non-null
+$.data.replies[].author.memberId string nullable
+$.data.replies[].author.nickname string non-null
+$.data.replies[].author.profileImage string nullable
+$.data.replies[].author.role object nullable
+$.data.replies[].author.role.id integer non-null
+$.data.replies[].author.role.name string non-null
+$.data.replies[].author.role.description string nullable
+$.data.replies[].likeCount integer non-null
+$.data.replies[].isLiked boolean non-null
+$.data.replies[].createdAt string non-null format=date-time java=LocalDateTime
+$.data.replies[].updatedAt string non-null format=date-time java=LocalDateTime
+$.data.replyCount integer non-null
+$.data.createdAt string non-null format=date-time java=LocalDateTime
+$.data.updatedAt string non-null format=date-time java=LocalDateTime
+
+## GET /api/v1/daily-messages/{id}
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.id integer non-null
+$.data.title string non-null
+$.data.content string non-null
+$.data.date string non-null format=date java=LocalDate
+$.data.createdAt string non-null format=date-time java=LocalDateTime
+
+## POST /api/v1/email-auth/login
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.accessToken string non-null
+$.data.refreshToken string non-null
+$.data.tokenType string non-null
+$.data.accessTokenExpiresIn integer non-null
+$.data.refreshTokenExpiresIn integer non-null
+$.data.member object non-null
+$.data.member.memberId string nullable
+$.data.member.email string non-null
+$.data.member.nickname string nullable
+$.data.member.profileImage string nullable
+$.data.isExistingUser boolean non-null
+$.data.isProfileComplete boolean non-null
+
+## POST /api/v1/email-auth/reset-password
+$ object non-null
+$.message string non-null
+$.data object non-null
+
+## POST /api/v1/email-auth/send-code
+$ object non-null
+$.message string non-null
+$.data object non-null
+
+## POST /api/v1/email-auth/send-temporary-password
+$ object non-null
+$.message string non-null
+$.data object non-null
+
+## POST /api/v1/email-auth/signup
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.accessToken string non-null
+$.data.refreshToken string non-null
+$.data.tokenType string non-null
+$.data.accessTokenExpiresIn integer non-null
+$.data.refreshTokenExpiresIn integer non-null
+$.data.member object non-null
+$.data.member.memberId string nullable
+$.data.member.email string non-null
+$.data.member.nickname string nullable
+$.data.member.profileImage string nullable
+$.data.isExistingUser boolean non-null
+$.data.isProfileComplete boolean non-null
+
+## POST /api/v1/email-auth/verify-code
+$ object non-null
+$.message string non-null
+$.data object non-null
+
+## GET /api/v1/events
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.content array non-null
+$.data.content[] object non-null
+$.data.content[].id integer non-null
+$.data.content[].title string non-null
+$.data.content[].subTitle string nullable
+$.data.content[].description string nullable
+$.data.content[].startedAt string non-null format=date-time java=LocalDateTime
+$.data.content[].expiredAt string non-null format=date-time java=LocalDateTime
+$.data.content[].status string non-null enum=[ACTIVE,EXPIRED,WINNER_SELECTING,WINNER_SELECTED,ALL]
+$.data.content[].thumbnailUrl string non-null
+$.data.page integer non-null
+$.data.size integer non-null
+$.data.totalElements integer non-null
+$.data.totalPages integer non-null
+$.data.isLast boolean non-null
+
+## GET /api/v1/events/my-awards
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.content array non-null
+$.data.content[] object non-null
+$.data.content[].eventId integer non-null
+$.data.content[].eventTitle string non-null
+$.data.content[].thumbnailUrl string non-null
+$.data.content[].startedAt string non-null format=date-time java=LocalDateTime
+$.data.content[].expiredAt string non-null format=date-time java=LocalDateTime
+$.data.page integer non-null
+$.data.size integer non-null
+$.data.totalElements integer non-null
+$.data.totalPages integer non-null
+$.data.isLast boolean non-null
+
+## GET /api/v1/events/{eventId}
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.id integer non-null
+$.data.title string non-null
+$.data.subTitle string nullable
+$.data.description string nullable
+$.data.startedAt string non-null format=date-time java=LocalDateTime
+$.data.expiredAt string non-null format=date-time java=LocalDateTime
+$.data.status string non-null enum=[ACTIVE,EXPIRED,WINNER_SELECTING,WINNER_SELECTED,ALL]
+$.data.thumbnailUrl string non-null
+$.data.images array non-null
+$.data.images[] object non-null
+$.data.images[].url string non-null
+$.data.images[].orderIndex integer non-null
+$.data.createdAt string non-null format=date-time java=LocalDateTime
+$.data.isWinner boolean non-null
+
+## GET /api/v1/events/{eventId}/my-winner-status
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.isWinner boolean non-null
+$.data.winnerId integer nullable
+
+## GET /api/v1/events/{eventId}/winner-announcement
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.eventId integer non-null
+$.data.eventTitle string non-null
+$.data.title string non-null
+$.data.content string non-null
+$.data.announcedAt string non-null format=date java=LocalDate
+
+## GET /api/v1/events/{eventId}/winners
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.eventId integer non-null
+$.data.eventTitle string non-null
+$.data.winners array non-null
+$.data.winners[] object non-null
+$.data.winners[].winnerId integer non-null
+$.data.winners[].memberId string nullable
+$.data.winners[].nickname string nullable
+$.data.winners[].profileImage string non-null
+
+## GET /api/v1/fan-notes
+$ object non-null
+$.message string non-null
+$.data object non-null 순서비고정(이름순)
+$.data.content array
+$.data.content[] object
+$.data.content[].id integer non-null
+$.data.content[].title string non-null
+$.data.content[].subtitle string nullable
+$.data.content[].content string nullable
+$.data.content[].productionDate string non-null format=date java=LocalDate
+$.data.content[].coverImageUrl string nullable
+$.data.empty boolean
+$.data.first boolean
+$.data.last boolean
+$.data.number integer
+$.data.numberOfElements integer
+$.data.pageable object 순서비고정(이름순)
+$.data.pageable.offset integer
+$.data.pageable.pageNumber integer
+$.data.pageable.pageSize integer
+$.data.pageable.paged boolean
+$.data.pageable.sort object 순서비고정(이름순)
+$.data.pageable.sort.empty boolean
+$.data.pageable.sort.sorted boolean
+$.data.pageable.sort.unsorted boolean
+$.data.pageable.unpaged boolean
+$.data.size integer
+$.data.sort object 순서비고정(이름순)
+$.data.sort.empty boolean
+$.data.sort.sorted boolean
+$.data.sort.unsorted boolean
+$.data.totalElements integer
+$.data.totalPages integer
+
+## GET /api/v1/fan-notes/{fanNoteId}
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.id integer non-null
+$.data.title string non-null
+$.data.subtitle string nullable
+$.data.content string nullable
+$.data.productionDate string non-null format=date java=LocalDate
+$.data.coverImageUrl string nullable
+$.data.pages array non-null
+$.data.pages[] object non-null
+$.data.pages[].pageNumber integer non-null
+$.data.pages[].imageUrl string non-null
+
+## GET /api/v1/fcm-tokens
+$ object non-null
+$.message string non-null
+$.data array non-null
+$.data[] object non-null
+$.data[].id integer non-null
+$.data[].deviceId string non-null
+$.data[].deviceType string nullable
+$.data[].createdAt string non-null format=date-time java=LocalDateTime
+
+## POST /api/v1/fcm-tokens
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.id integer non-null
+$.data.deviceId string non-null
+$.data.deviceType string nullable
+$.data.createdAt string non-null format=date-time java=LocalDateTime
+
+## DELETE /api/v1/fcm-tokens/{deviceId}
+$ object non-null
+$.message string non-null
+$.data object non-null
+
+## POST /api/v1/feeds consumes=multipart/form-data
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.id integer non-null
+$.data.title string non-null
+$.data.content string non-null
+$.data.boardId integer non-null
+$.data.boardTitle string non-null
+$.data.authorId string nullable
+$.data.authorNickname string nullable
+$.data.authorProfileUrl string nullable
+$.data.images array non-null
+$.data.images[] object non-null
+$.data.images[].id integer non-null
+$.data.images[].url string non-null
+$.data.images[].width integer non-null
+$.data.images[].height integer non-null
+$.data.tags array non-null
+$.data.tags[] string non-null
+$.data.likeCount integer non-null
+$.data.commentCount integer non-null
+$.data.createdAt string non-null format=date-time java=LocalDateTime
+
+## DELETE /api/v1/feeds/comments/{commentId}
+$ object non-null
+$.message string non-null
+$.data object non-null
+
+## PUT /api/v1/feeds/comments/{commentId}
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.id integer non-null
+$.data.content string non-null
+$.data.author object non-null
+$.data.author.memberId string nullable
+$.data.author.nickname string non-null
+$.data.author.profileImage string nullable
+$.data.author.role object nullable
+$.data.author.role.id integer non-null
+$.data.author.role.name string non-null
+$.data.author.role.description string nullable
+$.data.likeCount integer non-null
+$.data.isLiked boolean non-null
+$.data.replies array non-null
+$.data.replies[] object non-null
+$.data.replies[].id integer non-null
+$.data.replies[].content string non-null
+$.data.replies[].author object non-null
+$.data.replies[].author.memberId string nullable
+$.data.replies[].author.nickname string non-null
+$.data.replies[].author.profileImage string nullable
+$.data.replies[].author.role object nullable
+$.data.replies[].author.role.id integer non-null
+$.data.replies[].author.role.name string non-null
+$.data.replies[].author.role.description string nullable
+$.data.replies[].likeCount integer non-null
+$.data.replies[].isLiked boolean non-null
+$.data.replies[].createdAt string non-null format=date-time java=LocalDateTime
+$.data.replies[].updatedAt string non-null format=date-time java=LocalDateTime
+$.data.replyCount integer non-null
+$.data.createdAt string non-null format=date-time java=LocalDateTime
+$.data.updatedAt string non-null format=date-time java=LocalDateTime
+
+## DELETE /api/v1/feeds/{feedId}
+$ object non-null
+$.message string non-null
+$.data object non-null
+
+## GET /api/v1/feeds/{feedId}
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.id integer non-null
+$.data.author object nullable
+$.data.author.memberId string nullable
+$.data.author.nickname string nullable
+$.data.author.profileImage string non-null
+$.data.author.role object nullable
+$.data.author.role.id integer non-null
+$.data.author.role.name string non-null
+$.data.author.role.description string nullable
+$.data.boardId integer non-null
+$.data.boardTitle string non-null
+$.data.createdAt string non-null format=date-time java=LocalDateTime
+$.data.updatedAt string non-null format=date-time java=LocalDateTime
+$.data.title string non-null
+$.data.content string non-null
+$.data.images array non-null
+$.data.images[] object non-null
+$.data.images[].id integer non-null
+$.data.images[].url string non-null
+$.data.images[].width integer non-null
+$.data.images[].height integer non-null
+$.data.tags array non-null
+$.data.tags[] object non-null
+$.data.tags[].title string non-null
+$.data.tags[].isContest boolean non-null
+$.data.likeCount integer non-null
+$.data.isLiked boolean non-null
+$.data.commentCount integer non-null
+
+## PATCH /api/v1/feeds/{feedId} consumes=multipart/form-data
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.id integer non-null
+$.data.author object nullable
+$.data.author.memberId string nullable
+$.data.author.nickname string nullable
+$.data.author.profileImage string non-null
+$.data.author.role object nullable
+$.data.author.role.id integer non-null
+$.data.author.role.name string non-null
+$.data.author.role.description string nullable
+$.data.boardId integer non-null
+$.data.boardTitle string non-null
+$.data.createdAt string non-null format=date-time java=LocalDateTime
+$.data.updatedAt string non-null format=date-time java=LocalDateTime
+$.data.title string non-null
+$.data.content string non-null
+$.data.images array non-null
+$.data.images[] object non-null
+$.data.images[].id integer non-null
+$.data.images[].url string non-null
+$.data.images[].width integer non-null
+$.data.images[].height integer non-null
+$.data.tags array non-null
+$.data.tags[] object non-null
+$.data.tags[].title string non-null
+$.data.tags[].isContest boolean non-null
+$.data.likeCount integer non-null
+$.data.isLiked boolean non-null
+$.data.commentCount integer non-null
+
+## GET /api/v1/feeds/{feedId}/comments
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.comments array non-null
+$.data.comments[] object non-null
+$.data.comments[].id integer non-null
+$.data.comments[].content string non-null
+$.data.comments[].author object non-null
+$.data.comments[].author.memberId string nullable
+$.data.comments[].author.nickname string non-null
+$.data.comments[].author.profileImage string nullable
+$.data.comments[].author.role object nullable
+$.data.comments[].author.role.id integer non-null
+$.data.comments[].author.role.name string non-null
+$.data.comments[].author.role.description string nullable
+$.data.comments[].likeCount integer non-null
+$.data.comments[].isLiked boolean non-null
+$.data.comments[].replies array non-null
+$.data.comments[].replies[] object non-null
+$.data.comments[].replies[].id integer non-null
+$.data.comments[].replies[].content string non-null
+$.data.comments[].replies[].author object non-null
+$.data.comments[].replies[].author.memberId string nullable
+$.data.comments[].replies[].author.nickname string non-null
+$.data.comments[].replies[].author.profileImage string nullable
+$.data.comments[].replies[].author.role object nullable
+$.data.comments[].replies[].author.role.id integer non-null
+$.data.comments[].replies[].author.role.name string non-null
+$.data.comments[].replies[].author.role.description string nullable
+$.data.comments[].replies[].likeCount integer non-null
+$.data.comments[].replies[].isLiked boolean non-null
+$.data.comments[].replies[].createdAt string non-null format=date-time java=LocalDateTime
+$.data.comments[].replies[].updatedAt string non-null format=date-time java=LocalDateTime
+$.data.comments[].replyCount integer non-null
+$.data.comments[].createdAt string non-null format=date-time java=LocalDateTime
+$.data.comments[].updatedAt string non-null format=date-time java=LocalDateTime
+$.data.totalElements integer non-null
+$.data.totalPages integer non-null
+$.data.currentPage integer non-null
+$.data.pageSize integer non-null
+$.data.hasNext boolean non-null
+
+## POST /api/v1/feeds/{feedId}/comments
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.id integer non-null
+$.data.content string non-null
+$.data.author object non-null
+$.data.author.memberId string nullable
+$.data.author.nickname string non-null
+$.data.author.profileImage string nullable
+$.data.author.role object nullable
+$.data.author.role.id integer non-null
+$.data.author.role.name string non-null
+$.data.author.role.description string nullable
+$.data.likeCount integer non-null
+$.data.isLiked boolean non-null
+$.data.replies array non-null
+$.data.replies[] object non-null
+$.data.replies[].id integer non-null
+$.data.replies[].content string non-null
+$.data.replies[].author object non-null
+$.data.replies[].author.memberId string nullable
+$.data.replies[].author.nickname string non-null
+$.data.replies[].author.profileImage string nullable
+$.data.replies[].author.role object nullable
+$.data.replies[].author.role.id integer non-null
+$.data.replies[].author.role.name string non-null
+$.data.replies[].author.role.description string nullable
+$.data.replies[].likeCount integer non-null
+$.data.replies[].isLiked boolean non-null
+$.data.replies[].createdAt string non-null format=date-time java=LocalDateTime
+$.data.replies[].updatedAt string non-null format=date-time java=LocalDateTime
+$.data.replyCount integer non-null
+$.data.createdAt string non-null format=date-time java=LocalDateTime
+$.data.updatedAt string non-null format=date-time java=LocalDateTime
+
+## GET /api/v1/likes/boards
+$ object non-null
+$.message string non-null
+$.data object non-null 순서비고정(이름순)
+$.data.content array
+$.data.content[] object
+$.data.content[].id integer non-null
+$.data.content[].title string non-null
+$.data.content[].logo string non-null
+$.data.empty boolean
+$.data.first boolean
+$.data.last boolean
+$.data.number integer
+$.data.numberOfElements integer
+$.data.pageable object 순서비고정(이름순)
+$.data.pageable.offset integer
+$.data.pageable.pageNumber integer
+$.data.pageable.pageSize integer
+$.data.pageable.paged boolean
+$.data.pageable.sort object 순서비고정(이름순)
+$.data.pageable.sort.empty boolean
+$.data.pageable.sort.sorted boolean
+$.data.pageable.sort.unsorted boolean
+$.data.pageable.unpaged boolean
+$.data.size integer
+$.data.sort object 순서비고정(이름순)
+$.data.sort.empty boolean
+$.data.sort.sorted boolean
+$.data.sort.unsorted boolean
+$.data.totalElements integer
+$.data.totalPages integer
+
+## DELETE /api/v1/likes/boards/{boardId}
+$ object non-null
+$.message string non-null
+$.data object non-null
+
+## POST /api/v1/likes/boards/{boardId}
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.id integer non-null
+$.data.memberId string nullable
+$.data.boardId integer non-null
+
+## DELETE /api/v1/likes/daily-message-comments/{dailyMessageCommentId}
+$ object non-null
+$.message string non-null
+$.data object non-null
+
+## POST /api/v1/likes/daily-message-comments/{dailyMessageCommentId}
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.id integer non-null
+$.data.memberId string nullable
+$.data.dailyMessageCommentId integer non-null
+
+## DELETE /api/v1/likes/feed-comments/{feedCommentId}
+$ object non-null
+$.message string non-null
+$.data object non-null
+
+## POST /api/v1/likes/feed-comments/{feedCommentId}
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.id integer non-null
+$.data.memberId string nullable
+$.data.feedCommentId integer non-null
+
+## DELETE /api/v1/likes/feeds/{feedId}
+$ object non-null
+$.message string non-null
+$.data object non-null
+
+## POST /api/v1/likes/feeds/{feedId}
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.id integer non-null
+$.data.memberId string nullable
+$.data.feedId integer non-null
+
+## POST /api/v1/members/check-id
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.memberId string non-null
+$.data.available boolean non-null
+
+## DELETE /api/v1/members/me
+$ empty
+
+## GET /api/v1/members/me
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.memberId string nullable
+$.data.email string non-null
+$.data.nickname string nullable
+$.data.profileImage string non-null
+$.data.role object nullable
+$.data.role.id integer non-null
+$.data.role.name string non-null
+$.data.role.description string nullable
+$.data.provider string nullable
+$.data.emailVerified boolean non-null
+$.data.createdAt string non-null format=date-time java=LocalDateTime
+
+## PATCH /api/v1/members/me consumes=application/json
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.memberId string nullable
+$.data.email string non-null
+$.data.nickname string nullable
+$.data.profileImage string non-null
+$.data.role object nullable
+$.data.role.id integer non-null
+$.data.role.name string non-null
+$.data.role.description string nullable
+$.data.provider string nullable
+$.data.emailVerified boolean non-null
+$.data.createdAt string non-null format=date-time java=LocalDateTime
+
+## PATCH /api/v1/members/me consumes=multipart/form-data
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.memberId string nullable
+$.data.email string non-null
+$.data.nickname string nullable
+$.data.profileImage string non-null
+$.data.role object nullable
+$.data.role.id integer non-null
+$.data.role.name string non-null
+$.data.role.description string nullable
+$.data.provider string nullable
+$.data.emailVerified boolean non-null
+$.data.createdAt string non-null format=date-time java=LocalDateTime
+
+## GET /api/v1/members/me/contests
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.content array non-null
+$.data.content[] object non-null
+$.data.content[].id integer non-null
+$.data.content[].title string non-null
+$.data.content[].subTitle string nullable
+$.data.content[].description string nullable
+$.data.content[].startedAt string non-null format=date-time java=LocalDateTime
+$.data.content[].expiredAt string non-null format=date-time java=LocalDateTime
+$.data.content[].status string non-null enum=[ACTIVE,EXPIRED,WINNER_SELECTING,WINNER_SELECTED,ALL]
+$.data.content[].thumbnailUrl string non-null
+$.data.content[].tags array non-null
+$.data.content[].tags[] string non-null
+$.data.content[].winnerStatus string non-null enum=[WON,LOST,PENDING]
+$.data.content[].winnerRank integer nullable
+$.data.page integer non-null
+$.data.size integer non-null
+$.data.totalElements integer non-null
+$.data.totalPages integer non-null
+$.data.isLast boolean non-null
+
+## GET /api/v1/members/me/events
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.content array non-null
+$.data.content[] object non-null
+$.data.content[].id integer non-null
+$.data.content[].title string non-null
+$.data.content[].startedAt string non-null format=date-time java=LocalDateTime
+$.data.content[].expiredAt string non-null format=date-time java=LocalDateTime
+$.data.content[].status string non-null enum=[ACTIVE,EXPIRED,WINNER_SELECTING,WINNER_SELECTED,ALL]
+$.data.content[].thumbnailUrl string non-null
+$.data.content[].winnerStatus string non-null enum=[WON,LOST,PENDING]
+$.data.page integer non-null
+$.data.size integer non-null
+$.data.totalElements integer non-null
+$.data.totalPages integer non-null
+$.data.isLast boolean non-null
+
+## GET /api/v1/members/me/feeds
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.feeds array non-null
+$.data.feeds[] object non-null
+$.data.feeds[].id integer non-null
+$.data.feeds[].author object nullable
+$.data.feeds[].author.memberId string nullable
+$.data.feeds[].author.nickname string nullable
+$.data.feeds[].author.profileImage string non-null
+$.data.feeds[].author.role object nullable
+$.data.feeds[].author.role.id integer non-null
+$.data.feeds[].author.role.name string non-null
+$.data.feeds[].author.role.description string nullable
+$.data.feeds[].board string non-null
+$.data.feeds[].createdAt string non-null format=date-time java=LocalDateTime
+$.data.feeds[].title string non-null
+$.data.feeds[].content string non-null
+$.data.feeds[].images array non-null
+$.data.feeds[].images[] object non-null
+$.data.feeds[].images[].id integer non-null
+$.data.feeds[].images[].url string non-null
+$.data.feeds[].images[].width integer non-null
+$.data.feeds[].images[].height integer non-null
+$.data.feeds[].tags array non-null
+$.data.feeds[].tags[] object non-null
+$.data.feeds[].tags[].title string non-null
+$.data.feeds[].tags[].isContest boolean non-null
+$.data.feeds[].likeCount integer non-null
+$.data.feeds[].isLiked boolean non-null
+$.data.feeds[].commentCount integer non-null
+$.data.feeds[].comment object non-null
+$.data.feeds[].comment.profileImage string nullable
+$.data.feeds[].comment.content string non-null
+$.data.currentPage integer non-null
+$.data.totalPages integer non-null
+$.data.totalElements integer non-null
+$.data.size integer non-null
+$.data.hasNext boolean non-null
+$.data.hasPrevious boolean non-null
+
+## PATCH /api/v1/members/me/member-id
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.memberId string nullable
+$.data.email string non-null
+$.data.nickname string nullable
+$.data.profileImage string non-null
+$.data.role object nullable
+$.data.role.id integer non-null
+$.data.role.name string non-null
+$.data.role.description string nullable
+$.data.provider string nullable
+$.data.emailVerified boolean non-null
+$.data.createdAt string non-null format=date-time java=LocalDateTime
+
+## PUT /api/v1/members/password
+$ object non-null
+$.message string non-null
+$.data object non-null
+
+## POST /api/v1/members/setup-profile
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.memberId string nullable
+$.data.email string non-null
+$.data.nickname string nullable
+$.data.profileImage string non-null
+$.data.role object nullable
+$.data.role.id integer non-null
+$.data.role.name string non-null
+$.data.role.description string nullable
+$.data.provider string nullable
+$.data.emailVerified boolean non-null
+$.data.createdAt string non-null format=date-time java=LocalDateTime
+
+## GET /api/v1/notification-settings
+$ object non-null
+$.message string non-null
+$.data array non-null
+$.data[] object non-null
+$.data[].id integer non-null
+$.data[].notificationType string non-null enum=[FEED_LIKE,FEED_COMMENT]
+$.data[].isEnabled boolean non-null
+
+## PATCH /api/v1/notification-settings
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.id integer non-null
+$.data.notificationType string non-null enum=[FEED_LIKE,FEED_COMMENT]
+$.data.isEnabled boolean non-null
+
+## GET /api/v1/notifications
+$ object non-null
+$.message string non-null
+$.data object non-null 순서비고정(이름순)
+$.data.content array
+$.data.content[] object
+$.data.content[].id integer non-null
+$.data.content[].type string non-null enum=[FEED_LIKE,FEED_COMMENT]
+$.data.content[].senderNickname string nullable
+$.data.content[].senderProfileImage string nullable
+$.data.content[].content string non-null
+$.data.content[].isRead boolean non-null
+$.data.content[].relatedResourceId integer nullable
+$.data.content[].relatedResourceType string nullable
+$.data.content[].createdAt string non-null format=date-time java=LocalDateTime
+$.data.empty boolean
+$.data.first boolean
+$.data.last boolean
+$.data.number integer
+$.data.numberOfElements integer
+$.data.pageable object 순서비고정(이름순)
+$.data.pageable.offset integer
+$.data.pageable.pageNumber integer
+$.data.pageable.pageSize integer
+$.data.pageable.paged boolean
+$.data.pageable.sort object 순서비고정(이름순)
+$.data.pageable.sort.empty boolean
+$.data.pageable.sort.sorted boolean
+$.data.pageable.sort.unsorted boolean
+$.data.pageable.unpaged boolean
+$.data.size integer
+$.data.sort object 순서비고정(이름순)
+$.data.sort.empty boolean
+$.data.sort.sorted boolean
+$.data.sort.unsorted boolean
+$.data.totalElements integer
+$.data.totalPages integer
+
+## PATCH /api/v1/notifications/read-all
+$ object non-null
+$.message string non-null
+$.data object non-null
+
+## GET /api/v1/notifications/unread
+$ object non-null
+$.message string non-null
+$.data object non-null 순서비고정(이름순)
+$.data.content array
+$.data.content[] object
+$.data.content[].id integer non-null
+$.data.content[].type string non-null enum=[FEED_LIKE,FEED_COMMENT]
+$.data.content[].senderNickname string nullable
+$.data.content[].senderProfileImage string nullable
+$.data.content[].content string non-null
+$.data.content[].isRead boolean non-null
+$.data.content[].relatedResourceId integer nullable
+$.data.content[].relatedResourceType string nullable
+$.data.content[].createdAt string non-null format=date-time java=LocalDateTime
+$.data.empty boolean
+$.data.first boolean
+$.data.last boolean
+$.data.number integer
+$.data.numberOfElements integer
+$.data.pageable object 순서비고정(이름순)
+$.data.pageable.offset integer
+$.data.pageable.pageNumber integer
+$.data.pageable.pageSize integer
+$.data.pageable.paged boolean
+$.data.pageable.sort object 순서비고정(이름순)
+$.data.pageable.sort.empty boolean
+$.data.pageable.sort.sorted boolean
+$.data.pageable.sort.unsorted boolean
+$.data.pageable.unpaged boolean
+$.data.size integer
+$.data.sort object 순서비고정(이름순)
+$.data.sort.empty boolean
+$.data.sort.sorted boolean
+$.data.sort.unsorted boolean
+$.data.totalElements integer
+$.data.totalPages integer
+
+## GET /api/v1/notifications/unread/count
+$ object non-null
+$.message string non-null
+$.data integer non-null
+
+## DELETE /api/v1/notifications/{notificationId}
+$ object non-null
+$.message string non-null
+$.data object non-null
+
+## PATCH /api/v1/notifications/{notificationId}/read
+$ object non-null
+$.message string non-null
+$.data object non-null
+
+## GET /api/v1/preferences/genre
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.genreTypes array non-null
+$.data.genreTypes[] string non-null enum=[KPOP,WEBTOON_WEBNOVEL,MANGA_ANIME,GAME_ESPORTS,DRAMA_MOVIE,THEATER_MUSICAL,BAND_ROCK]
+
+## POST /api/v1/preferences/genre
+$ object non-null
+$.message string non-null
+$.data object non-null
+
+## GET /api/v1/preferences/goods
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.goodsTypes array non-null
+$.data.goodsTypes[] string non-null enum=[PHOTOCARD_HOLDER,DESK_TERIOR,LIGHT_STICK_DECO,ITABAG,UCHIWA,DIARY_DECO,NAME_BOARD,PHONE_ACCESSORY]
+
+## POST /api/v1/preferences/goods
+$ object non-null
+$.message string non-null
+$.data object non-null
+
+## GET /api/v1/preferences/mood
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.moodTypes array non-null
+$.data.moodTypes[] string non-null enum=[COZY,KITSCH,FRESH,DECADENT,SILLY,Y2K,PIXEL_ART,FUNNY]
+
+## POST /api/v1/preferences/mood
+$ object non-null
+$.message string non-null
+$.data object non-null
+
+## POST /api/v1/reports
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.id integer non-null
+$.data.reporterMemberId string nullable
+$.data.targetType string non-null
+$.data.targetTypeDescription string non-null
+$.data.targetId integer non-null
+$.data.targetMemberId string nullable
+$.data.reason string non-null
+$.data.reasonDescription string non-null
+$.data.detail string nullable
+$.data.status string non-null
+$.data.statusDescription string non-null
+$.data.processedAt string nullable format=date-time java=LocalDateTime
+$.data.createdAt string non-null format=date-time java=LocalDateTime
+
+## GET /api/v1/reports/reasons
+$ object non-null
+$.message string non-null
+$.data array non-null
+$.data[] object non-null
+$.data[].reason string non-null
+$.data[].description string non-null
+
+## GET /api/v1/roles
+$ object non-null
+$.message string non-null
+$.data array non-null
+$.data[] object non-null
+$.data[].id integer non-null
+$.data[].name string non-null
+$.data[].description string nullable
+
+## GET /api/v1/roles/me
+$ object non-null
+$.message string non-null
+$.data array non-null
+$.data[] object non-null
+$.data[].id integer non-null
+$.data[].role object non-null
+$.data[].role.id integer non-null
+$.data[].role.name string non-null
+$.data[].role.description string nullable
+$.data[].isRepresentative boolean non-null
+$.data[].earnedAt string non-null format=date-time java=LocalDateTime
+
+## GET /api/v1/roles/me/new
+$ object non-null
+$.message string non-null
+$.data array non-null
+$.data[] object non-null
+$.data[].id integer non-null
+$.data[].role object non-null
+$.data[].role.id integer non-null
+$.data[].role.name string non-null
+$.data[].role.description string nullable
+$.data[].isRepresentative boolean non-null
+$.data[].earnedAt string non-null format=date-time java=LocalDateTime
+
+## PATCH /api/v1/roles/{memberRoleId}/representative
+$ object non-null
+$.message string non-null
+$.data object non-null
+
+## GET /api/v1/search/feeds
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.boards array non-null
+$.data.boards[] object non-null
+$.data.boards[].boardId integer non-null
+$.data.boards[].boardTitle string non-null
+$.data.boards[].boardLogo string non-null
+$.data.boards[].totalCount integer non-null
+$.data.boards[].hasMore boolean non-null
+$.data.boards[].feeds array non-null
+$.data.boards[].feeds[] object non-null
+$.data.boards[].feeds[].id integer non-null
+$.data.boards[].feeds[].boardId integer non-null
+$.data.boards[].feeds[].boardTitle string non-null
+$.data.boards[].feeds[].title string non-null
+$.data.boards[].feeds[].content string non-null
+$.data.boards[].feeds[].thumbnailUrl string nullable
+$.data.boards[].feeds[].createdAt string non-null format=date-time java=LocalDateTime
+
+## GET /api/v1/search/feeds/boards/{boardId}
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.feeds array non-null
+$.data.feeds[] object non-null
+$.data.feeds[].id integer non-null
+$.data.feeds[].boardId integer non-null
+$.data.feeds[].boardTitle string non-null
+$.data.feeds[].title string non-null
+$.data.feeds[].content string non-null
+$.data.feeds[].thumbnailUrl string nullable
+$.data.feeds[].createdAt string non-null format=date-time java=LocalDateTime
+$.data.currentPage integer non-null
+$.data.totalPages integer non-null
+$.data.totalElements integer non-null
+$.data.size integer non-null
+$.data.hasNext boolean non-null
+$.data.hasPrevious boolean non-null
+
+## * /error
+$ map
+$.* any
+
+## * /error produces=text/html
+$ view
+

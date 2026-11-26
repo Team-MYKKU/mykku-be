@@ -1,0 +1,33 @@
+null → String: {"value":null} -> 오류 HttpMessageNotReadableException <- MissingKotlinParameterException
+누락 → String: {} -> 오류 HttpMessageNotReadableException <- MissingKotlinParameterException
+null → String?: {"value":null} -> 값 NullableTextProbe(value=null)
+누락 → String?: {} -> 값 NullableTextProbe(value=null)
+누락 → 기본값 String: {} -> 값 DefaultTextProbe(value=기본값)
+null → 기본값 String: {"value":null} -> 오류 HttpMessageNotReadableException <- MissingKotlinParameterException
+is 접두 이름 → Boolean: {"isActive":true} -> 값 BooleanNameProbe(isActive=true)
+접두 없는 이름 → Boolean: {"active":true} -> 값 BooleanNameProbe(isActive=false)
+null → List<String>: {"values":null} -> 오류 HttpMessageNotReadableException <- MissingKotlinParameterException
+null 원소 → List<String>: {"values":["a",null]} -> 값 ListProbe(values=[a, null])
+누락 → Long: {} -> 값 LongProbe(value=0)
+null → Long: {"value":null} -> 값 LongProbe(value=0)
+1.5 → Long: {"value":1.5} -> 오류 HttpMessageNotReadableException <- InvalidFormatException
+1.0 → Long: {"value":1.0} -> 오류 HttpMessageNotReadableException <- InvalidFormatException
+문자열 7 → Long: {"value":"7"} -> 값 LongProbe(value=7)
+빈 문자열 → Long?: {"value":""} -> 값 NullableLongProbe(value=null)
+빈 문자열 → Long: {"value":""} -> 값 LongProbe(value=0)
+Int 범위 초과 → Int: {"value":2147483648} -> 오류 HttpMessageNotReadableException <- JsonMappingException <- InputCoercionException
+숫자 1 → String: {"value":1} -> 값 TextProbe(value=1)
+상수 이름 enum: {"value":"HIGH"} -> 값 EnumProbe(value=HIGH)
+소문자 enum: {"value":"high"} -> 오류 HttpMessageNotReadableException <- InvalidFormatException
+숫자 enum: {"value":1} -> 값 EnumProbe(value=HIGH)
+toString 값 enum: {"value":"둘째"} -> 오류 HttpMessageNotReadableException <- InvalidFormatException
+Z 붙은 시각: {"value":"2001-02-03T04:05:06Z"} -> 값 DateTimeProbe(value=2001-02-03T04:05:06)
+오프셋 붙은 시각: {"value":"2001-02-03T04:05:06+09:00"} -> 오류 HttpMessageNotReadableException <- InvalidFormatException <- DateTimeParseException
+공백 구분 시각: {"value":"2001-02-03 04:05:06"} -> 오류 HttpMessageNotReadableException <- InvalidFormatException <- DateTimeParseException
+초 없는 시각: {"value":"2001-02-03T04:05"} -> 값 DateTimeProbe(value=2001-02-03T04:05)
+단일 값 → 배열: {"values":"a"} -> 오류 HttpMessageNotReadableException <- MismatchedInputException
+모르는 필드: {"value":"a","unknown":1} -> 값 TextProbe(value=a)
+중복 키: {"value":"a","value":"b"} -> 값 TextProbe(value=b)
+뒤따르는 토큰: {"value":"a"} {"value":"b"} -> 값 TextProbe(value=a)
+주석: {/* c */"value":"a"} -> 오류 HttpMessageNotReadableException <- JsonParseException
+작은따옴표: {'value':'a'} -> 오류 HttpMessageNotReadableException <- JsonParseException

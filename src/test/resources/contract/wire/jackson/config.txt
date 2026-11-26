@@ -1,0 +1,202 @@
+# 라이브러리 버전
+jackson-core 2.18.3
+jackson-databind 2.18.3
+jackson-module-kotlin 2.18.3
+jackson-datatype-jsr310 2.18.3
+jackson-datatype-jdk8 2.18.3
+jackson-module-parameter-names 2.18.3
+
+# 등록 모듈
+Spring Data Geo Mixins
+com.fasterxml.jackson.datatype.jdk8.Jdk8Module
+com.fasterxml.jackson.module.kotlin.KotlinModule
+jackson-datatype-jsr310
+jackson-module-parameter-names
+org.springframework.boot.jackson.JsonComponentModule
+org.springframework.boot.jackson.JsonMixinModule
+org.springframework.data.web.config.SpringDataJacksonConfiguration$PageModule
+
+# 포함 규칙·명명·날짜
+default-property-inclusion=JsonInclude.Value(value=USE_DEFAULTS,content=USE_DEFAULTS)
+property-naming-strategy=null
+date-format=com.fasterxml.jackson.databind.util.StdDateFormat
+time-zone=UTC
+explicit-time-zone=false
+serialization-visibility=[Visibility: getter=PUBLIC_ONLY,isGetter=PUBLIC_ONLY,setter=ANY,creator=ANY,field=PUBLIC_ONLY]
+deserialization-visibility=[Visibility: getter=PUBLIC_ONLY,isGetter=PUBLIC_ONLY,setter=ANY,creator=ANY,field=PUBLIC_ONLY]
+default-setter-info=JsonSetter.Value(valueNulls=DEFAULT,contentNulls=DEFAULT)
+default-mergeable=null
+annotation-introspectors=[com.fasterxml.jackson.module.kotlin.KotlinAnnotationIntrospector, com.fasterxml.jackson.module.paramnames.ParameterNamesAnnotationIntrospector, com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector, com.fasterxml.jackson.module.kotlin.KotlinNamesAnnotationIntrospector]
+
+# SerializationFeature
+WRAP_ROOT_VALUE=false
+INDENT_OUTPUT=false
+FAIL_ON_EMPTY_BEANS=true
+FAIL_ON_SELF_REFERENCES=true
+WRAP_EXCEPTIONS=true
+FAIL_ON_UNWRAPPED_TYPE_IDENTIFIERS=true
+WRITE_SELF_REFERENCES_AS_NULL=false
+CLOSE_CLOSEABLE=false
+FLUSH_AFTER_WRITE_VALUE=true
+WRITE_DATES_AS_TIMESTAMPS=false
+WRITE_DATE_KEYS_AS_TIMESTAMPS=false
+WRITE_DATES_WITH_ZONE_ID=false
+WRITE_DATES_WITH_CONTEXT_TIME_ZONE=true
+WRITE_DURATIONS_AS_TIMESTAMPS=false
+WRITE_CHAR_ARRAYS_AS_JSON_ARRAYS=false
+WRITE_ENUMS_USING_TO_STRING=false
+WRITE_ENUMS_USING_INDEX=false
+WRITE_ENUM_KEYS_USING_INDEX=false
+WRITE_NULL_MAP_VALUES=true
+WRITE_EMPTY_JSON_ARRAYS=true
+WRITE_SINGLE_ELEM_ARRAYS_UNWRAPPED=false
+WRITE_BIGDECIMAL_AS_PLAIN=false
+WRITE_DATE_TIMESTAMPS_AS_NANOSECONDS=true
+ORDER_MAP_ENTRIES_BY_KEYS=false
+EAGER_SERIALIZER_FETCH=true
+USE_EQUALITY_FOR_OBJECT_ID=false
+
+# DeserializationFeature
+USE_BIG_DECIMAL_FOR_FLOATS=false
+USE_BIG_INTEGER_FOR_INTS=false
+USE_LONG_FOR_INTS=false
+USE_JAVA_ARRAY_FOR_JSON_ARRAY=false
+FAIL_ON_UNKNOWN_PROPERTIES=false
+FAIL_ON_NULL_FOR_PRIMITIVES=false
+FAIL_ON_NUMBERS_FOR_ENUMS=false
+FAIL_ON_INVALID_SUBTYPE=true
+FAIL_ON_READING_DUP_TREE_KEY=false
+FAIL_ON_IGNORED_PROPERTIES=false
+FAIL_ON_UNRESOLVED_OBJECT_IDS=true
+FAIL_ON_MISSING_CREATOR_PROPERTIES=false
+FAIL_ON_NULL_CREATOR_PROPERTIES=false
+FAIL_ON_MISSING_EXTERNAL_TYPE_ID_PROPERTY=true
+FAIL_ON_TRAILING_TOKENS=false
+WRAP_EXCEPTIONS=true
+FAIL_ON_UNEXPECTED_VIEW_PROPERTIES=false
+ACCEPT_SINGLE_VALUE_AS_ARRAY=false
+UNWRAP_SINGLE_VALUE_ARRAYS=false
+UNWRAP_ROOT_VALUE=false
+ACCEPT_EMPTY_STRING_AS_NULL_OBJECT=false
+ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT=false
+ACCEPT_FLOAT_AS_INT=false
+READ_ENUMS_USING_TO_STRING=false
+READ_UNKNOWN_ENUM_VALUES_AS_NULL=false
+READ_UNKNOWN_ENUM_VALUES_USING_DEFAULT_VALUE=false
+READ_DATE_TIMESTAMPS_AS_NANOSECONDS=true
+ADJUST_DATES_TO_CONTEXT_TIME_ZONE=true
+EAGER_DESERIALIZER_FETCH=true
+
+# MapperFeature
+USE_ANNOTATIONS=true
+USE_GETTERS_AS_SETTERS=true
+PROPAGATE_TRANSIENT_MARKER=false
+AUTO_DETECT_CREATORS=true
+AUTO_DETECT_FIELDS=true
+AUTO_DETECT_GETTERS=true
+AUTO_DETECT_IS_GETTERS=true
+AUTO_DETECT_SETTERS=true
+REQUIRE_SETTERS_FOR_GETTERS=false
+ALLOW_FINAL_FIELDS_AS_MUTATORS=true
+INFER_PROPERTY_MUTATORS=true
+INFER_CREATOR_FROM_CONSTRUCTOR_PROPERTIES=true
+ALLOW_VOID_VALUED_PROPERTIES=false
+CAN_OVERRIDE_ACCESS_MODIFIERS=true
+OVERRIDE_PUBLIC_ACCESS_MODIFIERS=true
+USE_STATIC_TYPING=false
+USE_BASE_TYPE_AS_DEFAULT_IMPL=false
+INFER_BUILDER_TYPE_BINDINGS=true
+REQUIRE_TYPE_ID_FOR_SUBTYPES=true
+DEFAULT_VIEW_INCLUSION=false
+SORT_PROPERTIES_ALPHABETICALLY=false
+SORT_CREATOR_PROPERTIES_FIRST=true
+SORT_CREATOR_PROPERTIES_BY_DECLARATION_ORDER=false
+ACCEPT_CASE_INSENSITIVE_PROPERTIES=false
+ACCEPT_CASE_INSENSITIVE_ENUMS=false
+ACCEPT_CASE_INSENSITIVE_VALUES=false
+USE_WRAPPER_NAME_AS_PROPERTY_NAME=false
+USE_STD_BEAN_NAMING=false
+ALLOW_EXPLICIT_PROPERTY_RENAMING=false
+ALLOW_IS_GETTERS_FOR_NON_BOOLEAN=false
+ALLOW_COERCION_OF_SCALARS=true
+IGNORE_DUPLICATE_MODULE_REGISTRATIONS=true
+IGNORE_MERGE_FOR_UNMERGEABLE=true
+BLOCK_UNSAFE_POLYMORPHIC_BASE_TYPES=false
+APPLY_DEFAULT_VALUES=true
+
+# JsonParser.Feature(실제 파서)
+AUTO_CLOSE_SOURCE=true
+ALLOW_COMMENTS=false
+ALLOW_YAML_COMMENTS=false
+ALLOW_UNQUOTED_FIELD_NAMES=false
+ALLOW_SINGLE_QUOTES=false
+ALLOW_UNQUOTED_CONTROL_CHARS=false
+ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER=false
+ALLOW_NUMERIC_LEADING_ZEROS=false
+ALLOW_LEADING_PLUS_SIGN_FOR_NUMBERS=false
+ALLOW_LEADING_DECIMAL_POINT_FOR_NUMBERS=false
+ALLOW_TRAILING_DECIMAL_POINT_FOR_NUMBERS=false
+ALLOW_NON_NUMERIC_NUMBERS=false
+ALLOW_MISSING_VALUES=false
+ALLOW_TRAILING_COMMA=false
+STRICT_DUPLICATE_DETECTION=false
+IGNORE_UNDEFINED=false
+INCLUDE_SOURCE_IN_LOCATION=false
+USE_FAST_DOUBLE_PARSER=false
+USE_FAST_BIG_NUMBER_PARSER=false
+
+# JsonGenerator.Feature(실제 생성기)
+AUTO_CLOSE_TARGET=true
+AUTO_CLOSE_JSON_CONTENT=true
+FLUSH_PASSED_TO_STREAM=true
+QUOTE_FIELD_NAMES=true
+QUOTE_NON_NUMERIC_NUMBERS=true
+ESCAPE_NON_ASCII=false
+WRITE_NUMBERS_AS_STRINGS=false
+WRITE_BIGDECIMAL_AS_PLAIN=false
+STRICT_DUPLICATE_DETECTION=false
+IGNORE_UNKNOWN=false
+USE_FAST_DOUBLE_WRITER=false
+WRITE_HEX_UPPER_CASE=true
+ESCAPE_FORWARD_SLASHES=false
+COMBINE_UNICODE_SURROGATES_IN_UTF8=false
+
+# JsonFactory.Feature
+INTERN_FIELD_NAMES=true
+CANONICALIZE_FIELD_NAMES=true
+FAIL_ON_SYMBOL_HASH_OVERFLOW=true
+USE_THREAD_LOCAL_FOR_BUFFER_RECYCLING=true
+CHARSET_DETECTION=true
+
+# DatatypeFeature
+EnumFeature.READ_ENUM_KEYS_USING_INDEX=false
+EnumFeature.WRITE_ENUMS_TO_LOWERCASE=false
+JsonNodeFeature.READ_NULL_PROPERTIES=true
+JsonNodeFeature.WRITE_NULL_PROPERTIES=true
+JsonNodeFeature.WRITE_PROPERTIES_SORTED=false
+JsonNodeFeature.STRIP_TRAILING_BIGDECIMAL_ZEROES=true
+JsonNodeFeature.FAIL_ON_NAN_TO_BIG_DECIMAL_COERCION=false
+
+# 강제 변환(LogicalType × 입력 형태)
+Array: Array=TryConvert Object=TryConvert Integer=TryConvert Float=TryConvert Boolean=TryConvert String=TryConvert Binary=TryConvert EmptyArray=Fail EmptyObject=TryConvert EmptyString=Fail
+Collection: Array=TryConvert Object=TryConvert Integer=TryConvert Float=TryConvert Boolean=TryConvert String=TryConvert Binary=TryConvert EmptyArray=Fail EmptyObject=TryConvert EmptyString=Fail
+Map: Array=TryConvert Object=TryConvert Integer=TryConvert Float=TryConvert Boolean=TryConvert String=TryConvert Binary=TryConvert EmptyArray=Fail EmptyObject=TryConvert EmptyString=Fail
+POJO: Array=TryConvert Object=TryConvert Integer=TryConvert Float=TryConvert Boolean=TryConvert String=TryConvert Binary=TryConvert EmptyArray=Fail EmptyObject=TryConvert EmptyString=Fail
+Untyped: Array=TryConvert Object=TryConvert Integer=TryConvert Float=TryConvert Boolean=TryConvert String=TryConvert Binary=TryConvert EmptyArray=Fail EmptyObject=TryConvert EmptyString=Fail
+Integer: Array=TryConvert Object=TryConvert Integer=TryConvert Float=Fail Boolean=TryConvert String=TryConvert Binary=TryConvert EmptyArray=Fail EmptyObject=TryConvert EmptyString=AsNull
+Float: Array=TryConvert Object=TryConvert Integer=TryConvert Float=TryConvert Boolean=TryConvert String=TryConvert Binary=TryConvert EmptyArray=Fail EmptyObject=TryConvert EmptyString=AsNull
+Boolean: Array=TryConvert Object=TryConvert Integer=TryConvert Float=TryConvert Boolean=TryConvert String=TryConvert Binary=TryConvert EmptyArray=Fail EmptyObject=TryConvert EmptyString=AsNull
+Enum: Array=TryConvert Object=TryConvert Integer=TryConvert Float=TryConvert Boolean=TryConvert String=TryConvert Binary=TryConvert EmptyArray=Fail EmptyObject=TryConvert EmptyString=Fail
+Textual: Array=TryConvert Object=TryConvert Integer=TryConvert Float=TryConvert Boolean=TryConvert String=TryConvert Binary=TryConvert EmptyArray=Fail EmptyObject=TryConvert EmptyString=Fail
+Binary: Array=TryConvert Object=TryConvert Integer=TryConvert Float=TryConvert Boolean=TryConvert String=TryConvert Binary=TryConvert EmptyArray=Fail EmptyObject=TryConvert EmptyString=Fail
+DateTime: Array=TryConvert Object=TryConvert Integer=TryConvert Float=TryConvert Boolean=TryConvert String=TryConvert Binary=TryConvert EmptyArray=Fail EmptyObject=TryConvert EmptyString=AsNull
+OtherScalar: Array=TryConvert Object=TryConvert Integer=TryConvert Float=TryConvert Boolean=TryConvert String=TryConvert Binary=TryConvert EmptyArray=Fail EmptyObject=TryConvert EmptyString=TryConvert
+
+# 스트림 제약
+read.max-nesting-depth=1000
+read.max-document-length=-1
+read.max-token-count=-1
+read.max-number-length=1000
+read.max-string-length=20000000
+read.max-name-length=50000
+write.max-nesting-depth=1000
