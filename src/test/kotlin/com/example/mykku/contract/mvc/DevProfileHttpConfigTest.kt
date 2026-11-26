@@ -72,7 +72,7 @@ class DevProfileHttpConfigTest {
     }
 
     @Test
-    fun `대괄호 맵 키도 대괄호 밖 요소처럼 맞춰 안전 키는 남기고 대문자·스네이크·카멜 비밀 낱말은 뺀다`() {
+    fun `대괄호 맵 키도 중첩까지 같은 규칙으로 맞춰 안전 키는 남기고 대문자·스네이크·카멜 비밀 낱말은 뺀다`() {
         write("application-dev.yml", BRACKETED)
 
         assertThat(config().properties()).containsExactlyEntriesOf(
@@ -206,6 +206,7 @@ class DevProfileHttpConfigTest {
                   "[API_TOKEN]": abc
                   "[PRIVATE_KEY]": abc
                   "[keyStore]": abc
+                  "[app[DB_PASSWORD]]": abc
         """.trimIndent()
 
         val SENSITIVE = """
