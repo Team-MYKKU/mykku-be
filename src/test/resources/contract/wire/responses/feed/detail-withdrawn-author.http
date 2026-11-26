@@ -1,0 +1,23 @@
+### GET /api/v1/feeds/2 [익명]
+HTTP 200
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "message" : "피드 상세 정보를 성공적으로 조회했습니다.",
+  "data" : {
+    "id" : 2,
+    "author" : null,
+    "boardId" : 1,
+    "boardTitle" : "다솜",
+    "createdAt" : "2001-03-02T10:00:00",
+    "updatedAt" : "2001-03-02T10:00:00",
+    "title" : "탈퇴한 작성자 글",
+    "content" : "작성자가 탈퇴했다",
+    "images" : [ ],
+    "tags" : [ ],
+    "likeCount" : 0,
+    "isLiked" : false,
+    "commentCount" : 0
+  }
+}

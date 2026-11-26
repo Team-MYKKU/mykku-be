@@ -1,0 +1,9 @@
+### GET /api/v1/notifications/unread/count [회원 1]
+HTTP 200
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "message" : "읽지 않은 알림 개수를 성공적으로 조회했습니다.",
+  "data" : 2
+}

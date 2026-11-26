@@ -1,0 +1,28 @@
+### GET /api/v1/contests?status=EXPIRED [회원 1]
+HTTP 200
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "message" : "공모전 목록을 성공적으로 조회했습니다.",
+  "data" : {
+    "content" : [ {
+      "id" : 1,
+      "title" : "지난 공모전",
+      "subTitle" : "지난 공모전 부제",
+      "description" : "지난 공모전 설명",
+      "startedAt" : "2000-12-01T00:00:00",
+      "expiredAt" : "2001-01-31T23:59:59",
+      "status" : "EXPIRED",
+      "thumbnailUrl" : "https://cdn.example.com/contest/1.jpg",
+      "tags" : [ "지난태그" ],
+      "winnerStatus" : "PENDING",
+      "winnerRank" : null
+    } ],
+    "page" : 0,
+    "size" : 20,
+    "totalElements" : 1,
+    "totalPages" : 1,
+    "isLast" : true
+  }
+}

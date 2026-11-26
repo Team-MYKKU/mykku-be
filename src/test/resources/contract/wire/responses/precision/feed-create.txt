@@ -1,0 +1,2 @@
+### POST /api/v1/feeds [회원 1] multipart request=application/json:{"title":"프로브 피드","content":"프로브 본문","boardId":1} x5 /data/createdAt
+최대 소수 자릿수 7 이상: true

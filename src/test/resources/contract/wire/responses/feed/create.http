@@ -1,0 +1,28 @@
+### POST /api/v1/feeds [회원 1] multipart request=application/json:{"title":"새 피드","content":"새 피드 본문","boardId":1,"tags":[" 공모태그 ","새태그","공모태그"]} images=file(image.png, image/png)
+HTTP 200
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "message" : "피드가 성공적으로 작성되었습니다.",
+  "data" : {
+    "id" : 11,
+    "title" : "새 피드",
+    "content" : "새 피드 본문",
+    "boardId" : 1,
+    "boardTitle" : "다솜",
+    "authorId" : "snapgoogle",
+    "authorNickname" : "구글회원",
+    "authorProfileUrl" : "https://cdn.example.com/profile/1.png",
+    "images" : [ {
+      "id" : 5,
+      "url" : "https://test-bucket.s3.amazonaws.com/feed-images/test-image-<N>.jpg",
+      "width" : 800,
+      "height" : 600
+    } ],
+    "tags" : [ "공모태그", "새태그" ],
+    "likeCount" : 0,
+    "commentCount" : 0,
+    "createdAt" : "<LDT.F>"
+  }
+}

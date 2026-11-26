@@ -1,0 +1,12 @@
+### POST /api/v1/members/check-id [익명] {"memberId":"snapnewid"}
+HTTP 200
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "message" : "아이디 중복 확인 완료",
+  "data" : {
+    "memberId" : "snapnewid",
+    "available" : true
+  }
+}

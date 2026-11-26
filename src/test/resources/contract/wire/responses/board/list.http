@@ -1,0 +1,23 @@
+### GET /api/v1/boards [익명]
+HTTP 200
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "message" : "게시판 목록을 성공적으로 조회했습니다.",
+  "data" : {
+    "boards" : [ {
+      "id" : 1,
+      "title" : "다솜",
+      "logo" : "https://cdn.example.com/board/1.png"
+    }, {
+      "id" : 2,
+      "title" : "나무",
+      "logo" : "https://cdn.example.com/board/2.png"
+    }, {
+      "id" : 3,
+      "title" : "가람",
+      "logo" : "https://cdn.example.com/board/3.png"
+    } ]
+  }
+}

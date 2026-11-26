@@ -1,0 +1,20 @@
+# BUG-02 · 승인된 B PR만 바꿈 · 같은 이메일 회원 2명(지금 이메일 로그인·임시 비밀번호 발급 500 C402)
+### POST /api/v1/email-auth/login [익명] {"email":"snap-email@example.com","password":"contract-login-1!"}
+HTTP 500
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "code" : "C402",
+  "message" : "서버 오류가 발생했습니다. 관리자에게 문의해주세요"
+}
+
+### POST /api/v1/email-auth/send-temporary-password [익명] {"email":"snap-email@example.com"}
+HTTP 500
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "code" : "C402",
+  "message" : "서버 오류가 발생했습니다. 관리자에게 문의해주세요"
+}

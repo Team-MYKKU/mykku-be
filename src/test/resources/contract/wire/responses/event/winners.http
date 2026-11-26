@@ -1,0 +1,23 @@
+### GET /api/v1/events/1/winners [익명]
+HTTP 200
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "message" : "이벤트 당첨자 목록을 성공적으로 조회했습니다.",
+  "data" : {
+    "eventId" : 1,
+    "eventTitle" : "지난 이벤트",
+    "winners" : [ {
+      "winnerId" : 1,
+      "memberId" : "snapgoogle",
+      "nickname" : "구글회원",
+      "profileImage" : "https://cdn.example.com/profile/1.png"
+    }, {
+      "winnerId" : 2,
+      "memberId" : null,
+      "nickname" : null,
+      "profileImage" : ""
+    } ]
+  }
+}

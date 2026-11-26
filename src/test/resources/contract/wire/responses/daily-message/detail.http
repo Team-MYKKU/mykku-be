@@ -1,0 +1,15 @@
+### GET /api/v1/daily-messages/1 [익명]
+HTTP 200
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "message" : "하루 덕담 데이터 불러오기에 성공했습니다.",
+  "data" : {
+    "id" : 1,
+    "title" : "첫 덕담",
+    "content" : "오늘도 덕질 화이팅",
+    "date" : "2001-01-01",
+    "createdAt" : "2000-12-31T09:00:00.123456"
+  }
+}

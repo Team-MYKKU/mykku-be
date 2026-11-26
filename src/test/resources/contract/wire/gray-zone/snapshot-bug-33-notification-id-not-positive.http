@@ -1,0 +1,20 @@
+# BUG-33 · 승인된 B PR만 바꿈 · 0 이하 알림 ID(지금 500 C402)
+### PATCH /api/v1/notifications/0/read [회원 1]
+HTTP 500
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "code" : "C402",
+  "message" : "서버 오류가 발생했습니다. 관리자에게 문의해주세요"
+}
+
+### DELETE /api/v1/notifications/-1 [회원 1]
+HTTP 500
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "code" : "C402",
+  "message" : "서버 오류가 발생했습니다. 관리자에게 문의해주세요"
+}

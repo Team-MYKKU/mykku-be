@@ -1,0 +1,15 @@
+### GET /api/v1/contests/1/winner-announcement [익명]
+HTTP 200
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "message" : "수상자 발표 공지를 성공적으로 조회했습니다.",
+  "data" : {
+    "contestId" : 1,
+    "contestTitle" : "지난 공모전",
+    "title" : "지난 공모전 수상자 발표",
+    "content" : "수상을 축하합니다",
+    "announcedAt" : "2001-02-01"
+  }
+}

@@ -1,0 +1,18 @@
+### GET /api/v1/members/me [회원 4]
+HTTP 200
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "message" : "프로필 조회 성공",
+  "data" : {
+    "memberId" : null,
+    "email" : "snap-kakao@example.com",
+    "nickname" : null,
+    "profileImage" : "https://cdn.example.com/profile/4.png",
+    "role" : null,
+    "provider" : "KAKAO",
+    "emailVerified" : false,
+    "createdAt" : "2001-01-02T03:04:08"
+  }
+}

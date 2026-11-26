@@ -1,0 +1,12 @@
+### GET /api/v1/search/feeds/boards/101?keyword=동률 [익명] 101=T0 102~104=T1 105=T2 (snapshot-ties-feeds.sql)
+size=2 page=0: 105, 104
+size=2 page=1: 103, 102
+size=2 page=2: 101
+size=20 page=0: 105, 104, 103, 102, 101
+중복(size=2 page=0, size=2 page=1, size=2 page=2): 없음
+누락(size=2 page=0, size=2 page=1, size=2 page=2): 없음
+
+### GET /api/v1/search/feeds?keyword=동률 [익명] 101=T0 102~104=T1 105=T2 (snapshot-ties-feeds.sql)
+전체: 105, 104, 103
+중복(전체): 없음
+누락(전체): 101, 102

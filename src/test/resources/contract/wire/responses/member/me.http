@@ -1,0 +1,22 @@
+### GET /api/v1/members/me [회원 1]
+HTTP 200
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "message" : "프로필 조회 성공",
+  "data" : {
+    "memberId" : "snapgoogle",
+    "email" : "snap-google@example.com",
+    "nickname" : "구글회원",
+    "profileImage" : "https://cdn.example.com/profile/1.png",
+    "role" : {
+      "id" : 1,
+      "name" : "스냅샷 칭호",
+      "description" : "계약 스냅샷 칭호 설명"
+    },
+    "provider" : "GOOGLE",
+    "emailVerified" : false,
+    "createdAt" : "2001-01-02T03:04:05.123456"
+  }
+}

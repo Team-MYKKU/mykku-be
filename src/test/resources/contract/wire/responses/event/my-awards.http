@@ -1,0 +1,22 @@
+### GET /api/v1/events/my-awards [회원 1]
+HTTP 200
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "message" : "내 당첨 이벤트 목록을 성공적으로 조회했습니다.",
+  "data" : {
+    "content" : [ {
+      "eventId" : 1,
+      "eventTitle" : "지난 이벤트",
+      "thumbnailUrl" : "https://cdn.example.com/event/1.jpg",
+      "startedAt" : "2000-12-01T00:00:00",
+      "expiredAt" : "2001-01-31T23:59:59"
+    } ],
+    "page" : 0,
+    "size" : 20,
+    "totalElements" : 1,
+    "totalPages" : 1,
+    "isLast" : true
+  }
+}

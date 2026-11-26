@@ -1,0 +1,35 @@
+### GET /api/v1/contests/1/winners [익명]
+HTTP 200
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "message" : "수상작 상세 정보를 성공적으로 조회했습니다.",
+  "data" : {
+    "contestId" : 1,
+    "contestTitle" : "지난 공모전",
+    "winners" : [ {
+      "winnerId" : 1,
+      "winnerRank" : 1,
+      "awardTitle" : "대상",
+      "feedId" : 1,
+      "feedTitle" : "첫 피드",
+      "feedImageUrl" : "https://cdn.example.com/feed/1-a.jpg",
+      "authorNickname" : "구글회원",
+      "authorProfileImage" : "https://cdn.example.com/profile/1.png",
+      "description" : "축하합니다",
+      "acceptanceSpeech" : "감사합니다"
+    }, {
+      "winnerId" : 2,
+      "winnerRank" : 2,
+      "awardTitle" : null,
+      "feedId" : 2,
+      "feedTitle" : "탈퇴한 작성자 글",
+      "feedImageUrl" : "",
+      "authorNickname" : "",
+      "authorProfileImage" : "",
+      "description" : "",
+      "acceptanceSpeech" : ""
+    } ]
+  }
+}

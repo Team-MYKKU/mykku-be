@@ -1,0 +1,27 @@
+### GET /api/v1/contests/2 [회원 1]
+HTTP 200
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "message" : "공모전 상세 정보를 성공적으로 조회했습니다.",
+  "data" : {
+    "id" : 2,
+    "title" : "진행 공모전",
+    "subTitle" : null,
+    "description" : null,
+    "startedAt" : "2001-01-01T00:00:00",
+    "expiredAt" : "2099-12-31T23:59:59",
+    "status" : "ACTIVE",
+    "thumbnailUrl" : "https://cdn.example.com/contest/2.jpg",
+    "images" : [ {
+      "url" : "https://cdn.example.com/contest/2-a.jpg",
+      "orderIndex" : 1
+    }, {
+      "url" : "https://cdn.example.com/contest/2-b.jpg",
+      "orderIndex" : 2
+    } ],
+    "tags" : [ "공모태그" ],
+    "createdAt" : "2000-11-02T09:00:00.12"
+  }
+}

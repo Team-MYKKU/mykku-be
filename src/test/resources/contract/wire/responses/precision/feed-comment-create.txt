@@ -1,0 +1,2 @@
+### POST /api/v1/feeds/1/comments [회원 1] {"content":"프로브 댓글"} x5 /data/createdAt
+최대 소수 자릿수 7 이상: true

@@ -1,0 +1,23 @@
+### GET /api/v1/events?status=EXPIRED&sortType=LATEST [회원 1] 101=T0 102~104=T1 105=T2 (snapshot-ties-events-expired.sql)
+size=2 page=0: 105, 102
+size=2 page=1: 103, 104
+size=2 page=2: 101
+size=20 page=0: 105, 102, 103, 104, 101
+중복(size=2 page=0, size=2 page=1, size=2 page=2): 없음
+누락(size=2 page=0, size=2 page=1, size=2 page=2): 없음
+
+### GET /api/v1/events?status=EXPIRED&sortType=OLDEST [회원 1] 101=T0 102~104=T1 105=T2 (snapshot-ties-events-expired.sql)
+size=2 page=0: 105, 102
+size=2 page=1: 103, 104
+size=2 page=2: 101
+size=20 page=0: 105, 102, 103, 104, 101
+중복(size=2 page=0, size=2 page=1, size=2 page=2): 없음
+누락(size=2 page=0, size=2 page=1, size=2 page=2): 없음
+
+### GET /api/v1/events?status=EXPIRED&sortType=POPULAR [회원 1] 101=T0 102~104=T1 105=T2 (snapshot-ties-events-expired.sql)
+size=2 page=0: 105, 102
+size=2 page=1: 103, 104
+size=2 page=2: 101
+size=20 page=0: 105, 102, 103, 104, 101
+중복(size=2 page=0, size=2 page=1, size=2 page=2): 없음
+누락(size=2 page=0, size=2 page=1, size=2 page=2): 없음

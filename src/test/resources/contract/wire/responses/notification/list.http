@@ -1,0 +1,66 @@
+### GET /api/v1/notifications [회원 1]
+HTTP 200
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "message" : "알림 목록을 성공적으로 조회했습니다.",
+  "data" : {
+    "content" : [ {
+      "id" : 3,
+      "type" : "FEED_COMMENT",
+      "senderNickname" : null,
+      "senderProfileImage" : "https://cdn.example.com/profile/4.png",
+      "content" : "회원님의 피드에 댓글이 달렸습니다",
+      "isRead" : false,
+      "relatedResourceId" : null,
+      "relatedResourceType" : null,
+      "createdAt" : "2001-03-06T12:00:00"
+    }, {
+      "id" : 2,
+      "type" : "FEED_COMMENT",
+      "senderNickname" : null,
+      "senderProfileImage" : null,
+      "content" : "탈퇴한 회원님이 댓글을 남겼습니다",
+      "isRead" : true,
+      "relatedResourceId" : 1,
+      "relatedResourceType" : "FEED",
+      "createdAt" : "2001-03-06T11:00:00"
+    }, {
+      "id" : 1,
+      "type" : "FEED_LIKE",
+      "senderNickname" : "이메일회원",
+      "senderProfileImage" : "",
+      "content" : "이메일회원님이 회원님의 피드를 좋아합니다",
+      "isRead" : false,
+      "relatedResourceId" : 1,
+      "relatedResourceType" : "FEED",
+      "createdAt" : "2001-03-06T10:00:00"
+    } ],
+    "empty" : false,
+    "first" : true,
+    "last" : true,
+    "number" : 0,
+    "numberOfElements" : 3,
+    "pageable" : {
+      "offset" : 0,
+      "pageNumber" : 0,
+      "pageSize" : 20,
+      "paged" : true,
+      "sort" : {
+        "empty" : false,
+        "sorted" : true,
+        "unsorted" : false
+      },
+      "unpaged" : false
+    },
+    "size" : 20,
+    "sort" : {
+      "empty" : false,
+      "sorted" : true,
+      "unsorted" : false
+    },
+    "totalElements" : 3,
+    "totalPages" : 1
+  }
+}

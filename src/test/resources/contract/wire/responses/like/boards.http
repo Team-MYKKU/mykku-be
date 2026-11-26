@@ -1,0 +1,44 @@
+### GET /api/v1/likes/boards [회원 1]
+HTTP 200
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "message" : "즐겨찾기한 게시판 목록을 성공적으로 조회하였습니다.",
+  "data" : {
+    "content" : [ {
+      "id" : 2,
+      "title" : "가람",
+      "logo" : "https://cdn.example.com/board/3.png"
+    }, {
+      "id" : 1,
+      "title" : "다솜",
+      "logo" : "https://cdn.example.com/board/1.png"
+    } ],
+    "empty" : false,
+    "first" : true,
+    "last" : true,
+    "number" : 0,
+    "numberOfElements" : 2,
+    "pageable" : {
+      "offset" : 0,
+      "pageNumber" : 0,
+      "pageSize" : 20,
+      "paged" : true,
+      "sort" : {
+        "empty" : false,
+        "sorted" : true,
+        "unsorted" : false
+      },
+      "unpaged" : false
+    },
+    "size" : 20,
+    "sort" : {
+      "empty" : false,
+      "sorted" : true,
+      "unsorted" : false
+    },
+    "totalElements" : 2,
+    "totalPages" : 1
+  }
+}

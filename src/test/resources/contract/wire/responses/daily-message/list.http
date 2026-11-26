@@ -1,0 +1,46 @@
+### GET /api/v1/daily-messages?date=2001-01-02 [익명]
+HTTP 200
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "message" : "하루 덕담 리스트 불러오기에 성공했습니다.",
+  "data" : {
+    "content" : [ {
+      "id" : 2,
+      "title" : "두번째 덕담",
+      "content" : "내일도 덕질 화이팅",
+      "date" : "2001-01-02"
+    }, {
+      "id" : 1,
+      "title" : "첫 덕담",
+      "content" : "오늘도 덕질 화이팅",
+      "date" : "2001-01-01"
+    } ],
+    "empty" : false,
+    "first" : true,
+    "last" : true,
+    "number" : 0,
+    "numberOfElements" : 2,
+    "pageable" : {
+      "offset" : 0,
+      "pageNumber" : 0,
+      "pageSize" : 20,
+      "paged" : true,
+      "sort" : {
+        "empty" : false,
+        "sorted" : true,
+        "unsorted" : false
+      },
+      "unpaged" : false
+    },
+    "size" : 20,
+    "sort" : {
+      "empty" : false,
+      "sorted" : true,
+      "unsorted" : false
+    },
+    "totalElements" : 2,
+    "totalPages" : 1
+  }
+}

@@ -1,0 +1,23 @@
+### GET /api/v1/fan-notes/1 [익명]
+HTTP 200
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "message" : "덕질노트 상세 조회 성공",
+  "data" : {
+    "id" : 1,
+    "title" : "덕질노트 하나",
+    "subtitle" : "첫 부제",
+    "content" : "덕질노트 본문",
+    "productionDate" : "2001-01-10",
+    "coverImageUrl" : "https://cdn.example.com/fannote/1.jpg",
+    "pages" : [ {
+      "pageNumber" : 1,
+      "imageUrl" : "https://cdn.example.com/fannote/1-1.jpg"
+    }, {
+      "pageNumber" : 2,
+      "imageUrl" : "https://cdn.example.com/fannote/1-2.jpg"
+    } ]
+  }
+}

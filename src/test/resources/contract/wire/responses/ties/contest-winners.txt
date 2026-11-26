@@ -1,0 +1,9 @@
+### GET /api/v1/contests/winners [익명] 101~105(정렬 키 없음) (snapshot-ties-contest-winners.sql)
+전체: 101, 102, 103, 104, 105
+중복(전체): 없음
+누락(전체): 없음
+
+### GET /api/v1/contests/101/winners [익명] winner_rank 101=1 102~104=2 105=3 (snapshot-ties-contest-winners.sql)
+전체: 101, 102, 103, 104, 105
+중복(전체): 없음
+누락(전체): 없음

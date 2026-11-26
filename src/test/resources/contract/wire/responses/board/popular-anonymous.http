@@ -1,0 +1,26 @@
+### GET /api/v1/boards/2/feeds/popular [익명]
+HTTP 200
+Content-Type: application/json
+X-Request-ID: <REQ-ID:8hex>
+
+{
+  "message" : "인기 피드 목록을 성공적으로 조회했습니다.",
+  "data" : {
+    "feeds" : [ {
+      "id" : 6,
+      "rank" : 1,
+      "title" : "인기 일등",
+      "content" : "인기 피드 본문 하나"
+    }, {
+      "id" : 8,
+      "rank" : 2,
+      "title" : "인기 둘째",
+      "content" : "차단 대상의 인기 피드"
+    }, {
+      "id" : 7,
+      "rank" : 3,
+      "title" : "인기 셋째",
+      "content" : "인기 피드 본문 셋"
+    } ]
+  }
+}
