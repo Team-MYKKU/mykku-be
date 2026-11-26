@@ -1,7 +1,6 @@
 package com.example.mykku
 
 import com.example.mykku.util.DatabaseCleaner
-import com.example.mykku.admin.service.AdminRoleService
 import com.example.mykku.auth.adapter.output.persistence.JwtTokenProviderAdapter
 import com.example.mykku.auth.application.port.input.LogoutUseCase
 import com.example.mykku.auth.application.port.input.MobileLoginUseCase
@@ -13,7 +12,6 @@ import com.example.mykku.block.application.port.input.GetMemberBlocksUseCase
 import com.example.mykku.block.application.port.input.UnblockKeywordUseCase
 import com.example.mykku.block.application.port.input.UnblockMemberUseCase
 import com.example.mykku.board.application.port.input.ListBoardsUseCase
-import com.example.mykku.contest.application.port.input.CreateContestUseCase
 import com.example.mykku.contest.application.port.input.GetContestUseCase
 import com.example.mykku.contest.application.port.input.GetContestWinnerAnnouncementUseCase
 import com.example.mykku.contest.application.port.input.GetContestWinnerDetailUseCase
@@ -23,7 +21,6 @@ import com.example.mykku.contest.application.port.input.GetMyAwardFeedsUseCase
 import com.example.mykku.contest.application.port.input.GetMyAwardsPreviewUseCase
 import com.example.mykku.contest.application.port.input.GetMyWinnerStatusUseCase
 import com.example.mykku.contest.application.port.input.ListContestsUseCase
-import com.example.mykku.contest.application.port.input.SetContestWinnersUseCase
 import com.example.mykku.contest.application.port.input.UpdateAcceptanceSpeechUseCase
 import com.example.mykku.dailymessage.application.port.input.CreateCommentUseCase
 import com.example.mykku.dailymessage.application.port.input.DeleteCommentUseCase
@@ -32,18 +29,19 @@ import com.example.mykku.dailymessage.application.port.input.GetDailyMessageUseC
 import com.example.mykku.dailymessage.application.port.input.GetDailyMessagesUseCase
 import com.example.mykku.dailymessage.application.port.input.UpdateCommentUseCase
 import com.example.mykku.docs.ApiRequestConfig
+import com.example.mykku.docs.RequestResponseLogBuffer
+import com.example.mykku.docs.RequestResponseLogOnFailureExtension
+import com.example.mykku.docs.RequestResponseLogSource
 import com.example.mykku.docs.RestDocumentationFilterBuilder
 import com.example.mykku.docs.RestDocumentationRequest
 import com.example.mykku.docs.RestDocumentationResponse
 import com.example.mykku.email.EmailAuthService
-import com.example.mykku.event.application.port.input.CreateEventUseCase
 import com.example.mykku.event.application.port.input.GetEventUseCase
 import com.example.mykku.event.application.port.input.GetEventWinnerAnnouncementUseCase
 import com.example.mykku.event.application.port.input.GetEventWinnersUseCase
 import com.example.mykku.event.application.port.input.GetMyAwardEventsUseCase
 import com.example.mykku.event.application.port.input.GetMyEventWinnerStatusUseCase
 import com.example.mykku.event.application.port.input.ListEventsUseCase
-import com.example.mykku.event.application.port.input.SetEventWinnersUseCase
 import com.example.mykku.fannote.application.port.input.GetFanNoteDetailUseCase
 import com.example.mykku.fannote.application.port.input.GetFanNoteListUseCase
 import com.example.mykku.feed.application.port.input.CreateFeedCommentUseCase
@@ -102,15 +100,12 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.restassured.RestAssured
 import io.restassured.builder.RequestSpecBuilder
-import io.restassured.filter.log.RequestLoggingFilter
-import io.restassured.filter.log.ResponseLoggingFilter
 import io.restassured.http.Header
 import io.restassured.http.Headers
 import io.restassured.specification.RequestSpecification
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito.doReturn
-import org.mockito.junit.jupiter.MockitoExtension
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
@@ -129,15 +124,12 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean
 @ExtendWith(
     DatabaseCleaner::class,
     RestDocumentationExtension::class,
-    MockitoExtension::class,
+    RequestResponseLogOnFailureExtension::class,
     SnippetGoldenExtension::class,
     ContractManifestExtension::class
 )
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-abstract class BaseDocumentTest : SnippetIdentifierSource {
-
-    @MockitoBean
-    protected lateinit var adminRoleService: AdminRoleService
+abstract class BaseDocumentTest : SnippetIdentifierSource, RequestResponseLogSource {
 
     @MockitoBean
     protected lateinit var mobileLoginUseCase: MobileLoginUseCase
@@ -150,9 +142,6 @@ abstract class BaseDocumentTest : SnippetIdentifierSource {
 
     @MockitoBean
     protected lateinit var listBoardsUseCase: ListBoardsUseCase
-
-    @MockitoBean
-    protected lateinit var createContestUseCase: CreateContestUseCase
 
     @MockitoBean
     protected lateinit var getContestUseCase: GetContestUseCase
@@ -183,9 +172,6 @@ abstract class BaseDocumentTest : SnippetIdentifierSource {
 
     @MockitoBean
     protected lateinit var getMyAwardsPreviewUseCase: GetMyAwardsPreviewUseCase
-
-    @MockitoBean
-    protected lateinit var setContestWinnersUseCase: SetContestWinnersUseCase
 
     @MockitoBean
     protected lateinit var getMyRolesUseCase: GetMyRolesUseCase
@@ -281,9 +267,6 @@ abstract class BaseDocumentTest : SnippetIdentifierSource {
     protected lateinit var getFanNoteDetailUseCase: GetFanNoteDetailUseCase
 
     @MockitoBean
-    protected lateinit var createEventUseCase: CreateEventUseCase
-
-    @MockitoBean
     protected lateinit var getEventUseCase: GetEventUseCase
 
     @MockitoBean
@@ -300,9 +283,6 @@ abstract class BaseDocumentTest : SnippetIdentifierSource {
 
     @MockitoBean
     protected lateinit var getMyAwardEventsUseCase: GetMyAwardEventsUseCase
-
-    @MockitoBean
-    protected lateinit var setEventWinnersUseCase: SetEventWinnersUseCase
 
     @MockitoBean
     protected lateinit var emailAuthService: EmailAuthService
@@ -424,11 +404,16 @@ abstract class BaseDocumentTest : SnippetIdentifierSource {
 
     private val snippetIdentifiers = mutableListOf<String>()
 
+    private val requestResponseLogBuffer = RequestResponseLogBuffer()
+
     override fun drainSnippetIdentifiers(): List<String> =
         snippetIdentifiers.toList().also { snippetIdentifiers.clear() }
 
+    override fun requestResponseLog(): String = requestResponseLogBuffer.content()
+
     @BeforeEach
     fun setEnvironment(restDocumentation: RestDocumentationContextProvider) {
+        requestResponseLogBuffer.reset()
         setRestAssured(restDocumentation)
         setLoginMember()
     }
@@ -441,15 +426,12 @@ abstract class BaseDocumentTest : SnippetIdentifierSource {
                 Preprocessors.modifyUris()
                     .scheme("https")
                     .host("api.dev.mykku.kr")
-                    .removePort(),
-                Preprocessors.prettyPrint()
+                    .removePort()
             )
-            .withResponseDefaults(Preprocessors.prettyPrint())
 
         spec = RequestSpecBuilder()
             .addFilter(documentationConfigurer)
-            .addFilter(RequestLoggingFilter())
-            .addFilter(ResponseLoggingFilter())
+            .addFilters(requestResponseLogBuffer.filters())
             .build()
     }
 
