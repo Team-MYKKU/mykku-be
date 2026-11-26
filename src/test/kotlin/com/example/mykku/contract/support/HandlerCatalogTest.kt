@@ -7,6 +7,12 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
+import org.springframework.web.bind.annotation.CookieValue
+import org.springframework.web.bind.annotation.RequestHeader
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.method.HandlerMethod
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping
 import java.util.Random
@@ -116,6 +122,22 @@ class HandlerCatalogTest : BaseControllerTest() {
         }
     }
 
+    @Test
+    fun `헤더·쿠키·쿼리 맵·Sort·Pageable 인자를 실제 리졸버 기준으로 판정한다`() {
+        val probe = ArgumentProbeController::class.java.methods.single { it.name == "probe" }
+        val arguments = HandlerArgumentReader(handlerAdapter.argumentResolvers.orEmpty())
+            .read(HandlerMethod(ArgumentProbeController(), probe))
+
+        assertThat(arguments.map { listOf(it.kind, it.name, it.required, it.defaultValue) }).containsExactly(
+            listOf(ArgumentKind.HEADER, "X-Probe", true, null),
+            listOf(ArgumentKind.HEADER, "headers", false, null),
+            listOf(ArgumentKind.COOKIE, "probe", false, "none"),
+            listOf(ArgumentKind.QUERY, "params", false, null),
+            listOf(ArgumentKind.SORT, "sort", false, null),
+            listOf(ArgumentKind.PAGEABLE, "pageable", false, null)
+        )
+    }
+
     private fun summaries(endpoint: Endpoint): List<List<Any>> =
         endpoint.arguments.map { listOf(it.kind, it.name, it.required, it.validated, it.file) }
 
@@ -125,4 +147,16 @@ class HandlerCatalogTest : BaseControllerTest() {
     private companion object {
         const val SEED = 20261125L
     }
+}
+
+class ArgumentProbeController {
+    @Suppress("UNUSED_PARAMETER")
+    fun probe(
+        @RequestHeader("X-Probe") probeHeader: String,
+        @RequestHeader headers: Map<String, String>,
+        @CookieValue("probe", defaultValue = "none") cookie: String,
+        @RequestParam params: Map<String, String>,
+        sort: Sort,
+        pageable: Pageable
+    ) = Unit
 }

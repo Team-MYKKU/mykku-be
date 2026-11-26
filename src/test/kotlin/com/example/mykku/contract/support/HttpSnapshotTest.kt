@@ -43,7 +43,8 @@ class HttpSnapshotTest {
 
         assertThat(HttpSnapshot("GET /admin", 200, htmlHeaders, html).render()).endsWith("\n<html></html>\n")
         assertThatThrownBy { HttpSnapshot("GET /admin", 200, htmlHeaders, html, JsonRules.pageImpl()).render() }
-            .isInstanceOf(AssertionError::class.java)
+            .isInstanceOf(ContractViolationError::class.java)
+            .hasMessageContaining("응답이 JSON이 아닙니다: text/html;charset=UTF-8")
     }
 
     @Test
@@ -55,6 +56,8 @@ class HttpSnapshotTest {
         assertThat(HttpSnapshot("POST /login", 200, headers, body, rules).render()).contains("\"token\" : \"<JWT>\"")
         assertThatThrownBy { HttpSnapshot("POST /login", 204, headers, ByteArray(0), rules).render() }
             .isInstanceOf(ContractViolationError::class.java)
+            .hasMessageContaining("POST /login")
+            .hasMessageContaining("응답 본문이 비어 있습니다(HTTP 204)")
     }
 
     @Test

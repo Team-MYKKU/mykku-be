@@ -7,10 +7,16 @@ import org.springframework.jdbc.datasource.init.ScriptUtils
 import java.nio.charset.StandardCharsets.UTF_8
 import javax.sql.DataSource
 
-class SqlFixtureLoader(private val dataSource: DataSource) {
+class SqlFixtureLoader(
+    private val dataSource: DataSource,
+    private val golden: ContractGolden = ContractGolden.DEFAULT
+) {
 
     fun load(vararg fixtureNames: String) {
-        fixtureNames.forEach { execute(resourceOf(it)) }
+        fixtureNames.forEach { name ->
+            execute(resourceOf(name))
+            golden.markTouched("$MANIFEST_DIRECTORY/$name")
+        }
     }
 
     private fun resourceOf(fixtureName: String): ClassPathResource {
@@ -32,7 +38,8 @@ class SqlFixtureLoader(private val dataSource: DataSource) {
     }
 
     private companion object {
-        const val FIXTURE_ROOT = "contract/fixtures"
+        const val MANIFEST_DIRECTORY = "fixtures"
+        const val FIXTURE_ROOT = "contract/$MANIFEST_DIRECTORY"
         val FIXTURE_NAME = Regex("[a-z0-9][a-z0-9-]*\\.sql")
     }
 }

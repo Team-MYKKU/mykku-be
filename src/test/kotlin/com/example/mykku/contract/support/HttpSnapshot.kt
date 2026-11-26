@@ -46,10 +46,13 @@ class HttpSnapshot(
             return ContractJson.render(body, rules)
         }
         if (!rules.isEmpty) {
-            throw ContractViolationError("[API 계약 위반] JSON 규칙을 선언했지만 응답 본문이 JSON이 아닙니다: ${contentType()}")
+            throw ContractViolationError("[API 계약 위반] $title: JSON 규칙을 선언했지만 ${bodyProblem()}")
         }
         return ContractJson.decodeUtf8(body).ifEmpty { null }
     }
+
+    private fun bodyProblem(): String =
+        if (body.isEmpty()) "응답 본문이 비어 있습니다(HTTP $status)" else "응답이 JSON이 아닙니다: ${contentType()}"
 
     private fun isJson(): Boolean {
         val mediaType = contentType()?.let { MediaType.parseMediaType(it) } ?: return false

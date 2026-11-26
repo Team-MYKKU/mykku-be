@@ -25,7 +25,7 @@ class SqlFixtureLoaderTest : BaseControllerTest() {
     }
 
     @Test
-    fun `DatabaseCleaner 뒤에 넣은 픽스처가 명시한 ID와 시각 그대로 남는다`() {
+    fun `DatabaseCleaner 뒤에 넣은 픽스처가 명시한 ID와 시각 그대로 남고 MANIFEST 갱신 대상으로 기록된다`() {
         val board = jdbcTemplate.queryForMap(
             "SELECT title, DATE_FORMAT(created_at, '%Y-%m-%d %H:%i:%s.%f') AS created " +
                 "FROM board WHERE id = 9001"
@@ -35,6 +35,7 @@ class SqlFixtureLoaderTest : BaseControllerTest() {
         assertThat(board["created"]).isEqualTo("2026-01-02 03:04:05.120000")
         assertThat(jdbcTemplate.queryForObject("SELECT COUNT(*) FROM member WHERE id = 9001", Long::class.java))
             .isEqualTo(1L)
+        assertThat(ContractGolden.DEFAULT.touchedPaths()).contains("fixtures/support-selftest.sql")
     }
 
     @Test

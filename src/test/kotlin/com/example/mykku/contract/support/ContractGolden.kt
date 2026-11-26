@@ -12,7 +12,7 @@ class ContractGolden(
     private val updateMode: ContractUpdateMode = ContractUpdateMode.fromEnvironment()
 ) {
 
-    private val touched: MutableSet<String> = ConcurrentHashMap.newKeySet()
+    private val touched: MutableSet<String> = touchedUnder(goldenRoot)
 
     val updating: Boolean
         get() = updateMode.enabled
@@ -27,7 +27,7 @@ class ContractGolden(
         write(resolve(actualRoot, relativePath), normalized)
         if (updateMode.enabled) {
             write(resolve(goldenRoot, relativePath), normalized)
-            touched.add(keyOf(relativePath))
+            markTouched(relativePath)
             return null
         }
         return compare(relativePath, normalized)
@@ -47,6 +47,10 @@ class ContractGolden(
         updateMode.requireAllowed()
         check(updateMode.enabled) { "골든 삭제는 갱신 모드(-Pcontract.update=true)에서만 합니다: $relativePath" }
         Files.deleteIfExists(resolve(goldenRoot, relativePath))
+        markTouched(relativePath)
+    }
+
+    fun markTouched(relativePath: String) {
         touched.add(keyOf(relativePath))
     }
 
@@ -112,8 +116,13 @@ class ContractGolden(
             "- 이 JVM의 줄바꿈은 LF가 아닙니다. REST Docs는 요청 Content-Length를 플랫폼 줄바꿈으로 계산하므로 " +
                 "스니펫 골든은 Linux·macOS·WSL에서 비교합니다."
 
+        private val TOUCHED: MutableMap<Path, MutableSet<String>> = ConcurrentHashMap()
+
         val DEFAULT: ContractGolden = ContractGolden()
 
         fun isGoldenFile(path: Path): Boolean = Files.isRegularFile(path) && !path.fileName.toString().startsWith(".")
+
+        private fun touchedUnder(root: Path): MutableSet<String> =
+            TOUCHED.computeIfAbsent(root.toAbsolutePath().normalize()) { ConcurrentHashMap.newKeySet() }
     }
 }

@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.RequestPart
 import org.springframework.web.bind.annotation.ValueConstants
 import org.springframework.web.method.HandlerMethod
 import org.springframework.web.method.annotation.RequestHeaderMapMethodArgumentResolver
+import org.springframework.web.method.annotation.ModelAttributeMethodProcessor
 import org.springframework.web.method.annotation.RequestHeaderMethodArgumentResolver
+import org.springframework.web.method.annotation.RequestParamMapMethodArgumentResolver
 import org.springframework.web.method.annotation.RequestParamMethodArgumentResolver
 import org.springframework.web.method.support.HandlerMethodArgumentResolver
 import org.springframework.web.multipart.support.MultipartResolutionDelegate
@@ -24,12 +26,11 @@ import org.springframework.web.servlet.mvc.method.annotation.PathVariableMethodA
 import org.springframework.web.servlet.mvc.method.annotation.RequestPartMethodArgumentResolver
 import org.springframework.web.servlet.mvc.method.annotation.RequestResponseBodyMethodProcessor
 import org.springframework.web.servlet.mvc.method.annotation.ServletCookieValueMethodArgumentResolver
-import org.springframework.web.servlet.mvc.method.annotation.ServletModelAttributeMethodProcessor
 import kotlin.reflect.KType
 import kotlin.reflect.full.valueParameters
 import kotlin.reflect.jvm.kotlinFunction
 
-enum class ArgumentKind { QUERY, PATH, HEADER, COOKIE, BODY, PART, MODEL, PAGEABLE, MEMBER, FRAMEWORK }
+enum class ArgumentKind { QUERY, PATH, HEADER, COOKIE, BODY, PART, MODEL, PAGEABLE, SORT, MEMBER, FRAMEWORK }
 
 data class HandlerArgument(
     val kind: ArgumentKind,
@@ -80,14 +81,15 @@ class HandlerArgumentReader(private val resolvers: List<HandlerMethodArgumentRes
 
     private fun kindOfResolver(resolver: HandlerMethodArgumentResolver?): ArgumentKind {
         return when (resolver) {
-            is RequestParamMethodArgumentResolver -> ArgumentKind.QUERY
+            is RequestParamMethodArgumentResolver, is RequestParamMapMethodArgumentResolver -> ArgumentKind.QUERY
             is PathVariableMethodArgumentResolver -> ArgumentKind.PATH
             is RequestHeaderMethodArgumentResolver, is RequestHeaderMapMethodArgumentResolver -> ArgumentKind.HEADER
             is ServletCookieValueMethodArgumentResolver -> ArgumentKind.COOKIE
             is RequestResponseBodyMethodProcessor -> ArgumentKind.BODY
             is RequestPartMethodArgumentResolver -> ArgumentKind.PART
-            is ServletModelAttributeMethodProcessor -> ArgumentKind.MODEL
-            is PageableHandlerMethodArgumentResolver, is SortHandlerMethodArgumentResolver -> ArgumentKind.PAGEABLE
+            is ModelAttributeMethodProcessor -> ArgumentKind.MODEL
+            is PageableHandlerMethodArgumentResolver -> ArgumentKind.PAGEABLE
+            is SortHandlerMethodArgumentResolver -> ArgumentKind.SORT
             else -> ArgumentKind.FRAMEWORK
         }
     }
@@ -104,7 +106,10 @@ class HandlerArgumentReader(private val resolvers: List<HandlerMethodArgumentRes
         return declared?.takeIf { it.isNotEmpty() } ?: parameter.parameterName.orEmpty()
     }
 
-    private fun declaredRequired(kind: ArgumentKind, parameter: MethodParameter): Boolean = when (kind) {
+    private fun declaredRequired(kind: ArgumentKind, parameter: MethodParameter): Boolean =
+        annotationRequired(kind, parameter) && !(kind in MAP_BINDING_KINDS && isMap(parameter))
+
+    private fun annotationRequired(kind: ArgumentKind, parameter: MethodParameter): Boolean = when (kind) {
         ArgumentKind.QUERY -> parameter.getParameterAnnotation(RequestParam::class.java)?.required ?: false
         ArgumentKind.PATH -> parameter.getParameterAnnotation(PathVariable::class.java)?.required ?: true
         ArgumentKind.HEADER -> parameter.getParameterAnnotation(RequestHeader::class.java)?.required ?: true
@@ -112,7 +117,7 @@ class HandlerArgumentReader(private val resolvers: List<HandlerMethodArgumentRes
         ArgumentKind.BODY -> parameter.getParameterAnnotation(RequestBody::class.java)?.required ?: true
         ArgumentKind.PART -> parameter.getParameterAnnotation(RequestPart::class.java)?.required ?: true
         ArgumentKind.MEMBER -> parameter.getParameterAnnotation(CurrentMember::class.java)?.required ?: true
-        ArgumentKind.MODEL, ArgumentKind.PAGEABLE, ArgumentKind.FRAMEWORK -> false
+        ArgumentKind.MODEL, ArgumentKind.PAGEABLE, ArgumentKind.SORT, ArgumentKind.FRAMEWORK -> false
     }
 
     private fun optional(kind: ArgumentKind, parameter: MethodParameter): Boolean =
@@ -124,6 +129,13 @@ class HandlerArgumentReader(private val resolvers: List<HandlerMethodArgumentRes
         parameter.getParameterAnnotation(CookieValue::class.java)?.defaultValue
     ).firstOrNull { it != ValueConstants.DEFAULT_NONE }
 
+    private fun isMap(parameter: MethodParameter): Boolean =
+        Map::class.java.isAssignableFrom(parameter.nestedIfOptional().nestedParameterType)
+
     private fun isValidated(parameter: MethodParameter): Boolean =
         parameter.parameterAnnotations.any { ValidationAnnotationUtils.determineValidationHints(it) != null }
+
+    private companion object {
+        val MAP_BINDING_KINDS = setOf(ArgumentKind.QUERY, ArgumentKind.HEADER)
+    }
 }

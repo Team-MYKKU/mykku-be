@@ -41,7 +41,8 @@ class GoldenManifestTest {
     }
 
     private companion object {
-        const val MISMATCH_GUIDE = "골든을 갱신 모드 없이 고쳤거나 MANIFEST가 낡았습니다. 규약 보존 PR이면 골든을 되돌리고, " +
-            "승인된 규약 변경이면 로컬에서 ${ContractGolden.UPDATE_COMMAND} 로 다시 만듭니다"
+        const val MISMATCH_GUIDE = "골든·픽스처를 갱신 모드 없이 고쳤거나 MANIFEST가 낡았습니다. 규약 보존 PR이면 되돌립니다. " +
+            "승인된 규약 변경이면 로컬에서 ${ContractGolden.UPDATE_COMMAND} 로 다시 만듭니다. " +
+            "갱신 모드는 그 실행이 쓴 골든과 테스트가 읽은 픽스처의 해시만 다시 씁니다"
     }
 }

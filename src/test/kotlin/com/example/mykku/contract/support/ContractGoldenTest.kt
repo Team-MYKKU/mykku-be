@@ -94,15 +94,18 @@ class ContractGoldenTest {
     }
 
     @Test
-    fun `갱신 모드에서 쓰거나 지운 골든 경로를 기록한다`() {
+    fun `갱신 모드에서 쓰거나 지운 골든 경로를 골든 루트마다 하나로 모아 기록한다`() {
         writeGolden("docs/x/old.adoc", "old")
-        val golden = golden(update = true)
-
-        golden.verify("wire/./y/new.txt", "new")
-        golden.removeGolden("docs/x/old.adoc")
-
-        assertThat(golden.touchedPaths()).containsExactlyInAnyOrder("wire/y/new.txt", "docs/x/old.adoc")
+        golden(update = false).verify("docs/x/old.adoc", "old")
         assertThat(golden(update = false).touchedPaths()).isEmpty()
+
+        golden(update = true).verify("wire/./y/new.txt", "new")
+        golden(update = true).removeGolden("docs/x/old.adoc")
+        golden(update = false).markTouched("fixtures/a.sql")
+
+        assertThat(golden(update = false).touchedPaths())
+            .containsExactlyInAnyOrder("wire/y/new.txt", "docs/x/old.adoc", "fixtures/a.sql")
+        assertThat(ContractGolden(tempDir.resolve("other"), actualRoot).touchedPaths()).isEmpty()
     }
 
     private fun golden(update: Boolean) =
