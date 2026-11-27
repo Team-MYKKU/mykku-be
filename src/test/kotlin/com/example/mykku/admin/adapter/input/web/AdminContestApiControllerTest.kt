@@ -3,8 +3,10 @@ package com.example.mykku.admin.adapter.input.web
 import com.example.mykku.BaseControllerTest
 import com.example.mykku.admin.exception.AdminErrorCode
 import com.example.mykku.common.exception.CommonErrorCode
+import com.example.mykku.contest.adapter.output.persistence.entity.ContestImageJpaEntity
 import com.example.mykku.contest.adapter.output.persistence.entity.ContestJpaEntity
 import com.example.mykku.contest.adapter.output.persistence.entity.ContestParticipationJpaEntity
+import com.example.mykku.contest.adapter.output.persistence.repository.ContestImageJpaRepository
 import com.example.mykku.contest.adapter.output.persistence.repository.ContestJpaRepository
 import com.example.mykku.contest.adapter.output.persistence.repository.ContestParticipationJpaRepository
 import com.example.mykku.contest.adapter.output.persistence.repository.ContestWinnerJpaRepository
@@ -31,6 +33,9 @@ class AdminContestApiControllerTest : BaseControllerTest() {
 
     @Autowired
     private lateinit var contestJpaRepository: ContestJpaRepository
+
+    @Autowired
+    private lateinit var contestImageJpaRepository: ContestImageJpaRepository
 
     @Autowired
     private lateinit var contestParticipationJpaRepository: ContestParticipationJpaRepository
@@ -423,6 +428,25 @@ class AdminContestApiControllerTest : BaseControllerTest() {
     }
 
     @Test
+    @DisplayName("콘테스트 삭제 - 그 콘테스트의 썸네일과 상세 이미지만 지우고, 참여 피드와 다른 콘테스트의 이미지는 남긴다")
+    fun `delete - 그 콘테스트의 이미지만 지운다`() {
+        val contest = createAndSaveContest(thumbnailUrl = "$BUCKET_URL/contest-thumbnail.jpg")
+        val images = saveContestImages(contest, "a.jpg", "b.jpg")
+        saveContestImages(createAndSaveContest(title = "남는 공모전", thumbnailUrl = "$BUCKET_URL/kept.jpg"), "kept-a.jpg")
+        saveEntryWithImage(contest)
+
+        RestAssured.given()
+            .sessionId(getAdminSessionId())
+            .`when`()
+            .delete("/admin/api/v1/contests/{contestId}", contest.id)
+            .then()
+            .statusCode(200)
+
+        val expected = images + contest.thumbnailUrl
+        assertThat(testImageUploadService.deletedUrls).containsExactlyInAnyOrderElementsOf(expected)
+    }
+
+    @Test
     @DisplayName("콘테스트 삭제 - 없는 콘테스트는 CN001, 미인증은 401")
     fun `delete - 없는 콘테스트와 미인증`() {
         RestAssured.given()
@@ -462,7 +486,8 @@ class AdminContestApiControllerTest : BaseControllerTest() {
     private fun createAndSaveContest(
         title: String = "테스트 공모전",
         status: ContestStatusType = ContestStatusType.ACTIVE,
-        expiredAt: LocalDateTime = LocalDateTime.now().minusDays(1)
+        expiredAt: LocalDateTime = LocalDateTime.now().minusDays(1),
+        thumbnailUrl: String = "https://example.com/thumbnail.jpg"
     ): ContestJpaEntity {
         val contest = ContestJpaEntity(
             title = title,
@@ -470,9 +495,23 @@ class AdminContestApiControllerTest : BaseControllerTest() {
             startedAt = LocalDateTime.now().minusDays(30),
             expiredAt = expiredAt,
             status = status,
-            thumbnailUrl = "https://example.com/thumbnail.jpg"
+            thumbnailUrl = thumbnailUrl
         )
         return contestJpaRepository.save(contest)
+    }
+
+    private fun saveContestImages(contest: ContestJpaEntity, vararg names: String): List<String> {
+        return names.mapIndexed { index, name ->
+            val url = "$BUCKET_URL/contest-images/$name"
+            contestImageJpaRepository.save(ContestImageJpaEntity(url = url, orderIndex = index, contest = contest)).url
+        }
+    }
+
+    private fun saveEntryWithImage(contest: ContestJpaEntity) {
+        val member = createAndSaveMember()
+        val feed = createAndSaveFeed(member, createAndSaveBoard())
+        createAndSaveParticipation(member, contest, feed)
+        createAndSaveFeedImages(feed, "entry.jpg")
     }
 
     private fun createAndSaveFeed(
@@ -554,6 +593,7 @@ class AdminContestApiControllerTest : BaseControllerTest() {
     }
 
     companion object {
+        private const val BUCKET_URL = "https://test-bucket.s3.amazonaws.com"
         private val CONTEST_CHILD_TABLES = listOf(
             "contest_participation",
             "contest_winner",

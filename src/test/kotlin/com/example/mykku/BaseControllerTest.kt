@@ -8,7 +8,11 @@ import com.example.mykku.config.TestAsyncConfig
 import com.example.mykku.config.TestEmailConfig
 import com.example.mykku.config.TestEmailSenderConfig
 import com.example.mykku.config.TestImageUploadConfig
+import com.example.mykku.config.TestImageUploadService
 import com.example.mykku.contract.support.ContractManifestExtension
+import com.example.mykku.feed.adapter.output.persistence.FeedImageJpaRepository
+import com.example.mykku.feed.adapter.output.persistence.entity.FeedImageJpaEntity
+import com.example.mykku.feed.adapter.output.persistence.entity.FeedJpaEntity
 import com.example.mykku.member.adapter.output.persistence.MemberJpaRepository
 import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import com.example.mykku.member.domain.vo.SocialProvider
@@ -51,9 +55,16 @@ abstract class BaseControllerTest {
 
     protected val jwtTestTokens: JwtTestTokens by lazy { JwtTestTokens(serverJwtProperties, serverTokenProvider) }
 
+    @Autowired
+    protected lateinit var testImageUploadService: TestImageUploadService
+
+    @Autowired
+    private lateinit var feedImageFixtureRepository: FeedImageJpaRepository
+
     @BeforeEach
     fun baseSetUp() {
         RestAssured.port = port
+        testImageUploadService.reset()
     }
 
     protected fun createAndSaveMember(
@@ -86,6 +97,13 @@ abstract class BaseControllerTest {
             logo = logo
         )
         return boardJpaRepository.save(board)
+    }
+
+    protected fun createAndSaveFeedImages(feed: FeedJpaEntity, vararg names: String): List<String> {
+        return names.map { name ->
+            val url = "https://test-bucket.s3.amazonaws.com/feed-images/$name"
+            feedImageFixtureRepository.save(FeedImageJpaEntity(url = url, width = 10, height = 10, feed = feed)).url
+        }
     }
 
     protected fun getBearerToken(memberPk: Long): String {

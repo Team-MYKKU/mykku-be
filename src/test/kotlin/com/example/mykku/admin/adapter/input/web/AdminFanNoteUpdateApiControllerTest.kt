@@ -55,11 +55,33 @@ class AdminFanNoteUpdateApiControllerTest : BaseControllerTest() {
         putFanNote(fanNote.id!!, parts).statusCode(200)
 
         val urls = pageUrlsOf(fanNote.id!!)
+        val coverUrl = fanNoteJpaRepository.findById(fanNote.id!!).get().coverImageUrl
         assertThat(urls).hasSize(2)
         assertThat(urls[0]).isEqualTo(pages[1])
         assertThat(urls[1]).startsWith("https://test-bucket.s3.amazonaws.com/page-")
-        assertThat(fanNoteJpaRepository.findById(fanNote.id!!).get().coverImageUrl)
-            .startsWith("https://test-bucket.s3.amazonaws.com/cover-")
+        assertThat(coverUrl).startsWith("https://test-bucket.s3.amazonaws.com/cover-")
+        assertThat(testImageUploadService.uploadedUrls).containsExactly(coverUrl, urls[1])
+        assertThat(testImageUploadService.deletedUrls).isEmpty()
+    }
+
+    @Test
+    @DisplayName("업로드 뒤 수정이 FN101이나 FN001로 실패하면 이번에 올린 커버와 새 페이지만 지운다")
+    fun `update - 실패하면 이번에 올린 이미지만 지운다`() {
+        val fanNote = saveFanNote()
+        val pages = savePages(fanNote, 1)
+        val files = listOf(image("coverImage"), image("newPageImages"), image("newPageImages"))
+
+        putFanNote(fanNote.id!!, basicParts() + keepParts(listOf("https://other.example.com/p.jpg")) + files)
+            .statusCode(400)
+            .body("code", equalTo(FanNoteErrorCode.INVALID_KEEP_IMAGE_URLS.code))
+        putFanNote(999999L, basicParts() + keepParts(emptyList()) + files)
+            .statusCode(404)
+            .body("code", equalTo(FanNoteErrorCode.FAN_NOTE_NOT_FOUND.code))
+
+        assertThat(testImageUploadService.uploadedUrls).hasSize(6)
+        assertThat(testImageUploadService.deletedUrls).containsExactlyElementsOf(testImageUploadService.uploadedUrls)
+        assertThat(pageUrlsOf(fanNote.id!!)).containsExactlyElementsOf(pages)
+        assertThat(fanNoteJpaRepository.findById(fanNote.id!!).get().coverImageUrl).isEqualTo(COVER_URL)
     }
 
     @Test
@@ -73,6 +95,7 @@ class AdminFanNoteUpdateApiControllerTest : BaseControllerTest() {
 
         assertThat(fanNoteJpaRepository.findById(fanNote.id!!).get().coverImageUrl).isNull()
         assertThat(pageUrlsOf(fanNote.id!!)).isEmpty()
+        assertThat(testImageUploadService.deletedUrls).isEmpty()
     }
 
     @Test
@@ -93,6 +116,19 @@ class AdminFanNoteUpdateApiControllerTest : BaseControllerTest() {
             .body("code", equalTo(CommonErrorCode.INVALID_INPUT.code))
 
         assertThat(pageUrlsOf(fanNote.id!!)).containsExactlyElementsOf(pages)
+    }
+
+    @Test
+    @DisplayName("새 커버와 커버 삭제를 함께 보내 FN102로 거부되면 커버도 새 페이지도 올리지 않고 지우지도 않는다")
+    fun `update - 업로드 전 거부`() {
+        val fanNote = saveFanNote()
+
+        val files = listOf(image("coverImage"), image("newPageImages"))
+        putFanNote(fanNote.id!!, basicParts() + files + text("removeCoverImage", "true") + keepParts(emptyList()))
+            .statusCode(400)
+            .body("code", equalTo(FanNoteErrorCode.COVER_IMAGE_CONFLICT.code))
+
+        assertThat(testImageUploadService.uploadedUrls + testImageUploadService.deletedUrls).isEmpty()
     }
 
     @Test

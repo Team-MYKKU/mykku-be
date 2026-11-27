@@ -6,6 +6,7 @@ import com.example.mykku.image.dto.EntityImagesUploadResult
 import com.example.mykku.image.dto.FanNoteImagesUploadResult
 import com.example.mykku.image.dto.ImageUploadResult
 import org.springframework.web.multipart.MultipartFile
+import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.atomic.AtomicLong
 
 class TestImageUploadService : ImageUploadService {
@@ -15,6 +16,20 @@ class TestImageUploadService : ImageUploadService {
         private const val IMAGE_WIDTH = 800
         private const val IMAGE_HEIGHT = 600
         private val SEQUENCE = AtomicLong()
+    }
+
+    private val uploaded = CopyOnWriteArrayList<String>()
+    private val deleted = CopyOnWriteArrayList<String>()
+
+    val uploadedUrls: List<String>
+        get() = uploaded.toList()
+
+    val deletedUrls: List<String>
+        get() = deleted.toList()
+
+    fun reset() {
+        uploaded.clear()
+        deleted.clear()
     }
 
     override fun uploadImages(images: List<MultipartFile>, pathPrefix: String): List<ImageUploadResult> {
@@ -34,8 +49,8 @@ class TestImageUploadService : ImageUploadService {
         pageImages: List<MultipartFile>?
     ): FanNoteImagesUploadResult {
         return FanNoteImagesUploadResult(
-            coverImageUrl = coverImage?.let { testUrl("cover") },
-            pageImageUrls = pageImages?.map { testUrl("page") } ?: emptyList()
+            coverImageUrl = coverImage?.takeIf { !it.isEmpty }?.let { testUrl("cover") },
+            pageImageUrls = pageImages?.filterNot { it.isEmpty }?.map { testUrl("page") } ?: emptyList()
         )
     }
 
@@ -46,7 +61,9 @@ class TestImageUploadService : ImageUploadService {
     ): EntityImagesUploadResult {
         return EntityImagesUploadResult(
             thumbnailUrl = testUrl("$pathPrefix/thumbnail"),
-            imageUrls = images?.mapIndexed { index, _ -> testUrl("$pathPrefix/image-$index") } ?: emptyList()
+            imageUrls = images?.filterNot { it.isEmpty }?.mapIndexed { index, _ ->
+                testUrl("$pathPrefix/image-$index")
+            } ?: emptyList()
         )
     }
 
@@ -74,9 +91,12 @@ class TestImageUploadService : ImageUploadService {
     }
 
     override fun delete(url: String) {
+        deleted.add(url)
     }
 
     private fun testUrl(label: String): String {
-        return "$BASE_URL/$label-${SEQUENCE.incrementAndGet()}.jpg"
+        val url = "$BASE_URL/$label-${SEQUENCE.incrementAndGet()}.jpg"
+        uploaded.add(url)
+        return url
     }
 }

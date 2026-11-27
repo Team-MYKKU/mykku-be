@@ -17,6 +17,7 @@ import com.example.mykku.role.adapter.output.persistence.entity.RoleJpaEntity
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
+import org.assertj.core.api.Assertions.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.notNullValue
 import org.junit.jupiter.api.DisplayName
@@ -660,6 +661,24 @@ class FeedControllerTest : BaseControllerTest() {
             .then()
             .statusCode(200)
             .body("message", equalTo("피드가 성공적으로 삭제되었습니다."))
+    }
+
+    @Test
+    @DisplayName("피드 삭제 - 지운 피드의 이미지 URL만 지운다")
+    fun `deleteFeed - 지운 피드의 이미지만 지운다`() {
+        val member = createAndSaveMember()
+        val feed = saveFeed(member)
+        val deletedImages = createAndSaveFeedImages(feed, "a.jpg", "b.jpg")
+        createAndSaveFeedImages(saveFeed(member), "kept.jpg")
+
+        RestAssured.given()
+            .header("Authorization", getBearerToken(member.id))
+            .`when`()
+            .delete("/api/v1/feeds/{feedId}", feed.id)
+            .then()
+            .statusCode(200)
+
+        assertThat(testImageUploadService.deletedUrls).containsExactlyInAnyOrderElementsOf(deletedImages)
     }
 
     @Test

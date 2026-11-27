@@ -49,18 +49,42 @@ class AdminContestUpdateApiControllerTest : BaseControllerTest() {
     }
 
     @Test
-    @DisplayName("뺀 이미지는 지우고 새 이미지를 뒤에 붙인다")
+    @DisplayName("뺀 이미지는 지우고 새 이미지를 뒤에 붙이며, 새 썸네일로 바꾼다")
     fun `update - 이미지 교체`() {
         val contest = saveContest()
         val urls = saveImages(contest, 2)
 
-        putContest(contest.id!!, basicParts() + tagParts("덕질") + keepParts(listOf(urls[0])) + image("newImages"))
-            .statusCode(200)
+        val files = listOf(image("newImages"), image("thumbnailImage"))
+        putContest(contest.id!!, basicParts() + tagParts("덕질") + keepParts(listOf(urls[0])) + files).statusCode(200)
 
         val images = imageUrlsOf(contest.id!!)
+        val thumbnailUrl = contestJpaRepository.findById(contest.id!!).get().thumbnailUrl
         assertThat(images).hasSize(2)
         assertThat(images[0]).isEqualTo(urls[0])
         assertThat(images[1]).startsWith("https://test-bucket.s3.amazonaws.com/contest-images/image-")
+        assertThat(thumbnailUrl).startsWith("https://test-bucket.s3.amazonaws.com/contest-images/thumbnail-")
+        assertThat(testImageUploadService.uploadedUrls).containsExactly(thumbnailUrl, images[1])
+        assertThat(testImageUploadService.deletedUrls).isEmpty()
+    }
+
+    @Test
+    @DisplayName("업로드 뒤 수정이 CN112나 CN001로 실패하면 이번에 올린 썸네일과 새 이미지만 지운다")
+    fun `update - 실패하면 이번에 올린 이미지만 지운다`() {
+        val contest = saveContest()
+        val urls = saveImages(contest, 1)
+        val files = listOf(image("thumbnailImage"), image("newImages"), image("newImages"))
+
+        putContest(contest.id!!, basicParts() + tagParts("덕질") + keepParts(listOf(OTHER_URL)) + files)
+            .statusCode(400)
+            .body("code", equalTo(ContestErrorCode.INVALID_KEEP_IMAGE_URLS.code))
+        putContest(999999L, basicParts() + tagParts("덕질") + keepParts(emptyList()) + files)
+            .statusCode(404)
+            .body("code", equalTo(ContestErrorCode.CONTEST_NOT_FOUND.code))
+
+        assertThat(testImageUploadService.uploadedUrls).hasSize(6)
+        assertThat(testImageUploadService.deletedUrls).containsExactlyElementsOf(testImageUploadService.uploadedUrls)
+        assertThat(imageUrlsOf(contest.id!!)).containsExactlyElementsOf(urls)
+        assertThat(contestJpaRepository.findById(contest.id!!).get().thumbnailUrl).isEqualTo(OLD_THUMBNAIL_URL)
     }
 
     @Test
@@ -140,6 +164,23 @@ class AdminContestUpdateApiControllerTest : BaseControllerTest() {
         assertThat(imageUrlsOf(contest.id!!)).containsExactlyElementsOf(urls)
     }
 
+    @Test
+    @DisplayName("기간 역전(CN117)이나 11장(CN101)처럼 업로드 전에 거부되면 이미지를 올리지도 지우지도 않는다")
+    fun `update - 업로드 전 거부`() {
+        val contest = saveContest()
+        val urls = saveImages(contest, 2)
+        val parts = tagParts("덕질") + keepParts(urls) + image("thumbnailImage") + image("newImages")
+
+        putContest(contest.id!!, basicParts(startedAt = "2026-03-01T00:00:00") + parts)
+            .statusCode(400)
+            .body("code", equalTo(ContestErrorCode.INVALID_CONTEST_PERIOD.code))
+        putContest(contest.id!!, basicParts() + parts + (1..8).map { image("newImages") })
+            .statusCode(400)
+            .body("code", equalTo(ContestErrorCode.CONTEST_IMAGE_LIMIT_EXCEEDED.code))
+
+        assertThat(testImageUploadService.uploadedUrls + testImageUploadService.deletedUrls).isEmpty()
+    }
+
     private fun putContest(contestId: Long, parts: List<MultiPartSpecification>): ValidatableResponse {
         var spec = RestAssured.given()
             .sessionId(getAdminSessionId())
@@ -176,7 +217,7 @@ class AdminContestUpdateApiControllerTest : BaseControllerTest() {
                 startedAt = LocalDateTime.of(2026, 1, 1, 0, 0),
                 expiredAt = LocalDateTime.of(2026, 1, 31, 0, 0),
                 status = status,
-                thumbnailUrl = "https://test-bucket.s3.amazonaws.com/contest-images/old-thumbnail.jpg"
+                thumbnailUrl = OLD_THUMBNAIL_URL
             )
         )
         tags.forEach {
@@ -217,5 +258,10 @@ class AdminContestUpdateApiControllerTest : BaseControllerTest() {
             String::class.java,
             contestId
         )
+    }
+
+    companion object {
+        private const val OLD_THUMBNAIL_URL = "https://test-bucket.s3.amazonaws.com/contest-images/old-thumbnail.jpg"
+        private const val OTHER_URL = "https://other.example.com/x.jpg"
     }
 }

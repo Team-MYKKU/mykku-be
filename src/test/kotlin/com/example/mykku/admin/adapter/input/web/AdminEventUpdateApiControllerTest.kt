@@ -55,10 +55,8 @@ class AdminEventUpdateApiControllerTest : BaseControllerTest() {
         val event = saveEvent()
         val urls = saveImages(event, 2)
 
-        putEvent(
-            event.id!!,
-            basicParts() + keepParts(listOf(urls[1])) + image("newImages") + image("thumbnailImage")
-        ).statusCode(200)
+        val parts = basicParts() + keepParts(listOf(urls[1])) + image("newImages") + image("thumbnailImage")
+        putEvent(event.id!!, parts).statusCode(200)
 
         val images = imageUrlsOf(event.id!!)
         assertThat(images).hasSize(2)
@@ -66,6 +64,27 @@ class AdminEventUpdateApiControllerTest : BaseControllerTest() {
         assertThat(images[1]).startsWith("https://test-bucket.s3.amazonaws.com/event-images/image-")
         assertThat(eventJpaRepository.findById(event.id!!).get().thumbnailUrl)
             .startsWith("https://test-bucket.s3.amazonaws.com/event-images/thumbnail-")
+        assertThat(testImageUploadService.uploadedUrls).hasSize(2).contains(images[1])
+        assertThat(testImageUploadService.deletedUrls).isEmpty()
+    }
+
+    @Test
+    @DisplayName("업로드 뒤 수정이 EV104나 EV001로 실패하면 이번에 올린 썸네일과 새 이미지만 지운다")
+    fun `update - 실패하면 이번에 올린 이미지만 지운다`() {
+        val event = saveEvent()
+        val urls = saveImages(event, 1)
+        val files = listOf(image("thumbnailImage"), image("newImages"))
+
+        putEvent(event.id!!, basicParts() + keepParts(listOf(urls[0], urls[0])) + files)
+            .statusCode(400)
+            .body("code", equalTo(EventErrorCode.INVALID_KEEP_IMAGE_URLS.code))
+        putEvent(999999L, basicParts() + keepParts(emptyList()) + files)
+            .statusCode(404)
+            .body("code", equalTo(EventErrorCode.EVENT_NOT_FOUND.code))
+
+        assertThat(testImageUploadService.uploadedUrls).hasSize(4)
+        assertThat(testImageUploadService.deletedUrls).containsExactlyElementsOf(testImageUploadService.uploadedUrls)
+        assertThat(imageUrlsOf(event.id!!)).containsExactlyElementsOf(urls)
     }
 
     @Test
@@ -77,6 +96,7 @@ class AdminEventUpdateApiControllerTest : BaseControllerTest() {
         putEvent(event.id!!, basicParts() + keepParts(emptyList())).statusCode(200)
 
         assertThat(imageUrlsOf(event.id!!)).isEmpty()
+        assertThat(testImageUploadService.deletedUrls).isEmpty()
     }
 
     @Test
@@ -115,6 +135,8 @@ class AdminEventUpdateApiControllerTest : BaseControllerTest() {
         putEvent(event.id!!, basicParts() + keepParts(urls) + (1..9).map { image("newImages", "n$it.png") })
             .statusCode(400)
             .body("code", equalTo(EventErrorCode.EVENT_IMAGE_LIMIT_EXCEEDED.code))
+
+        assertThat(testImageUploadService.uploadedUrls + testImageUploadService.deletedUrls).isEmpty()
     }
 
     @Test
