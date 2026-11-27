@@ -14,6 +14,7 @@ import io.restassured.response.ValidatableResponse
 import io.restassured.specification.MultiPartSpecification
 import org.assertj.core.api.Assertions.assertThat
 import org.hamcrest.Matchers.equalTo
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -27,6 +28,13 @@ class AdminFanNoteUpdateApiControllerTest : BaseControllerTest() {
 
     @Autowired
     private lateinit var fanNotePageJpaRepository: FanNotePageJpaRepository
+
+    private lateinit var adminSessionId: String
+
+    @BeforeEach
+    fun setUp() {
+        adminSessionId = getAdminSessionId()
+    }
 
     @Test
     @DisplayName("텍스트를 바꾸고 표시값과 기존 페이지를 모두 보내면 페이지와 커버는 그대로다")
@@ -141,7 +149,7 @@ class AdminFanNoteUpdateApiControllerTest : BaseControllerTest() {
 
     private fun putFanNote(fanNoteId: Long, parts: List<MultiPartSpecification>): ValidatableResponse {
         var spec = RestAssured.given()
-            .sessionId(getAdminSessionId())
+            .sessionId(adminSessionId)
             .contentType("multipart/form-data")
         parts.forEach { spec = spec.multiPart(it) }
         return spec.`when`().put("/admin/api/v1/fannotes/{id}", fanNoteId).then()

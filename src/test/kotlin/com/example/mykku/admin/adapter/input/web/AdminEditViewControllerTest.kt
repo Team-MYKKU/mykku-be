@@ -18,6 +18,7 @@ import io.restassured.response.ValidatableResponse
 import org.hamcrest.Matchers.containsString
 import org.hamcrest.Matchers.endsWith
 import org.hamcrest.Matchers.not
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -45,6 +46,13 @@ class AdminEditViewControllerTest : BaseControllerTest() {
 
     @Autowired
     private lateinit var jdbcTemplate: JdbcTemplate
+
+    private lateinit var adminSessionId: String
+
+    @BeforeEach
+    fun setUp() {
+        adminSessionId = getAdminSessionId()
+    }
 
     @Test
     @DisplayName("이벤트 수정 화면은 현재 값과 이미지를 채우고, 목록에 수정 링크가 있다")
@@ -169,7 +177,7 @@ class AdminEditViewControllerTest : BaseControllerTest() {
 
     private fun getPage(path: String): ValidatableResponse {
         return RestAssured.given()
-            .sessionId(getAdminSessionId())
+            .sessionId(adminSessionId)
             .`when`()
             .get(path)
             .then()

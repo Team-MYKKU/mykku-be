@@ -303,8 +303,9 @@ class AdminContestApiControllerTest : BaseControllerTest() {
         val member = createAndSaveMember()
         val board = createAndSaveBoard()
         val contest = createAndSaveContest()
-        val first = createAndSaveParticipation(null, contest, createAndSaveFeed(member, board, title = "피드1"))
-        val second = createAndSaveParticipation(null, contest, createAndSaveFeed(member, board, title = "피드2"))
+        val first = createAndSaveParticipation(member, contest, createAndSaveFeed(member, board, title = "피드1"))
+        val second = createAndSaveParticipation(member, contest, createAndSaveFeed(member, board, title = "피드2"))
+        withdraw(member)
 
         postWinners(adminSessionId, contest.id!!, listOf(first.id!! to 1, second.id!! to 2))
             .statusCode(200)

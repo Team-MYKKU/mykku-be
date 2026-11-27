@@ -14,6 +14,7 @@ import io.restassured.response.ValidatableResponse
 import io.restassured.specification.MultiPartSpecification
 import org.assertj.core.api.Assertions.assertThat
 import org.hamcrest.Matchers.equalTo
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -28,6 +29,13 @@ class AdminEventUpdateApiControllerTest : BaseControllerTest() {
 
     @Autowired
     private lateinit var jdbcTemplate: JdbcTemplate
+
+    private lateinit var adminSessionId: String
+
+    @BeforeEach
+    fun setUp() {
+        adminSessionId = getAdminSessionId()
+    }
 
     @Test
     @DisplayName("텍스트와 기간을 바꾸고, 표시값과 기존 URL을 모두 보내면 이미지는 그대로다")
@@ -163,7 +171,7 @@ class AdminEventUpdateApiControllerTest : BaseControllerTest() {
             .statusCode(400)
             .body("code", equalTo(EventErrorCode.INVALID_EVENT_PERIOD.code))
         RestAssured.given()
-            .sessionId(getAdminSessionId())
+            .sessionId(adminSessionId)
             .contentType("multipart/form-data")
             .multiPart(text("title", "역전 이벤트"))
             .multiPart(text("startedAt", "2026-02-01T00:00"))
@@ -194,7 +202,7 @@ class AdminEventUpdateApiControllerTest : BaseControllerTest() {
 
     private fun putEvent(eventId: Long, parts: List<MultiPartSpecification>): ValidatableResponse {
         var spec = RestAssured.given()
-            .sessionId(getAdminSessionId())
+            .sessionId(adminSessionId)
             .contentType("multipart/form-data")
         parts.forEach { spec = spec.multiPart(it) }
         return spec.`when`().put("/admin/api/v1/events/{eventId}", eventId).then()

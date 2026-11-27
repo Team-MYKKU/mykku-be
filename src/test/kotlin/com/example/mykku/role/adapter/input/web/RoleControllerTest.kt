@@ -65,14 +65,7 @@ class RoleControllerTest : BaseControllerTest() {
         memberRoleJpaRepository.save(MemberRoleJpaEntity(memberId = member.id, role = role1))
 
         // when & then
-        RestAssured
-            .given()
-            .contentType(ContentType.JSON)
-            .headers(createAuthHeaders(member.id))
-            .`when`()
-            .get("/api/v1/roles/me/new")
-            .then()
-            .statusCode(200)
+        requestNewRoles(member.id)
             .body("message", equalTo("새로 획득한 칭호 조회 성공"))
             .body("data", hasSize<Any>(1))
             .body("data[0].role.name", equalTo("칭호1"))
@@ -86,25 +79,11 @@ class RoleControllerTest : BaseControllerTest() {
         val member = createAndSaveMember(nickname = "테스터", role = role1)
         memberRoleJpaRepository.save(MemberRoleJpaEntity(memberId = member.id, role = role1))
 
-        RestAssured
-            .given()
-            .contentType(ContentType.JSON)
-            .headers(createAuthHeaders(member.id))
-            .`when`()
-            .get("/api/v1/roles/me/new")
-            .then()
-            .statusCode(200)
+        requestNewRoles(member.id)
             .body("data", hasSize<Any>(1))
 
         // when & then
-        RestAssured
-            .given()
-            .contentType(ContentType.JSON)
-            .headers(createAuthHeaders(member.id))
-            .`when`()
-            .get("/api/v1/roles/me/new")
-            .then()
-            .statusCode(200)
+        requestNewRoles(member.id)
             .body("data", hasSize<Any>(0))
     }
 
@@ -119,14 +98,7 @@ class RoleControllerTest : BaseControllerTest() {
         memberRoleJpaRepository.save(MemberRoleJpaEntity(memberId = member.id, role = role2))
 
         // when & then
-        RestAssured
-            .given()
-            .contentType(ContentType.JSON)
-            .headers(createAuthHeaders(member.id))
-            .`when`()
-            .get("/api/v1/roles/me/new")
-            .then()
-            .statusCode(200)
+        requestNewRoles(member.id)
             .body("data", hasSize<Any>(1))
             .body("data[0].role.name", equalTo("칭호2"))
     }

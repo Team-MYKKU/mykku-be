@@ -9,6 +9,7 @@ import io.restassured.http.ContentType
 import io.restassured.response.ValidatableResponse
 import org.assertj.core.api.Assertions.assertThat
 import org.hamcrest.Matchers.equalTo
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -19,6 +20,13 @@ class AdminDailyMessageUpdateApiControllerTest : BaseControllerTest() {
 
     @Autowired
     private lateinit var dailyMessageJpaRepository: DailyMessageJpaRepository
+
+    private lateinit var adminSessionId: String
+
+    @BeforeEach
+    fun setUp() {
+        adminSessionId = getAdminSessionId()
+    }
 
     @Test
     @DisplayName("제목·내용·날짜를 바꾼다(자기 날짜를 그대로 보내도 된다)")
@@ -54,7 +62,7 @@ class AdminDailyMessageUpdateApiControllerTest : BaseControllerTest() {
 
     private fun putMessage(id: Long, title: String, content: String, date: String): ValidatableResponse {
         return RestAssured.given()
-            .sessionId(getAdminSessionId())
+            .sessionId(adminSessionId)
             .contentType(ContentType.JSON)
             .body(mapOf("title" to title, "content" to content, "date" to date))
             .`when`()

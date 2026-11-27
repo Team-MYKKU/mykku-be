@@ -28,6 +28,7 @@ import org.hamcrest.Matchers.containsString
 import org.hamcrest.Matchers.endsWith
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.not
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -61,6 +62,13 @@ class AdminReportViewControllerTest : BaseControllerTest() {
 
     @Autowired
     private lateinit var jdbcTemplate: JdbcTemplate
+
+    private lateinit var adminSessionId: String
+
+    @BeforeEach
+    fun setUp() {
+        adminSessionId = getAdminSessionId()
+    }
 
     @Test
     @DisplayName("신고 목록은 신고자·피신고자 memberId와 닉네임을 보여 준다")
@@ -243,7 +251,7 @@ class AdminReportViewControllerTest : BaseControllerTest() {
 
     private fun getPage(path: String): ValidatableResponse {
         return RestAssured.given()
-            .sessionId(getAdminSessionId())
+            .sessionId(adminSessionId)
             .urlEncodingEnabled(false)
             .`when`()
             .get(path)

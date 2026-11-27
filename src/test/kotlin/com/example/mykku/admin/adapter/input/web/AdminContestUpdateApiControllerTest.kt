@@ -13,6 +13,7 @@ import io.restassured.response.ValidatableResponse
 import io.restassured.specification.MultiPartSpecification
 import org.assertj.core.api.Assertions.assertThat
 import org.hamcrest.Matchers.equalTo
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -27,6 +28,13 @@ class AdminContestUpdateApiControllerTest : BaseControllerTest() {
 
     @Autowired
     private lateinit var jdbcTemplate: JdbcTemplate
+
+    private lateinit var adminSessionId: String
+
+    @BeforeEach
+    fun setUp() {
+        adminSessionId = getAdminSessionId()
+    }
 
     @Test
     @DisplayName("텍스트·기간·태그를 바꾸고, 표시값과 기존 URL을 모두 보내면 이미지는 그대로다")
@@ -183,7 +191,7 @@ class AdminContestUpdateApiControllerTest : BaseControllerTest() {
 
     private fun putContest(contestId: Long, parts: List<MultiPartSpecification>): ValidatableResponse {
         var spec = RestAssured.given()
-            .sessionId(getAdminSessionId())
+            .sessionId(adminSessionId)
             .contentType("multipart/form-data")
         parts.forEach { spec = spec.multiPart(it) }
         return spec.`when`().put("/admin/api/v1/contests/{contestId}", contestId).then()

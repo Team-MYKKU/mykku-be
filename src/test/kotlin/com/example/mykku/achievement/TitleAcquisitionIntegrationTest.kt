@@ -63,14 +63,7 @@ class TitleAcquisitionIntegrationTest : BaseControllerTest() {
         createFeed(member.id, board.id!!)
 
         // then
-        RestAssured
-            .given()
-            .contentType(ContentType.JSON)
-            .headers(createAuthHeaders(member.id))
-            .`when`()
-            .get("/api/v1/roles/me/new")
-            .then()
-            .statusCode(200)
+        requestNewRoles(member.id)
             .body("data", hasSize<Any>(1))
             .body("data[0].role.name", equalTo("이 몸 등장"))
             .body("data[0].isRepresentative", equalTo(true))
@@ -137,7 +130,7 @@ class TitleAcquisitionIntegrationTest : BaseControllerTest() {
     @DisplayName("덕질노트를 조회하면 조회 칭호가 자동 부여되고 신규 칭호 조회에 나온다")
     fun awardsFanNoteViewTitle() {
         // given
-        roleJpaRepository.save(RoleJpaEntity(name = "초보 오타쿠", description = "덕질노트 1회 조회"))
+        roleJpaRepository.save(RoleJpaEntity(name = "초보 오타쿠", description = "덕질노트 1회 열람"))
         val member = createAndSaveMember(memberId = "titleacqtester", nickname = "테스터", role = null)
         val fanNote = fanNoteJpaRepository.save(
             FanNoteJpaEntity(
@@ -197,14 +190,4 @@ class TitleAcquisitionIntegrationTest : BaseControllerTest() {
             .then()
             .statusCode(200)
     }
-
-    private fun requestNewRoles(memberPk: Long) =
-        RestAssured
-            .given()
-            .contentType(ContentType.JSON)
-            .headers(createAuthHeaders(memberPk))
-            .`when`()
-            .get("/api/v1/roles/me/new")
-            .then()
-            .statusCode(200)
 }
