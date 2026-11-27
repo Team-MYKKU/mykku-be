@@ -4,7 +4,6 @@ import com.example.mykku.BaseControllerTest
 import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import com.example.mykku.notification.adapter.output.persistence.entity.FcmTokenJpaEntity
 import com.example.mykku.notification.adapter.output.persistence.repository.FcmTokenJpaRepository
-import com.example.mykku.util.TestTokenGenerator
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
 import org.hamcrest.Matchers.equalTo
@@ -42,7 +41,7 @@ class FcmTokenControllerTest : BaseControllerTest() {
             nickname = "TestUser",
             email = "test@example.com"
         )
-        val authHeader = TestTokenGenerator.getBearerToken(member.id)
+        val authHeader = getBearerToken(member.id)
 
         val request = mapOf(
             "token" to "test_fcm_token_123",
@@ -76,7 +75,7 @@ class FcmTokenControllerTest : BaseControllerTest() {
             deviceId = "device_001",
             deviceType = "ANDROID"
         )
-        val authHeader = TestTokenGenerator.getBearerToken(member.id)
+        val authHeader = getBearerToken(member.id)
 
         val request = mapOf(
             "token" to "new_token_updated",
@@ -119,7 +118,7 @@ class FcmTokenControllerTest : BaseControllerTest() {
     @DisplayName("FCM 토큰 등록 - 필수 필드 누락")
     fun `registerToken - 필수 필드가 누락되면 실패한다`() {
         val member = createAndSaveMember()
-        val authHeader = TestTokenGenerator.getBearerToken(member.id)
+        val authHeader = getBearerToken(member.id)
 
         val request = mapOf(
             "deviceId" to "device_001"
@@ -151,7 +150,7 @@ class FcmTokenControllerTest : BaseControllerTest() {
             deviceId = "device_002",
             deviceType = "IOS"
         )
-        val authHeader = TestTokenGenerator.getBearerToken(member.id)
+        val authHeader = getBearerToken(member.id)
 
         RestAssured.given()
             .header("Authorization", authHeader)
@@ -182,7 +181,7 @@ class FcmTokenControllerTest : BaseControllerTest() {
             token = "token1",
             deviceId = "device_001"
         )
-        val authHeader = TestTokenGenerator.getBearerToken(member.id)
+        val authHeader = getBearerToken(member.id)
 
         RestAssured.given()
             .header("Authorization", authHeader)

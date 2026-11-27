@@ -16,7 +16,6 @@ import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntit
 import com.example.mykku.member.domain.vo.SocialProvider
 import com.example.mykku.member.exception.MemberErrorCode
 import com.example.mykku.role.adapter.output.persistence.entity.RoleJpaEntity
-import com.example.mykku.util.TestTokenGenerator
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
 import java.time.LocalDate
@@ -63,7 +62,7 @@ class DailyMessageCommentControllerTest : BaseControllerTest() {
                 date = LocalDate.now()
             )
         )
-        val authHeader = TestTokenGenerator.getBearerToken(member.id)
+        val authHeader = getBearerToken(member.id)
         val request = CreateCommentRequest(content = "좋은 글이네요!")
 
         // when & then
@@ -132,7 +131,7 @@ class DailyMessageCommentControllerTest : BaseControllerTest() {
                 date = LocalDate.now()
             )
         )
-        val authHeader = TestTokenGenerator.getBearerToken(member.id)
+        val authHeader = getBearerToken(member.id)
         val request = CreateCommentRequest(content = "좋은 글이네요!")
 
         // when & then
@@ -169,7 +168,7 @@ class DailyMessageCommentControllerTest : BaseControllerTest() {
                 date = LocalDate.now()
             )
         )
-        val authHeader = TestTokenGenerator.getBearerToken(member.id)
+        val authHeader = getBearerToken(member.id)
         val request = CreateCommentRequest(content = "좋은 글이네요!")
 
         // when & then
@@ -232,7 +231,7 @@ class DailyMessageCommentControllerTest : BaseControllerTest() {
                 parentComment = comment
             )
         )
-        val authHeader = TestTokenGenerator.getBearerToken(member.id)
+        val authHeader = getBearerToken(member.id)
         val request = UpdateCommentRequest(content = "수정된 댓글")
 
         // when & then
@@ -299,7 +298,7 @@ class DailyMessageCommentControllerTest : BaseControllerTest() {
                 member = member
             )
         )
-        val authHeader = TestTokenGenerator.getBearerToken(member.id)
+        val authHeader = getBearerToken(member.id)
 
         // when & then
         RestAssured.given()
@@ -351,7 +350,7 @@ class DailyMessageCommentControllerTest : BaseControllerTest() {
                 member = member1
             )
         )
-        val authHeader = TestTokenGenerator.getBearerToken(member2.id)
+        val authHeader = getBearerToken(member2.id)
 
         // when & then
         RestAssured.given()
@@ -408,7 +407,7 @@ class DailyMessageCommentControllerTest : BaseControllerTest() {
         likeDailyMessageCommentJpaRepository.save(
             LikeDailyMessageCommentJpaEntity(member = member, dailyMessageComment = reply)
         )
-        val authHeader = TestTokenGenerator.getBearerToken(member.id)
+        val authHeader = getBearerToken(member.id)
 
         // when & then
         RestAssured.given()
@@ -796,7 +795,7 @@ class DailyMessageCommentControllerTest : BaseControllerTest() {
                 parentComment = comment
             )
         )
-        val authHeader = TestTokenGenerator.getBearerToken(member.id)
+        val authHeader = getBearerToken(member.id)
         val request = CreateCommentRequest(content = "답글의 답글", parentCommentId = reply.id)
 
         RestAssured.given()

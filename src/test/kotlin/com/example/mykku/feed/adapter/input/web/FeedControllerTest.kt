@@ -14,7 +14,6 @@ import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntit
 import com.example.mykku.member.domain.vo.SocialProvider
 import com.example.mykku.member.exception.MemberErrorCode
 import com.example.mykku.role.adapter.output.persistence.entity.RoleJpaEntity
-import com.example.mykku.util.TestTokenGenerator
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
@@ -57,7 +56,7 @@ class FeedControllerTest : BaseControllerTest() {
                 logo = "test_logo.png"
             )
         )
-        val authHeader = TestTokenGenerator.getBearerToken(member.id)
+        val authHeader = getBearerToken(member.id)
         val request = CreateFeedRequestDto(
             title = "테스트 피드",
             content = "테스트 내용",
@@ -131,7 +130,7 @@ class FeedControllerTest : BaseControllerTest() {
                 logo = "test_logo.png"
             )
         )
-        val authHeader = TestTokenGenerator.getBearerToken(member.id)
+        val authHeader = getBearerToken(member.id)
         val request = CreateFeedRequestDto(
             title = "테스트 피드",
             content = "테스트 내용",
@@ -173,7 +172,7 @@ class FeedControllerTest : BaseControllerTest() {
                 logo = "test_logo.png"
             )
         )
-        val authHeader = TestTokenGenerator.getBearerToken(member.id)
+        val authHeader = getBearerToken(member.id)
         val request = CreateFeedRequestDto(
             title = "테스트 피드",
             content = "테스트 내용",
@@ -223,7 +222,7 @@ class FeedControllerTest : BaseControllerTest() {
                 board = board
             )
         )
-        val authHeader = TestTokenGenerator.getBearerToken(member.id)
+        val authHeader = getBearerToken(member.id)
 
         // when & then
         RestAssured.given()
@@ -564,7 +563,7 @@ class FeedControllerTest : BaseControllerTest() {
                 board = board
             )
         )
-        val authHeader = TestTokenGenerator.getBearerToken(member.id)
+        val authHeader = getBearerToken(member.id)
 
         // when & then
         RestAssured.given()
@@ -651,7 +650,7 @@ class FeedControllerTest : BaseControllerTest() {
                 board = board
             )
         )
-        val authHeader = TestTokenGenerator.getBearerToken(member.id)
+        val authHeader = getBearerToken(member.id)
 
         // when & then
         RestAssured.given()
@@ -741,7 +740,7 @@ class FeedControllerTest : BaseControllerTest() {
                 board = board
             )
         )
-        val authHeader = TestTokenGenerator.getBearerToken(otherMember.id)
+        val authHeader = getBearerToken(otherMember.id)
 
         // when & then
         RestAssured.given()
@@ -767,7 +766,7 @@ class FeedControllerTest : BaseControllerTest() {
                 profileImage = ""
             )
         )
-        val authHeader = TestTokenGenerator.getBearerToken(member.id)
+        val authHeader = getBearerToken(member.id)
         val nonExistentFeedId = 99999L
 
         // when & then

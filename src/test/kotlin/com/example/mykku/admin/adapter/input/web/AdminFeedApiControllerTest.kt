@@ -13,7 +13,6 @@ import com.example.mykku.feed.adapter.output.persistence.entity.FeedCommentJpaEn
 import com.example.mykku.feed.adapter.output.persistence.entity.FeedJpaEntity
 import com.example.mykku.feed.exception.FeedErrorCode
 import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
-import com.example.mykku.util.TestTokenGenerator
 import io.restassured.RestAssured
 import io.restassured.response.ValidatableResponse
 import org.assertj.core.api.Assertions.assertThat
@@ -124,7 +123,7 @@ class AdminFeedApiControllerTest : BaseControllerTest() {
         saveComment(feed, author, parent)
 
         RestAssured.given()
-            .header("Authorization", TestTokenGenerator.getBearerToken(author.id))
+            .header("Authorization", getBearerToken(author.id))
             .`when`()
             .delete("/api/v1/feeds/{feedId}", feed.id)
             .then()

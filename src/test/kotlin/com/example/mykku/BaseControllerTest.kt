@@ -1,5 +1,7 @@
 package com.example.mykku
 
+import com.example.mykku.auth.application.port.output.TokenProvider
+import com.example.mykku.auth.config.JwtProperties
 import com.example.mykku.board.adapter.output.persistence.BoardJpaRepository
 import com.example.mykku.board.adapter.output.persistence.entity.BoardJpaEntity
 import com.example.mykku.config.TestAsyncConfig
@@ -13,7 +15,7 @@ import com.example.mykku.member.domain.vo.SocialProvider
 import com.example.mykku.role.adapter.output.persistence.entity.RoleJpaEntity
 import com.example.mykku.role.adapter.output.persistence.repository.RoleJpaRepository
 import com.example.mykku.util.DatabaseCleaner
-import com.example.mykku.util.TestTokenGenerator
+import com.example.mykku.util.JwtTestTokens
 import io.restassured.RestAssured
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.ExtendWith
@@ -40,6 +42,14 @@ abstract class BaseControllerTest {
 
     @Autowired
     protected lateinit var roleJpaRepository: RoleJpaRepository
+
+    @Autowired
+    private lateinit var serverTokenProvider: TokenProvider
+
+    @Autowired
+    private lateinit var serverJwtProperties: JwtProperties
+
+    protected val jwtTestTokens: JwtTestTokens by lazy { JwtTestTokens(serverJwtProperties, serverTokenProvider) }
 
     @BeforeEach
     fun baseSetUp() {
@@ -79,11 +89,11 @@ abstract class BaseControllerTest {
     }
 
     protected fun getBearerToken(memberPk: Long): String {
-        return TestTokenGenerator.getBearerToken(memberPk)
+        return JwtTestTokens.bearer(jwtTestTokens.access(memberPk))
     }
 
     protected fun createAuthHeaders(memberPk: Long): Map<String, String> {
-        return TestTokenGenerator.createAuthHeaders(memberPk)
+        return mapOf("Authorization" to getBearerToken(memberPk))
     }
 
     /**
