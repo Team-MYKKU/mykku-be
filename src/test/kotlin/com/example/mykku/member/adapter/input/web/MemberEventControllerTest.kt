@@ -230,7 +230,7 @@ class MemberEventControllerTest : BaseControllerTest() {
             .statusCode(401)
     }
 
-    @ParameterizedTest(name = "{0}")
+    @ParameterizedTest(name = "{displayName} [{0}]")
     @EnumSource(EventType::class)
     @DisplayName("내가 참여한 이벤트 목록 조회 - 유형이 다른 이벤트도 같은 조건의 일반 이벤트와 같은 필드·값으로 응답한다")
     fun `getMyParticipatedEvents - 유형과 무관하게 같은 응답`(type: EventType) {
@@ -238,7 +238,14 @@ class MemberEventControllerTest : BaseControllerTest() {
         val general = createAndSaveWonEvent(member, EventType.GENERAL)
         val typed = createAndSaveWonEvent(member, type)
 
-        val content = RestAssured.given()
+        val content = getMyEventsContent(member)
+
+        assertThat(content.map { it["id"] }).containsExactlyInAnyOrder(general.id!!.toInt(), typed.id!!.toInt())
+        assertThat(content.map { ResponseMaps.masked(it, setOf("id")) }.distinct()).hasSize(1)
+    }
+
+    private fun getMyEventsContent(member: MemberJpaEntity): List<Map<String, Any?>> {
+        return RestAssured.given()
             .header("Authorization", getBearerToken(member.id))
             .`when`()
             .get("/api/v1/members/me/events")
@@ -246,14 +253,20 @@ class MemberEventControllerTest : BaseControllerTest() {
             .statusCode(200)
             .extract()
             .jsonPath()
-            .getList<Map<String, Any?>>("data.content")
-
-        assertThat(content.map { it["id"] }).containsExactlyInAnyOrder(general.id!!.toInt(), typed.id!!.toInt())
-        assertThat(content.map { ResponseMaps.withoutKeys(it, setOf("id")) }.distinct()).hasSize(1)
+            .getList("data.content")
     }
 
     private fun createAndSaveWonEvent(member: MemberJpaEntity, type: EventType): EventJpaEntity {
-        val event = eventJpaRepository.save(
+        val event = createAndSaveTypedEvent(type)
+        val participation = eventParticipationJpaRepository.save(
+            EventParticipationJpaEntity(member = member, event = event)
+        )
+        eventWinnerJpaRepository.save(EventWinnerJpaEntity(event = event, participation = participation))
+        return event
+    }
+
+    private fun createAndSaveTypedEvent(type: EventType): EventJpaEntity {
+        return eventJpaRepository.save(
             EventJpaEntity(
                 title = "유형 비교 이벤트",
                 startedAt = LocalDateTime.of(2020, 1, 1, 0, 0),
@@ -264,10 +277,5 @@ class MemberEventControllerTest : BaseControllerTest() {
                 googleFormUrl = "https://forms.gle/abc123".takeIf { type == EventType.GOOGLE_FORM }
             )
         )
-        val participation = eventParticipationJpaRepository.save(
-            EventParticipationJpaEntity(member = member, event = event)
-        )
-        eventWinnerJpaRepository.save(EventWinnerJpaEntity(event = event, participation = participation))
-        return event
     }
 }

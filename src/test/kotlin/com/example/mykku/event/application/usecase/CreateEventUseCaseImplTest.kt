@@ -37,7 +37,7 @@ class CreateEventUseCaseImplTest {
     @InjectMocks
     private lateinit var useCase: CreateEventUseCaseImpl
 
-    @ParameterizedTest(name = "{0}")
+    @ParameterizedTest(name = "{displayName} [{0}]")
     @EnumSource(EventType::class)
     @DisplayName("명령의 유형과 구글폼 링크를 그대로 담아 이벤트를 저장한다")
     fun `생성 - 유형과 구글폼 링크 전달`(type: EventType) {

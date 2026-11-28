@@ -17,7 +17,7 @@ class GoogleFormUrlTest {
     @DisplayName("normalize 메서드")
     inner class Normalize {
 
-        @ParameterizedTest(name = "[{0}]")
+        @ParameterizedTest(name = "{displayName} [{0}]")
         @ValueSource(strings = ["", "   ", " \t\n "])
         @DisplayName("빈 값이나 공백만 있으면 미입력(null)으로 본다")
         fun `정규화 - 빈 값은 null`(raw: String) {
@@ -41,7 +41,7 @@ class GoogleFormUrlTest {
     @DisplayName("of 메서드")
     inner class Of {
 
-        @ParameterizedTest(name = "{0}")
+        @ParameterizedTest(name = "{displayName} [{0}]")
         @ValueSource(
             strings = [
                 "https://docs.google.com/forms/d/e/1FAIpQLSc_example/viewform",
@@ -50,6 +50,8 @@ class GoogleFormUrlTest {
                 "https://docs.google.com/forms/d/e/x/viewform?usp=sf_link",
                 "https://docs.google.com/forms/d/e/x/viewform/",
                 "https://DOCS.Google.com/forms/d/e/x/viewform",
+                "https://docs.google.com/forms/u/1/d/e/x/viewform",
+                "https://docs.google.com/forms/d/e/x/viewform?usp=pp_url&entry.1=%EA%B0%80",
                 "https://forms.gle/abc",
                 "HTTPS://forms.gle/abc"
             ]
@@ -59,7 +61,7 @@ class GoogleFormUrlTest {
             assertThat(GoogleFormUrl.of(url).value).isEqualTo(url)
         }
 
-        @ParameterizedTest(name = "{0}")
+        @ParameterizedTest(name = "{displayName} [{0}]")
         @ValueSource(
             strings = [
                 "http://docs.google.com/forms/d/e/x/viewform",
@@ -72,9 +74,19 @@ class GoogleFormUrlTest {
                 "https://docs.google.com/forms/d/e/x/formResponse",
                 "https://docs.google.com/forms/",
                 "https://docs.google.com/forms",
+                "https://docs.google.com/forms/d/e/x/viewform/edit",
+                "https://docs.google.com/formsx/d/e/x/viewform",
                 "https://docs.google.com/forms/../document/d/x/viewform",
+                "https://docs.google.com/x/../forms/d/e/x/viewform",
+                "https://docs.google.com/forms/d/./e/x/viewform",
+                "https://docs.google.com/forms/%2e%2e/document/d/x/viewform",
+                "https://docs.google.com/forms/.%2E/document/d/x/viewform",
+                "https://docs.google.com/forms/d/e/x%2Fviewform",
+                "https://docs.google.com//forms/d/e/x/viewform",
                 "https://forms.gle/",
                 "https://forms.gle",
+                "https://forms.gle/..",
+                "https://forms.gle/%2e%2e",
                 "https://x@docs.google.com/forms/d/e/x/viewform",
                 "https://docs.google.com:8443/forms/d/e/x/viewform",
                 "https://docs.google.com:443/forms/d/e/x/viewform",
@@ -85,7 +97,7 @@ class GoogleFormUrlTest {
                 " https://forms.gle/abc"
             ]
         )
-        @DisplayName("https가 아니거나 허용 호스트의 응답 링크가 아니면 EV109")
+        @DisplayName("https가 아니거나, 허용 호스트의 응답 링크가 아니거나, 경로에 인코딩·빈 세그먼트·점 세그먼트가 있으면 EV109")
         fun `거부 - 응답 링크가 아님`(url: String) {
             assertInvalid(url)
         }

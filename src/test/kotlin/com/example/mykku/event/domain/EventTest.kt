@@ -298,14 +298,14 @@ class EventTest {
             assertInvalidTypeSetting { Event.validateTypeSetting(EventType.GOOGLE_FORM, EDIT_FORM_URL) }
         }
 
-        @ParameterizedTest(name = "{0}")
+        @ParameterizedTest(name = "{displayName} [{0}]")
         @EnumSource(value = EventType::class, names = ["GOOGLE_FORM"], mode = EnumSource.Mode.EXCLUDE)
         @DisplayName("GOOGLE_FORM이 아닌 유형은 구글폼 링크가 없으면 통과한다")
         fun `유형 설정 - 다른 유형 링크 없음`(type: EventType) {
             assertThatCode { Event.validateTypeSetting(type, null) }.doesNotThrowAnyException()
         }
 
-        @ParameterizedTest(name = "{0}")
+        @ParameterizedTest(name = "{displayName} [{0}]")
         @EnumSource(value = EventType::class, names = ["GOOGLE_FORM"], mode = EnumSource.Mode.EXCLUDE)
         @DisplayName("GOOGLE_FORM이 아닌 유형에 구글폼 링크가 있으면 EV109")
         fun `유형 설정 - 다른 유형에 링크`(type: EventType) {

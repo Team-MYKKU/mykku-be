@@ -36,7 +36,7 @@ class AdminEventService(
 
     @Transactional
     fun create(request: EventCreateRequest): CreateEventResponse {
-        val googleFormUrl = validateTypeSetting(request.type, request.googleFormUrl)
+        val googleFormUrl = validateAndNormalizeGoogleFormUrl(request.type, request.googleFormUrl)
         Event.validatePeriod(request.startedAt, request.expiredAt)
         validateImageCount(request.images?.size ?: 0)
 
@@ -50,7 +50,7 @@ class AdminEventService(
         return CreateEventResponse.from(result)
     }
 
-    private fun validateTypeSetting(type: EventType, rawGoogleFormUrl: String?): String? {
+    private fun validateAndNormalizeGoogleFormUrl(type: EventType, rawGoogleFormUrl: String?): String? {
         if (type !in CREATABLE_TYPES) throw EventException.invalidEventTypeSetting()
         val googleFormUrl = GoogleFormUrl.normalize(rawGoogleFormUrl)
         Event.validateTypeSetting(type, googleFormUrl)

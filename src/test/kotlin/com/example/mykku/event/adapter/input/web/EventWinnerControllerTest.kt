@@ -210,7 +210,7 @@ class EventWinnerControllerTest : BaseControllerTest() {
             .statusCode(404)
     }
 
-    @ParameterizedTest(name = "{0}")
+    @ParameterizedTest(name = "{displayName} [{0}]")
     @EnumSource(EventType::class)
     @DisplayName("유형이 다른 이벤트도 당첨자·발표 공지·내 당첨 여부·내 당첨 목록을 같은 조건의 일반 이벤트와 같은 필드·값으로 응답한다")
     fun `당첨 조회 - 유형과 무관하게 같은 응답`(type: EventType) {
@@ -220,18 +220,25 @@ class EventWinnerControllerTest : BaseControllerTest() {
         val typed = createAndSaveWonEvent(member, type)
 
         listOf("winners", "winner-announcement", "my-winner-status").forEach { path ->
-            assertThat(getDataWithoutIds(authHeader, "/api/v1/events/${typed.id}/$path")).`as`(path)
-                .isEqualTo(getDataWithoutIds(authHeader, "/api/v1/events/${general.id}/$path"))
+            assertThat(getDataWithMaskedIds(authHeader, "/api/v1/events/${typed.id}/$path")).`as`(path)
+                .isEqualTo(getDataWithMaskedIds(authHeader, "/api/v1/events/${general.id}/$path"))
         }
         val awards = getData(authHeader, "/api/v1/events/my-awards") as Map<*, *>
         val content = awards["content"] as List<*>
         assertThat(content.map { (it as Map<*, *>)["eventId"] })
             .containsExactlyInAnyOrder(general.id!!.toInt(), typed.id!!.toInt())
-        assertThat(content.map { ResponseMaps.withoutKeys(it, ID_KEYS) }.distinct()).hasSize(1)
+        assertThat(content.map { ResponseMaps.masked(it, ID_KEYS) }.distinct()).hasSize(1)
     }
 
     private fun createAndSaveWonEvent(member: MemberJpaEntity, type: EventType): EventJpaEntity {
-        val event = eventJpaRepository.save(
+        val event = createAndSaveTypedEvent(type)
+        createAndSaveWinner(event, createAndSaveParticipation(member, event))
+        createAndSaveAnnouncement(event)
+        return event
+    }
+
+    private fun createAndSaveTypedEvent(type: EventType): EventJpaEntity {
+        return eventJpaRepository.save(
             EventJpaEntity(
                 title = "유형 비교 이벤트",
                 description = "유형 비교 설명",
@@ -243,7 +250,9 @@ class EventWinnerControllerTest : BaseControllerTest() {
                 googleFormUrl = "https://forms.gle/abc123".takeIf { type == EventType.GOOGLE_FORM }
             )
         )
-        createAndSaveWinner(event, createAndSaveParticipation(member, event))
+    }
+
+    private fun createAndSaveAnnouncement(event: EventJpaEntity) {
         eventWinnerAnnouncementJpaRepository.save(
             EventWinnerAnnouncementJpaEntity(
                 event = event,
@@ -252,11 +261,10 @@ class EventWinnerControllerTest : BaseControllerTest() {
                 announcedAt = LocalDate.of(2020, 2, 1)
             )
         )
-        return event
     }
 
-    private fun getDataWithoutIds(authHeader: String, path: String): Any? {
-        return ResponseMaps.withoutKeys(getData(authHeader, path), ID_KEYS)
+    private fun getDataWithMaskedIds(authHeader: String, path: String): Any? {
+        return ResponseMaps.masked(getData(authHeader, path), ID_KEYS)
     }
 
     private fun getData(authHeader: String, path: String): Any? {

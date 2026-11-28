@@ -108,7 +108,7 @@ class AdminEventApiControllerTest : BaseControllerTest() {
         assertThat(storedTypeColumns(createdId(response))).isEqualTo("GENERAL" to null)
     }
 
-    @ParameterizedTest(name = "[{0}]")
+    @ParameterizedTest(name = "{displayName} [{0}]")
     @ValueSource(strings = ["FOO", "general"])
     @DisplayName("이벤트 생성 - 정의되지 않은 type 값은 C101이고 이미지를 올리지 않는다")
     fun `create - 정의되지 않은 type은 C101`(type: String) {
@@ -120,7 +120,7 @@ class AdminEventApiControllerTest : BaseControllerTest() {
         assertThat(eventJpaRepository.count()).isZero()
     }
 
-    @ParameterizedTest(name = "{0}")
+    @ParameterizedTest(name = "{displayName} [{0}]")
     @EnumSource(value = EventType::class, names = ["ATTENDANCE", "GOOGLE_FORM", "ENTRY"])
     @DisplayName("이벤트 생성 - 아직 생성을 열지 않은 유형은 EV109이고 이미지를 올리지 않는다")
     fun `create - 생성 허용 목록 밖 유형은 EV109`(type: EventType) {
@@ -134,7 +134,7 @@ class AdminEventApiControllerTest : BaseControllerTest() {
         assertThat(eventJpaRepository.count()).isZero()
     }
 
-    @ParameterizedTest(name = "[{0}]")
+    @ParameterizedTest(name = "{displayName} [{0}]")
     @ValueSource(strings = ["", "   "])
     @DisplayName("이벤트 생성 - GENERAL에 빈 구글폼 링크를 보내면 미입력으로 보고 링크 없이 저장한다")
     fun `create - 빈 구글폼 링크는 null로 저장`(googleFormUrl: String) {
@@ -144,13 +144,29 @@ class AdminEventApiControllerTest : BaseControllerTest() {
         assertThat(storedTypeColumns(createdId(response))).isEqualTo("GENERAL" to null)
     }
 
-    @ParameterizedTest(name = "{0}")
+    @ParameterizedTest(name = "{displayName} [{0}]")
     @ValueSource(strings = [FORM_URL, "javascript:alert(1)"])
     @DisplayName("이벤트 생성 - GENERAL에 구글폼 링크를 보내면 EV109이고 이미지를 올리지 않는다")
     fun `create - GENERAL에 구글폼 링크는 EV109`(googleFormUrl: String) {
         postEvent(createParts() + text("googleFormUrl", googleFormUrl))
             .statusCode(400)
             .body("code", equalTo(EventErrorCode.INVALID_EVENT_TYPE_SETTING.code))
+
+        assertThat(testImageUploadService.uploadedUrls).isEmpty()
+        assertThat(eventJpaRepository.count()).isZero()
+    }
+
+    @Test
+    @DisplayName("이벤트 생성 - 유형 설정(EV109)을 기간(EV107)·이미지 수(EV101)보다 먼저 검사하고, 모두 이미지를 올리기 전에 거부한다")
+    fun `create - 유형 설정 검사가 기간과 이미지 수 검사보다 먼저다`() {
+        val invertedPeriod = createParts(startedAt = "2026-12-08T00:00:00")
+        val elevenImages = createParts(imageCount = 11)
+        val googleFormUrl = text("googleFormUrl", FORM_URL)
+
+        assertCreateRejected(invertedPeriod, EventErrorCode.INVALID_EVENT_PERIOD)
+        assertCreateRejected(elevenImages, EventErrorCode.EVENT_IMAGE_LIMIT_EXCEEDED)
+        assertCreateRejected(invertedPeriod + googleFormUrl, EventErrorCode.INVALID_EVENT_TYPE_SETTING)
+        assertCreateRejected(elevenImages + googleFormUrl, EventErrorCode.INVALID_EVENT_TYPE_SETTING)
 
         assertThat(testImageUploadService.uploadedUrls).isEmpty()
         assertThat(eventJpaRepository.count()).isZero()
@@ -530,14 +546,21 @@ class AdminEventApiControllerTest : BaseControllerTest() {
         return spec.`when`().post("/admin/api/v1/events").then()
     }
 
-    private fun createParts(title: String = "유형 이벤트"): List<MultiPartSpecification> {
+    private fun createParts(
+        title: String = "유형 이벤트",
+        startedAt: String = "2026-12-01T00:00:00",
+        imageCount: Int = 1
+    ): List<MultiPartSpecification> {
         return listOf(
             text("title", title),
-            text("startedAt", "2026-12-01T00:00:00"),
+            text("startedAt", startedAt),
             text("expiredAt", "2026-12-07T23:59:59"),
-            image("thumbnailImage"),
-            image("images")
-        )
+            image("thumbnailImage")
+        ) + (1..imageCount).map { image("images", "image-$it.png") }
+    }
+
+    private fun assertCreateRejected(parts: List<MultiPartSpecification>, errorCode: EventErrorCode) {
+        postEvent(parts).statusCode(400).body("code", equalTo(errorCode.code))
     }
 
     private fun createdId(response: ValidatableResponse): Long {

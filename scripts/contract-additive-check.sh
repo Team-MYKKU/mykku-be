@@ -38,6 +38,20 @@ listed() {
   grep -Fxq -- "$1" "$2"
 }
 
+check_new_prefixes() {
+  local prefix
+  while IFS= read -r prefix; do
+    [ -n "$prefix" ] || continue
+    case "$prefix" in
+      */) ;;
+      *) echo "새 파일 접두는 '/'로 끝나야 한다: $prefix"; fail=1 ;;
+    esac
+    case "$prefix" in
+      wire/responses/*|fixtures/*) echo "이 아래 새 파일은 승인 파일 목록으로만 받는다: $prefix"; fail=1 ;;
+    esac
+  done < "$NEW_PREFIXES"
+}
+
 under_new_prefix() {
   local rel="$1" prefix
   while IFS= read -r prefix; do
@@ -125,6 +139,19 @@ check_manifest() {
   cmp -s "$T/add" "$T/all" || { echo "MANIFEST: 더한 해시 줄과 수정·새 파일이 다르다"; diff "$T/add" "$T/all" || true; fail=1; }
 }
 
+report_schema_insertions() {
+  echo "스키마 파일에 더한 줄(승인 블록 안 삽입은 PR 본문의 기대 줄과 대조한다):"
+  git diff -U0 "$R" -- "$C/wire/schema/request.txt" "$C/wire/schema/response.txt" | { grep -E '^(\+\+\+ |\+)' || true; }
+}
+
+report_harness_changes() {
+  echo "참고(실패 조건 아님) — 계약 하네스·문서 테스트 기반 파일의 변경:"
+  git diff --no-renames --name-status "$R" -- src/test/kotlin/com/example/mykku/contract \
+    src/test/kotlin/com/example/mykku/BaseDocumentTest.kt src/test/kotlin/com/example/mykku/docs \
+    ':(glob)src/test/kotlin/**/*DocumentTest.kt'
+}
+
+check_new_prefixes
 check_file_status
 check_modified_lines
 check_schema_blocks
@@ -133,5 +160,7 @@ check_manifest
 
 echo "기준: $BASE_REF (merge-base $MB), 대상: $R"
 git diff --no-renames --numstat "$R" -- "$C"
+report_schema_insertions
+report_harness_changes
 if [ "$fail" = 0 ]; then echo "추가만 검사 통과"; else echo "추가만 검사 실패"; fi
 exit "$fail"

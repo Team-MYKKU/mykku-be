@@ -2,11 +2,17 @@ package com.example.mykku.util
 
 object ResponseMaps {
 
-    fun withoutKeys(value: Any?, keys: Set<String>): Any? {
+    private const val MASK = "<masked>"
+
+    fun masked(value: Any?, keys: Set<String>): Any? {
         return when (value) {
-            is Map<*, *> -> value.filterKeys { it !in keys }.mapValues { withoutKeys(it.value, keys) }
-            is List<*> -> value.map { withoutKeys(it, keys) }
+            is Map<*, *> -> value.mapValues { (key, item) -> maskedEntry(key, item, keys) }
+            is List<*> -> value.map { masked(it, keys) }
             else -> value
         }
+    }
+
+    private fun maskedEntry(key: Any?, item: Any?, keys: Set<String>): Any? {
+        return if (key in keys && item != null) MASK else masked(item, keys)
     }
 }

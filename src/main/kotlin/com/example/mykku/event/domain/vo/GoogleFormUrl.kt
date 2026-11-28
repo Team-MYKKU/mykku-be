@@ -13,6 +13,7 @@ value class GoogleFormUrl private constructor(val value: String) {
         private const val SHORT_LINK_HOST = "forms.gle"
         private const val FORMS_PATH_PREFIX = "/forms/"
         private const val RESPONSE_PATH_SUFFIX = "/viewform"
+        private val DOT_SEGMENTS = setOf(".", "..")
 
         fun normalize(raw: String?): String? = raw?.trim()?.ifEmpty { null }
 
@@ -27,12 +28,16 @@ value class GoogleFormUrl private constructor(val value: String) {
             val uri = parse(value) ?: return false
             if (!uri.scheme.equals(HTTPS, ignoreCase = true)) return false
             if (uri.rawUserInfo != null || uri.port != -1) return false
-            val path = uri.rawPath ?: return false
+            val path = uri.rawPath?.takeIf { isPlainPath(it) } ?: return false
             return when (uri.host?.lowercase()) {
                 FORMS_HOST -> isFormsResponsePath(path)
                 SHORT_LINK_HOST -> path.length > 1
                 else -> false
             }
+        }
+
+        private fun isPlainPath(path: String): Boolean {
+            return '%' !in path && "//" !in path && path.split('/').none { it in DOT_SEGMENTS }
         }
 
         private fun isFormsResponsePath(path: String): Boolean {
@@ -41,7 +46,7 @@ value class GoogleFormUrl private constructor(val value: String) {
 
         private fun parse(value: String): URI? {
             return try {
-                URI(value).normalize()
+                URI(value)
             } catch (e: URISyntaxException) {
                 null
             }

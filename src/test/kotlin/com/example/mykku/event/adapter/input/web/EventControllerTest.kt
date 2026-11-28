@@ -142,7 +142,7 @@ class EventControllerTest : BaseControllerTest() {
             .statusCode(401)
     }
 
-    @ParameterizedTest(name = "{0}")
+    @ParameterizedTest(name = "{displayName} [{0}]")
     @EnumSource(EventType::class)
     @DisplayName("유형이 다른 이벤트도 목록(ALL·ACTIVE)과 상세에서 같은 조건의 일반 이벤트와 같은 필드·값으로 응답한다")
     fun `getEvents getEventDetail - 유형과 무관하게 같은 응답`(type: EventType) {
@@ -154,9 +154,9 @@ class EventControllerTest : BaseControllerTest() {
             val content = getListContent(authHeader, status)
             assertThat(content.map { it["id"] }).`as`(status)
                 .containsExactlyInAnyOrder(general.id!!.toInt(), typed.id!!.toInt())
-            assertThat(content.map { ResponseMaps.withoutKeys(it, setOf("id")) }.distinct()).`as`(status).hasSize(1)
+            assertThat(content.map { ResponseMaps.masked(it, setOf("id")) }.distinct()).`as`(status).hasSize(1)
         }
-        assertThat(getDetailWithoutIds(authHeader, typed.id!!)).isEqualTo(getDetailWithoutIds(authHeader, general.id!!))
+        assertThat(getDetailWithMaskedIds(authHeader, typed.id!!)).isEqualTo(getDetailWithMaskedIds(authHeader, general.id!!))
     }
 
     private fun getListContent(authHeader: String, status: String): List<Map<String, Any?>> {
@@ -172,7 +172,7 @@ class EventControllerTest : BaseControllerTest() {
             .getList("data.content")
     }
 
-    private fun getDetailWithoutIds(authHeader: String, eventId: Long): Any? {
+    private fun getDetailWithMaskedIds(authHeader: String, eventId: Long): Any? {
         val data = RestAssured.given()
             .header("Authorization", authHeader)
             .`when`()
@@ -182,7 +182,7 @@ class EventControllerTest : BaseControllerTest() {
             .extract()
             .jsonPath()
             .getMap<String, Any?>("data")
-        return ResponseMaps.withoutKeys(data, setOf("id", "createdAt"))
+        return ResponseMaps.masked(data, setOf("id", "createdAt"))
     }
 
     private fun createAndSaveTypedEvent(type: EventType): EventJpaEntity {

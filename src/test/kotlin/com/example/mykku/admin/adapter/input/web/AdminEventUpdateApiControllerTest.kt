@@ -206,9 +206,10 @@ class AdminEventUpdateApiControllerTest : BaseControllerTest() {
     fun `update - GENERAL 이벤트의 구글폼 링크`() {
         val event = saveEvent()
 
-        putEvent(event.id!!, basicParts(title = "링크 이벤트") + keepParts(emptyList()) + text("googleFormUrl", FORM_URL))
-            .statusCode(400)
-            .body("code", equalTo(EventErrorCode.INVALID_EVENT_TYPE_SETTING.code))
+        assertTypeSettingRejected(
+            event.id!!,
+            basicParts(title = "링크 이벤트") + keepParts(emptyList()) + text("googleFormUrl", FORM_URL)
+        )
         putEvent(event.id!!, basicParts(title = "빈 링크 이벤트") + keepParts(emptyList()) + text("googleFormUrl", "   "))
             .statusCode(200)
 
@@ -238,12 +239,8 @@ class AdminEventUpdateApiControllerTest : BaseControllerTest() {
         val event = saveEvent(type = EventType.GOOGLE_FORM, googleFormUrl = FORM_URL)
         val parts = basicParts(title = "바뀌면 안 되는 제목") + keepParts(emptyList()) + image("thumbnailImage")
 
-        putEvent(event.id!!, parts)
-            .statusCode(400)
-            .body("code", equalTo(EventErrorCode.INVALID_EVENT_TYPE_SETTING.code))
-        putEvent(event.id!!, parts + text("googleFormUrl", "https://docs.google.com/forms/d/x/edit"))
-            .statusCode(400)
-            .body("code", equalTo(EventErrorCode.INVALID_EVENT_TYPE_SETTING.code))
+        assertTypeSettingRejected(event.id!!, parts)
+        assertTypeSettingRejected(event.id!!, parts + text("googleFormUrl", "https://docs.google.com/forms/d/x/edit"))
 
         val saved = eventJpaRepository.findById(event.id!!).get()
         assertThat(saved.title).isEqualTo("이벤트")
@@ -251,6 +248,12 @@ class AdminEventUpdateApiControllerTest : BaseControllerTest() {
         assertThat(saved.googleFormUrl).isEqualTo(FORM_URL)
         assertThat(testImageUploadService.uploadedUrls).hasSize(2)
         assertThat(testImageUploadService.deletedUrls).containsExactlyElementsOf(testImageUploadService.uploadedUrls)
+    }
+
+    private fun assertTypeSettingRejected(eventId: Long, parts: List<MultiPartSpecification>) {
+        putEvent(eventId, parts)
+            .statusCode(400)
+            .body("code", equalTo(EventErrorCode.INVALID_EVENT_TYPE_SETTING.code))
     }
 
     private fun putEvent(eventId: Long, parts: List<MultiPartSpecification>): ValidatableResponse {
