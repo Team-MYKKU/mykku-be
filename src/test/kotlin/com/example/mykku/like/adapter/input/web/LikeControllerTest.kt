@@ -4,7 +4,6 @@ import com.example.mykku.BaseControllerTest
 import com.example.mykku.board.adapter.output.persistence.entity.BoardJpaEntity
 import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import com.example.mykku.member.domain.vo.SocialProvider
-import com.example.mykku.util.TestTokenGenerator
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
 import org.hamcrest.Matchers.equalTo
@@ -30,7 +29,7 @@ class LikeControllerTest : BaseControllerTest() {
                 profileImage = ""
             )
         )
-        val authHeader = TestTokenGenerator.getBearerToken(member.id)
+        val authHeader = getBearerToken(member.id)
 
         // when & then
         RestAssured.given()
@@ -75,7 +74,7 @@ class LikeControllerTest : BaseControllerTest() {
                 logo = "test_logo.png"
             )
         )
-        val authHeader = TestTokenGenerator.getBearerToken(member.id)
+        val authHeader = getBearerToken(member.id)
 
         // when & then
         RestAssured.given()

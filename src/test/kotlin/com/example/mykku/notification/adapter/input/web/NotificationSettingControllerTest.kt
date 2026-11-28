@@ -5,7 +5,6 @@ import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntit
 import com.example.mykku.notification.adapter.output.persistence.entity.NotificationSettingJpaEntity
 import com.example.mykku.notification.adapter.output.persistence.repository.NotificationSettingJpaRepository
 import com.example.mykku.notification.domain.vo.NotificationType
-import com.example.mykku.util.TestTokenGenerator
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
 import org.hamcrest.Matchers.equalTo
@@ -45,7 +44,7 @@ class NotificationSettingControllerTest : BaseControllerTest() {
             isEnabled = true
         )
 
-        val authHeader = TestTokenGenerator.getBearerToken(member.id)
+        val authHeader = getBearerToken(member.id)
 
         RestAssured.given()
             .header("Authorization", authHeader)
@@ -62,7 +61,7 @@ class NotificationSettingControllerTest : BaseControllerTest() {
     fun `getSettings - 설정이 없으면 기본 설정을 생성한다`() {
         val member = createAndSaveMember()
 
-        val authHeader = TestTokenGenerator.getBearerToken(member.id)
+        val authHeader = getBearerToken(member.id)
 
         RestAssured.given()
             .header("Authorization", authHeader)
@@ -100,7 +99,7 @@ class NotificationSettingControllerTest : BaseControllerTest() {
             isEnabled = false
         )
 
-        val authHeader = TestTokenGenerator.getBearerToken(member.id)
+        val authHeader = getBearerToken(member.id)
 
         RestAssured.given()
             .header("Authorization", authHeader)
@@ -125,7 +124,7 @@ class NotificationSettingControllerTest : BaseControllerTest() {
             isEnabled = false
         )
 
-        val authHeader = TestTokenGenerator.getBearerToken(member.id)
+        val authHeader = getBearerToken(member.id)
 
         RestAssured.given()
             .header("Authorization", authHeader)
@@ -162,7 +161,7 @@ class NotificationSettingControllerTest : BaseControllerTest() {
     fun `updateSetting - 유효하지 않은 요청은 거부된다`() {
         val member = createAndSaveMember()
 
-        val authHeader = TestTokenGenerator.getBearerToken(member.id)
+        val authHeader = getBearerToken(member.id)
 
         RestAssured.given()
             .header("Authorization", authHeader)

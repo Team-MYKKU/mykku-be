@@ -1,7 +1,6 @@
 package com.example.mykku.contest.adapter.output.persistence
 
 import com.example.mykku.BaseRepositoryTest
-import com.example.mykku.contest.adapter.output.persistence.entity.ContestJpaEntity
 import com.example.mykku.contest.adapter.output.persistence.repository.ContestJpaRepository
 import com.example.mykku.contest.application.port.output.ContestRepository
 import com.example.mykku.contest.domain.entity.Contest
@@ -29,24 +28,6 @@ class ContestRepositoryAdapterTest : BaseRepositoryTest() {
 
     @Autowired
     private lateinit var contestJpaRepository: ContestJpaRepository
-
-    private fun createAndSaveContest(
-        title: String = "테스트 콘테스트",
-        description: String? = "테스트 설명",
-        startedAt: LocalDateTime = LocalDateTime.now().minusDays(1),
-        expiredAt: LocalDateTime = LocalDateTime.now().plusDays(7),
-        status: ContestStatusType = ContestStatusType.ACTIVE
-    ): ContestJpaEntity {
-        val contest = ContestJpaEntity(
-            title = title,
-            description = description,
-            startedAt = startedAt,
-            expiredAt = expiredAt,
-            status = status,
-            thumbnailUrl = "https://example.com/thumbnail.jpg"
-        )
-        return contestJpaRepository.save(contest)
-    }
 
     @Nested
     @DisplayName("save 메서드")

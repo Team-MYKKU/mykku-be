@@ -13,7 +13,6 @@ import com.example.mykku.feed.adapter.output.persistence.entity.FeedCommentJpaEn
 import com.example.mykku.feed.adapter.output.persistence.entity.FeedJpaEntity
 import com.example.mykku.feed.exception.FeedErrorCode
 import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
-import com.example.mykku.util.TestTokenGenerator
 import io.restassured.RestAssured
 import io.restassured.response.ValidatableResponse
 import org.assertj.core.api.Assertions.assertThat
@@ -62,6 +61,7 @@ class AdminFeedApiControllerTest : BaseControllerTest() {
         assertThat(count("SELECT COUNT(*) FROM contest_winner")).isZero()
         assertThat(count("SELECT COUNT(*) FROM like_feed_comment")).isZero()
         assertThat(feedJpaRepository.existsById(feed.id!!)).isFalse()
+        assertThat(testImageUploadService.deletedUrls).containsExactly(FEED_IMAGE_URL)
     }
 
     @Test
@@ -124,7 +124,7 @@ class AdminFeedApiControllerTest : BaseControllerTest() {
         saveComment(feed, author, parent)
 
         RestAssured.given()
-            .header("Authorization", TestTokenGenerator.getBearerToken(author.id))
+            .header("Authorization", getBearerToken(author.id))
             .`when`()
             .delete("/api/v1/feeds/{feedId}", feed.id)
             .then()
@@ -174,7 +174,7 @@ class AdminFeedApiControllerTest : BaseControllerTest() {
         )
         jdbcTemplate.update(
             "INSERT INTO feed_image (url, width, height, feed_id, created_at, updated_at) " +
-                "VALUES ('https://test-bucket.s3.amazonaws.com/feed-images/a.jpg', 10, 10, ?, NOW(), NOW())",
+                "VALUES ('$FEED_IMAGE_URL', 10, 10, ?, NOW(), NOW())",
             feed.id
         )
         jdbcTemplate.update(
@@ -223,6 +223,7 @@ class AdminFeedApiControllerTest : BaseControllerTest() {
     }
 
     companion object {
+        private const val FEED_IMAGE_URL = "https://test-bucket.s3.amazonaws.com/feed-images/a.jpg"
         private val FEED_CHILD_TABLES = listOf(
             "feed_comment",
             "like_feed",

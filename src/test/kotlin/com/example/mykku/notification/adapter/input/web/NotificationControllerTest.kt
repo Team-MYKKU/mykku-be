@@ -5,7 +5,6 @@ import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntit
 import com.example.mykku.notification.adapter.output.persistence.entity.NotificationJpaEntity
 import com.example.mykku.notification.adapter.output.persistence.repository.NotificationJpaRepository
 import com.example.mykku.notification.domain.vo.NotificationType
-import com.example.mykku.util.TestTokenGenerator
 import io.restassured.RestAssured
 import org.assertj.core.api.Assertions.assertThat
 import org.hamcrest.Matchers.equalTo
@@ -55,7 +54,7 @@ class NotificationControllerTest : BaseControllerTest() {
             content = "sender1님이 회원님의 피드에 댓글을 남겼습니다"
         )
 
-        val authHeader = TestTokenGenerator.getBearerToken(receiver.id)
+        val authHeader = getBearerToken(receiver.id)
 
         RestAssured.given()
             .header("Authorization", authHeader)
@@ -101,7 +100,7 @@ class NotificationControllerTest : BaseControllerTest() {
             content = "읽지 않은 알림"
         )
 
-        val authHeader = TestTokenGenerator.getBearerToken(receiver.id)
+        val authHeader = getBearerToken(receiver.id)
 
         RestAssured.given()
             .header("Authorization", authHeader)
@@ -132,7 +131,7 @@ class NotificationControllerTest : BaseControllerTest() {
             content = "알림2"
         )
 
-        val authHeader = TestTokenGenerator.getBearerToken(receiver.id)
+        val authHeader = getBearerToken(receiver.id)
 
         RestAssured.given()
             .header("Authorization", authHeader)
@@ -157,7 +156,7 @@ class NotificationControllerTest : BaseControllerTest() {
             content = "알림"
         )
 
-        val authHeader = TestTokenGenerator.getBearerToken(receiver.id)
+        val authHeader = getBearerToken(receiver.id)
 
         RestAssured.given()
             .header("Authorization", authHeader)
@@ -185,7 +184,7 @@ class NotificationControllerTest : BaseControllerTest() {
             content = "알림"
         )
 
-        val authHeader = TestTokenGenerator.getBearerToken(other.id)
+        val authHeader = getBearerToken(other.id)
 
         RestAssured.given()
             .header("Authorization", authHeader)
@@ -214,7 +213,7 @@ class NotificationControllerTest : BaseControllerTest() {
             content = "알림2"
         )
 
-        val authHeader = TestTokenGenerator.getBearerToken(receiver.id)
+        val authHeader = getBearerToken(receiver.id)
 
         RestAssured.given()
             .header("Authorization", authHeader)
@@ -241,7 +240,7 @@ class NotificationControllerTest : BaseControllerTest() {
             content = "알림"
         )
 
-        val authHeader = TestTokenGenerator.getBearerToken(receiver.id)
+        val authHeader = getBearerToken(receiver.id)
 
         RestAssured.given()
             .header("Authorization", authHeader)
@@ -268,7 +267,7 @@ class NotificationControllerTest : BaseControllerTest() {
             content = "알림"
         )
 
-        val authHeader = TestTokenGenerator.getBearerToken(other.id)
+        val authHeader = getBearerToken(other.id)
 
         RestAssured.given()
             .header("Authorization", authHeader)

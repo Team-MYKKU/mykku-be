@@ -9,11 +9,19 @@ import org.assertj.core.api.Assertions.assertThat
 import org.hamcrest.Matchers.containsString
 import org.hamcrest.Matchers.endsWith
 import org.hamcrest.Matchers.not
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 
 @DisplayName("AdminMemberViewController 통합 테스트")
 class AdminMemberViewControllerTest : BaseControllerTest() {
+
+    private lateinit var adminSessionId: String
+
+    @BeforeEach
+    fun setUp() {
+        adminSessionId = getAdminSessionId()
+    }
 
     @Test
     @DisplayName("검색어 없이 들어가면 전체 회원이 보이고 사이드바 회원 메뉴가 활성화된다")
@@ -167,7 +175,7 @@ class AdminMemberViewControllerTest : BaseControllerTest() {
     }
 
     private fun getMemberPage(vararg params: Pair<String, String>): ValidatableResponse {
-        val request = RestAssured.given().sessionId(getAdminSessionId())
+        val request = RestAssured.given().sessionId(adminSessionId)
         params.forEach { (name, value) -> request.queryParam(name, value) }
         return request
             .`when`()

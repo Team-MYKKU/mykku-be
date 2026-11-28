@@ -83,20 +83,27 @@ class AdminBoardApiControllerTest : BaseControllerTest() {
     fun `update - 제목과 로고를 바꾼다`() {
         val board = createAndSaveBoard(title = "옛 제목", logo = "https://test-bucket.s3.amazonaws.com/old.png")
 
-        RestAssured.given()
-            .sessionId(adminSessionId)
-            .contentType("multipart/form-data")
-            .multiPart(titlePart("새 제목"))
-            .multiPart("logo", "logo.png", "fake-image".toByteArray(), "image/png")
-            .`when`()
-            .put("/admin/api/v1/boards/{boardId}", board.id)
-            .then()
+        val logo = putBoardWithLogo(board.id!!, "새 제목")
             .statusCode(200)
             .body("message", equalTo("게시판이 수정되었습니다"))
             .body("data.title", equalTo("새 제목"))
             .body("data.logo", startsWith("https://test-bucket.s3.amazonaws.com/board-images/"))
+            .extract().path<String>("data.logo")
 
         assertThat(boardJpaRepository.findById(board.id!!).get().title).isEqualTo("새 제목")
+        assertThat(testImageUploadService.uploadedUrls).containsExactly(logo)
+        assertThat(testImageUploadService.deletedUrls).isEmpty()
+    }
+
+    @Test
+    @DisplayName("게시판 수정 - 없는 게시판에 로고를 보내면 BO001이고 이번에 올린 로고만 지운다")
+    fun `update - 실패하면 이번에 올린 로고를 지운다`() {
+        putBoardWithLogo(999999L, "새 제목")
+            .statusCode(404)
+            .body("code", equalTo(BoardErrorCode.BOARD_NOT_FOUND.code))
+
+        assertThat(testImageUploadService.uploadedUrls).hasSize(1)
+        assertThat(testImageUploadService.deletedUrls).containsExactlyElementsOf(testImageUploadService.uploadedUrls)
     }
 
     @Test
@@ -143,6 +150,7 @@ class AdminBoardApiControllerTest : BaseControllerTest() {
 
         assertThat(boardJpaRepository.existsById(board.id!!)).isFalse()
         assertThat(jdbcTemplate.queryForObject("SELECT COUNT(*) FROM like_board", Int::class.java)).isZero()
+        assertThat(testImageUploadService.deletedUrls).containsExactly(board.logo)
     }
 
     @Test
@@ -156,14 +164,16 @@ class AdminBoardApiControllerTest : BaseControllerTest() {
             .body("code", equalTo(BoardErrorCode.BOARD_HAS_FEEDS.code))
 
         assertThat(boardJpaRepository.existsById(board.id!!)).isTrue()
+        assertThat(testImageUploadService.deletedUrls).isEmpty()
     }
 
     @Test
     @DisplayName("게시판 삭제 - MOVE면 글을 대상 게시판으로 옮기고 지운다")
     fun `delete - MOVE`() {
-        val board = createAndSaveBoard(title = "지울 게시판")
-        val target = createAndSaveBoard(title = "대상 게시판")
+        val board = createAndSaveBoard(title = "지울 게시판", logo = "https://test-bucket.s3.amazonaws.com/deleted.png")
+        val target = createAndSaveBoard(title = "대상 게시판", logo = "https://test-bucket.s3.amazonaws.com/target.png")
         val feeds = listOf(saveFeed(board), saveFeed(board))
+        createAndSaveFeedImages(feeds[0], "moved.jpg")
 
         deleteBoard(board.id!!, "?feedAction=MOVE&targetBoardId=${target.id}")
             .statusCode(200)
@@ -171,6 +181,7 @@ class AdminBoardApiControllerTest : BaseControllerTest() {
         assertThat(boardJpaRepository.existsById(board.id!!)).isFalse()
         val boardIds = feeds.map { boardIdOf(it.id!!) }
         assertThat(boardIds).containsOnly(target.id)
+        assertThat(testImageUploadService.deletedUrls).containsExactly(board.logo)
     }
 
     @Test
@@ -211,6 +222,21 @@ class AdminBoardApiControllerTest : BaseControllerTest() {
     }
 
     @Test
+    @DisplayName("게시판 삭제 - DELETE면 그 게시판 글들의 이미지와 로고를 지우고, 다른 게시판 글의 이미지는 남긴다")
+    fun `delete - DELETE 이미지 정리`() {
+        val board = createAndSaveBoard(logo = "https://test-bucket.s3.amazonaws.com/deleted.png")
+        val other = createAndSaveBoard(title = "남는 게시판")
+        val deletedImages = createAndSaveFeedImages(saveFeed(board), "a.jpg", "b.jpg") +
+            createAndSaveFeedImages(saveFeed(board), "c.jpg")
+        createAndSaveFeedImages(saveFeed(other), "kept.jpg")
+
+        deleteBoard(board.id!!, "?feedAction=DELETE")
+            .statusCode(200)
+
+        assertThat(testImageUploadService.deletedUrls).containsExactlyInAnyOrderElementsOf(deletedImages + board.logo)
+    }
+
+    @Test
     @DisplayName("게시판 삭제 - 잘못된 처리 방식은 C106, 없는 게시판은 BO001")
     fun `delete - 잘못된 enum과 없는 게시판`() {
         val board = createAndSaveBoard()
@@ -247,6 +273,17 @@ class AdminBoardApiControllerTest : BaseControllerTest() {
             .sessionId(adminSessionId)
             .contentType("multipart/form-data")
             .multiPart(titlePart(title))
+            .`when`()
+            .put("/admin/api/v1/boards/{boardId}", boardId)
+            .then()
+    }
+
+    private fun putBoardWithLogo(boardId: Long, title: String): ValidatableResponse {
+        return RestAssured.given()
+            .sessionId(adminSessionId)
+            .contentType("multipart/form-data")
+            .multiPart(titlePart(title))
+            .multiPart("logo", "logo.png", "fake-image".toByteArray(), "image/png")
             .`when`()
             .put("/admin/api/v1/boards/{boardId}", boardId)
             .then()

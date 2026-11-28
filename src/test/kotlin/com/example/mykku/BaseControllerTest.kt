@@ -1,20 +1,23 @@
 package com.example.mykku
 
-import com.example.mykku.board.adapter.output.persistence.BoardJpaRepository
-import com.example.mykku.board.adapter.output.persistence.entity.BoardJpaEntity
+import com.example.mykku.auth.application.port.output.TokenProvider
+import com.example.mykku.auth.config.JwtProperties
 import com.example.mykku.config.TestAsyncConfig
 import com.example.mykku.config.TestEmailConfig
 import com.example.mykku.config.TestEmailSenderConfig
 import com.example.mykku.config.TestImageUploadConfig
+import com.example.mykku.config.TestImageUploadService
 import com.example.mykku.contract.support.ContractManifestExtension
-import com.example.mykku.member.adapter.output.persistence.MemberJpaRepository
+import com.example.mykku.feed.adapter.output.persistence.FeedImageJpaRepository
+import com.example.mykku.feed.adapter.output.persistence.entity.FeedImageJpaEntity
+import com.example.mykku.feed.adapter.output.persistence.entity.FeedJpaEntity
 import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
-import com.example.mykku.member.domain.vo.SocialProvider
-import com.example.mykku.role.adapter.output.persistence.entity.RoleJpaEntity
-import com.example.mykku.role.adapter.output.persistence.repository.RoleJpaRepository
 import com.example.mykku.util.DatabaseCleaner
-import com.example.mykku.util.TestTokenGenerator
+import com.example.mykku.util.JwtTestTokens
 import io.restassured.RestAssured
+import io.restassured.http.ContentType
+import io.restassured.response.ValidatableResponse
+import org.hamcrest.Matchers.matchesPattern
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -27,68 +30,60 @@ import org.springframework.test.context.ActiveProfiles
 @ActiveProfiles("test")
 @Import(TestEmailConfig::class, TestEmailSenderConfig::class, TestImageUploadConfig::class, TestAsyncConfig::class)
 @ExtendWith(DatabaseCleaner::class, ContractManifestExtension::class)
-abstract class BaseControllerTest {
+abstract class BaseControllerTest : BaseFixtureTest() {
 
     @LocalServerPort
     protected var port: Int = 0
 
     @Autowired
-    protected lateinit var memberJpaRepository: MemberJpaRepository
+    private lateinit var serverTokenProvider: TokenProvider
 
     @Autowired
-    protected lateinit var boardJpaRepository: BoardJpaRepository
+    private lateinit var serverJwtProperties: JwtProperties
+
+    protected val jwtTestTokens: JwtTestTokens by lazy { JwtTestTokens(serverJwtProperties, serverTokenProvider) }
 
     @Autowired
-    protected lateinit var roleJpaRepository: RoleJpaRepository
+    protected lateinit var testImageUploadService: TestImageUploadService
+
+    @Autowired
+    private lateinit var feedImageFixtureRepository: FeedImageJpaRepository
 
     @BeforeEach
     fun baseSetUp() {
         RestAssured.port = port
+        testImageUploadService.reset()
     }
 
-    protected fun createAndSaveMember(
-        memberId: String? = "testmember",
-        nickname: String = "테스트유저",
-        email: String = "test@example.com",
-        socialId: String = "12345",
-        provider: SocialProvider = SocialProvider.GOOGLE,
-        role: RoleJpaEntity? = null,
-        profileImage: String = ""
-    ): MemberJpaEntity {
-        val member = MemberJpaEntity(
-            memberId = memberId,
-            nickname = nickname,
-            email = email,
-            socialId = socialId,
-            provider = provider,
-            role = role,
-            profileImage = profileImage
-        )
-        return memberJpaRepository.save(member)
+    protected fun withdraw(member: MemberJpaEntity) {
+        memberJpaRepository.deleteById(member.id)
     }
 
-    protected fun createAndSaveBoard(
-        title: String = "테스트 게시판",
-        logo: String = "test_logo.png"
-    ): BoardJpaEntity {
-        val board = BoardJpaEntity(
-            title = title,
-            logo = logo
-        )
-        return boardJpaRepository.save(board)
+    protected fun createAndSaveFeedImages(feed: FeedJpaEntity, vararg names: String): List<String> {
+        return names.map { name ->
+            val url = "https://test-bucket.s3.amazonaws.com/feed-images/$name"
+            feedImageFixtureRepository.save(FeedImageJpaEntity(url = url, width = 10, height = 10, feed = feed)).url
+        }
     }
 
     protected fun getBearerToken(memberPk: Long): String {
-        return TestTokenGenerator.getBearerToken(memberPk)
+        return JwtTestTokens.bearer(jwtTestTokens.access(memberPk))
     }
 
     protected fun createAuthHeaders(memberPk: Long): Map<String, String> {
-        return TestTokenGenerator.createAuthHeaders(memberPk)
+        return mapOf("Authorization" to getBearerToken(memberPk))
     }
 
-    /**
-     * 관리자 세션 생성 및 SessionId 반환
-     */
+    protected fun requestNewRoles(memberPk: Long): ValidatableResponse {
+        return RestAssured.given()
+            .contentType(ContentType.JSON)
+            .headers(createAuthHeaders(memberPk))
+            .`when`()
+            .get("/api/v1/roles/me/new")
+            .then()
+            .statusCode(200)
+    }
+
     protected fun getAdminSessionId(): String {
         return RestAssured
             .given()
@@ -98,6 +93,7 @@ abstract class BaseControllerTest {
                 .post("/admin/api/login")
             .then()
                 .statusCode(302)
+                .header("Location", matchesPattern("http://[^/]+/admin(;jsessionid=[0-9A-F]+)?"))
                 .extract()
                 .sessionId()
     }

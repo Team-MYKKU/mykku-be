@@ -8,7 +8,6 @@ import com.example.mykku.email.dto.SendVerificationCodeRequest
 import com.example.mykku.email.dto.SignupRequest
 import com.example.mykku.email.dto.VerifyCodeRequest
 import com.example.mykku.email.tool.RedisVerificationCodeManager
-import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import com.example.mykku.role.adapter.output.persistence.entity.RoleJpaEntity
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
@@ -56,20 +55,12 @@ class EmailAuthControllerTest : BaseControllerTest() {
     @DisplayName("인증 코드 발송 - 이미 존재하는 이메일로 회원가입 시도")
     fun `sendVerificationCode - 이미 존재하는 이메일로 회원가입 인증 코드 발송 시 실패`() {
         val existingEmail = "existing@example.com"
-        val role = roleJpaRepository.findByName("일반 덕후")
-            ?: roleJpaRepository.save(RoleJpaEntity(name = "일반 덕후", description = "테스트용 칭호"))
-        val member = MemberJpaEntity(
+        saveExistingEmailMember(
             memberId = "existingmember",
             email = existingEmail,
             password = "password",
-            nickname = "기존유저",
-            provider = null,
-            socialId = null,
-            profileImage = "",
-            role = role,
-            emailVerified = true
+            nickname = "기존유저"
         )
-        memberJpaRepository.save(member)
 
         val request = SendVerificationCodeRequest(
             email = existingEmail,
@@ -212,13 +203,7 @@ class EmailAuthControllerTest : BaseControllerTest() {
             .statusCode(200)
 
         val member = memberJpaRepository.findByEmail("firstmeeting@example.com")!!
-        RestAssured.given()
-            .contentType(ContentType.JSON)
-            .headers(createAuthHeaders(member.id))
-            .`when`()
-            .get("/api/v1/roles/me/new")
-            .then()
-            .statusCode(200)
+        requestNewRoles(member.id)
             .body("data[0].role.name", equalTo("첫 만남"))
             .body("data[0].isRepresentative", equalTo(true))
     }
@@ -227,20 +212,12 @@ class EmailAuthControllerTest : BaseControllerTest() {
     @DisplayName("회원가입 - 이미 존재하는 이메일")
     fun `signup - 이미 존재하는 이메일로 회원가입 시 실패`() {
         val existingEmail = "existing@example.com"
-        val role = roleJpaRepository.findByName("일반 덕후")
-            ?: roleJpaRepository.save(RoleJpaEntity(name = "일반 덕후", description = "테스트용 칭호"))
-        val member = MemberJpaEntity(
+        saveExistingEmailMember(
             memberId = "existingmember2",
             email = existingEmail,
             password = "password",
-            nickname = "기존유저",
-            provider = null,
-            socialId = null,
-            profileImage = "",
-            role = role,
-            emailVerified = true
+            nickname = "기존유저"
         )
-        memberJpaRepository.save(member)
 
         val request = SignupRequest(
             email = existingEmail,
@@ -279,20 +256,12 @@ class EmailAuthControllerTest : BaseControllerTest() {
     fun `login - 이메일 로그인 성공`() {
         val email = "user@example.com"
         val password = "password123!"
-        val role = roleJpaRepository.findByName("일반 덕후")
-            ?: roleJpaRepository.save(RoleJpaEntity(name = "일반 덕후", description = "테스트용 칭호"))
-        val member = MemberJpaEntity(
+        saveExistingEmailMember(
             memberId = "loginmember1",
             email = email,
             password = passwordEncoder.encode(password),
-            nickname = "로그인유저",
-            provider = null,
-            socialId = null,
-            profileImage = "",
-            role = role,
-            emailVerified = true
+            nickname = "로그인유저"
         )
-        memberJpaRepository.save(member)
 
         val request = EmailLoginRequest(
             email = email,
@@ -333,20 +302,12 @@ class EmailAuthControllerTest : BaseControllerTest() {
     @DisplayName("로그인 - 잘못된 비밀번호")
     fun `login - 잘못된 비밀번호로 로그인 시 실패`() {
         val email = "user@example.com"
-        val role = roleJpaRepository.findByName("일반 덕후")
-            ?: roleJpaRepository.save(RoleJpaEntity(name = "일반 덕후", description = "테스트용 칭호"))
-        val member = MemberJpaEntity(
+        saveExistingEmailMember(
             memberId = "wrongpassword1",
             email = email,
             password = passwordEncoder.encode("correctPassword123!"),
-            nickname = "유저",
-            provider = null,
-            socialId = null,
-            profileImage = "",
-            role = role,
-            emailVerified = true
+            nickname = "유저"
         )
-        memberJpaRepository.save(member)
 
         val request = EmailLoginRequest(
             email = email,
@@ -367,20 +328,12 @@ class EmailAuthControllerTest : BaseControllerTest() {
     @DisplayName("비밀번호 재설정 - 성공")
     fun `resetPassword - 비밀번호 재설정 성공`() {
         val email = "reset@example.com"
-        val role = roleJpaRepository.findByName("일반 덕후")
-            ?: roleJpaRepository.save(RoleJpaEntity(name = "일반 덕후", description = "테스트용 칭호"))
-        val member = MemberJpaEntity(
+        saveExistingEmailMember(
             memberId = "resetmember1",
             email = email,
             password = passwordEncoder.encode("oldPassword123!"),
-            nickname = "재설정유저",
-            provider = null,
-            socialId = null,
-            profileImage = "",
-            role = role,
-            emailVerified = true
+            nickname = "재설정유저"
         )
-        memberJpaRepository.save(member)
 
         val code = redisVerificationCodeManager.saveVerificationCode(
             email = email,
@@ -445,5 +398,11 @@ class EmailAuthControllerTest : BaseControllerTest() {
             .then()
             .statusCode(400)
             .body("message", equalTo("인증 코드가 만료되었습니다"))
+    }
+
+    private fun saveExistingEmailMember(memberId: String, email: String, password: String, nickname: String) {
+        val role = roleJpaRepository.findByName("일반 덕후")
+            ?: roleJpaRepository.save(RoleJpaEntity(name = "일반 덕후", description = "테스트용 칭호"))
+        createAndSaveEmailMember(email, password, memberId, nickname, role)
     }
 }

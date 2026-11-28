@@ -4,14 +4,12 @@ import com.example.mykku.BaseRepositoryTest
 import com.example.mykku.contest.adapter.output.persistence.entity.ContestJpaEntity
 import com.example.mykku.contest.adapter.output.persistence.entity.ContestParticipationJpaEntity
 import com.example.mykku.contest.adapter.output.persistence.entity.ContestWinnerJpaEntity
-import com.example.mykku.contest.adapter.output.persistence.repository.ContestJpaRepository
 import com.example.mykku.contest.adapter.output.persistence.repository.ContestParticipationJpaRepository
 import com.example.mykku.contest.adapter.output.persistence.repository.ContestWinnerJpaRepository
 import com.example.mykku.contest.application.port.output.ContestWinnerRepository
 import com.example.mykku.contest.domain.entity.ContestWinner
 import com.example.mykku.contest.domain.vo.ContestId
 import com.example.mykku.contest.domain.vo.ContestParticipationId
-import com.example.mykku.contest.domain.vo.ContestStatusType
 import com.example.mykku.contest.domain.vo.ContestWinnerId
 import com.example.mykku.contest.exception.ContestException
 import com.example.mykku.feed.adapter.output.persistence.FeedJpaRepository
@@ -23,16 +21,12 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import java.time.LocalDateTime
 
 @DisplayName("ContestWinnerRepositoryAdapter 통합 테스트")
 class ContestWinnerRepositoryAdapterTest : BaseRepositoryTest() {
 
     @Autowired
     private lateinit var contestWinnerRepository: ContestWinnerRepository
-
-    @Autowired
-    private lateinit var contestJpaRepository: ContestJpaRepository
 
     @Autowired
     private lateinit var contestParticipationJpaRepository: ContestParticipationJpaRepository
@@ -42,24 +36,6 @@ class ContestWinnerRepositoryAdapterTest : BaseRepositoryTest() {
 
     @Autowired
     private lateinit var feedJpaRepository: FeedJpaRepository
-
-    private fun createAndSaveContest(
-        title: String = "테스트 콘테스트",
-        description: String? = "테스트 설명",
-        startedAt: LocalDateTime = LocalDateTime.now().minusDays(1),
-        expiredAt: LocalDateTime = LocalDateTime.now().plusDays(7),
-        status: ContestStatusType = ContestStatusType.ACTIVE
-    ): ContestJpaEntity {
-        val contest = ContestJpaEntity(
-            title = title,
-            description = description,
-            startedAt = startedAt,
-            expiredAt = expiredAt,
-            status = status,
-            thumbnailUrl = "https://example.com/thumbnail.jpg"
-        )
-        return contestJpaRepository.save(contest)
-    }
 
     private fun createAndSaveFeed(
         title: String = "테스트 피드",

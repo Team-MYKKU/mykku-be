@@ -91,14 +91,4 @@ class TitleAwardFailureIsolationTest : BaseControllerTest() {
             null
         }
     }
-
-    private fun requestNewRoles(memberPk: Long) =
-        RestAssured
-            .given()
-            .contentType(ContentType.JSON)
-            .headers(createAuthHeaders(memberPk))
-            .`when`()
-            .get("/api/v1/roles/me/new")
-            .then()
-            .statusCode(200)
 }

@@ -83,10 +83,9 @@ class ContestWinnerControllerTest : BaseControllerTest() {
         val member = createAndSaveMember()
         val contest = createAndSaveContest(status = ContestStatusType.WINNER_SELECTED)
         val feed = createAndSaveFeed(member, createAndSaveBoard())
-        val participation = contestParticipationJpaRepository.save(
-            ContestParticipationJpaEntity(member = null, contest = contest, feed = feed)
-        )
+        val participation = createAndSaveParticipation(member, contest, feed)
         createAndSaveWinner(contest, participation, winnerRank = 1)
+        withdraw(member)
 
         RestAssured.given()
             .`when`()

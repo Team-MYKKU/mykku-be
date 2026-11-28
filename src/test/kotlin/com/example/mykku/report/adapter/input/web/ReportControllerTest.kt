@@ -133,13 +133,7 @@ class ReportControllerTest : BaseControllerTest() {
             detail = "광고 도배입니다"
         )
 
-        RestAssured.given()
-            .header("Authorization", getBearerToken(reporter.id))
-            .contentType(ContentType.JSON)
-            .body(request)
-            .`when`()
-            .post("/api/v1/reports")
-            .then()
+        postReport(reporter.id, request)
             .statusCode(201)
             .body("message", equalTo("신고가 접수되었습니다"))
             .body("data.targetType", equalTo("FEED"))
@@ -165,13 +159,7 @@ class ReportControllerTest : BaseControllerTest() {
             detail = null
         )
 
-        RestAssured.given()
-            .header("Authorization", getBearerToken(reporter.id))
-            .contentType(ContentType.JSON)
-            .body(request)
-            .`when`()
-            .post("/api/v1/reports")
-            .then()
+        postReport(reporter.id, request)
             .statusCode(201)
             .body("data.targetType", equalTo("FEED_COMMENT"))
             .body("data.targetId", equalTo(comment.id!!.toInt()))
@@ -242,22 +230,10 @@ class ReportControllerTest : BaseControllerTest() {
             detail = null
         )
 
-        RestAssured.given()
-            .header("Authorization", getBearerToken(reporter.id))
-            .contentType(ContentType.JSON)
-            .body(request)
-            .`when`()
-            .post("/api/v1/reports")
-            .then()
+        postReport(reporter.id, request)
             .statusCode(201)
 
-        RestAssured.given()
-            .header("Authorization", getBearerToken(reporter.id))
-            .contentType(ContentType.JSON)
-            .body(request)
-            .`when`()
-            .post("/api/v1/reports")
-            .then()
+        postReport(reporter.id, request)
             .statusCode(409)
             .body("code", equalTo(ReportErrorCode.ALREADY_REPORTED.code))
     }
@@ -274,13 +250,7 @@ class ReportControllerTest : BaseControllerTest() {
             detail = null
         )
 
-        RestAssured.given()
-            .header("Authorization", getBearerToken(reporter.id))
-            .contentType(ContentType.JSON)
-            .body(request)
-            .`when`()
-            .post("/api/v1/reports")
-            .then()
+        postReport(reporter.id, request)
             .statusCode(400)
             .body("code", equalTo(ReportErrorCode.CANNOT_REPORT_OWN_CONTENT.code))
     }
@@ -296,13 +266,7 @@ class ReportControllerTest : BaseControllerTest() {
             detail = null
         )
 
-        RestAssured.given()
-            .header("Authorization", getBearerToken(reporter.id))
-            .contentType(ContentType.JSON)
-            .body(request)
-            .`when`()
-            .post("/api/v1/reports")
-            .then()
+        postReport(reporter.id, request)
             .statusCode(404)
             .body("code", equalTo(ReportErrorCode.REPORT_TARGET_NOT_FOUND.code))
     }
@@ -319,13 +283,7 @@ class ReportControllerTest : BaseControllerTest() {
             detail = null
         )
 
-        RestAssured.given()
-            .header("Authorization", getBearerToken(reporter.id))
-            .contentType(ContentType.JSON)
-            .body(request)
-            .`when`()
-            .post("/api/v1/reports")
-            .then()
+        postReport(reporter.id, request)
             .statusCode(400)
             .body("code", equalTo(ReportErrorCode.REPORT_DETAIL_REQUIRED.code))
     }

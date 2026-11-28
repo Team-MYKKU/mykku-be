@@ -13,7 +13,6 @@ import com.example.mykku.feed.adapter.output.persistence.entity.FeedJpaEntity
 import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import com.example.mykku.member.domain.vo.SocialProvider
 import com.example.mykku.member.exception.MemberErrorCode
-import com.example.mykku.util.TestTokenGenerator
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
@@ -65,7 +64,7 @@ class FeedCommentControllerTest : BaseControllerTest() {
                 board = board
             )
         )
-        val authHeader = TestTokenGenerator.getBearerToken(member.id)
+        val authHeader = getBearerToken(member.id)
         val request = CreateFeedCommentRequest(
             content = "테스트 댓글",
             parentCommentId = null
@@ -127,7 +126,7 @@ class FeedCommentControllerTest : BaseControllerTest() {
                 member = member
             )
         )
-        val authHeader = TestTokenGenerator.getBearerToken(member.id)
+        val authHeader = getBearerToken(member.id)
         val request = CreateFeedCommentRequest(
             content = "답글입니다",
             parentCommentId = parentComment.id
@@ -228,7 +227,7 @@ class FeedCommentControllerTest : BaseControllerTest() {
                 board = board
             )
         )
-        val authHeader = TestTokenGenerator.getBearerToken(incompleteMember.id)
+        val authHeader = getBearerToken(incompleteMember.id)
         val request = CreateFeedCommentRequest(
             content = "테스트 댓글",
             parentCommentId = null
@@ -285,7 +284,7 @@ class FeedCommentControllerTest : BaseControllerTest() {
                 board = board
             )
         )
-        val authHeader = TestTokenGenerator.getBearerToken(incompleteMember.id)
+        val authHeader = getBearerToken(incompleteMember.id)
         val request = CreateFeedCommentRequest(
             content = "테스트 댓글",
             parentCommentId = null
@@ -346,7 +345,7 @@ class FeedCommentControllerTest : BaseControllerTest() {
                 parentComment = comment
             )
         )
-        val authHeader = TestTokenGenerator.getBearerToken(member.id)
+        val authHeader = getBearerToken(member.id)
         val request = UpdateFeedCommentRequest(content = "수정된 댓글")
         val requestJson = objectMapper.writeValueAsString(request)
 
@@ -450,7 +449,7 @@ class FeedCommentControllerTest : BaseControllerTest() {
                 member = member1
             )
         )
-        val authHeader = TestTokenGenerator.getBearerToken(member2.id)
+        val authHeader = getBearerToken(member2.id)
         val request = UpdateFeedCommentRequest(content = "수정된 댓글")
         val requestJson = objectMapper.writeValueAsString(request)
 
@@ -499,7 +498,7 @@ class FeedCommentControllerTest : BaseControllerTest() {
                 member = member
             )
         )
-        val authHeader = TestTokenGenerator.getBearerToken(member.id)
+        val authHeader = getBearerToken(member.id)
 
         RestAssured.given()
             .header("Authorization", authHeader)
@@ -556,7 +555,7 @@ class FeedCommentControllerTest : BaseControllerTest() {
                 member = member1
             )
         )
-        val authHeader = TestTokenGenerator.getBearerToken(member2.id)
+        val authHeader = getBearerToken(member2.id)
 
         RestAssured.given()
             .header("Authorization", authHeader)

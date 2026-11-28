@@ -3,7 +3,9 @@ package com.example.mykku.admin.adapter.input.web
 import com.example.mykku.BaseControllerTest
 import com.example.mykku.admin.exception.AdminErrorCode
 import com.example.mykku.common.exception.CommonErrorCode
+import com.example.mykku.event.adapter.output.persistence.entity.EventImageJpaEntity
 import com.example.mykku.event.adapter.output.persistence.entity.EventJpaEntity
+import com.example.mykku.event.adapter.output.persistence.repository.EventImageJpaRepository
 import com.example.mykku.event.adapter.output.persistence.repository.EventJpaRepository
 import com.example.mykku.event.domain.vo.EventStatusType
 import com.example.mykku.event.exception.EventErrorCode
@@ -27,6 +29,9 @@ class AdminEventApiControllerTest : BaseControllerTest() {
 
     @Autowired
     private lateinit var eventJpaRepository: EventJpaRepository
+
+    @Autowired
+    private lateinit var eventImageJpaRepository: EventImageJpaRepository
 
     @Autowired
     private lateinit var jdbcTemplate: JdbcTemplate
@@ -314,6 +319,23 @@ class AdminEventApiControllerTest : BaseControllerTest() {
     }
 
     @Test
+    @DisplayName("이벤트 삭제 - 그 이벤트의 썸네일과 상세 이미지만 지우고, 다른 이벤트의 이미지는 남긴다")
+    fun `delete - 그 이벤트의 이미지만 지운다`() {
+        val event = createAndSaveEvent(thumbnailUrl = "$BUCKET_URL/event-thumbnail.jpg")
+        val images = saveEventImages(event, "a.jpg", "b.jpg")
+        saveEventImages(createAndSaveEvent(title = "남는 이벤트", thumbnailUrl = "$BUCKET_URL/kept.jpg"), "kept-a.jpg")
+
+        RestAssured.given()
+            .sessionId(getAdminSessionId())
+            .`when`()
+            .delete("/admin/api/v1/events/{eventId}", event.id)
+            .then()
+            .statusCode(200)
+
+        assertThat(testImageUploadService.deletedUrls).containsExactlyInAnyOrderElementsOf(images + event.thumbnailUrl)
+    }
+
+    @Test
     @DisplayName("이벤트 삭제 - 없는 이벤트는 EV001, 미인증은 401")
     fun `delete - 없는 이벤트와 미인증`() {
         RestAssured.given()
@@ -408,7 +430,8 @@ class AdminEventApiControllerTest : BaseControllerTest() {
 
     private fun createAndSaveEvent(
         title: String = "테스트 이벤트",
-        expiredAt: LocalDateTime = LocalDateTime.now().minusDays(1)
+        expiredAt: LocalDateTime = LocalDateTime.now().minusDays(1),
+        thumbnailUrl: String = "https://example.com/thumbnail.jpg"
     ): EventJpaEntity {
         val event = EventJpaEntity(
             title = title,
@@ -416,9 +439,16 @@ class AdminEventApiControllerTest : BaseControllerTest() {
             startedAt = LocalDateTime.now().minusDays(30),
             expiredAt = expiredAt,
             status = EventStatusType.ACTIVE,
-            thumbnailUrl = "https://example.com/thumbnail.jpg"
+            thumbnailUrl = thumbnailUrl
         )
         return eventJpaRepository.save(event)
+    }
+
+    private fun saveEventImages(event: EventJpaEntity, vararg names: String): List<String> {
+        return names.mapIndexed { index, name ->
+            val image = EventImageJpaEntity(url = "$BUCKET_URL/event-images/$name", orderIndex = index, event = event)
+            eventImageJpaRepository.save(image).url
+        }
     }
 
     private fun putWinners(
@@ -479,6 +509,7 @@ class AdminEventApiControllerTest : BaseControllerTest() {
     }
 
     companion object {
+        private const val BUCKET_URL = "https://test-bucket.s3.amazonaws.com"
         private val EVENT_CHILD_TABLES = listOf(
             "event_participation",
             "event_winner",
