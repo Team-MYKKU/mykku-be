@@ -48,7 +48,9 @@ class EventAttendanceRepositoryAdapterTest : BaseRepositoryTest() {
     @BeforeEach
     fun setUp() {
         event = saveEvent("출석 이벤트")
+        saveMember("padding")
         member = saveMember("attendee")
+        assertThat(member.id).`as`("이벤트 id와 회원 id가 달라야 두 인자를 뒤바꾼 조회를 잡는다").isNotEqualTo(event.id)
     }
 
     @Nested
@@ -66,7 +68,7 @@ class EventAttendanceRepositoryAdapterTest : BaseRepositoryTest() {
             assertThat(stored.eventId).isEqualTo(event.id)
             assertThat(stored.memberId).isEqualTo(member.id)
             assertThat(stored.attendanceDate).isEqualTo(DECEMBER_1)
-            assertThat(stored.toDomain().attendanceDate).isEqualTo(DECEMBER_1)
+            assertSameAttendance(stored.toDomain(), saved)
         }
 
         @Test
@@ -175,6 +177,7 @@ class EventAttendanceRepositoryAdapterTest : BaseRepositoryTest() {
 
             val rows = eventAttendanceJpaRepository.findAll()
             assertThat(rows).hasSize(2).allSatisfy { assertThat(it.memberId).isNull() }
+            assertThat(rows.map { it.toDomain().memberId }).containsOnlyNulls()
             assertThat(rows.map { it.attendanceDate }).containsOnly(DECEMBER_1)
             assertThat(eventAttendanceRepository.countByEventIds(listOf(eventId(event)))).containsEntry(event.id!!, 2)
         }
@@ -226,6 +229,13 @@ class EventAttendanceRepositoryAdapterTest : BaseRepositoryTest() {
     }
 
     private fun eventId(event: EventJpaEntity): EventId = EventId(event.id!!)
+
+    private fun assertSameAttendance(reloaded: EventAttendance, saved: EventAttendance) {
+        assertThat(reloaded.id).isEqualTo(saved.id)
+        assertThat(reloaded.eventId).isEqualTo(saved.eventId).isEqualTo(eventId(event))
+        assertThat(reloaded.memberId).isEqualTo(saved.memberId).isEqualTo(member.id)
+        assertThat(reloaded.attendanceDate).isEqualTo(saved.attendanceDate).isEqualTo(DECEMBER_1)
+    }
 
     private fun exists(event: EventJpaEntity, member: MemberJpaEntity, date: LocalDate): Boolean {
         return eventAttendanceRepository.existsByEventIdAndMemberIdAndDate(EventId(event.id!!), member.id, date)

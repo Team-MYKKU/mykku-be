@@ -64,6 +64,22 @@ class AttendanceSummaryTest {
 
             assertSummary(summary, Expected(3, 0, false, false))
         }
+
+        @Test
+        @DisplayName("종료 뒤 연속은 마지막 날부터 빈 날 전까지만 센다(12-01·02·06·07 출석이면 2일)")
+        fun `예시1 확장 - 종료 뒤 빈 날에서 끊김`() {
+            val summary = summaryAt(event, "2026-12-09T10:00", "2026-12-01", "2026-12-02", "2026-12-06", "2026-12-07")
+
+            assertSummary(summary, Expected(4, 2, false, false))
+        }
+
+        @Test
+        @DisplayName("오늘 미출석이면 어제부터 빈 날 전까지만 센다(12-01·03 출석, 12-04 조회면 1일)")
+        fun `예시1 확장 - 어제부터 빈 날에서 끊김`() {
+            val summary = summaryAt(event, "2026-12-04T10:00", "2026-12-01", "2026-12-03")
+
+            assertSummary(summary, Expected(2, 1, false, true))
+        }
     }
 
     @Nested
@@ -162,7 +178,7 @@ class AttendanceSummaryTest {
     }
 
     @Nested
-    @DisplayName("KST 자정 경계와 JVM 기본 시간대")
+    @DisplayName("KST 자정 경계: UTC 인스턴트를 KST로 바꾼 입력, 계산은 JVM 기본 시간대를 읽지 않아 UTC에서도 같다")
     inner class KstMidnight {
 
         private val event = eventBetween("2026-12-01T00:00", "2026-12-08T00:00")
@@ -260,6 +276,14 @@ class AttendanceSummaryTest {
 
             assertThat(event.phaseAt(at("2026-12-03T09:00"))).isEqualTo(EventPhase.BEFORE)
             assertSummary(summary, Expected(1, 0, true, false))
+        }
+
+        @Test
+        @DisplayName("시작이 종료보다 늦게 저장된 기간은 그날 행이 있어도 모두 0이고 출석할 수 없다")
+        fun `뒤집힌 기간 - 모두 0`() {
+            val event = eventBetween("2026-12-01T10:00", "2026-12-01T09:00")
+
+            assertSummary(summaryAt(event, "2026-12-01T12:00", "2026-12-01"), Expected(0, 0, false, false))
         }
 
         @Test

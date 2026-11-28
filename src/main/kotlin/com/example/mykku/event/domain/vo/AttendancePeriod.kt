@@ -2,6 +2,7 @@ package com.example.mykku.event.domain.vo
 
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.util.Objects
 
 class AttendancePeriod private constructor(
     val startDate: LocalDate?,
@@ -14,6 +15,14 @@ class AttendancePeriod private constructor(
         if (startDate == null || endDate == null) return false
         return !date.isBefore(startDate) && !date.isAfter(endDate)
     }
+
+    override fun equals(other: Any?): Boolean {
+        return other is AttendancePeriod && startDate == other.startDate && endDate == other.endDate
+    }
+
+    override fun hashCode(): Int = Objects.hash(startDate, endDate)
+
+    override fun toString(): String = "AttendancePeriod(startDate=$startDate, endDate=$endDate)"
 
     companion object {
         private val EMPTY = AttendancePeriod(null, null)

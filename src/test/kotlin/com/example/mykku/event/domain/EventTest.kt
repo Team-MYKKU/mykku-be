@@ -457,6 +457,18 @@ class EventTest {
             assertThat(period.contains(LocalDate.of(2026, 12, 1))).isFalse()
         }
 
+        @ParameterizedTest(name = "{displayName} [{0} ~ {1}]")
+        @CsvSource("2026-12-01T10:00, 2026-12-01T09:00", "2026-12-05T00:00, 2026-12-03T00:00")
+        @DisplayName("시작이 종료보다 늦게 저장된 기간(검증 없는 복원)도 기간 날짜가 비어 있다")
+        fun `기간 날짜 - 시작이 종료보다 늦으면 비어 있음`(startedAt: String, expiredAt: String) {
+            val period = eventBetween(startedAt, expiredAt).attendancePeriod()
+
+            assertThat(period.isEmpty).isTrue()
+            assertThat(period.startDate).isNull()
+            assertThat(period.contains(LocalDate.of(2026, 12, 1))).isFalse()
+            assertThat(period.contains(LocalDate.of(2026, 12, 4))).isFalse()
+        }
+
         @Test
         @DisplayName("마지막 날은 종료 시각에서 1나노초를 뺀 날짜다")
         fun `기간 날짜 - 종료 1나노초 전`() {
@@ -518,6 +530,17 @@ class EventTest {
             val instantEvent = eventBetween("2026-12-01T10:00", "2026-12-01T10:00")
 
             assertThat(instantEvent.phaseAt(at(now))).isEqualTo(phase)
+        }
+
+        @ParameterizedTest(name = "{displayName} [{0}]")
+        @ValueSource(strings = ["2026-11-30T00:00", "2026-12-01T09:30", "2026-12-01T10:00", "2026-12-04T00:00"])
+        @DisplayName("시작이 종료보다 늦게 저장된 기간에는 진행 중인 순간이 없다")
+        fun `진행 상태 - 시작이 종료보다 늦음`(now: String) {
+            val sameDay = eventBetween("2026-12-01T10:00", "2026-12-01T09:00")
+            val acrossDays = eventBetween("2026-12-05T00:00", "2026-12-03T00:00")
+
+            assertThat(sameDay.phaseAt(at(now))).isNotEqualTo(EventPhase.IN_PROGRESS)
+            assertThat(acrossDays.phaseAt(at(now))).isNotEqualTo(EventPhase.IN_PROGRESS)
         }
 
         @Test

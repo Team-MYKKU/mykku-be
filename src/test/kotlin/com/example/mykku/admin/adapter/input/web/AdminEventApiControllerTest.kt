@@ -405,23 +405,23 @@ class AdminEventApiControllerTest : BaseControllerTest() {
     }
 
     @Test
-    @DisplayName("이벤트 삭제 - 삭제 로그에 참여·당첨·출석 기록 수를 남긴다")
+    @DisplayName("이벤트 삭제 - 삭제 로그에 참여·당첨·출석 기록 수를 남기고, 기록이 없으면 0이다")
     fun `delete - 삭제 로그의 기록 수`() {
         val adminSessionId = getAdminSessionId()
         val member = createAndSaveMember(memberId = "memberA", email = "a@example.com", socialId = "a1")
-        val event = createAndSaveEvent()
-        putWinners(adminSessionId, event.id!!, listOf("memberA")).statusCode(200)
-        insertAttendance(event.id!!, member.id, "2026-12-01")
-        insertAttendance(event.id!!, member.id, "2026-12-02")
+        val attended = createAndSaveEvent()
+        val empty = createAndSaveEvent(title = "출석 없는 이벤트")
+        putWinners(adminSessionId, attended.id!!, listOf("memberA")).statusCode(200)
+        insertAttendance(attended.id!!, member.id, "2026-12-01")
+        insertAttendance(attended.id!!, member.id, "2026-12-02")
 
         val messages = captureInfoLogs(DeleteEventUseCaseImpl::class.java) {
-            RestAssured.given().sessionId(adminSessionId).`when`()
-                .delete("/admin/api/v1/events/{eventId}", event.id).then().statusCode(200)
+            listOf(attended, empty).forEach { deleteEvent(adminSessionId, it.id!!) }
         }
 
-        assertThat(messages).singleElement().asString()
-            .contains("id=${event.id}, ")
-            .contains("participations=1, winners=1, attendances=2, ")
+        assertThat(messages).hasSize(2)
+        assertThat(messages[0]).contains("id=${attended.id}, ", "participations=1, winners=1, attendances=2, ")
+        assertThat(messages[1]).contains("id=${empty.id}, ", "participations=0, winners=0, attendances=0, ")
     }
 
     @Test
@@ -665,6 +665,11 @@ class AdminEventApiControllerTest : BaseControllerTest() {
             memberPk,
             date
         )
+    }
+
+    private fun deleteEvent(adminSessionId: String, eventId: Long) {
+        RestAssured.given().sessionId(adminSessionId).`when`()
+            .delete("/admin/api/v1/events/{eventId}", eventId).then().statusCode(200)
     }
 
     private fun captureInfoLogs(source: Class<*>, action: () -> Unit): List<String> {
