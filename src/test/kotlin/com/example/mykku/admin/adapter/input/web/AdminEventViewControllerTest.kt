@@ -191,17 +191,18 @@ class AdminEventViewControllerTest : BaseControllerTest() {
     }
 
     @Test
-    @DisplayName("생성 화면의 유형 선택지는 서버 생성 허용 목록으로 그리고, 지금은 GENERAL 하나다")
+    @DisplayName("생성 화면의 유형 선택지는 서버 생성 허용 목록으로 그리고, 지금은 GENERAL과 ATTENDANCE다")
     fun `createPage - 유형 선택지`() {
         val html = getPage(getAdminSessionId(), "/admin/event/create")
             .statusCode(200)
             .body(containsString("<select class=\"form-select\" id=\"type\" name=\"type\">"))
             .body(containsString("<option value=\"GENERAL\">일반 이벤트(앱 안 참여 없음)</option>"))
+            .body(containsString("<option value=\"ATTENDANCE\">출석체크</option>"))
             .body(containsString("id=\"googleFormUrl\""))
             .extract()
             .asString()
 
-        assertThat(AdminEventService.creatableTypes()).containsExactly(EventType.GENERAL)
+        assertThat(AdminEventService.creatableTypes()).containsExactly(EventType.GENERAL, EventType.ATTENDANCE)
         assertThat(Regex("<option value=\"([A-Z_]+)\">").findAll(html).map { it.groupValues[1] }.toList())
             .containsExactlyElementsOf(AdminEventService.creatableTypes().map { it.name })
     }

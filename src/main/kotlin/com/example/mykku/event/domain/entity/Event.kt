@@ -95,6 +95,16 @@ class Event private constructor(
         }
     }
 
+    fun isInProgress(now: LocalDateTime): Boolean = phaseAt(now) == EventPhase.IN_PROGRESS
+
+    fun requireInProgress(now: LocalDateTime) {
+        if (!isInProgress(now)) throw EventException.eventNotActive()
+    }
+
+    fun requireType(expected: EventType) {
+        if (type != expected) throw EventException.eventTypeMismatch()
+    }
+
     fun attendancePeriod(): AttendancePeriod = AttendancePeriod.of(startedAt, expiredAt)
 
     companion object {

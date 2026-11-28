@@ -553,6 +553,89 @@ class EventTest {
         }
     }
 
+    @Nested
+    @DisplayName("참여 가능 구간")
+    inner class InProgress {
+
+        private val event = eventBetween("2026-12-01T10:00", "2026-12-07T18:00")
+
+        @ParameterizedTest(name = "{displayName} [{0} → {1}]")
+        @CsvSource(
+            "2026-12-01T09:59:59.999999999, false",
+            "2026-12-01T10:00, true",
+            "2026-12-07T17:59:59.999999999, true",
+            "2026-12-07T18:00, false"
+        )
+        @DisplayName("시작 시각부터 종료 시각 직전까지만 참여 가능 구간이다")
+        fun `참여 가능 구간 - 시작 포함 종료 배타`(now: String, expected: Boolean) {
+            assertThat(event.isInProgress(at(now))).isEqualTo(expected)
+        }
+
+        @Test
+        @DisplayName("시작과 종료가 같으면 참여 가능 구간이 없다")
+        fun `참여 가능 구간 - 시작과 종료가 같음`() {
+            val instantEvent = eventBetween("2026-12-01T10:00", "2026-12-01T10:00")
+
+            assertThat(instantEvent.isInProgress(at("2026-12-01T10:00"))).isFalse()
+        }
+
+        @ParameterizedTest(name = "{displayName} [{0}]")
+        @ValueSource(strings = ["2026-12-01T09:59:59.999999999", "2026-12-07T18:00", "2026-12-08T00:00"])
+        @DisplayName("참여 가능 구간 밖이면 EV102")
+        fun `참여 가능 구간 검사 - 구간 밖`(now: String) {
+            val exception = assertThrows<EventException> { event.requireInProgress(at(now)) }
+
+            assertThat(exception.errorCode).isEqualTo(EventErrorCode.EVENT_NOT_ACTIVE)
+        }
+
+        @ParameterizedTest(name = "{displayName} [{0}]")
+        @ValueSource(strings = ["2026-12-01T10:00", "2026-12-07T17:59:59.999999999"])
+        @DisplayName("참여 가능 구간 안이면 통과한다")
+        fun `참여 가능 구간 검사 - 구간 안`(now: String) {
+            assertThatCode { event.requireInProgress(at(now)) }.doesNotThrowAnyException()
+        }
+    }
+
+    @Nested
+    @DisplayName("유형 일치 검사")
+    inner class RequireType {
+
+        @Test
+        @DisplayName("이벤트 유형이 기대한 유형과 같으면 통과한다")
+        fun `유형 일치 - 같은 유형`() {
+            assertThatCode { createEvent(EventType.ATTENDANCE, null).requireType(EventType.ATTENDANCE) }
+                .doesNotThrowAnyException()
+        }
+
+        @ParameterizedTest(name = "{displayName} [{0}]")
+        @EnumSource(value = EventType::class, names = ["ATTENDANCE"], mode = EnumSource.Mode.EXCLUDE)
+        @DisplayName("이벤트 유형이 기대한 유형과 다르면 EV108")
+        fun `유형 일치 - 다른 유형`(type: EventType) {
+            val event = reconstituteWithType(type)
+
+            val exception = assertThrows<EventException> { event.requireType(EventType.ATTENDANCE) }
+
+            assertThat(exception.errorCode).isEqualTo(EventErrorCode.EVENT_TYPE_MISMATCH)
+        }
+
+        private fun reconstituteWithType(type: EventType): Event {
+            return Event.reconstitute(
+                id = EventId(1L),
+                title = "유형 이벤트",
+                subTitle = null,
+                description = null,
+                startedAt = STARTED_AT,
+                expiredAt = EXPIRED_AT,
+                thumbnailUrl = "https://example.com/thumbnail.jpg",
+                type = type,
+                googleFormUrl = null,
+                status = EventStatusType.ACTIVE,
+                createdAt = STARTED_AT,
+                updatedAt = STARTED_AT
+            )
+        }
+    }
+
     private fun eventBetween(startedAt: String, expiredAt: String): Event {
         return Event.reconstitute(
             id = EventId(1L),

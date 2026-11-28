@@ -477,6 +477,11 @@ include::api/member-event.adoc[]
 
 include::api/event.adoc[]
 
+[[event-type-api]]
+== 이벤트 유형별 API(출석체크·구글폼·응모)
+
+include::api/event-type.adoc[]
+
 [[event-winner-api]]
 == 이벤트 당첨자 API
 

@@ -1,0 +1,56 @@
+[[event-type-attendance]]
+=== 출석체크
+
+출석체크(`ATTENDANCE`) 이벤트에 오늘 출석합니다. 요청 본문은 없습니다.
+
+* *인증 필요*: 토큰이 없거나 유효하지 않으면(만료 포함) 401 `AU201` (<<overview-error-response,공통 에러>> 참고). 숫자가 아닌 `eventId` 는 토큰이 없어도 400 `C106` 입니다.
+* *프로필 설정 필요*: 아이디와 닉네임을 모두 설정한 회원만 출석할 수 있습니다. 설정하지 않았으면 403 `MB201` 이므로 <<member-setup-profile,프로필 설정>> 화면으로 안내하세요. 자동 로그인 뒤에는 <<member-get-my-profile,내 정보 조회>>의 `memberId` · `nickname` 이 둘 다 있는지로 판단합니다.
+* *하루 기준*: 하루는 기기 시간대와 관계없이 서버 기준 KST(Asia/Seoul) 자정으로 나뉩니다. 출석은 서버가 요청을 처리하기 시작한 순간의 KST 날짜(`attendance.today`)로 기록되므로, 자정 직전에 보낸 요청은 전날로 기록될 수 있습니다.
+* *출석 가능 기간*: `startedAt ≤ 지금 < expiredAt` (KST)일 때만 출석할 수 있고, 시작 전이거나 종료된 뒤에는 400 `EV102` 입니다. 종료 일시가 23:59:59 이면 마지막 1초는 출석할 수 없습니다. 목록·상세의 `status=ACTIVE` 는 시작 전 이벤트도 포함하므로 출석 버튼을 열지 판단하는 데 쓰지 마세요.
+* *하루 한 번*: 같은 이벤트에 같은 날 다시 출석하면 409 `EV304` 입니다. 버튼을 연타하거나 두 기기에서 거의 동시에 보내도 한 건만 기록되고, 나머지 요청은 같은 `EV304` 를 받습니다. 에러 응답에는 출석 일수가 없습니다.
+* *응답*: 출석한 뒤의 내 이벤트 상태입니다. 이 응답 모양(`eventId`, `type`, `isInProgress`, `attendance`, `entry`)은 이벤트 유형별 API가 함께 쓰는 공통 상태 응답입니다. 출석 성공 응답에서 `attendance.hasAttendedToday` 는 항상 `true`, `attendance.isAttendable` 은 항상 `false`, `entry` 는 항상 `null` 입니다.
+* *총·연속 일수*: 총 일수는 출석할 수 있는 날짜(`periodStartDate` ~ `periodEndDate`) 안의 출석 날짜 수이고, 빠진 날이 있어도 줄지 않습니다. 연속 일수는 오늘부터 하루씩 거꾸로 끊김 없이 이어진 출석 날짜 수이며, 하루라도 빠지면 다시 1부터 셉니다. 관리자가 기간을 바꾸면 바뀐 기간 안의 날짜만 다시 셉니다.
+* *드문 경합*: 처리 중에 이벤트가 삭제되거나 회원이 탈퇴하면 409 `C302` 입니다. 같은 회원의 출석 요청이 몰리는 아주 드문 경우 409 `C301` 이 올 수 있으며, 잠시 뒤 다시 시도하면 됩니다(이미 기록됐다면 `EV304`).
+* *검증 순서*: 경로 변수 형식(C106) → 인증(AU201) → 이벤트 존재(EV001) → 유형(EV108) → 출석 가능 기간(EV102) → 프로필(MB201) → 오늘 출석 여부(EV304) 순서로 확인하며, 가장 먼저 걸린 에러 하나만 반환됩니다.
+* 출석 기록만 있는 이벤트는 <<member-events,내가 참여한 이벤트 목록>>에 나오지 않습니다. 당첨자로 선정되면 나옵니다.
+
+operation::event-type/attendance/200[snippets='http-request,request-headers,path-parameters,http-response,response-fields']
+
+[[event-type-attendance-error]]
+==== 에러 응답
+
+.`EVENT_NOT_FOUND` · 404 · EV001 — 존재하지 않는 이벤트 ID (0 이하 포함)
+[%collapsible]
+====
+include::{snippets}/event-type/attendance/EVENT_NOT_FOUND/http-response.adoc[]
+====
+
+.`EVENT_TYPE_MISMATCH` · 400 · EV108 — 출석체크(`ATTENDANCE`)가 아닌 이벤트
+[%collapsible]
+====
+include::{snippets}/event-type/attendance/EVENT_TYPE_MISMATCH/http-response.adoc[]
+====
+
+.`EVENT_NOT_ACTIVE` · 400 · EV102 — 시작 전이거나 종료된 이벤트 (`startedAt ≤ 지금 < expiredAt` 밖, KST)
+[%collapsible]
+====
+include::{snippets}/event-type/attendance/EVENT_NOT_ACTIVE/http-response.adoc[]
+====
+
+.`PROFILE_NOT_COMPLETED` · 403 · MB201 — 아이디 또는 닉네임을 설정하지 않은 회원
+[%collapsible]
+====
+include::{snippets}/event-type/attendance/PROFILE_NOT_COMPLETED/http-response.adoc[]
+====
+
+.`ALREADY_ATTENDED_TODAY` · 409 · EV304 — 오늘(KST) 이미 출석함 (거의 동시에 보낸 요청 포함)
+[%collapsible]
+====
+include::{snippets}/event-type/attendance/ALREADY_ATTENDED_TODAY/http-response.adoc[]
+====
+
+.`DATA_INTEGRITY_VIOLATION` · 409 · C302 — 아주 드묾: 처리 중에 이벤트가 삭제되거나 회원이 탈퇴함
+[%collapsible]
+====
+include::{snippets}/event-type/attendance/DATA_INTEGRITY_VIOLATION/http-response.adoc[]
+====

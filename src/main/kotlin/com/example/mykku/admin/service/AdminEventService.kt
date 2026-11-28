@@ -123,7 +123,7 @@ class AdminEventService(
 
     companion object {
         private const val EVENT_IMAGE_PATH = "event-images"
-        private val CREATABLE_TYPES = setOf(EventType.GENERAL)
+        private val CREATABLE_TYPES = setOf(EventType.GENERAL, EventType.ATTENDANCE)
 
         fun creatableTypes(): List<EventType> = EventType.entries.filter { it in CREATABLE_TYPES }
     }
