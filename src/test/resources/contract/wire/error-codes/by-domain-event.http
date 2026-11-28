@@ -78,6 +78,12 @@ X-Request-ID: <REQ-ID:8hex>
     "status" : 400,
     "message" : "해당 이벤트의 참여 정보가 아닙니다"
   }, {
+    "code" : "EV304",
+    "domain" : "event",
+    "name" : "ALREADY_ATTENDED_TODAY",
+    "status" : 409,
+    "message" : "오늘은 이미 출석했습니다"
+  }, {
     "code" : "EV401",
     "domain" : "event",
     "name" : "EMPTY_WINNERS",
