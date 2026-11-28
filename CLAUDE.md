@@ -400,6 +400,12 @@ src/main/kotlin/com/example/mykku/
 - **예외**: 응답 message 문자열 자체가 규약이므로 문자열 비교가 목적이다. 아래 'ErrorCode Enum 사용 필수' 규칙을 적용하지 않는다
 - **상속**: Spring 컨텍스트가 필요한 계약 테스트는 `BaseControllerTest`·`BaseDocumentTest`를 그대로 상속한다 (`@MockitoBean`·`@Import`를 더해 새 Spring 컨텍스트를 만들지 않는다). Spring 없이 골든을 쓰는 테스트는 `@ExtendWith(ContractManifestExtension::class)`를 단다
 - **골든 변경**: `contract/wire/**`·`contract/fixtures/**`의 기존 파일은 고치지 않는다. `contract/docs/**`는 wire 변경이 0인 문서 PR에서만 바꾼다. 승인된 규약 변경만 로컬에서 `./gradlew clean test -Pcontract.update=true`로 갱신한다 (CI에서는 갱신하면 실패)
+- **기능 PR**: 앱과 합의한 새 엔드포인트·에러 코드·필드를 더하는 PR은 운영 코드 커밋 뒤 별도 커밋에서 갱신 모드로 골든을 만든다.
+  - 새 식별자의 wire·docs 스니펫 골든은 이 커밋에서 추가할 수 있다.
+  - 기존 집계 골든은 새 줄·새 블록·새 원소 추가만 허용한다. 대상은 `wire/endpoints/(app|admin).txt`, `wire/schema/(response|request).txt`, `wire/matrix/*.txt`, `wire/error-codes/(list.http|by-domain-event.http|responses.txt)`, `wire/snippets/error-code/list/200/http-response.adoc`이다.
+  - 기존 블록 안 줄 삽입은 PR 본문에 승인 블록으로 적은 것만 허용한다.
+  - 그 밖의 기존 contract 파일은 바이트 그대로다.
+  - 골든 커밋 뒤 깨끗한 작업 트리에서 추가만 검사(`scripts/contract-additive-check.sh`)를 돌린다. 그 결과와 승인 결정 번호, 바뀐 골든 목록을 PR 본문 맨 위에 적는다.
 - **MANIFEST**: `contract/MANIFEST.sha256`의 해시 줄은 손으로 고치지 않는다. 갱신 모드가 끝날 때 그 실행이 쓰거나 지운 골든, 테스트가 읽은 픽스처, 새 파일의 해시를 다시 쓰고, 디스크에서 사라진 파일의 줄은 뺀다(지운 사실은 git diff로 리뷰한다). 손으로 고친 다른 파일은 기록이 그대로라 `GoldenManifestTest`가 잡는다
   - 손으로 고치는 유일한 줄은 첫 줄 `base`다. 기존 골든을 바꾸는 승인된 PR이 그 PR이 기반한 develop 커밋으로 고친다
   - 골든은 `ContractGolden.DEFAULT`·`SnippetGolden.DEFAULT`·`HttpSnapshot.verify`로만 쓴다
