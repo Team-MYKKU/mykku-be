@@ -143,15 +143,22 @@ class EventAttendanceDocumentTest : BaseDocumentTest() {
                         "목록·상세의 status=ACTIVE는 시작 전도 포함하므로 이 값과 다를 수 있음. 출석 성공 응답에서는 항상 true"
                 ),
             fieldWithPath("data.attendance").type(JsonFieldType.OBJECT)
-                .description("내 출석 현황. 출석체크(ATTENDANCE) 이벤트에서만 값이 있고 그 밖의 유형은 null. 출석 성공 응답에서는 항상 있음"),
+                .description(
+                    "내 출석 현황. 출석체크(ATTENDANCE) 이벤트에서만 값이 있고 그 밖의 유형은 null(공통 상태 응답). " +
+                        "출석 성공 응답에서는 항상 있음"
+                ),
             fieldWithPath("data.attendance.today").type(JsonFieldType.STRING)
                 .description("서버 기준 KST 오늘 날짜 (yyyy-MM-dd). 이번 출석은 이 날짜로 기록됨"),
             fieldWithPath("data.attendance.periodStartDate").type(JsonFieldType.STRING)
-                .description("출석할 수 있는 첫날 (yyyy-MM-dd, startedAt의 날짜)"),
+                .description(
+                    "출석할 수 있는 첫날 (yyyy-MM-dd, startedAt의 날짜). 공통 상태 응답에서는 기간이 빈 이벤트" +
+                        "(startedAt ≥ expiredAt)면 null. 출석 성공 응답에서는 항상 있음"
+                ),
             fieldWithPath("data.attendance.periodEndDate").type(JsonFieldType.STRING)
                 .description(
                     "출석할 수 있는 마지막 날 (yyyy-MM-dd, expiredAt 직전 순간의 날짜). " +
-                        "예: expiredAt이 12-08T00:00이면 12-07, 12-07T23:59:59이면 12-07"
+                        "예: expiredAt이 12-08T00:00이면 12-07, 12-07T23:59:59이면 12-07. " +
+                        "공통 상태 응답에서는 기간이 빈 이벤트면 null. 출석 성공 응답에서는 항상 있음"
                 ),
             fieldWithPath("data.attendance.hasAttendedToday").type(JsonFieldType.BOOLEAN)
                 .description("오늘(today) 출석이 기록돼 있는지. 출석 성공 응답에서는 항상 true"),

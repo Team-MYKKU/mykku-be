@@ -16,6 +16,7 @@ import com.example.mykku.member.domain.entity.Member
 import com.example.mykku.member.domain.vo.SocialProvider
 import com.example.mykku.member.exception.MemberErrorCode
 import com.example.mykku.member.exception.MemberException
+import com.example.mykku.util.DefaultTimeZone
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -55,14 +56,20 @@ class AttendEventUseCaseImplTest {
     @DisplayName("오늘 날짜(UTC 존 고정 시계)")
     inner class Today {
 
-        @ParameterizedTest(name = "{displayName} [{0} → {1}]")
-        @CsvSource("2026-11-28T14:59:59.999999Z, 2026-11-28", "2026-11-28T15:00:00Z, 2026-11-29")
-        @DisplayName("시계의 순간을 KST 날짜로 바꿔 출석 날짜로 쓴다(KST 자정 = UTC 전날 15:00)")
-        fun `KST 자정`(instant: String, today: LocalDate) {
+        @ParameterizedTest(name = "{displayName} [{0} → {1}, JVM {2}]")
+        @CsvSource(
+            "2026-11-28T14:59:59.999999Z, 2026-11-28, Asia/Seoul",
+            "2026-11-28T15:00:00Z, 2026-11-29, Asia/Seoul",
+            "2026-11-28T14:59:59.999999Z, 2026-11-28, UTC",
+            "2026-11-28T15:00:00Z, 2026-11-29, UTC",
+            "2026-11-28T15:00:00Z, 2026-11-29, America/Los_Angeles"
+        )
+        @DisplayName("시계의 순간을 KST 날짜로 바꿔 출석 날짜로 쓴다(KST 자정 = UTC 전날 15:00, 시계 존·JVM 기본 시간대 무관)")
+        fun `KST 자정`(instant: String, today: LocalDate, jvmZone: String) {
             val event = givenEvent(attendanceEvent())
             givenAttendable(event, today)
 
-            val result = attendAt(Instant.parse(instant))
+            val result = DefaultTimeZone.with(jvmZone) { attendAt(Instant.parse(instant)) }
 
             assertThat(result.attendance?.today).isEqualTo(today)
             assertThat(savedDates()).containsExactly(today)

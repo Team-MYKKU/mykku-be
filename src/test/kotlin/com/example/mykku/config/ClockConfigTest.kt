@@ -15,7 +15,7 @@ class ClockConfigTest : BaseRepositoryTest() {
     private lateinit var applicationContext: ApplicationContext
 
     @Test
-    @DisplayName("Clock 빈은 clock 하나뿐이고 JVM 기본 시간대의 시스템 시계다")
+    @DisplayName("Clock 빈은 clock 하나뿐이고 시스템 시계다(시간대는 ClockConfigZoneTest)")
     fun `Clock 빈은 하나뿐인 시스템 시계다`() {
         val clocks = applicationContext.getBeansOfType(Clock::class.java)
 

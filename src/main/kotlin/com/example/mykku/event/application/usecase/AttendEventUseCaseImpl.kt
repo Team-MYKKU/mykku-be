@@ -7,6 +7,7 @@ import com.example.mykku.event.application.dto.MyEventStatusResult
 import com.example.mykku.event.application.port.input.AttendEventUseCase
 import com.example.mykku.event.application.port.output.EventAttendanceRepository
 import com.example.mykku.event.application.port.output.EventRepository
+import com.example.mykku.event.application.port.output.findDatesIn
 import com.example.mykku.event.domain.entity.Event
 import com.example.mykku.event.domain.entity.EventAttendance
 import com.example.mykku.event.domain.vo.EventId
@@ -32,8 +33,9 @@ class AttendEventUseCaseImpl(
         val event = findAttendableEvent(command.eventId, now)
         member.requireProfileCompleted()
         attendToday(event, member.id.value, now.toLocalDate())
-        val attendedDates = findAttendedDates(event, member.id.value)
-        return MyEventStatusResult.of(event, now, attendance = AttendanceStatusResult.of(event, now, attendedDates))
+        val attendedDates = eventAttendanceRepository.findDatesIn(event.id, member.id.value, event.attendancePeriod())
+        val attendance = AttendanceStatusResult.of(event, now, attendedDates)
+        return MyEventStatusResult.of(event, now, attendance = attendance, entry = null)
     }
 
     private fun findAttendableEvent(eventId: Long, now: LocalDateTime): Event {
@@ -48,12 +50,5 @@ class AttendEventUseCaseImpl(
             throw EventException.alreadyAttendedToday()
         }
         eventAttendanceRepository.save(EventAttendance.create(event.id, memberPk, today))
-    }
-
-    private fun findAttendedDates(event: Event, memberPk: Long): List<LocalDate> {
-        val period = event.attendancePeriod()
-        val from = period.startDate ?: return emptyList()
-        val to = period.endDate ?: return emptyList()
-        return eventAttendanceRepository.findDates(event.id, memberPk, from, to)
     }
 }

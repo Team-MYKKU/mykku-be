@@ -17,8 +17,8 @@ data class MyEventStatusResult(
         fun of(
             event: Event,
             now: LocalDateTime,
-            attendance: AttendanceStatusResult? = null,
-            entry: EntryStatusResult? = null
+            attendance: AttendanceStatusResult?,
+            entry: EntryStatusResult?
         ): MyEventStatusResult {
             return MyEventStatusResult(
                 eventId = event.id.value,
