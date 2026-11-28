@@ -16,6 +16,7 @@ import org.hamcrest.Matchers.not
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.jdbc.core.JdbcTemplate
 import java.time.LocalDateTime
 
 @DisplayName("AdminEventViewController 통합 테스트")
@@ -23,6 +24,9 @@ class AdminEventViewControllerTest : BaseControllerTest() {
 
     @Autowired
     private lateinit var eventJpaRepository: EventJpaRepository
+
+    @Autowired
+    private lateinit var jdbcTemplate: JdbcTemplate
 
     @Test
     @DisplayName("status를 생략하면 전체 탭이 활성화되고 모든 이벤트가 보인다")
@@ -168,6 +172,25 @@ class AdminEventViewControllerTest : BaseControllerTest() {
     }
 
     @Test
+    @DisplayName("목록의 삭제 버튼에 이벤트별 출석 기록 수를 싣고, 출석이 없으면 0이다")
+    fun `listPage - 삭제 확인용 출석 건수`() {
+        val member = createAndSaveMember(memberId = "memberA", email = "a@example.com", socialId = "a1")
+        val attended = createAndSaveEvent(title = "출석 이벤트", expiredAt = LocalDateTime.now().plusDays(7))
+        val notAttended = createAndSaveEvent(title = "출석 없는 이벤트", expiredAt = LocalDateTime.now().plusDays(7))
+        insertAttendance(attended.id!!, member.id, "2026-12-01")
+        insertAttendance(attended.id!!, member.id, "2026-12-02")
+
+        val html = getPage(getAdminSessionId(), "/admin/event")
+            .statusCode(200)
+            .body(containsString("button.dataset.attendanceCount"))
+            .extract()
+            .asString()
+
+        assertThat(deleteButtonOf(html, attended.id!!)).contains("data-attendance-count=\"2\"")
+        assertThat(deleteButtonOf(html, notAttended.id!!)).contains("data-attendance-count=\"0\"")
+    }
+
+    @Test
     @DisplayName("생성 화면의 유형 선택지는 서버 생성 허용 목록으로 그리고, 지금은 GENERAL 하나다")
     fun `createPage - 유형 선택지`() {
         val html = getPage(getAdminSessionId(), "/admin/event/create")
@@ -300,6 +323,21 @@ class AdminEventViewControllerTest : BaseControllerTest() {
 
     private fun activeTab(status: String): String {
         return "class=\"nav-link active\" href=\"/admin/event?status=$status\""
+    }
+
+    private fun insertAttendance(eventId: Long, memberPk: Long, date: String) {
+        jdbcTemplate.update(
+            "INSERT INTO event_attendance (event_id, member_id, attendance_date, created_at, updated_at) " +
+                "VALUES (?, ?, ?, NOW(6), NOW(6))",
+            eventId,
+            memberPk,
+            date
+        )
+    }
+
+    private fun deleteButtonOf(html: String, eventId: Long): String {
+        val button = Regex("<button[^>]*\\bdata-id=\"$eventId\"[^>]*>")
+        return requireNotNull(button.find(html)) { "삭제 버튼이 없다: eventId=$eventId" }.value
     }
 
     private fun typeBadge(event: EventJpaEntity, type: EventType): String {

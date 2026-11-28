@@ -185,6 +185,7 @@
 | EV301 | ALREADY_PARTICIPATED | 409 | 이미 참여한 이벤트입니다 |
 | EV302 | EVENT_PARTICIPATION_NOT_FOUND | 404 | 이벤트 참여 정보를 찾을 수 없습니다 |
 | EV303 | PARTICIPATION_NOT_BELONG_TO_EVENT | 400 | 해당 이벤트의 참여 정보가 아닙니다 |
+| EV304 | ALREADY_ATTENDED_TODAY | 409 | 오늘은 이미 출석했습니다 |
 | EV401 | EMPTY_WINNERS | 400 | 당첨자 목록은 비어있을 수 없습니다 |
 | EV402 | DUPLICATE_WINNER | 400 | 중복된 당첨자가 있습니다 |
 | EV403 | WINNER_NOT_ANNOUNCED | 400 | 아직 당첨자가 발표되지 않았습니다 |

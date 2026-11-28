@@ -1,6 +1,7 @@
 package com.example.mykku.event.application.usecase
 
 import com.example.mykku.event.application.port.input.DeleteEventUseCase
+import com.example.mykku.event.application.port.output.EventAttendanceRepository
 import com.example.mykku.event.application.port.output.EventImageRepository
 import com.example.mykku.event.application.port.output.EventParticipationRepository
 import com.example.mykku.event.application.port.output.EventRepository
@@ -19,6 +20,7 @@ class DeleteEventUseCaseImpl(
     private val eventImageRepository: EventImageRepository,
     private val eventParticipationRepository: EventParticipationRepository,
     private val eventWinnerRepository: EventWinnerRepository,
+    private val eventAttendanceRepository: EventAttendanceRepository,
     private val imageCleanupPort: ImageCleanupPort
 ) : DeleteEventUseCase {
 
@@ -36,11 +38,12 @@ class DeleteEventUseCaseImpl(
     private fun logDeletion(event: Event, imageUrls: List<String>) {
         val ids = listOf(event.id)
         log.info(
-            "admin delete event id={}, title={}, participations={}, winners={}, imageUrls={}",
+            "admin delete event id={}, title={}, participations={}, winners={}, attendances={}, imageUrls={}",
             event.id.value,
             event.title,
             eventParticipationRepository.countByEventIds(ids)[event.id.value] ?: 0,
             eventWinnerRepository.countByEventIds(ids)[event.id.value] ?: 0,
+            eventAttendanceRepository.countByEventIds(ids)[event.id.value] ?: 0,
             imageUrls
         )
     }

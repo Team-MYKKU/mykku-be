@@ -1,7 +1,9 @@
 package com.example.mykku.event.domain.entity
 
+import com.example.mykku.event.domain.vo.AttendancePeriod
 import com.example.mykku.event.domain.vo.EventContent
 import com.example.mykku.event.domain.vo.EventId
+import com.example.mykku.event.domain.vo.EventPhase
 import com.example.mykku.event.domain.vo.EventStatusType
 import com.example.mykku.event.domain.vo.EventType
 import com.example.mykku.event.domain.vo.GoogleFormUrl
@@ -84,6 +86,16 @@ class Event private constructor(
         if (!expiredAt.isAfter(now)) return EventStatusType.EXPIRED
         return EventStatusType.ACTIVE
     }
+
+    fun phaseAt(now: LocalDateTime): EventPhase {
+        return when {
+            now.isBefore(startedAt) -> EventPhase.BEFORE
+            now.isBefore(expiredAt) -> EventPhase.IN_PROGRESS
+            else -> EventPhase.ENDED
+        }
+    }
+
+    fun attendancePeriod(): AttendancePeriod = AttendancePeriod.of(startedAt, expiredAt)
 
     companion object {
         const val IMAGE_MAX_COUNT = 10
