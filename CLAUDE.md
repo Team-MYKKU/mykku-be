@@ -407,6 +407,14 @@ src/main/kotlin/com/example/mykku/
   - 여러 PR이 함께 쓰는 `wire/gray-zone/`은 파일 이름 접두(`framework-`·`matrix-` 등)로 소유를 나누고, 각 완전성 테스트는 자기 접두 파일만 본다
 - 주석 금지·메서드 15줄·들여쓰기 2단계 규칙은 계약 테스트에도 적용한다
 
+#### 5. 병렬 실행 (Gradle fork)
+- `test`는 테스트 JVM(fork) 여러 개에 클래스를 나눠 돌린다. 기본 fork 수는 `CPU 수 / 2`를 슬롯 수의 절반(7)으로 제한한 값이다(CI 4 vCPU는 2: 4코어 측정에서 가장 빨랐다. 상한 7은 기본값 빌드 둘이 한 MySQL의 슬롯 15개를 나눠 쓰는 값). `-PtestForks=N`(1~15)으로 바꾸고, 실제 fork 수는 `--max-workers`(기본 CPU 수)를 넘지 않는다. `-Pcontract.update=true`는 항상 fork 1개로 돌고, 두 번째 테스트 JVM은 `ContractUpdateLock`(`.gradle/contract-update.lock`)에서 계약 오류로 바로 실패한다
+- 모든 Spring 테스트 컨텍스트는 fork 커스터마이저(`config/fork/`, `src/test/resources/META-INF/spring.factories`)를 거친다. `spring.datasource.url`이 `jdbc:mysql://<호스트>/<DB>` 형식이면 JVM마다 MySQL `GET_LOCK`으로 슬롯 n(1~15)을 잡아, DB 이름 뒤에 `_n`을 붙인 스키마를 새로 만들어 쓰고(Flyway가 V1부터 migrate), Redis는 DB n을 쓴다(Redisson·Spring Data Redis 모두). 슬롯 15개는 같은 MySQL을 쓰는 모든 빌드와 IDE 실행이 나눠 쓰며, 빈 슬롯이 없으면 최대 10분 기다린 뒤 실패한다. 슬롯 수는 `build.gradle.kts`의 `testForkSlots`와 `SlotLocks.MAX_SLOTS`를 함께 바꾼다(`ForkSlotCountTest`)
+- worktree마다 컨테이너를 띄우고 `SPRING_DATASOURCE_URL`·`SPRING_DATA_REDIS_PORT`를 바꾸는 방식도, 여러 빌드가 컨테이너 한 쌍을 함께 쓰는 방식도 된다. Redis DB 번호를 MySQL 슬롯에서 정하므로 Redis 서버를 함께 쓰는 빌드는 MySQL 서버도 함께 써야 한다. 이 변경 전 브랜치는 `FLUSHALL`로 모든 Redis DB를 지우므로 그런 브랜치와는 컨테이너를 함께 쓰지 않는다
+- 테스트 컨텍스트의 Hikari는 최소 유휴 2·`idle-timeout` 10초(최대 풀 10 그대로)다. 연결 여러 개가 동시에 필요한 테스트는 시작 전에 `fillConnectionPool(n)`(BaseControllerTest)으로 풀을 채운다
+- 테스트는 자기 fork 밖을 건드리지 않는다. Redis `flushall`은 쓰지 않고 인증 키 패턴 삭제를 쓴다(`RedisFlushGuardTest`). MySQL 서버 전역 상태는 `DATABASE()`로 좁혀 읽고 스키마 이름을 하드코딩하지 않는다(예외: 동률 진단 `StatementLog`의 performance_schema consumer 전환은 진단 파일에만 영향). `document()` 식별자는 `BaseDocumentTest`를 상속한 클래스 하나에서 리터럴로 쓰고, 문서 테스트는 서로 상속하지 않는다(`SnippetIdentifierOwnershipTest`)
+- worktree 하나에서는 Gradle을 한 번에 하나만 돌린다(`cleanTest`·`clean`이 다른 빌드의 `build/`를 지운다). fork 구성은 클래스를 추가하거나 직전 실행이 실패하면(실패 클래스를 먼저 배정) 바뀐다. fork 구성에 따라 달라 보이는 실패는 `./gradlew test --rerun -PtestForks=1`(필요하면 `--tests`)로 다시 확인한다. `-PtestForks=1`도 슬롯 스키마·Redis DB n·위 Hikari 설정을 그대로 쓰므로 fork 배정의 영향만 걸러진다
+
 ### 테스트 작성 체크리스트
 - [ ] ControllerTest로 엔드포인트 검증
 - [ ] DocumentTest로 API 문서 생성 (Admin 제외)
