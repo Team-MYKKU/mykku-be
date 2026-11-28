@@ -54,6 +54,12 @@ X-Request-ID: <REQ-ID:8hex>
     "status" : 400,
     "message" : "이벤트 시작일은 종료일보다 늦을 수 없습니다"
   }, {
+    "code" : "EV108",
+    "domain" : "event",
+    "name" : "EVENT_TYPE_MISMATCH",
+    "status" : 400,
+    "message" : "이 이벤트에서 지원하지 않는 참여 방식입니다"
+  }, {
     "code" : "EV109",
     "domain" : "event",
     "name" : "INVALID_EVENT_TYPE_SETTING",

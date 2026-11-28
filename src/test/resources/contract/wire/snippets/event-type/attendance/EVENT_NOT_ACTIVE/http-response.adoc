@@ -1,0 +1,10 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+
+{
+  "code" : "EV102",
+  "message" : "진행 중인 이벤트가 아닙니다"
+}
+----
