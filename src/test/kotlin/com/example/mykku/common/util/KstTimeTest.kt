@@ -1,5 +1,6 @@
 package com.example.mykku.common.util
 
+import com.example.mykku.util.DefaultTimeZone
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -35,6 +36,17 @@ class KstTimeTest {
         val clock = Clock.fixed(Instant.parse("2026-11-28T15:00:00Z"), ZoneId.of(zone))
 
         assertThat(KstTime.now(clock)).isEqualTo(LocalDateTime.parse("2026-11-29T00:00"))
+    }
+
+    @ParameterizedTest(name = "{displayName} [{0}]")
+    @ValueSource(strings = ["UTC", "America/Los_Angeles", "Pacific/Kiritimati", "Asia/Seoul"])
+    @DisplayName("JVM 기본 시간대와 관계없이 같은 순간이면 같은 KST 시각이다")
+    fun `JVM 기본 시간대 무시`(jvmZone: String) {
+        val clock = Clock.fixed(Instant.parse("2026-11-28T15:00:00Z"), ZoneOffset.UTC)
+
+        val now = DefaultTimeZone.with(jvmZone) { KstTime.now(clock) }
+
+        assertThat(now).isEqualTo(LocalDateTime.parse("2026-11-29T00:00"))
     }
 
     @Test

@@ -12,11 +12,13 @@ import com.example.mykku.event.exception.EventException
 import com.example.mykku.member.domain.entity.Member
 import com.example.mykku.util.KstDayGuard
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.dao.PessimisticLockingFailureException
 import org.springframework.jdbc.core.JdbcTemplate
 import java.time.Clock
@@ -58,13 +60,12 @@ class AttendEventConcurrencyTest : BaseControllerTest() {
         val tally = Tally(attendConcurrently(event, List(THREAD_COUNT) { member }))
 
         day.assumeStillToday(today)
-        log.info("같은 회원 동시 출석: 성공 {}, EV304 {}, C301 {}", tally.attended.size, tally.duplicates, tally.lockConflicts)
-        assertThat(tally.unexpected).`as`("EV304·C301 밖의 실패").isEmpty()
-        assertThat(tally.attended).`as`("성공 수 (EV304 ${tally.duplicates}건, C301 ${tally.lockConflicts}건)")
-            .hasSize(1)
-        assertThat(tally.attended.single().attendance?.totalAttendanceDays).isOne()
-        assertThat(tally.duplicates + tally.lockConflicts).isEqualTo(THREAD_COUNT - 1)
-        assertThat(rowsOf(event)).isOne()
+        log.info(
+            "같은 회원 동시 출석: 성공 {}, EV304 {}(INSERT 충돌 {}), C301 {}",
+            tally.attended.size, tally.duplicates, tally.insertCollisions, tally.lockConflicts
+        )
+        assertSingleAttendance(tally, event)
+        assumeTrue(tally.insertCollisions > 0) { "경합이 INSERT까지 가지 않아 어댑터의 EV304 변환 경로를 지나지 않았다" }
     }
 
     @Test
@@ -80,6 +81,15 @@ class AttendEventConcurrencyTest : BaseControllerTest() {
         assertThat(tally.failures).isEmpty()
         assertThat(tally.attended.map { it.attendance?.totalAttendanceDays }).containsOnly(1).hasSize(THREAD_COUNT)
         assertThat(rowsOf(event)).isEqualTo(THREAD_COUNT)
+    }
+
+    private fun assertSingleAttendance(tally: Tally, event: EventJpaEntity) {
+        assertThat(tally.unexpected).`as`("EV304·C301 밖의 실패").isEmpty()
+        assertThat(tally.attended).`as`("성공 수 (EV304 ${tally.duplicates}건, C301 ${tally.lockConflicts}건)")
+            .hasSize(1)
+        assertThat(tally.attended.single().attendance?.totalAttendanceDays).isOne()
+        assertThat(tally.duplicates + tally.lockConflicts).isEqualTo(THREAD_COUNT - 1)
+        assertThat(rowsOf(event)).isOne()
     }
 
     private fun attendConcurrently(event: EventJpaEntity, members: List<Member>): List<Result<MyEventStatusResult>> {
@@ -131,6 +141,7 @@ class AttendEventConcurrencyTest : BaseControllerTest() {
         val failures = outcomes.mapNotNull { it.exceptionOrNull() }
         val attended = outcomes.mapNotNull { it.getOrNull() }
         val duplicates = failures.count { isDuplicate(it) }
+        val insertCollisions = failures.count { isDuplicate(it) && it.cause is DataIntegrityViolationException }
         val lockConflicts = failures.count { it is PessimisticLockingFailureException }
         val unexpected = failures.filterNot { isDuplicate(it) || it is PessimisticLockingFailureException }
 
