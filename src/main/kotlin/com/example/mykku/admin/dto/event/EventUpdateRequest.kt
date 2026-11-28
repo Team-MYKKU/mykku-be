@@ -1,6 +1,7 @@
 package com.example.mykku.admin.dto.event
 
 import com.example.mykku.event.domain.vo.EventContent
+import com.example.mykku.event.domain.vo.GoogleFormUrl
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
@@ -31,7 +32,9 @@ data class EventUpdateRequest(
     @field:NotNull(message = "유지할 이미지 목록(_keepImageUrls)은 필수입니다")
     val keepImageUrls: List<String>?,
 
-    val newImages: List<MultipartFile>? = null
+    val newImages: List<MultipartFile>? = null,
+
+    val googleFormUrl: String? = null
 ) {
     val newImageCount: Int
         get() = newImages.orEmpty().count { !it.isEmpty }
@@ -42,7 +45,8 @@ data class EventUpdateRequest(
             subTitle = subTitle?.takeIf { it.isNotBlank() },
             description = description?.takeIf { it.isNotBlank() },
             startedAt = startedAt,
-            expiredAt = expiredAt
+            expiredAt = expiredAt,
+            googleFormUrl = GoogleFormUrl.normalize(googleFormUrl)
         )
     }
 }

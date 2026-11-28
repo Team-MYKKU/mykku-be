@@ -8,18 +8,27 @@ import com.example.mykku.event.adapter.output.persistence.entity.EventJpaEntity
 import com.example.mykku.event.adapter.output.persistence.repository.EventImageJpaRepository
 import com.example.mykku.event.adapter.output.persistence.repository.EventJpaRepository
 import com.example.mykku.event.domain.vo.EventStatusType
+import com.example.mykku.event.domain.vo.EventType
 import com.example.mykku.event.exception.EventErrorCode
 import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
 import com.example.mykku.member.domain.vo.SocialProvider
+import com.example.mykku.util.MultipartParts.image
+import com.example.mykku.util.MultipartParts.text
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
 import io.restassured.response.ValidatableResponse
+import io.restassured.specification.MultiPartSpecification
 import org.assertj.core.api.Assertions.assertThat
 import org.hamcrest.Matchers.contains
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.hasKey
+import org.hamcrest.Matchers.not
 import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
+import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.jdbc.core.JdbcTemplate
 import java.time.LocalDateTime
@@ -76,6 +85,75 @@ class AdminEventApiControllerTest : BaseControllerTest() {
             .then()
             .statusCode(400)
             .body("code", equalTo(CommonErrorCode.INVALID_INPUT.code))
+    }
+
+    @Test
+    @DisplayName("이벤트 생성 - type을 보내지 않거나 빈 값으로 보내면 GENERAL로 저장하고 응답 모양은 그대로다")
+    fun `create - type 생략과 빈 값은 GENERAL`() {
+        val omitted = postEvent(createParts("유형 생략 이벤트"))
+            .statusCode(200)
+            .body("data", not(hasKey("type")))
+            .body("data", not(hasKey("googleFormUrl")))
+        val blank = postEvent(createParts("유형 빈 값 이벤트") + text("type", "")).statusCode(200)
+
+        assertThat(storedTypeColumns(createdId(omitted))).isEqualTo("GENERAL" to null)
+        assertThat(storedTypeColumns(createdId(blank))).isEqualTo("GENERAL" to null)
+    }
+
+    @Test
+    @DisplayName("이벤트 생성 - GENERAL을 지정하면 GENERAL로 저장한다")
+    fun `create - GENERAL 지정`() {
+        val response = postEvent(createParts() + text("type", "GENERAL")).statusCode(200)
+
+        assertThat(storedTypeColumns(createdId(response))).isEqualTo("GENERAL" to null)
+    }
+
+    @ParameterizedTest(name = "[{0}]")
+    @ValueSource(strings = ["FOO", "general"])
+    @DisplayName("이벤트 생성 - 정의되지 않은 type 값은 C101이고 이미지를 올리지 않는다")
+    fun `create - 정의되지 않은 type은 C101`(type: String) {
+        postEvent(createParts() + text("type", type))
+            .statusCode(400)
+            .body("code", equalTo(CommonErrorCode.INVALID_INPUT.code))
+
+        assertThat(testImageUploadService.uploadedUrls).isEmpty()
+        assertThat(eventJpaRepository.count()).isZero()
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @EnumSource(value = EventType::class, names = ["ATTENDANCE", "GOOGLE_FORM", "ENTRY"])
+    @DisplayName("이벤트 생성 - 아직 생성을 열지 않은 유형은 EV109이고 이미지를 올리지 않는다")
+    fun `create - 생성 허용 목록 밖 유형은 EV109`(type: EventType) {
+        val googleFormUrl = listOfNotNull(FORM_URL.takeIf { type == EventType.GOOGLE_FORM })
+
+        postEvent(createParts() + text("type", type.name) + googleFormUrl.map { text("googleFormUrl", it) })
+            .statusCode(400)
+            .body("code", equalTo(EventErrorCode.INVALID_EVENT_TYPE_SETTING.code))
+
+        assertThat(testImageUploadService.uploadedUrls).isEmpty()
+        assertThat(eventJpaRepository.count()).isZero()
+    }
+
+    @ParameterizedTest(name = "[{0}]")
+    @ValueSource(strings = ["", "   "])
+    @DisplayName("이벤트 생성 - GENERAL에 빈 구글폼 링크를 보내면 미입력으로 보고 링크 없이 저장한다")
+    fun `create - 빈 구글폼 링크는 null로 저장`(googleFormUrl: String) {
+        val response = postEvent(createParts() + text("type", "GENERAL") + text("googleFormUrl", googleFormUrl))
+            .statusCode(200)
+
+        assertThat(storedTypeColumns(createdId(response))).isEqualTo("GENERAL" to null)
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @ValueSource(strings = [FORM_URL, "javascript:alert(1)"])
+    @DisplayName("이벤트 생성 - GENERAL에 구글폼 링크를 보내면 EV109이고 이미지를 올리지 않는다")
+    fun `create - GENERAL에 구글폼 링크는 EV109`(googleFormUrl: String) {
+        postEvent(createParts() + text("googleFormUrl", googleFormUrl))
+            .statusCode(400)
+            .body("code", equalTo(EventErrorCode.INVALID_EVENT_TYPE_SETTING.code))
+
+        assertThat(testImageUploadService.uploadedUrls).isEmpty()
+        assertThat(eventJpaRepository.count()).isZero()
     }
 
     @Test
@@ -444,6 +522,36 @@ class AdminEventApiControllerTest : BaseControllerTest() {
         return eventJpaRepository.save(event)
     }
 
+    private fun postEvent(parts: List<MultiPartSpecification>): ValidatableResponse {
+        var spec = RestAssured.given()
+            .sessionId(getAdminSessionId())
+            .contentType("multipart/form-data")
+        parts.forEach { spec = spec.multiPart(it) }
+        return spec.`when`().post("/admin/api/v1/events").then()
+    }
+
+    private fun createParts(title: String = "유형 이벤트"): List<MultiPartSpecification> {
+        return listOf(
+            text("title", title),
+            text("startedAt", "2026-12-01T00:00:00"),
+            text("expiredAt", "2026-12-07T23:59:59"),
+            image("thumbnailImage"),
+            image("images")
+        )
+    }
+
+    private fun createdId(response: ValidatableResponse): Long {
+        return response.extract().jsonPath().getLong("data.id")
+    }
+
+    private fun storedTypeColumns(eventId: Long): Pair<String, String?> {
+        return jdbcTemplate.queryForObject(
+            "SELECT type, google_form_url FROM event WHERE id = ?",
+            { rs, _ -> rs.getString("type") to rs.getString("google_form_url") },
+            eventId
+        )!!
+    }
+
     private fun saveEventImages(event: EventJpaEntity, vararg names: String): List<String> {
         return names.mapIndexed { index, name ->
             val image = EventImageJpaEntity(url = "$BUCKET_URL/event-images/$name", orderIndex = index, event = event)
@@ -510,6 +618,7 @@ class AdminEventApiControllerTest : BaseControllerTest() {
 
     companion object {
         private const val BUCKET_URL = "https://test-bucket.s3.amazonaws.com"
+        private const val FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSc_example/viewform"
         private val EVENT_CHILD_TABLES = listOf(
             "event_participation",
             "event_winner",

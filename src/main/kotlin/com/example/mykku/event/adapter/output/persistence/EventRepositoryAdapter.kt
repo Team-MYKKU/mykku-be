@@ -8,6 +8,7 @@ import com.example.mykku.event.domain.vo.EventId
 import com.example.mykku.event.domain.vo.EventListFilter
 import com.example.mykku.event.domain.vo.EventSortType
 import com.example.mykku.event.domain.vo.EventStatusType
+import com.example.mykku.event.domain.vo.EventType
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Repository
@@ -38,6 +39,11 @@ class EventRepositoryAdapter(
             return emptyList()
         }
         return eventJpaRepository.findAllById(ids.map { it.value }).map { it.toDomain() }
+    }
+
+    override fun findTypesByIds(ids: List<EventId>): Map<Long, EventType> {
+        if (ids.isEmpty()) return emptyMap()
+        return eventJpaRepository.findTypesByIdIn(ids.map { it.value }).associate { it.getId() to it.getType() }
     }
 
     override fun findByExpiredAtAfter(dateTime: LocalDateTime): List<Event> {

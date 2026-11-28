@@ -1,6 +1,7 @@
 package com.example.mykku.event.application.dto
 
 import com.example.mykku.event.domain.vo.EventStatusType
+import com.example.mykku.event.domain.vo.EventType
 import com.example.mykku.event.domain.vo.EventWinnerEntryStatus
 import com.example.mykku.event.domain.vo.EventWinnerStatus
 import org.springframework.data.domain.Page
@@ -182,5 +183,7 @@ data class EventEditResult(
     val expiredAt: LocalDateTime,
     val status: EventStatusType,
     val thumbnailUrl: String,
-    val imageUrls: List<String>
+    val imageUrls: List<String>,
+    val type: EventType,
+    val googleFormUrl: String?
 )

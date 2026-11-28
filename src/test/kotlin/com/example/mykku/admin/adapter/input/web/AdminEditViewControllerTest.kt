@@ -9,6 +9,7 @@ import com.example.mykku.dailymessage.adapter.output.persistence.repository.Dail
 import com.example.mykku.event.adapter.output.persistence.entity.EventJpaEntity
 import com.example.mykku.event.adapter.output.persistence.repository.EventJpaRepository
 import com.example.mykku.event.domain.vo.EventStatusType
+import com.example.mykku.event.domain.vo.EventType
 import com.example.mykku.fannote.adapter.output.persistence.entity.FanNoteJpaEntity
 import com.example.mykku.fannote.adapter.output.persistence.entity.FanNotePageJpaEntity
 import com.example.mykku.fannote.adapter.output.persistence.repository.FanNoteJpaRepository
@@ -82,6 +83,36 @@ class AdminEditViewControllerTest : BaseControllerTest() {
         getPage("/admin/event")
             .statusCode(200)
             .body(containsString("href=\"/admin/event/${event.id}/edit\""))
+    }
+
+    @Test
+    @DisplayName("GOOGLE_FORM 이벤트 수정 화면은 유형을 읽기 전용으로 보이고 구글폼 링크 입력에 현재 값을 채운다")
+    fun `event editPage - 구글폼 유형`() {
+        val event = saveTypedEvent(EventType.GOOGLE_FORM, FORM_URL)
+
+        getPage("/admin/event/${event.id}/edit")
+            .statusCode(200)
+            .body(containsString("id=\"eventType\" value=\"구글폼 제출\" data-event-type=\"GOOGLE_FORM\" readonly"))
+            .body(containsString("id=\"googleFormUrl\" maxlength=\"500\" value=\"$FORM_URL\""))
+            .body(not(containsString("id=\"attendance-period-notice\"")))
+    }
+
+    @Test
+    @DisplayName("GENERAL 이벤트 수정 화면에는 구글폼 링크 입력이 없고, 출석체크 이벤트는 기간 변경 경고를 띄운다")
+    fun `event editPage - 일반과 출석체크 유형`() {
+        val general = saveTypedEvent(EventType.GENERAL, null)
+        val attendance = saveTypedEvent(EventType.ATTENDANCE, null)
+
+        getPage("/admin/event/${general.id}/edit")
+            .statusCode(200)
+            .body(containsString("value=\"일반 이벤트(앱 안 참여 없음)\" data-event-type=\"GENERAL\" readonly"))
+            .body(not(containsString("id=\"googleFormUrl\"")))
+            .body(not(containsString("id=\"attendance-period-notice\"")))
+        getPage("/admin/event/${attendance.id}/edit")
+            .statusCode(200)
+            .body(containsString("data-event-type=\"ATTENDANCE\" readonly"))
+            .body(containsString("id=\"attendance-period-notice\""))
+            .body(not(containsString("id=\"googleFormUrl\"")))
     }
 
     @Test
@@ -175,11 +206,29 @@ class AdminEditViewControllerTest : BaseControllerTest() {
             .header("Location", endsWith("/admin/login"))
     }
 
+    private fun saveTypedEvent(type: EventType, googleFormUrl: String?): EventJpaEntity {
+        return eventJpaRepository.save(
+            EventJpaEntity(
+                title = "${type.name} 이벤트",
+                startedAt = LocalDateTime.of(2026, 12, 1, 0, 0),
+                expiredAt = LocalDateTime.of(2026, 12, 7, 23, 59, 59),
+                status = EventStatusType.ACTIVE,
+                thumbnailUrl = "https://test-bucket.s3.amazonaws.com/e/thumb.jpg",
+                type = type,
+                googleFormUrl = googleFormUrl
+            )
+        )
+    }
+
     private fun getPage(path: String): ValidatableResponse {
         return RestAssured.given()
             .sessionId(adminSessionId)
             .`when`()
             .get(path)
             .then()
+    }
+
+    companion object {
+        private const val FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSc_example/viewform"
     }
 }

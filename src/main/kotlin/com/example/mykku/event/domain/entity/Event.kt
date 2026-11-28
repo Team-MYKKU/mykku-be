@@ -3,21 +3,25 @@ package com.example.mykku.event.domain.entity
 import com.example.mykku.event.domain.vo.EventContent
 import com.example.mykku.event.domain.vo.EventId
 import com.example.mykku.event.domain.vo.EventStatusType
+import com.example.mykku.event.domain.vo.EventType
+import com.example.mykku.event.domain.vo.GoogleFormUrl
 import com.example.mykku.event.exception.EventException
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 
 class Event private constructor(
     val id: EventId,
+    val type: EventType,
     title: String,
     subTitle: String?,
     description: String?,
     startedAt: LocalDateTime,
     expiredAt: LocalDateTime,
     thumbnailUrl: String,
+    googleFormUrl: String?,
     private var _status: EventStatusType,
     val createdAt: LocalDateTime,
-    updatedAt: LocalDateTime
+    updatedAt: LocalDateTime = createdAt
 ) {
     var title: String = title
         private set
@@ -37,6 +41,9 @@ class Event private constructor(
     var thumbnailUrl: String = thumbnailUrl
         private set
 
+    var googleFormUrl: String? = googleFormUrl
+        private set
+
     var updatedAt: LocalDateTime = updatedAt
         private set
 
@@ -46,11 +53,13 @@ class Event private constructor(
     fun update(content: EventContent, thumbnailUrl: String?) {
         validatePeriod(content.startedAt, content.expiredAt)
         validatePeriodEditable(content.startedAt, content.expiredAt)
+        validateTypeSetting(type, content.googleFormUrl)
         title = content.title
         subTitle = content.subTitle
         description = content.description
         startedAt = content.startedAt
         expiredAt = content.expiredAt
+        googleFormUrl = content.googleFormUrl
         thumbnailUrl?.let { this.thumbnailUrl = it }
         updatedAt = LocalDateTime.now()
     }
@@ -85,26 +94,35 @@ class Event private constructor(
             }
         }
 
+        fun validateTypeSetting(type: EventType, googleFormUrl: String?) {
+            val requiresGoogleFormUrl = type == EventType.GOOGLE_FORM
+            if (requiresGoogleFormUrl != (googleFormUrl != null)) throw EventException.invalidEventTypeSetting()
+            googleFormUrl?.let { GoogleFormUrl.of(it) }
+        }
+
         fun create(
             title: String,
             subTitle: String?,
             description: String?,
             startedAt: LocalDateTime,
             expiredAt: LocalDateTime,
-            thumbnailUrl: String
+            thumbnailUrl: String,
+            type: EventType,
+            googleFormUrl: String?
         ): Event {
-            val now = LocalDateTime.now()
+            validateTypeSetting(type, googleFormUrl)
             return Event(
                 id = EventId(0),
+                type = type,
                 title = title,
                 subTitle = subTitle,
                 description = description,
                 startedAt = startedAt,
                 expiredAt = expiredAt,
                 thumbnailUrl = thumbnailUrl,
+                googleFormUrl = googleFormUrl,
                 _status = EventStatusType.ACTIVE,
-                createdAt = now,
-                updatedAt = now
+                createdAt = LocalDateTime.now()
             )
         }
 
@@ -116,18 +134,22 @@ class Event private constructor(
             startedAt: LocalDateTime,
             expiredAt: LocalDateTime,
             thumbnailUrl: String,
+            type: EventType,
+            googleFormUrl: String?,
             status: EventStatusType,
             createdAt: LocalDateTime,
             updatedAt: LocalDateTime
         ): Event {
             return Event(
                 id = id,
+                type = type,
                 title = title,
                 subTitle = subTitle,
                 description = description,
                 startedAt = startedAt,
                 expiredAt = expiredAt,
                 thumbnailUrl = thumbnailUrl,
+                googleFormUrl = googleFormUrl,
                 _status = status,
                 createdAt = createdAt,
                 updatedAt = updatedAt

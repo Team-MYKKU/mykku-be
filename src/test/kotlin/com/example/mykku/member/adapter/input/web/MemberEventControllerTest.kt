@@ -8,11 +8,17 @@ import com.example.mykku.event.adapter.output.persistence.repository.EventJpaRep
 import com.example.mykku.event.adapter.output.persistence.repository.EventParticipationJpaRepository
 import com.example.mykku.event.adapter.output.persistence.repository.EventWinnerJpaRepository
 import com.example.mykku.event.domain.vo.EventStatusType
+import com.example.mykku.event.domain.vo.EventType
+import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
+import com.example.mykku.util.ResponseMaps
 import io.restassured.RestAssured
+import org.assertj.core.api.Assertions.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.notNullValue
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDateTime
 
@@ -222,5 +228,46 @@ class MemberEventControllerTest : BaseControllerTest() {
             .get("/api/v1/members/me/events")
         .then()
             .statusCode(401)
+    }
+
+    @ParameterizedTest(name = "{0}")
+    @EnumSource(EventType::class)
+    @DisplayName("내가 참여한 이벤트 목록 조회 - 유형이 다른 이벤트도 같은 조건의 일반 이벤트와 같은 필드·값으로 응답한다")
+    fun `getMyParticipatedEvents - 유형과 무관하게 같은 응답`(type: EventType) {
+        val member = createAndSaveMember()
+        val general = createAndSaveWonEvent(member, EventType.GENERAL)
+        val typed = createAndSaveWonEvent(member, type)
+
+        val content = RestAssured.given()
+            .header("Authorization", getBearerToken(member.id))
+            .`when`()
+            .get("/api/v1/members/me/events")
+            .then()
+            .statusCode(200)
+            .extract()
+            .jsonPath()
+            .getList<Map<String, Any?>>("data.content")
+
+        assertThat(content.map { it["id"] }).containsExactlyInAnyOrder(general.id!!.toInt(), typed.id!!.toInt())
+        assertThat(content.map { ResponseMaps.withoutKeys(it, setOf("id")) }.distinct()).hasSize(1)
+    }
+
+    private fun createAndSaveWonEvent(member: MemberJpaEntity, type: EventType): EventJpaEntity {
+        val event = eventJpaRepository.save(
+            EventJpaEntity(
+                title = "유형 비교 이벤트",
+                startedAt = LocalDateTime.of(2020, 1, 1, 0, 0),
+                expiredAt = LocalDateTime.of(2020, 1, 31, 23, 59, 59),
+                status = EventStatusType.WINNER_SELECTED,
+                thumbnailUrl = "https://example.com/thumbnail.jpg",
+                type = type,
+                googleFormUrl = "https://forms.gle/abc123".takeIf { type == EventType.GOOGLE_FORM }
+            )
+        )
+        val participation = eventParticipationJpaRepository.save(
+            EventParticipationJpaEntity(member = member, event = event)
+        )
+        eventWinnerJpaRepository.save(EventWinnerJpaEntity(event = event, participation = participation))
+        return event
     }
 }

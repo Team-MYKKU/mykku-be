@@ -47,4 +47,7 @@ interface EventJpaRepository : JpaRepository<EventJpaEntity, Long> {
     @Modifying(flushAutomatically = true)
     @Query("DELETE FROM EventJpaEntity e WHERE e.id = :id")
     fun deleteEventById(@Param("id") id: Long): Int
+
+    @Query("SELECT e.id AS id, e.type AS type FROM EventJpaEntity e WHERE e.id IN :ids")
+    fun findTypesByIdIn(@Param("ids") ids: List<Long>): List<EventTypeRow>
 }
