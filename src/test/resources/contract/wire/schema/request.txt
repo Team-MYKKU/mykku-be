@@ -97,6 +97,8 @@ expiredAt kotlin=expiredAt type=LocalDateTime default=none @DateTimeFormat(fallb
   @NotNull(message="종료일은 필수입니다")
 thumbnailImage kotlin=thumbnailImage type=file default=none
 images kotlin=images type=List<file>? default=none
+type kotlin=type type=enum[GENERAL,ATTENDANCE,GOOGLE_FORM,ENTRY] default=GENERAL
+googleFormUrl kotlin=googleFormUrl type=String? default=null
 
 ## PUT /admin/api/v1/events/{eventId} consumes=multipart/form-data model:form valid
 title kotlin=title type=String default=none
@@ -113,6 +115,7 @@ thumbnailImage kotlin=thumbnailImage type=file? default=null
 keepImageUrls kotlin=keepImageUrls type=List<String>? default=none
   @NotNull(message="유지할 이미지 목록(_keepImageUrls)은 필수입니다")
 newImages kotlin=newImages type=List<file>? default=null
+googleFormUrl kotlin=googleFormUrl type=String? default=null
 
 ## PUT /admin/api/v1/events/{eventId}/winner-announcement body:json valid
 title kotlin=title type=String default=none jackson-required=true

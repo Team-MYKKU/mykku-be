@@ -84,6 +84,7 @@ app EV104 400 application/json {"code":"EV104","message":"유지할 이미지 �
 app EV105 400 application/json {"code":"EV105","message":"당첨자를 선정한 뒤에는 이벤트 기간을 바꿀 수 없습니다"}
 app EV106 400 application/json {"code":"EV106","message":"당첨자로 지정할 수 없는 회원 아이디가 있습니다"}
 app EV107 400 application/json {"code":"EV107","message":"이벤트 시작일은 종료일보다 늦을 수 없습니다"}
+app EV109 400 application/json {"code":"EV109","message":"이벤트 유형 설정이 올바르지 않습니다"}
 app EV301 409 application/json {"code":"EV301","message":"이미 참여한 이벤트입니다"}
 app EV302 404 application/json {"code":"EV302","message":"이벤트 참여 정보를 찾을 수 없습니다"}
 app EV303 400 application/json {"code":"EV303","message":"해당 이벤트의 참여 정보가 아닙니다"}
@@ -247,6 +248,7 @@ admin-event EV104 400 application/json {"code":"EV104","message":"유지할 이�
 admin-event EV105 400 application/json {"code":"EV105","message":"당첨자를 선정한 뒤에는 이벤트 기간을 바꿀 수 없습니다"}
 admin-event EV106 400 application/json {"code":"EV106","message":"당첨자로 지정할 수 없는 회원 아이디가 있습니다","invalidMemberIds":["contract-probe-1","contract-probe-2"]}
 admin-event EV107 400 application/json {"code":"EV107","message":"이벤트 시작일은 종료일보다 늦을 수 없습니다"}
+admin-event EV109 400 application/json {"code":"EV109","message":"이벤트 유형 설정이 올바르지 않습니다"}
 admin-event EV301 409 application/json {"code":"EV301","message":"이미 참여한 이벤트입니다"}
 admin-event EV302 404 application/json {"code":"EV302","message":"이벤트 참여 정보를 찾을 수 없습니다"}
 admin-event EV303 400 application/json {"code":"EV303","message":"해당 이벤트의 참여 정보가 아닙니다"}
