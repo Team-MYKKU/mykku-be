@@ -1,0 +1,24 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 200 OK
+Content-Type: application/json
+
+{
+  "message" : "출석을 완료했습니다.",
+  "data" : {
+    "eventId" : 12,
+    "type" : "ATTENDANCE",
+    "isInProgress" : true,
+    "attendance" : {
+      "today" : "2026-11-24",
+      "periodStartDate" : "2026-11-21",
+      "periodEndDate" : "2026-11-27",
+      "hasAttendedToday" : true,
+      "isAttendable" : false,
+      "totalAttendanceDays" : 3,
+      "consecutiveAttendanceDays" : 3
+    },
+    "entry" : null
+  }
+}
+----
