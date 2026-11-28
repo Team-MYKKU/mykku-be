@@ -9,6 +9,7 @@ import org.springframework.web.method.support.HandlerMethodReturnValueHandler
 import org.springframework.web.servlet.mvc.method.annotation.HttpEntityMethodProcessor
 import org.springframework.web.servlet.mvc.method.annotation.ModelAndViewMethodReturnValueHandler
 import org.springframework.web.servlet.mvc.method.annotation.RequestResponseBodyMethodProcessor
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityReturnValueHandler
 import org.springframework.web.servlet.mvc.method.annotation.ViewNameMethodReturnValueHandler
 import kotlin.reflect.KType
 import kotlin.reflect.jvm.kotlinFunction
@@ -26,7 +27,7 @@ class ResponseBodies(
             ?.kotlinFunction
             ?.returnType
         return when (val handler = returnValueHandlers.firstOrNull { it.supportsReturnType(returnType) }) {
-            is HttpEntityMethodProcessor -> body(entityBody(returnType), declared?.arguments?.firstOrNull()?.type)
+            is HttpEntityMethodProcessor, is ResponseEntityReturnValueHandler -> body(entityBody(returnType), declared?.arguments?.firstOrNull()?.type)
             is RequestResponseBodyMethodProcessor -> body(ResolvableType.forMethodParameter(returnType), declared)
             is ViewNameMethodReturnValueHandler, is ModelAndViewMethodReturnValueHandler -> listOf("$ROOT view")
             else -> listOf("$ROOT ${handler?.javaClass?.simpleName ?: "unhandled"}")
