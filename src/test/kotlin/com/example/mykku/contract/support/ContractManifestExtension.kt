@@ -3,9 +3,15 @@ package com.example.mykku.contract.support
 import org.junit.jupiter.api.extension.BeforeAllCallback
 import org.junit.jupiter.api.extension.ExtensionContext
 
-class ContractManifestExtension : BeforeAllCallback {
+class ContractManifestExtension(
+    private val updateMode: ContractUpdateMode = ContractUpdateMode.fromEnvironment(),
+    private val updateLock: ContractUpdateLock = ContractUpdateLock.DEFAULT
+) : BeforeAllCallback {
 
     override fun beforeAll(context: ExtensionContext) {
+        if (updateMode.enabled) {
+            updateLock.hold()
+        }
         context.root.getStore(NAMESPACE).getOrComputeIfAbsent(ManifestRefresh::class.java.name) { ManifestRefresh() }
     }
 

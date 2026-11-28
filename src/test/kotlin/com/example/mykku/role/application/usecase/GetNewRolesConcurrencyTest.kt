@@ -44,6 +44,7 @@ class GetNewRolesConcurrencyTest : BaseControllerTest() {
     }
 
     private fun getNewRolesConcurrently(memberPk: Long): List<List<MemberRoleResult>> {
+        fillConnectionPool(THREAD_COUNT)
         val executor = Executors.newFixedThreadPool(THREAD_COUNT)
         val start = CountDownLatch(1)
         try {

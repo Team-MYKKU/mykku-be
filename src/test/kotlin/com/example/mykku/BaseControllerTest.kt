@@ -25,6 +25,8 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.ActiveProfiles
+import java.sql.Connection
+import javax.sql.DataSource
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -49,10 +51,22 @@ abstract class BaseControllerTest : BaseFixtureTest() {
     @Autowired
     private lateinit var feedImageFixtureRepository: FeedImageJpaRepository
 
+    @Autowired
+    private lateinit var connectionPoolDataSource: DataSource
+
     @BeforeEach
     fun baseSetUp() {
         RestAssured.port = port
         testImageUploadService.reset()
+    }
+
+    protected fun fillConnectionPool(connections: Int) {
+        val borrowed = mutableListOf<Connection>()
+        try {
+            repeat(connections) { borrowed.add(connectionPoolDataSource.connection) }
+        } finally {
+            borrowed.forEach { it.close() }
+        }
     }
 
     protected fun withdraw(member: MemberJpaEntity) {

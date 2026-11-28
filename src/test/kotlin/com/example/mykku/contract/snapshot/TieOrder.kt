@@ -1,6 +1,7 @@
 package com.example.mykku.contract.snapshot
 
 import org.springframework.jdbc.core.JdbcTemplate
+import java.math.BigDecimal
 import java.nio.charset.StandardCharsets.UTF_8
 import java.nio.file.Files
 import java.nio.file.Path
@@ -82,7 +83,7 @@ class StatementLog(private val jdbcTemplate: JdbcTemplate) {
 
     fun explain(title: String, statements: List<String>): String {
         if (statements.isEmpty()) {
-            return "### $title\nSELECT를 찾지 못했습니다(performance_schema 문장 기록을 켜지 못함)\n"
+            return "### $title\nSELECT를 찾지 못했습니다(performance_schema 문장 기록을 켜지 못했거나 같은 MySQL의 다른 실행이 껐음)\n"
         }
         return "### $title\n" + statements.joinToString("") { sql -> "SQL: $sql\n" + explainRows(sql) }
     }
@@ -115,12 +116,24 @@ class StatementLog(private val jdbcTemplate: JdbcTemplate) {
         jdbcTemplate.update("UPDATE $CONSUMERS SET ENABLED = ? WHERE NAME = ?", state, HISTORY_LONG)
     }
 
-    private fun selectsAfter(baseline: Map<Long, Long>): List<String> = jdbcTemplate.query(
-        "SELECT THREAD_ID, EVENT_ID, SQL_TEXT FROM performance_schema.$HISTORY_LONG " +
-            "WHERE LOWER(SQL_TEXT) LIKE 'select%' AND SQL_TEXT NOT LIKE '%performance_schema%' ORDER BY TIMER_START"
-    ) { row, _ -> Triple(row.getLong(1), row.getLong(2), row.getString(3)) }
-        .filter { it.second > (baseline[it.first] ?: 0L) }
-        .map { it.third }
+    private fun selectsAfter(baseline: Map<Long, Long>): List<String> = runCatching { recordedSelects() }
+        .getOrDefault(emptyList())
+        .filter { it.eventId > (baseline[it.threadId] ?: 0L) }
+        .sortedBy { it.timerStart }
+        .mapNotNull { it.sql }
+
+    private fun recordedSelects(): List<RecordedStatement> = jdbcTemplate.query(
+        "SELECT THREAD_ID, EVENT_ID, TIMER_START, SQL_TEXT FROM performance_schema.$HISTORY_LONG " +
+            "WHERE CURRENT_SCHEMA = DATABASE() AND LOWER(SQL_TEXT) LIKE 'select%' " +
+            "AND SQL_TEXT NOT LIKE '%performance_schema%'"
+    ) { row, _ -> RecordedStatement(row.getLong(1), row.getLong(2), row.getBigDecimal(3), row.getString(4)) }
+
+    private class RecordedStatement(
+        val threadId: Long,
+        val eventId: Long,
+        val timerStart: BigDecimal?,
+        val sql: String?
+    )
 
     private companion object {
         const val EXPLAIN_ROOT = "build/contract-actual/explain"

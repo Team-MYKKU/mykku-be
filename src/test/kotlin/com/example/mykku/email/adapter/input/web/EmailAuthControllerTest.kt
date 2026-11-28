@@ -16,6 +16,7 @@ import org.hamcrest.Matchers.notNullValue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import org.redisson.api.RedissonClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.crypto.password.PasswordEncoder
 
@@ -28,9 +29,12 @@ class EmailAuthControllerTest : BaseControllerTest() {
     @Autowired
     private lateinit var redisVerificationCodeManager: RedisVerificationCodeManager
 
+    @Autowired
+    private lateinit var redissonClient: RedissonClient
+
     @BeforeEach
     fun setUp() {
-        redisVerificationCodeManager.deleteReservationLock()
+        redissonClient.keys.deleteByPattern(VERIFICATION_KEYS)
     }
 
     @Test
@@ -404,5 +408,9 @@ class EmailAuthControllerTest : BaseControllerTest() {
         val role = roleJpaRepository.findByName("일반 덕후")
             ?: roleJpaRepository.save(RoleJpaEntity(name = "일반 덕후", description = "테스트용 칭호"))
         createAndSaveEmailMember(email, password, memberId, nickname, role)
+    }
+
+    private companion object {
+        const val VERIFICATION_KEYS = "email:verification:*"
     }
 }

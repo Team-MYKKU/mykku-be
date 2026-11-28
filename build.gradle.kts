@@ -65,10 +65,24 @@ allOpen {
     annotation("jakarta.persistence.Embeddable")
 }
 
+val contractUpdate = gradle.startParameter.projectProperties["contract.update"] ?: "false"
+val testForkSlots = 15
+val defaultTestForks = (Runtime.getRuntime().availableProcessors() / 2).coerceIn(1, testForkSlots / 2)
+val testForks = if (contractUpdate.toBoolean()) {
+    1
+} else {
+    providers.gradleProperty("testForks").map { parseTestForks(it) }.getOrElse(defaultTestForks)
+}
+
+fun parseTestForks(value: String): Int = requireNotNull(value.toIntOrNull()?.takeIf { it in 1..testForkSlots }) {
+    "-PtestForks는 1~$testForkSlots 사이 정수여야 합니다(fork마다 Redis DB 1~$testForkSlots 중 하나를 씁니다): '$value'"
+}
+
 tasks.withType<Test> {
     useJUnitPlatform()
+    maxParallelForks = testForks
     systemProperty("user.timezone", "Asia/Seoul")
-    systemProperty("contract.update", gradle.startParameter.projectProperties["contract.update"] ?: "false")
+    systemProperty("contract.update", contractUpdate)
     outputs.dir("build/generated-snippets")
     inputs.files(fileTree("mykku-be-config/templates"))
         .withPropertyName("adminTemplates")
@@ -83,6 +97,32 @@ tasks.withType<Test> {
     testLogging {
         events(org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED)
         exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+    }
+    addTestListener(FailedForkClassOrder(logger))
+}
+
+class FailedForkClassOrder(private val logger: Logger) : TestListener {
+
+    private val classesByFork = mutableMapOf<String, MutableList<String>>()
+
+    override fun beforeSuite(suite: TestDescriptor) {
+        val fork = suite.parent?.name?.takeIf { it.startsWith(FORK_PREFIX) } ?: return
+        suite.className?.let { classesByFork.getOrPut(fork) { mutableListOf() }.add(it) }
+    }
+
+    override fun afterSuite(suite: TestDescriptor, result: TestResult) {
+        if (suite.name.startsWith(FORK_PREFIX) && result.failedTestCount > 0) {
+            val classes = classesByFork[suite.name].orEmpty()
+            logger.lifecycle("${suite.name} 실패 ${result.failedTestCount}건, 이 fork의 클래스 순서: $classes")
+        }
+    }
+
+    override fun beforeTest(testDescriptor: TestDescriptor) {}
+
+    override fun afterTest(testDescriptor: TestDescriptor, result: TestResult) {}
+
+    private companion object {
+        const val FORK_PREFIX = "Gradle Test Executor"
     }
 }
 
