@@ -1,8 +1,8 @@
 # 라이브러리 버전
-spring-boot 3.4.5
-spring-framework 6.2.6
-tomcat Apache Tomcat/10.1.40
-hibernate-validator 8.0.2.Final
+spring-boot 3.5.16
+spring-framework 6.2.19
+tomcat Apache Tomcat/10.1.55
+hibernate-validator 8.0.3.Final
 
 # 메시지 컨버터(핸들러 어댑터, 테스트 클래스패스 전용 ProjectingJackson2HttpMessageConverter 제외)
 1 ByteArrayHttpMessageConverter types=[application/octet-stream, */*] charset=-
