@@ -171,7 +171,8 @@ data class PagedMyAwardEventsResult(
 
 data class EventDeletionSummaryResult(
     val participationCount: Int,
-    val winnerCount: Int
+    val winnerCount: Int,
+    val attendanceCount: Int
 )
 
 data class EventEditResult(

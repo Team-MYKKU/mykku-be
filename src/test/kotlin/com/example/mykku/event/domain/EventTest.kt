@@ -3,6 +3,7 @@ package com.example.mykku.event.domain
 import com.example.mykku.event.domain.entity.Event
 import com.example.mykku.event.domain.vo.EventContent
 import com.example.mykku.event.domain.vo.EventId
+import com.example.mykku.event.domain.vo.EventPhase
 import com.example.mykku.event.domain.vo.EventStatusType
 import com.example.mykku.event.domain.vo.EventType
 import com.example.mykku.event.exception.EventErrorCode
@@ -14,7 +15,10 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.CsvSource
 import org.junit.jupiter.params.provider.EnumSource
+import org.junit.jupiter.params.provider.ValueSource
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 @DisplayName("Event 도메인 엔티티 테스트")
@@ -416,6 +420,157 @@ class EventTest {
             )
         }
     }
+
+    @Nested
+    @DisplayName("출석 기간 날짜")
+    inner class AttendancePeriodOfEvent {
+
+        @Test
+        @DisplayName("종료가 00:00이면 기간 날짜는 전날까지다")
+        fun `기간 날짜 - 자정 종료`() {
+            val period = eventBetween("2026-12-01T00:00", "2026-12-08T00:00").attendancePeriod()
+
+            assertThat(period.isEmpty).isFalse()
+            assertThat(period.startDate).isEqualTo(LocalDate.of(2026, 12, 1))
+            assertThat(period.endDate).isEqualTo(LocalDate.of(2026, 12, 7))
+        }
+
+        @ParameterizedTest(name = "{displayName} [{0}]")
+        @ValueSource(strings = ["2026-12-07T18:00", "2026-12-07T23:59:59", "2026-12-07T00:00:00.000000001"])
+        @DisplayName("종료가 그날 00:00 뒤면 기간 날짜는 그날까지다")
+        fun `기간 날짜 - 자정이 아닌 종료`(expiredAt: String) {
+            val period = eventBetween("2026-12-01T10:00", expiredAt).attendancePeriod()
+
+            assertThat(period.startDate).isEqualTo(LocalDate.of(2026, 12, 1))
+            assertThat(period.endDate).isEqualTo(LocalDate.of(2026, 12, 7))
+        }
+
+        @ParameterizedTest(name = "{displayName} [{0}]")
+        @ValueSource(strings = ["2026-12-01T00:00", "2026-12-01T10:00"])
+        @DisplayName("시작과 종료가 같으면 00:00이든 10:00이든 기간 날짜가 비어 있다")
+        fun `기간 날짜 - 시작과 종료가 같으면 비어 있음`(startedAt: String) {
+            val period = eventBetween(startedAt, startedAt).attendancePeriod()
+
+            assertThat(period.isEmpty).isTrue()
+            assertThat(period.startDate).isNull()
+            assertThat(period.endDate).isNull()
+            assertThat(period.contains(LocalDate.of(2026, 12, 1))).isFalse()
+        }
+
+        @ParameterizedTest(name = "{displayName} [{0} ~ {1}]")
+        @CsvSource("2026-12-01T10:00, 2026-12-01T09:00", "2026-12-05T00:00, 2026-12-03T00:00")
+        @DisplayName("시작이 종료보다 늦게 저장된 기간(검증 없는 복원)도 기간 날짜가 비어 있다")
+        fun `기간 날짜 - 시작이 종료보다 늦으면 비어 있음`(startedAt: String, expiredAt: String) {
+            val period = eventBetween(startedAt, expiredAt).attendancePeriod()
+
+            assertThat(period.isEmpty).isTrue()
+            assertThat(period.startDate).isNull()
+            assertThat(period.contains(LocalDate.of(2026, 12, 1))).isFalse()
+            assertThat(period.contains(LocalDate.of(2026, 12, 4))).isFalse()
+        }
+
+        @Test
+        @DisplayName("마지막 날은 종료 시각에서 1나노초를 뺀 날짜다")
+        fun `기간 날짜 - 종료 1나노초 전`() {
+            val justAfterMidnight = eventBetween("2026-12-01T00:00", "2026-12-08T00:00:00.000000001")
+            val oneNanoLong = eventBetween("2026-12-07T23:59:59.999999999", "2026-12-08T00:00")
+
+            assertThat(justAfterMidnight.attendancePeriod().endDate).isEqualTo(LocalDate.of(2026, 12, 8))
+            assertThat(oneNanoLong.attendancePeriod().startDate).isEqualTo(LocalDate.of(2026, 12, 7))
+            assertThat(oneNanoLong.attendancePeriod().endDate).isEqualTo(LocalDate.of(2026, 12, 7))
+        }
+
+        @Test
+        @DisplayName("기간 날짜는 양 끝을 포함한다")
+        fun `기간 날짜 - 양 끝 포함`() {
+            val period = eventBetween("2026-12-01T10:00", "2026-12-07T18:00").attendancePeriod()
+
+            assertThat(period.contains(LocalDate.of(2026, 11, 30))).isFalse()
+            assertThat(period.contains(LocalDate.of(2026, 12, 1))).isTrue()
+            assertThat(period.contains(LocalDate.of(2026, 12, 7))).isTrue()
+            assertThat(period.contains(LocalDate.of(2026, 12, 8))).isFalse()
+        }
+
+        @Test
+        @DisplayName("기간을 고치면 기간 날짜도 새 기간으로 다시 계산한다(D13)")
+        fun `기간 날짜 - 기간 수정 뒤 다시 계산`() {
+            val event = eventBetween("2026-12-01T00:00", "2026-12-08T00:00")
+            val content = EventContent("제목", null, null, at("2026-12-03T00:00"), at("2026-12-05T12:00"), null)
+
+            event.update(content, null)
+
+            assertThat(event.attendancePeriod().startDate).isEqualTo(LocalDate.of(2026, 12, 3))
+            assertThat(event.attendancePeriod().endDate).isEqualTo(LocalDate.of(2026, 12, 5))
+        }
+    }
+
+    @Nested
+    @DisplayName("진행 상태(phase)")
+    inner class PhaseAt {
+
+        private val event = eventBetween("2026-12-01T10:00", "2026-12-07T18:00")
+
+        @ParameterizedTest(name = "{displayName} [{0} → {1}]")
+        @CsvSource(
+            "2026-12-01T09:59:59.999999999, BEFORE",
+            "2026-12-01T10:00, IN_PROGRESS",
+            "2026-12-07T17:59:59.999999999, IN_PROGRESS",
+            "2026-12-07T18:00, ENDED",
+            "2026-12-08T00:00, ENDED"
+        )
+        @DisplayName("시작 시각은 진행 중에 포함하고 종료 시각은 포함하지 않는다")
+        fun `진행 상태 - 시작 포함 종료 배타`(now: String, phase: EventPhase) {
+            assertThat(event.phaseAt(at(now))).isEqualTo(phase)
+        }
+
+        @ParameterizedTest(name = "{displayName} [{0} → {1}]")
+        @CsvSource("2026-12-01T09:59:59.999999999, BEFORE", "2026-12-01T10:00, ENDED", "2026-12-02T00:00, ENDED")
+        @DisplayName("시작과 종료가 같으면 진행 중인 순간이 없다")
+        fun `진행 상태 - 시작과 종료가 같음`(now: String, phase: EventPhase) {
+            val instantEvent = eventBetween("2026-12-01T10:00", "2026-12-01T10:00")
+
+            assertThat(instantEvent.phaseAt(at(now))).isEqualTo(phase)
+        }
+
+        @ParameterizedTest(name = "{displayName} [{0}]")
+        @ValueSource(strings = ["2026-11-30T00:00", "2026-12-01T09:30", "2026-12-01T10:00", "2026-12-04T00:00"])
+        @DisplayName("시작이 종료보다 늦게 저장된 기간에는 진행 중인 순간이 없다")
+        fun `진행 상태 - 시작이 종료보다 늦음`(now: String) {
+            val sameDay = eventBetween("2026-12-01T10:00", "2026-12-01T09:00")
+            val acrossDays = eventBetween("2026-12-05T00:00", "2026-12-03T00:00")
+
+            assertThat(sameDay.phaseAt(at(now))).isNotEqualTo(EventPhase.IN_PROGRESS)
+            assertThat(acrossDays.phaseAt(at(now))).isNotEqualTo(EventPhase.IN_PROGRESS)
+        }
+
+        @Test
+        @DisplayName("저장 status가 ACTIVE든 WINNER_SELECTED든 진행 상태는 기간과 시각으로만 정한다")
+        fun `진행 상태 - 저장 status와 무관`() {
+            val selected = eventBetween("2026-12-01T10:00", "2026-12-07T18:00")
+            selected.updateStatus(EventStatusType.WINNER_SELECTED)
+
+            assertThat(selected.phaseAt(at("2026-12-03T10:00"))).isEqualTo(EventPhase.IN_PROGRESS)
+        }
+    }
+
+    private fun eventBetween(startedAt: String, expiredAt: String): Event {
+        return Event.reconstitute(
+            id = EventId(1L),
+            title = "출석 이벤트",
+            subTitle = null,
+            description = null,
+            startedAt = at(startedAt),
+            expiredAt = at(expiredAt),
+            thumbnailUrl = "https://example.com/thumbnail.jpg",
+            type = EventType.ATTENDANCE,
+            googleFormUrl = null,
+            status = EventStatusType.ACTIVE,
+            createdAt = at(startedAt),
+            updatedAt = at(startedAt)
+        )
+    }
+
+    private fun at(value: String): LocalDateTime = LocalDateTime.parse(value)
 
     private fun createEvent(type: EventType, googleFormUrl: String?): Event {
         return Event.create(

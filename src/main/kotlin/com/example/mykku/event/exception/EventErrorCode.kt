@@ -22,6 +22,7 @@ enum class EventErrorCode(
     ALREADY_PARTICIPATED("EV301", HttpStatus.CONFLICT, "이미 참여한 이벤트입니다"),
     EVENT_PARTICIPATION_NOT_FOUND("EV302", HttpStatus.NOT_FOUND, "이벤트 참여 정보를 찾을 수 없습니다"),
     PARTICIPATION_NOT_BELONG_TO_EVENT("EV303", HttpStatus.BAD_REQUEST, "해당 이벤트의 참여 정보가 아닙니다"),
+    ALREADY_ATTENDED_TODAY("EV304", HttpStatus.CONFLICT, "오늘은 이미 출석했습니다"),
 
     EMPTY_WINNERS("EV401", HttpStatus.BAD_REQUEST, "당첨자 목록은 비어있을 수 없습니다"),
     DUPLICATE_WINNER("EV402", HttpStatus.BAD_REQUEST, "중복된 당첨자가 있습니다"),

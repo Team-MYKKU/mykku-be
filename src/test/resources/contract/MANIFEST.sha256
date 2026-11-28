@@ -1,4 +1,4 @@
-base 99316f91ef775d50cf57b6ab7864acd260919db8
+base 54fd982e0eaa5869fb75d7422bd8de450b1d8618
 0fb35278cdaa94f77b1062032e6b16b1f25385cede3580351f0eadb1bdce7b3e  docs/snippets/auth/logout/200/request-fields.adoc
 ffb9e76d9fb250f8f31b2dd22d0dbc8c71323d3dff6b69f718bb5705ee090bc5  docs/snippets/auth/logout/200/request-headers.adoc
 28b332f02c34c04b5f4b0625f09e6b4d3e914bf655461e57afa927a9d311977b  docs/snippets/auth/logout/200/response-fields.adoc
@@ -783,7 +783,7 @@ c5cdf1f866d7e81c1675631c489cf800eb4c2bb43c2bc708367afa91fe1aebe2  wire/error-cod
 cee5a89a203266ca191a4dfe722e54c148437060c652be1c171d365cda457fbf  wire/error-codes/by-domain-contest.http
 263c6b645d95d28dfdcb839a69f9c0d5dd1a9e551966f5aa9812fae5b34e3954  wire/error-codes/by-domain-dailyMessage.http
 3d6432439a89fc26864bc5541c75097f491fbc8e90a9d74e48b9e0137de1b345  wire/error-codes/by-domain-email.http
-63b734c46680a2fbee4e04e82697d765abd4d8c53598b0e46c8f4952a6c27522  wire/error-codes/by-domain-event.http
+39cdab68cc5ed931c8fefcbe8b30021e109ace5e9834e93cbf3aeebbd698a31e  wire/error-codes/by-domain-event.http
 682eb4b589ae9f156bf4fb6b17dab4d248fa636d5844315c8064274bf183441f  wire/error-codes/by-domain-fanNote.http
 7162d9e4276133eb3d0d9fb2d5065a1c4f9d61d1605324ad254c128cbdbc9a1f  wire/error-codes/by-domain-feed.http
 4fabeed02b09b6328c034ef36a580f17272bae33e6885f99b60c37bda69b075a  wire/error-codes/by-domain-image.http
@@ -795,8 +795,8 @@ f31eb61eb28f7df224f4c6147812115a58f539ab94e6e43587d427dfeb0197f7  wire/error-cod
 838aedd95dbcb1f1399e8e3cbf1f045316df31f30df83b31dff729b58b53b88b  wire/error-codes/by-domain-role.http
 508bc1b1d41b4db2c46cd27d95943f0aec0cc9ed3dcb8331858201dbeb77db50  wire/error-codes/by-domain-unknown.http
 3781eecc9ff40cc9fcc2651ad21bf7d9143e6310c8bd49d91ddc4c7c2bbc31d2  wire/error-codes/domains.http
-41d8f7074c3dafe51f7d1308a9ba20e4a6aebdb9e616ca03a150e866f922463b  wire/error-codes/list.http
-234a6212ad829a490a68e62e8d1a8bc29ec830036988d24cdb410296c8f886a9  wire/error-codes/responses.txt
+1512a34f79af8d172bdcfd71990ed37bdd144c773b74da50c27fc33697d5c148  wire/error-codes/list.http
+e4e41b9e876ce02dfb341d49da6674063e53a8d09c16f4ab9e3b510d822dc23f  wire/error-codes/responses.txt
 20ec732ada49fb3a232bb5434f89f96e933fc8a971d54e979c9151af96f85e88  wire/errors/framework-http.txt
 d4a486dabfd8a5006639b6153bf8599bfc26d9dd5fd057c4fe584442e621b473  wire/errors/framework-mapping.txt
 fab0162490a430a8341fbddb20d4c5763a6dd7215e02ce5202328fae4e6bc577  wire/gray-zone/framework-http.txt
@@ -1105,7 +1105,7 @@ c50b272bfbbe34586947bc92336c100de57bea9f0a9e85daf686dc50c6bf83ae  wire/snippets/
 923460743d7e65d110086495616023a312037d83fa771b214130232af20717ca  wire/snippets/error-code/domains/200/http-request.adoc
 5facf3d817105ebfb1c11b0114eef7f4d01093a4bc386aa6861e3de0c4071d8c  wire/snippets/error-code/domains/200/http-response.adoc
 531748d988a8c68641e848e114911485d3492211ba1f4a5713edc85fe6f33e2c  wire/snippets/error-code/list/200/http-request.adoc
-68dec46b6a0a47f83c2e4ec9e60ba3500ef12cb8bb15ac9308fd2b88dc4e69fe  wire/snippets/error-code/list/200/http-response.adoc
+41fb145a68b9204859e77bb37da7ee63558ca52c958b5f9b102244679ef18549  wire/snippets/error-code/list/200/http-response.adoc
 b3842d253c51f274fa725597ed55cdc3403b65b7c507dbc85c5979464f2df7a5  wire/snippets/event-winner/announcement/200/http-request.adoc
 a5d19e2956be3e5349daeea2f9d262a453283e6de1d8198f1af0c1054d72a418  wire/snippets/event-winner/announcement/200/http-response.adoc
 7d49ff9d47a96f1463a90e66ac949f818c8511c74a41979729abec487e0e7e38  wire/snippets/event-winner/announcement/EVENT_NOT_FOUND/http-request.adoc

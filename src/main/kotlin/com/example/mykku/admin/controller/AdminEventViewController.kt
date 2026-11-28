@@ -37,8 +37,10 @@ class AdminEventViewController(
     ): String {
         val events = adminEventService.findAll(page, size, status)
         val eventIds = events.content.map { it.id }
+        val deletionSummaries = getEventDeletionSummariesUseCase.execute(eventIds)
         model.addAttribute("events", events)
-        model.addAttribute("deletionSummaries", getEventDeletionSummariesUseCase.execute(eventIds))
+        model.addAttribute("deletionSummaries", deletionSummaries)
+        model.addAttribute("attendanceCountById", deletionSummaries.mapValues { it.value.attendanceCount })
         model.addAttribute("eventTypeById", getEventTypesByIdsUseCase.execute(eventIds))
         model.addAttribute("currentStatus", status)
         return "admin/event/list"

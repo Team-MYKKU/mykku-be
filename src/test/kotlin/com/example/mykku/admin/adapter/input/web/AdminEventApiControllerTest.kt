@@ -1,5 +1,9 @@
 package com.example.mykku.admin.adapter.input.web
 
+import ch.qos.logback.classic.Level
+import ch.qos.logback.classic.Logger
+import ch.qos.logback.classic.spi.ILoggingEvent
+import ch.qos.logback.core.read.ListAppender
 import com.example.mykku.BaseControllerTest
 import com.example.mykku.admin.exception.AdminErrorCode
 import com.example.mykku.common.exception.CommonErrorCode
@@ -7,6 +11,7 @@ import com.example.mykku.event.adapter.output.persistence.entity.EventImageJpaEn
 import com.example.mykku.event.adapter.output.persistence.entity.EventJpaEntity
 import com.example.mykku.event.adapter.output.persistence.repository.EventImageJpaRepository
 import com.example.mykku.event.adapter.output.persistence.repository.EventJpaRepository
+import com.example.mykku.event.application.usecase.DeleteEventUseCaseImpl
 import com.example.mykku.event.domain.vo.EventStatusType
 import com.example.mykku.event.domain.vo.EventType
 import com.example.mykku.event.exception.EventErrorCode
@@ -29,6 +34,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.ValueSource
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.jdbc.core.JdbcTemplate
 import java.time.LocalDateTime
@@ -380,29 +386,15 @@ class AdminEventApiControllerTest : BaseControllerTest() {
     }
 
     @Test
-    @DisplayName("이벤트 삭제 - 참여·당첨·공지·이미지를 함께 지운다")
+    @DisplayName("이벤트 삭제 - 참여·당첨·공지·이미지·출석을 함께 지운다")
     fun `delete - 딸린 기록을 함께 지운다`() {
         val adminSessionId = getAdminSessionId()
-        createAndSaveMember(memberId = "memberA", email = "a@example.com", socialId = "a1")
+        val member = createAndSaveMember(memberId = "memberA", email = "a@example.com", socialId = "a1")
         val event = createAndSaveEvent()
-        putWinners(adminSessionId, event.id!!, listOf("memberA")).statusCode(200)
-        jdbcTemplate.update(
-            "INSERT INTO event_image (url, order_index, event_id, created_at, updated_at) " +
-                "VALUES ('https://test-bucket.s3.amazonaws.com/e.jpg', 0, ?, NOW(), NOW())",
-            event.id
-        )
-        RestAssured.given()
-            .sessionId(adminSessionId)
-            .contentType(ContentType.JSON)
-            .body(mapOf("title" to "발표", "content" to "축하합니다", "announcedAt" to "2025-10-10"))
-            .`when`()
-            .put("/admin/api/v1/events/{eventId}/winner-announcement", event.id)
-            .then()
-            .statusCode(200)
+        seedChildRows(adminSessionId, event.id!!, member.id)
+        EVENT_CHILD_TABLES.forEach { assertThat(countByEvent(it, event.id!!)).`as`(it).isPositive() }
 
-        RestAssured.given()
-            .sessionId(adminSessionId)
-            .`when`()
+        RestAssured.given().sessionId(adminSessionId).`when`()
             .delete("/admin/api/v1/events/{eventId}", event.id)
             .then()
             .statusCode(200)
@@ -410,6 +402,26 @@ class AdminEventApiControllerTest : BaseControllerTest() {
 
         EVENT_CHILD_TABLES.forEach { assertThat(countByEvent(it, event.id!!)).`as`(it).isZero() }
         assertThat(eventJpaRepository.existsById(event.id!!)).isFalse()
+    }
+
+    @Test
+    @DisplayName("이벤트 삭제 - 삭제 로그에 참여·당첨·출석 기록 수를 남기고, 기록이 없으면 0이다")
+    fun `delete - 삭제 로그의 기록 수`() {
+        val adminSessionId = getAdminSessionId()
+        val member = createAndSaveMember(memberId = "memberA", email = "a@example.com", socialId = "a1")
+        val attended = createAndSaveEvent()
+        val empty = createAndSaveEvent(title = "출석 없는 이벤트")
+        putWinners(adminSessionId, attended.id!!, listOf("memberA")).statusCode(200)
+        insertAttendance(attended.id!!, member.id, "2026-12-01")
+        insertAttendance(attended.id!!, member.id, "2026-12-02")
+
+        val messages = captureInfoLogs(DeleteEventUseCaseImpl::class.java) {
+            listOf(attended, empty).forEach { deleteEvent(adminSessionId, it.id!!) }
+        }
+
+        assertThat(messages).hasSize(2)
+        assertThat(messages[0]).contains("id=${attended.id}, ", "participations=1, winners=1, attendances=2, ")
+        assertThat(messages[1]).contains("id=${empty.id}, ", "participations=0, winners=0, attendances=0, ")
     }
 
     @Test
@@ -627,6 +639,51 @@ class AdminEventApiControllerTest : BaseControllerTest() {
         ).associate { it["member_id"] as String? to (it["winner_id"] as Number).toLong() }
     }
 
+    private fun seedChildRows(adminSessionId: String, eventId: Long, memberPk: Long) {
+        putWinners(adminSessionId, eventId, listOf("memberA")).statusCode(200)
+        jdbcTemplate.update(
+            "INSERT INTO event_image (url, order_index, event_id, created_at, updated_at) " +
+                "VALUES ('https://test-bucket.s3.amazonaws.com/e.jpg', 0, ?, NOW(), NOW())",
+            eventId
+        )
+        RestAssured.given()
+            .sessionId(adminSessionId)
+            .contentType(ContentType.JSON)
+            .body(mapOf("title" to "발표", "content" to "축하합니다", "announcedAt" to "2025-10-10"))
+            .`when`()
+            .put("/admin/api/v1/events/{eventId}/winner-announcement", eventId)
+            .then()
+            .statusCode(200)
+        insertAttendance(eventId, memberPk, "2026-12-01")
+    }
+
+    private fun insertAttendance(eventId: Long, memberPk: Long, date: String) {
+        jdbcTemplate.update(
+            "INSERT INTO event_attendance (event_id, member_id, attendance_date, created_at, updated_at) " +
+                "VALUES (?, ?, ?, NOW(6), NOW(6))",
+            eventId,
+            memberPk,
+            date
+        )
+    }
+
+    private fun deleteEvent(adminSessionId: String, eventId: Long) {
+        RestAssured.given().sessionId(adminSessionId).`when`()
+            .delete("/admin/api/v1/events/{eventId}", eventId).then().statusCode(200)
+    }
+
+    private fun captureInfoLogs(source: Class<*>, action: () -> Unit): List<String> {
+        val logger = LoggerFactory.getLogger(source) as Logger
+        val appender = ListAppender<ILoggingEvent>().apply { start() }
+        logger.addAppender(appender)
+        try {
+            action()
+            return appender.list.filter { it.level == Level.INFO }.map { it.formattedMessage }
+        } finally {
+            logger.detachAppender(appender)
+        }
+    }
+
     private fun countByEvent(table: String, eventId: Long): Int {
         return jdbcTemplate.queryForObject("SELECT COUNT(*) FROM $table WHERE event_id = ?", Int::class.java, eventId)!!
     }
@@ -646,7 +703,8 @@ class AdminEventApiControllerTest : BaseControllerTest() {
             "event_participation",
             "event_winner",
             "event_winner_announcement",
-            "event_image"
+            "event_image",
+            "event_attendance"
         )
     }
 }

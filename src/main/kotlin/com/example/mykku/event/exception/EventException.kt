@@ -18,6 +18,8 @@ open class EventException(
             EventException(EventErrorCode.EVENT_PARTICIPATION_NOT_FOUND)
         fun participationNotBelongToEvent(): EventException =
             EventException(EventErrorCode.PARTICIPATION_NOT_BELONG_TO_EVENT)
+        fun alreadyAttendedToday(cause: Throwable? = null): EventException =
+            EventException(EventErrorCode.ALREADY_ATTENDED_TODAY, cause = cause)
         fun invalidKeepImageUrls(): EventException = EventException(EventErrorCode.INVALID_KEEP_IMAGE_URLS)
         fun periodLockedAfterWinnerSelected(): EventException =
             EventException(EventErrorCode.PERIOD_LOCKED_AFTER_WINNER_SELECTED)

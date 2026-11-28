@@ -2,6 +2,7 @@ package com.example.mykku.event.application.usecase
 
 import com.example.mykku.event.application.dto.EventDeletionSummaryResult
 import com.example.mykku.event.application.port.input.GetEventDeletionSummariesUseCase
+import com.example.mykku.event.application.port.output.EventAttendanceRepository
 import com.example.mykku.event.application.port.output.EventParticipationRepository
 import com.example.mykku.event.application.port.output.EventWinnerRepository
 import com.example.mykku.event.domain.vo.EventId
@@ -11,7 +12,8 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class GetEventDeletionSummariesUseCaseImpl(
     private val eventParticipationRepository: EventParticipationRepository,
-    private val eventWinnerRepository: EventWinnerRepository
+    private val eventWinnerRepository: EventWinnerRepository,
+    private val eventAttendanceRepository: EventAttendanceRepository
 ) : GetEventDeletionSummariesUseCase {
 
     @Transactional(readOnly = true)
@@ -19,8 +21,13 @@ class GetEventDeletionSummariesUseCaseImpl(
         val ids = eventIds.map { EventId.of(it) }
         val participationCounts = eventParticipationRepository.countByEventIds(ids)
         val winnerCounts = eventWinnerRepository.countByEventIds(ids)
+        val attendanceCounts = eventAttendanceRepository.countByEventIds(ids)
         return eventIds.associateWith {
-            EventDeletionSummaryResult(participationCounts[it] ?: 0, winnerCounts[it] ?: 0)
+            EventDeletionSummaryResult(
+                participationCount = participationCounts[it] ?: 0,
+                winnerCount = winnerCounts[it] ?: 0,
+                attendanceCount = attendanceCounts[it] ?: 0
+            )
         }
     }
 }
