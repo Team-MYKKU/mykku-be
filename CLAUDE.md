@@ -379,7 +379,7 @@ src/main/kotlin/com/example/mykku/
 - **스니펫 계약 골든**: `document()`로 만든 스니펫은 테스트가 끝나면 `src/test/resources/contract/{wire,docs}/snippets/<식별자>/` 골든과 비교된다 (아래 4. ContractTest)
   - 목 결과·요청 예시의 시각은 `docs/DocumentFixtureTime`(`NOW`·`NOW_MICROS`·`NOW_SECONDS`·`TODAY`)을 쓰고 `now()`를 쓰지 않는다
   - 기존 예시 값(목 결과·요청 예시)과 `document()` 식별자는 바꾸지 않는다. 설명 문구는 바꿔도 된다
-  - 새 식별자는 골든이 없어 '[새 계약 대상]'으로 실패한다. 0단계 PR이나 운영 코드를 바꾸기 전 커밋에서만 갱신 모드로 골든을 만든다
+  - 새 식별자는 골든이 없어 '[새 계약 대상]'으로 실패한다. 0단계 PR이나 운영 코드를 바꾸기 전 커밋에서만 갱신 모드로 골든을 만든다 (기능 PR은 아래 4. ContractTest의 '기능 PR' 항목을 따른다)
 - **참고**: Admin API (`/admin/**`)는 Document 테스트 작성하지 않음
 
 #### 3. UseCaseTest (단위 테스트)
@@ -399,7 +399,7 @@ src/main/kotlin/com/example/mykku/
   - P00c 골든은 여기에 더해 다음만 한다. `wire/errors/framework-mapping.txt`는 `handlerExceptionResolver`가 쓴 상태·Content-Type·본문을 그대로 한 줄에 쓴다(P00a `wire/error-codes/responses.txt`와 같은 형식). `wire/matrix/*`는 정규형 검사를 거친 JSON 본문을 compact 한 줄로 쓰고, JSON이 아닌 본문은 `\`·CR·LF를 이스케이프하고, 없는 Content-Type·본문은 `-`로 쓰고, 선택 인증 줄이 같은 엔드포인트의 익명 응답과 상태·Content-Type·본문이 같으면 `= none`으로 쓴다. `wire/headers/response-headers.txt`는 헤더 값 대신 상태, 전송 계층 헤더를 뺀 헤더 이름(대소문자 무시 이름순, 중복 유지), Content-Type 값, X-Request-ID 규칙(없음·보낸 값 그대로·생성값·보낸 값 대신 생성값, 보낸 값을 바꿔 돌려주면 그 값), 세션 ID만 `<SESSION:32HEX>`로 가린 Set-Cookie를 남긴다
 - **예외**: 응답 message 문자열 자체가 규약이므로 문자열 비교가 목적이다. 아래 'ErrorCode Enum 사용 필수' 규칙을 적용하지 않는다
 - **상속**: Spring 컨텍스트가 필요한 계약 테스트는 `BaseControllerTest`·`BaseDocumentTest`를 그대로 상속한다 (`@MockitoBean`·`@Import`를 더해 새 Spring 컨텍스트를 만들지 않는다). Spring 없이 골든을 쓰는 테스트는 `@ExtendWith(ContractManifestExtension::class)`를 단다
-- **골든 변경**: `contract/wire/**`·`contract/fixtures/**`의 기존 파일은 고치지 않는다. `contract/docs/**`는 wire 변경이 0인 문서 PR에서만 바꾼다. 승인된 규약 변경만 로컬에서 `./gradlew clean test -Pcontract.update=true`로 갱신한다 (CI에서는 갱신하면 실패)
+- **골든 변경**: `contract/wire/**`·`contract/fixtures/**`의 기존 파일은 고치지 않는다. `contract/docs/**`는 wire 변경이 0인 문서 PR에서만 바꾼다. 승인된 규약 변경만 로컬에서 `./gradlew clean test -Pcontract.update=true`로 갱신한다 (CI에서는 갱신하면 실패) (기능 PR은 바로 아래 '기능 PR' 항목을 따른다)
 - **기능 PR**: 앱과 합의한 새 엔드포인트·에러 코드·필드를 더하는 PR은 운영 코드 커밋 뒤 별도 커밋에서 갱신 모드로 골든을 만든다.
   - 새 식별자의 wire·docs 스니펫 골든은 이 커밋에서 추가할 수 있다.
   - 기존 집계 골든은 새 줄·새 블록·새 원소 추가만 허용한다. 대상은 `wire/endpoints/(app|admin).txt`, `wire/schema/(response|request).txt`, `wire/matrix/*.txt`, `wire/error-codes/(list.http|by-domain-event.http|responses.txt)`, `wire/snippets/error-code/list/200/http-response.adoc`이다.
