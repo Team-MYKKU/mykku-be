@@ -83,6 +83,8 @@ class GoogleFormUrlTest {
                 "https://docs.google.com/forms/.%2E/document/d/x/viewform",
                 "https://docs.google.com/forms/d/e/x%2Fviewform",
                 "https://docs.google.com//forms/d/e/x/viewform",
+                "https://docs.google.com/forms/d/e/x//viewform",
+                "https://forms.gle//abc",
                 "https://forms.gle/",
                 "https://forms.gle",
                 "https://forms.gle/..",
