@@ -181,6 +181,7 @@
 | EV105 | PERIOD_LOCKED_AFTER_WINNER_SELECTED | 400 | 당첨자를 선정한 뒤에는 이벤트 기간을 바꿀 수 없습니다 |
 | EV106 | INVALID_WINNER_MEMBER_IDS | 400 | 당첨자로 지정할 수 없는 회원 아이디가 있습니다 |
 | EV107 | INVALID_EVENT_PERIOD | 400 | 이벤트 시작일은 종료일보다 늦을 수 없습니다 |
+| EV108 | EVENT_TYPE_MISMATCH | 400 | 이 이벤트에서 지원하지 않는 참여 방식입니다 |
 | EV109 | INVALID_EVENT_TYPE_SETTING | 400 | 이벤트 유형 설정이 올바르지 않습니다 |
 | EV301 | ALREADY_PARTICIPATED | 409 | 이미 참여한 이벤트입니다 |
 | EV302 | EVENT_PARTICIPATION_NOT_FOUND | 404 | 이벤트 참여 정보를 찾을 수 없습니다 |

@@ -36,6 +36,7 @@ import com.example.mykku.docs.RestDocumentationFilterBuilder
 import com.example.mykku.docs.RestDocumentationRequest
 import com.example.mykku.docs.RestDocumentationResponse
 import com.example.mykku.email.EmailAuthService
+import com.example.mykku.event.application.port.input.AttendEventUseCase
 import com.example.mykku.event.application.port.input.GetEventUseCase
 import com.example.mykku.event.application.port.input.GetEventWinnerAnnouncementUseCase
 import com.example.mykku.event.application.port.input.GetEventWinnersUseCase
@@ -283,6 +284,9 @@ abstract class BaseDocumentTest : SnippetIdentifierSource, RequestResponseLogSou
 
     @MockitoBean
     protected lateinit var getMyAwardEventsUseCase: GetMyAwardEventsUseCase
+
+    @MockitoBean
+    protected lateinit var attendEventUseCase: AttendEventUseCase
 
     @MockitoBean
     protected lateinit var emailAuthService: EmailAuthService
