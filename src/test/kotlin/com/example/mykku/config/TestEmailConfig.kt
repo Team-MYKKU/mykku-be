@@ -7,8 +7,6 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
 import org.springframework.mail.SimpleMailMessage
 import org.springframework.mail.javamail.JavaMailSender
-import org.thymeleaf.TemplateEngine
-import org.thymeleaf.context.Context
 
 @TestConfiguration
 class TestEmailConfig {
@@ -27,17 +25,5 @@ class TestEmailConfig {
         Mockito.doNothing().`when`(mailSender).send(Mockito.any(MimeMessage::class.java))
 
         return mailSender
-    }
-
-    @Bean
-    @Primary
-    fun templateEngine(): TemplateEngine {
-        val templateEngine = Mockito.mock(TemplateEngine::class.java)
-
-        // Stub process method to return a dummy HTML string
-        Mockito.`when`(templateEngine.process(Mockito.anyString(), Mockito.any(Context::class.java)))
-            .thenReturn("<html><body>Test Email</body></html>")
-
-        return templateEngine
     }
 }
