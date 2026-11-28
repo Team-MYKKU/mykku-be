@@ -522,6 +522,12 @@ Content-Type: application/json
     "status" : 400,
     "message" : "이벤트 시작일은 종료일보다 늦을 수 없습니다"
   }, {
+    "code" : "EV109",
+    "domain" : "event",
+    "name" : "INVALID_EVENT_TYPE_SETTING",
+    "status" : 400,
+    "message" : "이벤트 유형 설정이 올바르지 않습니다"
+  }, {
     "code" : "EV301",
     "domain" : "event",
     "name" : "ALREADY_PARTICIPATED",

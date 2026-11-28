@@ -6,6 +6,7 @@ import com.example.mykku.common.exception.CommonErrorCode
 import com.example.mykku.event.adapter.output.persistence.entity.EventJpaEntity
 import com.example.mykku.event.adapter.output.persistence.repository.EventJpaRepository
 import com.example.mykku.event.domain.vo.EventStatusType
+import com.example.mykku.event.domain.vo.EventType
 import com.example.mykku.event.exception.EventErrorCode
 import com.example.mykku.util.MultipartParts.image
 import com.example.mykku.util.MultipartParts.text
@@ -200,6 +201,61 @@ class AdminEventUpdateApiControllerTest : BaseControllerTest() {
             .body("code", equalTo(AdminErrorCode.UNAUTHORIZED.code))
     }
 
+    @Test
+    @DisplayName("GENERAL 이벤트에 구글폼 링크를 보내면 EV109이고, 빈 링크는 미입력으로 보고 저장한다")
+    fun `update - GENERAL 이벤트의 구글폼 링크`() {
+        val event = saveEvent()
+
+        assertTypeSettingRejected(
+            event.id!!,
+            basicParts(title = "링크 이벤트") + keepParts(emptyList()) + text("googleFormUrl", FORM_URL)
+        )
+        putEvent(event.id!!, basicParts(title = "빈 링크 이벤트") + keepParts(emptyList()) + text("googleFormUrl", "   "))
+            .statusCode(200)
+
+        val saved = eventJpaRepository.findById(event.id!!).get()
+        assertThat(saved.title).isEqualTo("빈 링크 이벤트")
+        assertThat(saved.type).isEqualTo(EventType.GENERAL)
+        assertThat(saved.googleFormUrl).isNull()
+    }
+
+    @Test
+    @DisplayName("GOOGLE_FORM 이벤트는 구글폼 링크를 앞뒤 공백을 잘라 바꾸고, type을 보내도 유형은 그대로다")
+    fun `update - GOOGLE_FORM 이벤트 링크 수정`() {
+        val event = saveEvent(type = EventType.GOOGLE_FORM, googleFormUrl = FORM_URL)
+
+        val parts = basicParts() + keepParts(emptyList()) + text("googleFormUrl", "  $OTHER_FORM_URL  ") +
+            text("type", EventType.ATTENDANCE.name)
+        putEvent(event.id!!, parts).statusCode(200)
+
+        val saved = eventJpaRepository.findById(event.id!!).get()
+        assertThat(saved.googleFormUrl).isEqualTo(OTHER_FORM_URL)
+        assertThat(saved.type).isEqualTo(EventType.GOOGLE_FORM)
+    }
+
+    @Test
+    @DisplayName("GOOGLE_FORM 이벤트에서 구글폼 링크를 빠뜨리거나 규칙 밖 링크를 보내면 EV109이고 저장값은 그대로, 올린 이미지는 지운다")
+    fun `update - GOOGLE_FORM 이벤트 링크 누락과 규칙 위반`() {
+        val event = saveEvent(type = EventType.GOOGLE_FORM, googleFormUrl = FORM_URL)
+        val parts = basicParts(title = "바뀌면 안 되는 제목") + keepParts(emptyList()) + image("thumbnailImage")
+
+        assertTypeSettingRejected(event.id!!, parts)
+        assertTypeSettingRejected(event.id!!, parts + text("googleFormUrl", "https://docs.google.com/forms/d/x/edit"))
+
+        val saved = eventJpaRepository.findById(event.id!!).get()
+        assertThat(saved.title).isEqualTo("이벤트")
+        assertThat(saved.type).isEqualTo(EventType.GOOGLE_FORM)
+        assertThat(saved.googleFormUrl).isEqualTo(FORM_URL)
+        assertThat(testImageUploadService.uploadedUrls).hasSize(2)
+        assertThat(testImageUploadService.deletedUrls).containsExactlyElementsOf(testImageUploadService.uploadedUrls)
+    }
+
+    private fun assertTypeSettingRejected(eventId: Long, parts: List<MultiPartSpecification>) {
+        putEvent(eventId, parts)
+            .statusCode(400)
+            .body("code", equalTo(EventErrorCode.INVALID_EVENT_TYPE_SETTING.code))
+    }
+
     private fun putEvent(eventId: Long, parts: List<MultiPartSpecification>): ValidatableResponse {
         var spec = RestAssured.given()
             .sessionId(adminSessionId)
@@ -220,14 +276,20 @@ class AdminEventUpdateApiControllerTest : BaseControllerTest() {
         return listOf(text("_keepImageUrls", "on")) + urls.map { text("keepImageUrls", it) }
     }
 
-    private fun saveEvent(status: EventStatusType = EventStatusType.ACTIVE): EventJpaEntity {
+    private fun saveEvent(
+        status: EventStatusType = EventStatusType.ACTIVE,
+        type: EventType = EventType.GENERAL,
+        googleFormUrl: String? = null
+    ): EventJpaEntity {
         return eventJpaRepository.save(
             EventJpaEntity(
                 title = "이벤트",
                 startedAt = STARTED_AT,
                 expiredAt = EXPIRED_AT,
                 status = status,
-                thumbnailUrl = "https://test-bucket.s3.amazonaws.com/event-images/old-thumbnail.jpg"
+                thumbnailUrl = "https://test-bucket.s3.amazonaws.com/event-images/old-thumbnail.jpg",
+                type = type,
+                googleFormUrl = googleFormUrl
             )
         )
     }
@@ -255,6 +317,8 @@ class AdminEventUpdateApiControllerTest : BaseControllerTest() {
     }
 
     companion object {
+        private const val FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSc_example/viewform"
+        private const val OTHER_FORM_URL = "https://forms.gle/abc123"
         private val STARTED_AT = LocalDateTime.of(2026, 1, 1, 0, 0)
         private val EXPIRED_AT = LocalDateTime.of(2026, 1, 31, 0, 0)
     }

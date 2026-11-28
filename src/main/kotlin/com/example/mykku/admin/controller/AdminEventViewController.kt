@@ -4,6 +4,7 @@ import com.example.mykku.admin.service.AdminEventService
 import com.example.mykku.event.application.dto.EventWinnerAnnouncementResult
 import com.example.mykku.event.application.port.input.GetEventDeletionSummariesUseCase
 import com.example.mykku.event.application.port.input.GetEventForEditUseCase
+import com.example.mykku.event.application.port.input.GetEventTypesByIdsUseCase
 import com.example.mykku.event.application.port.input.GetEventWinnerAnnouncementUseCase
 import com.example.mykku.event.application.port.input.GetEventWinnerSelectionUseCase
 import com.example.mykku.event.domain.vo.EventListFilter
@@ -23,7 +24,8 @@ class AdminEventViewController(
     private val getEventWinnerSelectionUseCase: GetEventWinnerSelectionUseCase,
     private val getEventWinnerAnnouncementUseCase: GetEventWinnerAnnouncementUseCase,
     private val getEventDeletionSummariesUseCase: GetEventDeletionSummariesUseCase,
-    private val getEventForEditUseCase: GetEventForEditUseCase
+    private val getEventForEditUseCase: GetEventForEditUseCase,
+    private val getEventTypesByIdsUseCase: GetEventTypesByIdsUseCase
 ) {
 
     @GetMapping
@@ -34,15 +36,17 @@ class AdminEventViewController(
         model: Model
     ): String {
         val events = adminEventService.findAll(page, size, status)
+        val eventIds = events.content.map { it.id }
         model.addAttribute("events", events)
-        val deletionSummaries = getEventDeletionSummariesUseCase.execute(events.content.map { it.id })
-        model.addAttribute("deletionSummaries", deletionSummaries)
+        model.addAttribute("deletionSummaries", getEventDeletionSummariesUseCase.execute(eventIds))
+        model.addAttribute("eventTypeById", getEventTypesByIdsUseCase.execute(eventIds))
         model.addAttribute("currentStatus", status)
         return "admin/event/list"
     }
 
     @GetMapping("/create")
-    fun createPage(): String {
+    fun createPage(model: Model): String {
+        model.addAttribute("eventTypes", AdminEventService.creatableTypes())
         return "admin/event/create"
     }
 

@@ -1,5 +1,6 @@
 package com.example.mykku.admin.dto.event
 
+import com.example.mykku.event.domain.vo.EventType
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Size
@@ -27,5 +28,9 @@ data class EventCreateRequest(
 
     val thumbnailImage: MultipartFile,
 
-    val images: List<MultipartFile>?
+    val images: List<MultipartFile>?,
+
+    val type: EventType = EventType.GENERAL,
+
+    val googleFormUrl: String? = null
 )

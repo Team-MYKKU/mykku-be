@@ -7,5 +7,6 @@ data class EventContent(
     val subTitle: String?,
     val description: String?,
     val startedAt: LocalDateTime,
-    val expiredAt: LocalDateTime
+    val expiredAt: LocalDateTime,
+    val googleFormUrl: String?
 )

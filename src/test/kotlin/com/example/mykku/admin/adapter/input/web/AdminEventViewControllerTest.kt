@@ -1,12 +1,15 @@
 package com.example.mykku.admin.adapter.input.web
 
 import com.example.mykku.BaseControllerTest
+import com.example.mykku.admin.service.AdminEventService
 import com.example.mykku.event.adapter.output.persistence.entity.EventJpaEntity
 import com.example.mykku.event.adapter.output.persistence.repository.EventJpaRepository
 import com.example.mykku.event.domain.vo.EventStatusType
+import com.example.mykku.event.domain.vo.EventType
 import io.restassured.RestAssured
 import io.restassured.http.ContentType
 import io.restassured.response.ValidatableResponse
+import org.assertj.core.api.Assertions.assertThat
 import org.hamcrest.Matchers.containsString
 import org.hamcrest.Matchers.endsWith
 import org.hamcrest.Matchers.not
@@ -165,6 +168,38 @@ class AdminEventViewControllerTest : BaseControllerTest() {
     }
 
     @Test
+    @DisplayName("생성 화면의 유형 선택지는 서버 생성 허용 목록으로 그리고, 지금은 GENERAL 하나다")
+    fun `createPage - 유형 선택지`() {
+        val html = getPage(getAdminSessionId(), "/admin/event/create")
+            .statusCode(200)
+            .body(containsString("<select class=\"form-select\" id=\"type\" name=\"type\">"))
+            .body(containsString("<option value=\"GENERAL\">일반 이벤트(앱 안 참여 없음)</option>"))
+            .body(containsString("id=\"googleFormUrl\""))
+            .extract()
+            .asString()
+
+        assertThat(AdminEventService.creatableTypes()).containsExactly(EventType.GENERAL)
+        assertThat(Regex("<option value=\"([A-Z_]+)\">").findAll(html).map { it.groupValues[1] }.toList())
+            .containsExactlyElementsOf(AdminEventService.creatableTypes().map { it.name })
+    }
+
+    @Test
+    @DisplayName("목록은 GENERAL이 아닌 이벤트에만 유형 배지를 그린다")
+    fun `listPage - 유형 배지`() {
+        val past = LocalDateTime.now().minusDays(1)
+        val events = EventType.entries.associateWith { type ->
+            createAndSaveEvent(title = "${type.name} 이벤트", expiredAt = past, type = type)
+        }
+
+        val page = getPage(getAdminSessionId(), "/admin/event").statusCode(200)
+
+        events.filterKeys { it != EventType.GENERAL }.forEach { (type, event) ->
+            page.body(containsString(typeBadge(event, type)))
+        }
+        page.body(not(containsString("data-event-id=\"${events.getValue(EventType.GENERAL).id}\"")))
+    }
+
+    @Test
     @DisplayName("당첨자 화면은 현재 당첨자 memberId를 줄마다 채우고, 공지가 없으면 빈 폼을 띄운다")
     fun `winnersPage - 현재 당첨자 미리 채움과 빈 공지 폼`() {
         val adminSessionId = getAdminSessionId()
@@ -267,18 +302,26 @@ class AdminEventViewControllerTest : BaseControllerTest() {
         return "class=\"nav-link active\" href=\"/admin/event?status=$status\""
     }
 
+    private fun typeBadge(event: EventJpaEntity, type: EventType): String {
+        return "<span class=\"badge event-type-badge\" data-event-id=\"${event.id}\" " +
+            "data-event-type=\"${type.name}\">${type.description}</span>"
+    }
+
     private fun createAndSaveEvent(
         title: String,
         startedAt: LocalDateTime = LocalDateTime.now().minusDays(10),
         expiredAt: LocalDateTime,
-        status: EventStatusType = EventStatusType.ACTIVE
+        status: EventStatusType = EventStatusType.ACTIVE,
+        type: EventType = EventType.GENERAL
     ): EventJpaEntity {
         val event = EventJpaEntity(
             title = title,
             startedAt = startedAt,
             expiredAt = expiredAt,
             status = status,
-            thumbnailUrl = "https://example.com/thumbnail.jpg"
+            thumbnailUrl = "https://example.com/thumbnail.jpg",
+            type = type,
+            googleFormUrl = "https://forms.gle/abc123".takeIf { type == EventType.GOOGLE_FORM }
         )
         return eventJpaRepository.save(event)
     }

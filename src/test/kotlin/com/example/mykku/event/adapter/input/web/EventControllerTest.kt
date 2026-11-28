@@ -5,11 +5,16 @@ import com.example.mykku.common.exception.CommonErrorCode
 import com.example.mykku.event.adapter.output.persistence.entity.EventJpaEntity
 import com.example.mykku.event.adapter.output.persistence.repository.EventJpaRepository
 import com.example.mykku.event.domain.vo.EventStatusType
+import com.example.mykku.event.domain.vo.EventType
+import com.example.mykku.util.ResponseMaps
 import io.restassured.RestAssured
+import org.assertj.core.api.Assertions.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.notNullValue
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDateTime
 
@@ -135,6 +140,64 @@ class EventControllerTest : BaseControllerTest() {
             .get("/api/v1/events/{eventId}", event.id)
             .then()
             .statusCode(401)
+    }
+
+    @ParameterizedTest(name = "{displayName} [{0}]")
+    @EnumSource(EventType::class)
+    @DisplayName("유형이 다른 이벤트도 목록(ALL·ACTIVE)과 상세에서 같은 조건의 일반 이벤트와 같은 필드·값으로 응답한다")
+    fun `getEvents getEventDetail - 유형과 무관하게 같은 응답`(type: EventType) {
+        val authHeader = getBearerToken(createAndSaveMember().id)
+        val general = createAndSaveTypedEvent(EventType.GENERAL)
+        val typed = createAndSaveTypedEvent(type)
+
+        listOf("ALL", "ACTIVE").forEach { status ->
+            val content = getListContent(authHeader, status)
+            assertThat(content.map { it["id"] }).`as`(status)
+                .containsExactlyInAnyOrder(general.id!!.toInt(), typed.id!!.toInt())
+            assertThat(content.map { ResponseMaps.masked(it, setOf("id")) }.distinct()).`as`(status).hasSize(1)
+        }
+        assertThat(getDetailWithMaskedIds(authHeader, typed.id!!)).isEqualTo(getDetailWithMaskedIds(authHeader, general.id!!))
+    }
+
+    private fun getListContent(authHeader: String, status: String): List<Map<String, Any?>> {
+        return RestAssured.given()
+            .header("Authorization", authHeader)
+            .param("status", status)
+            .`when`()
+            .get("/api/v1/events")
+            .then()
+            .statusCode(200)
+            .extract()
+            .jsonPath()
+            .getList("data.content")
+    }
+
+    private fun getDetailWithMaskedIds(authHeader: String, eventId: Long): Any? {
+        val data = RestAssured.given()
+            .header("Authorization", authHeader)
+            .`when`()
+            .get("/api/v1/events/{eventId}", eventId)
+            .then()
+            .statusCode(200)
+            .extract()
+            .jsonPath()
+            .getMap<String, Any?>("data")
+        return ResponseMaps.masked(data, setOf("id", "createdAt"))
+    }
+
+    private fun createAndSaveTypedEvent(type: EventType): EventJpaEntity {
+        val event = EventJpaEntity(
+            title = "유형 비교 이벤트",
+            subTitle = "유형 비교 부제",
+            description = "유형 비교 설명",
+            startedAt = LocalDateTime.of(2020, 1, 1, 0, 0),
+            expiredAt = LocalDateTime.of(2099, 12, 31, 23, 59, 59),
+            thumbnailUrl = "https://example.com/thumbnail.jpg",
+            status = EventStatusType.ACTIVE,
+            type = type,
+            googleFormUrl = "https://forms.gle/abc123".takeIf { type == EventType.GOOGLE_FORM }
+        )
+        return eventJpaRepository.save(event)
     }
 
     private fun createAndSaveEvent(

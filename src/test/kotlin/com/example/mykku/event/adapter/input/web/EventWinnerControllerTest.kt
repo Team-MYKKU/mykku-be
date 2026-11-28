@@ -10,13 +10,18 @@ import com.example.mykku.event.adapter.output.persistence.repository.EventPartic
 import com.example.mykku.event.adapter.output.persistence.repository.EventWinnerAnnouncementJpaRepository
 import com.example.mykku.event.adapter.output.persistence.repository.EventWinnerJpaRepository
 import com.example.mykku.event.domain.vo.EventStatusType
+import com.example.mykku.event.domain.vo.EventType
 import com.example.mykku.member.adapter.output.persistence.entity.MemberJpaEntity
+import com.example.mykku.util.ResponseMaps
 import io.restassured.RestAssured
+import org.assertj.core.api.Assertions.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.notNullValue
 import org.hamcrest.Matchers.nullValue
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.EnumSource
 import org.springframework.beans.factory.annotation.Autowired
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -205,6 +210,75 @@ class EventWinnerControllerTest : BaseControllerTest() {
             .statusCode(404)
     }
 
+    @ParameterizedTest(name = "{displayName} [{0}]")
+    @EnumSource(EventType::class)
+    @DisplayName("유형이 다른 이벤트도 당첨자·발표 공지·내 당첨 여부·내 당첨 목록을 같은 조건의 일반 이벤트와 같은 필드·값으로 응답한다")
+    fun `당첨 조회 - 유형과 무관하게 같은 응답`(type: EventType) {
+        val member = createAndSaveMember()
+        val authHeader = getBearerToken(member.id)
+        val general = createAndSaveWonEvent(member, EventType.GENERAL)
+        val typed = createAndSaveWonEvent(member, type)
+
+        listOf("winners", "winner-announcement", "my-winner-status").forEach { path ->
+            assertThat(getDataWithMaskedIds(authHeader, "/api/v1/events/${typed.id}/$path")).`as`(path)
+                .isEqualTo(getDataWithMaskedIds(authHeader, "/api/v1/events/${general.id}/$path"))
+        }
+        val awards = getData(authHeader, "/api/v1/events/my-awards") as Map<*, *>
+        val content = awards["content"] as List<*>
+        assertThat(content.map { (it as Map<*, *>)["eventId"] })
+            .containsExactlyInAnyOrder(general.id!!.toInt(), typed.id!!.toInt())
+        assertThat(content.map { ResponseMaps.masked(it, ID_KEYS) }.distinct()).hasSize(1)
+    }
+
+    private fun createAndSaveWonEvent(member: MemberJpaEntity, type: EventType): EventJpaEntity {
+        val event = createAndSaveTypedEvent(type)
+        createAndSaveWinner(event, createAndSaveParticipation(member, event))
+        createAndSaveAnnouncement(event)
+        return event
+    }
+
+    private fun createAndSaveTypedEvent(type: EventType): EventJpaEntity {
+        return eventJpaRepository.save(
+            EventJpaEntity(
+                title = "유형 비교 이벤트",
+                description = "유형 비교 설명",
+                startedAt = LocalDateTime.of(2020, 1, 1, 0, 0),
+                expiredAt = LocalDateTime.of(2020, 1, 31, 23, 59, 59),
+                status = EventStatusType.WINNER_SELECTED,
+                thumbnailUrl = "https://example.com/thumbnail.jpg",
+                type = type,
+                googleFormUrl = "https://forms.gle/abc123".takeIf { type == EventType.GOOGLE_FORM }
+            )
+        )
+    }
+
+    private fun createAndSaveAnnouncement(event: EventJpaEntity) {
+        eventWinnerAnnouncementJpaRepository.save(
+            EventWinnerAnnouncementJpaEntity(
+                event = event,
+                title = "당첨자 발표",
+                content = "축하합니다",
+                announcedAt = LocalDate.of(2020, 2, 1)
+            )
+        )
+    }
+
+    private fun getDataWithMaskedIds(authHeader: String, path: String): Any? {
+        return ResponseMaps.masked(getData(authHeader, path), ID_KEYS)
+    }
+
+    private fun getData(authHeader: String, path: String): Any? {
+        return RestAssured.given()
+            .header("Authorization", authHeader)
+            .`when`()
+            .get(path)
+            .then()
+            .statusCode(200)
+            .extract()
+            .jsonPath()
+            .get<Any?>("data")
+    }
+
     private fun createAndSaveEvent(
         title: String = "테스트 이벤트",
         status: EventStatusType = EventStatusType.WINNER_SELECTED
@@ -236,5 +310,9 @@ class EventWinnerControllerTest : BaseControllerTest() {
         return eventWinnerJpaRepository.save(
             EventWinnerJpaEntity(event = event, participation = participation)
         )
+    }
+
+    companion object {
+        private val ID_KEYS = setOf("eventId", "winnerId")
     }
 }

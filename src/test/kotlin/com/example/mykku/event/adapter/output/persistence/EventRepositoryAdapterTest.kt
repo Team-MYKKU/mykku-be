@@ -9,6 +9,7 @@ import com.example.mykku.event.domain.vo.EventId
 import com.example.mykku.event.domain.vo.EventListFilter
 import com.example.mykku.event.domain.vo.EventSortType
 import com.example.mykku.event.domain.vo.EventStatusType
+import com.example.mykku.event.domain.vo.EventType
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.within
 import org.junit.jupiter.api.DisplayName
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
+import org.springframework.jdbc.core.JdbcTemplate
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 
@@ -29,6 +31,9 @@ class EventRepositoryAdapterTest : BaseRepositoryTest() {
 
     @Autowired
     private lateinit var eventJpaRepository: EventJpaRepository
+
+    @Autowired
+    private lateinit var jdbcTemplate: JdbcTemplate
 
     @Nested
     @DisplayName("save 메서드")
@@ -56,7 +61,9 @@ class EventRepositoryAdapterTest : BaseRepositoryTest() {
                 description = null,
                 startedAt = LocalDateTime.now(),
                 expiredAt = LocalDateTime.now().plusDays(7),
-                thumbnailUrl = "https://example.com/thumbnail.jpg"
+                thumbnailUrl = "https://example.com/thumbnail.jpg",
+                type = EventType.GENERAL,
+                googleFormUrl = null
             )
 
             val savedEvent = eventRepository.save(event)
@@ -375,6 +382,139 @@ class EventRepositoryAdapterTest : BaseRepositoryTest() {
         }
     }
 
+    @Nested
+    @DisplayName("유형과 구글폼 링크")
+    inner class TypeAndGoogleFormUrl {
+
+        @Test
+        @DisplayName("유형과 구글폼 링크를 저장하고 영속성 컨텍스트를 비운 뒤 다시 읽는다")
+        fun `유형 저장 - 다시 읽기`() {
+            val googleForm = eventRepository.save(createTypedEvent(EventType.GOOGLE_FORM, FORM_URL))
+            val attendance = eventRepository.save(createTypedEvent(EventType.ATTENDANCE, null))
+            flushAndClear()
+
+            val foundGoogleForm = eventRepository.findById(googleForm.id)!!
+            val foundAttendance = eventRepository.findById(attendance.id)!!
+
+            assertThat(foundGoogleForm.type).isEqualTo(EventType.GOOGLE_FORM)
+            assertThat(foundGoogleForm.googleFormUrl).isEqualTo(FORM_URL)
+            assertThat(foundAttendance.type).isEqualTo(EventType.ATTENDANCE)
+            assertThat(foundAttendance.googleFormUrl).isNull()
+        }
+
+        @Test
+        @DisplayName("type 컬럼 없이 넣은 기존 형태의 행은 DB 기본값으로 GENERAL, 링크 없음이 된다")
+        fun `유형 저장 - DB 기본값`() {
+            val id = insertLegacyEventRow()
+
+            val found = eventRepository.findById(id)!!
+
+            assertThat(found.type).isEqualTo(EventType.GENERAL)
+            assertThat(found.googleFormUrl).isNull()
+            assertThat(storedTypeColumns(id)).isEqualTo("GENERAL" to null)
+        }
+
+        @Test
+        @DisplayName("유형 설정 규칙에 맞지 않는 저장값도 검사 없이 그대로 읽는다")
+        fun `유형 저장 - 규칙 밖 저장값`() {
+            val withoutUrl = insertTypedEventRow("GOOGLE_FORM", null)
+            val strayUrl = insertTypedEventRow("GENERAL", "http://example.com/not-a-form")
+
+            val foundWithoutUrl = eventRepository.findById(withoutUrl)!!
+            val foundStrayUrl = eventRepository.findById(strayUrl)!!
+
+            assertThat(foundWithoutUrl.type).isEqualTo(EventType.GOOGLE_FORM)
+            assertThat(foundWithoutUrl.googleFormUrl).isNull()
+            assertThat(foundStrayUrl.type).isEqualTo(EventType.GENERAL)
+            assertThat(foundStrayUrl.googleFormUrl).isEqualTo("http://example.com/not-a-form")
+        }
+
+        @Test
+        @DisplayName("기존 이벤트를 다시 저장하면 구글폼 링크만 반영하고 저장된 유형은 바꾸지 않는다")
+        fun `유형 저장 - 수정 저장은 유형을 바꾸지 않는다`() {
+            val saved = eventRepository.save(createTypedEvent(EventType.GENERAL, null))
+            flushAndClear()
+
+            eventRepository.save(reconstituteWithType(saved, EventType.GOOGLE_FORM, FORM_URL))
+            flushAndClear()
+
+            assertThat(storedTypeColumns(saved.id)).isEqualTo("GENERAL" to FORM_URL)
+            assertThat(eventRepository.findById(saved.id)!!.type).isEqualTo(EventType.GENERAL)
+        }
+
+        @Test
+        @DisplayName("findTypesByIds는 있는 이벤트의 유형만 id별로 돌려준다")
+        fun `유형 일괄 조회`() {
+            val saved = EventType.entries.associateWith { type ->
+                eventRepository.save(createTypedEvent(type, FORM_URL.takeIf { type == EventType.GOOGLE_FORM })).id
+            }
+            eventRepository.save(createTypedEvent(EventType.ATTENDANCE, null))
+
+            val types = eventRepository.findTypesByIds(saved.values.toList() + EventId(999999L))
+
+            assertThat(types).isEqualTo(saved.entries.associate { (type, id) -> id.value to type })
+        }
+
+        @Test
+        @DisplayName("findTypesByIds에 빈 목록을 주면 빈 맵을 돌려준다")
+        fun `유형 일괄 조회 - 빈 목록`() {
+            eventRepository.save(createTypedEvent(EventType.ATTENDANCE, null))
+
+            assertThat(eventRepository.findTypesByIds(emptyList())).isEmpty()
+        }
+
+        private fun reconstituteWithType(event: Event, type: EventType, googleFormUrl: String?): Event {
+            return Event.reconstitute(
+                id = event.id,
+                title = event.title,
+                subTitle = event.subTitle,
+                description = event.description,
+                startedAt = event.startedAt,
+                expiredAt = event.expiredAt,
+                thumbnailUrl = event.thumbnailUrl,
+                type = type,
+                googleFormUrl = googleFormUrl,
+                status = event.status,
+                createdAt = event.createdAt,
+                updatedAt = event.updatedAt
+            )
+        }
+
+        private fun insertLegacyEventRow(): EventId {
+            jdbcTemplate.update(
+                "INSERT INTO event (title, started_at, expired_at, status, thumbnail_url, created_at, updated_at) " +
+                    "VALUES ('기존 형태 이벤트', '2026-12-01 00:00:00', '2026-12-07 23:59:59', 'ACTIVE', ?, " +
+                    "NOW(6), NOW(6))",
+                THUMBNAIL_URL
+            )
+            return EventId(lastInsertId())
+        }
+
+        private fun insertTypedEventRow(type: String, googleFormUrl: String?): EventId {
+            jdbcTemplate.update(
+                "INSERT INTO event (title, started_at, expired_at, status, thumbnail_url, created_at, updated_at, " +
+                    "type, google_form_url) VALUES ('저장값 이벤트', '2026-12-01 00:00:00', '2026-12-07 23:59:59', " +
+                    "'ACTIVE', ?, NOW(6), NOW(6), ?, ?)",
+                THUMBNAIL_URL,
+                type,
+                googleFormUrl
+            )
+            return EventId(lastInsertId())
+        }
+
+        private fun lastInsertId(): Long {
+            return jdbcTemplate.queryForObject("SELECT LAST_INSERT_ID()", Long::class.java)!!
+        }
+
+        private fun storedTypeColumns(id: EventId): Pair<String, String?> {
+            return jdbcTemplate.queryForObject(
+                "SELECT type, google_form_url FROM event WHERE id = ?",
+                { rs, _ -> rs.getString("type") to rs.getString("google_form_url") },
+                id.value
+            )!!
+        }
+    }
+
     private fun createEvent(): Event {
         return Event.create(
             title = "테스트 이벤트",
@@ -382,7 +522,9 @@ class EventRepositoryAdapterTest : BaseRepositoryTest() {
             description = "테스트 이벤트 설명",
             startedAt = LocalDateTime.now(),
             expiredAt = LocalDateTime.now().plusDays(7),
-            thumbnailUrl = "https://example.com/thumbnail.jpg"
+            thumbnailUrl = "https://example.com/thumbnail.jpg",
+            type = EventType.GENERAL,
+            googleFormUrl = null
         )
     }
 
@@ -393,8 +535,27 @@ class EventRepositoryAdapterTest : BaseRepositoryTest() {
             description = "테스트 이벤트 설명",
             startedAt = LocalDateTime.now().minusDays(1),
             expiredAt = expiredAt,
-            thumbnailUrl = "https://example.com/thumbnail.jpg"
+            thumbnailUrl = "https://example.com/thumbnail.jpg",
+            type = EventType.GENERAL,
+            googleFormUrl = null
         )
     }
 
+    private fun createTypedEvent(type: EventType, googleFormUrl: String?): Event {
+        return Event.create(
+            title = "유형 이벤트",
+            subTitle = null,
+            description = null,
+            startedAt = LocalDateTime.of(2026, 12, 1, 0, 0),
+            expiredAt = LocalDateTime.of(2026, 12, 7, 23, 59, 59),
+            thumbnailUrl = THUMBNAIL_URL,
+            type = type,
+            googleFormUrl = googleFormUrl
+        )
+    }
+
+    companion object {
+        private const val THUMBNAIL_URL = "https://example.com/thumbnail.jpg"
+        private const val FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSc_example/viewform"
+    }
 }

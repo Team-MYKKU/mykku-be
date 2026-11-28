@@ -14,9 +14,12 @@ import com.example.mykku.event.application.port.input.UpdateEventUseCase
 import com.example.mykku.event.domain.entity.Event
 import com.example.mykku.event.domain.vo.EventListFilter
 import com.example.mykku.event.domain.vo.EventSortType
+import com.example.mykku.event.domain.vo.EventType
+import com.example.mykku.event.domain.vo.GoogleFormUrl
 import com.example.mykku.event.exception.EventException
 import com.example.mykku.image.ImageUploadService
 import com.example.mykku.image.dto.EntityImagesUpdateUploadResult
+import com.example.mykku.image.dto.EntityImagesUploadResult
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
@@ -33,6 +36,7 @@ class AdminEventService(
 
     @Transactional
     fun create(request: EventCreateRequest): CreateEventResponse {
+        val googleFormUrl = validateAndNormalizeGoogleFormUrl(request.type, request.googleFormUrl)
         Event.validatePeriod(request.startedAt, request.expiredAt)
         validateImageCount(request.images?.size ?: 0)
 
@@ -42,7 +46,23 @@ class AdminEventService(
             EVENT_IMAGE_PATH
         )
 
-        val command = CreateEventCommand(
+        val result = createEventUseCase.execute(toCreateCommand(request, uploadResult, googleFormUrl))
+        return CreateEventResponse.from(result)
+    }
+
+    private fun validateAndNormalizeGoogleFormUrl(type: EventType, rawGoogleFormUrl: String?): String? {
+        if (type !in CREATABLE_TYPES) throw EventException.invalidEventTypeSetting()
+        val googleFormUrl = GoogleFormUrl.normalize(rawGoogleFormUrl)
+        Event.validateTypeSetting(type, googleFormUrl)
+        return googleFormUrl
+    }
+
+    private fun toCreateCommand(
+        request: EventCreateRequest,
+        uploadResult: EntityImagesUploadResult,
+        googleFormUrl: String?
+    ): CreateEventCommand {
+        return CreateEventCommand(
             title = request.title,
             subTitle = request.subTitle,
             description = request.description,
@@ -51,11 +71,10 @@ class AdminEventService(
             thumbnailUrl = uploadResult.thumbnailUrl,
             images = uploadResult.imageUrls.mapIndexed { index, url ->
                 EventImageCommand(url = url, orderIndex = index)
-            }
+            },
+            type = request.type,
+            googleFormUrl = googleFormUrl
         )
-
-        val result = createEventUseCase.execute(command)
-        return CreateEventResponse.from(result)
     }
 
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
@@ -104,5 +123,8 @@ class AdminEventService(
 
     companion object {
         private const val EVENT_IMAGE_PATH = "event-images"
+        private val CREATABLE_TYPES = setOf(EventType.GENERAL)
+
+        fun creatableTypes(): List<EventType> = EventType.entries.filter { it in CREATABLE_TYPES }
     }
 }

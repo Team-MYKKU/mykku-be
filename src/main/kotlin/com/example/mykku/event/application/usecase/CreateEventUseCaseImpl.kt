@@ -42,7 +42,9 @@ class CreateEventUseCaseImpl(
             description = command.description,
             startedAt = command.startedAt,
             expiredAt = command.expiredAt,
-            thumbnailUrl = command.thumbnailUrl
+            thumbnailUrl = command.thumbnailUrl,
+            type = command.type,
+            googleFormUrl = command.googleFormUrl
         )
         return eventRepository.save(event)
     }

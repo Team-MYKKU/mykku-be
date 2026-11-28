@@ -3,6 +3,7 @@ package com.example.mykku.event.application.dto
 import com.example.mykku.event.domain.vo.EventContent
 import com.example.mykku.event.domain.vo.EventListFilter
 import com.example.mykku.event.domain.vo.EventSortType
+import com.example.mykku.event.domain.vo.EventType
 import org.springframework.data.domain.Pageable
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -14,7 +15,9 @@ data class CreateEventCommand(
     val startedAt: LocalDateTime,
     val expiredAt: LocalDateTime,
     val thumbnailUrl: String,
-    val images: List<EventImageCommand>
+    val images: List<EventImageCommand>,
+    val type: EventType,
+    val googleFormUrl: String?
 )
 
 data class EventImageCommand(

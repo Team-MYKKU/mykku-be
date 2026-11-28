@@ -4,6 +4,7 @@ import com.example.mykku.common.adapter.persistence.BaseJpaEntity
 import com.example.mykku.event.domain.entity.Event
 import com.example.mykku.event.domain.vo.EventId
 import com.example.mykku.event.domain.vo.EventStatusType
+import com.example.mykku.event.domain.vo.EventType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
@@ -41,7 +42,14 @@ class EventJpaEntity(
     var status: EventStatusType = EventStatusType.ACTIVE,
 
     @Column(name = "thumbnail_url", nullable = false)
-    var thumbnailUrl: String
+    var thumbnailUrl: String,
+
+    @Column(name = "type", length = 30, nullable = false)
+    @Enumerated(EnumType.STRING)
+    var type: EventType = EventType.GENERAL,
+
+    @Column(name = "google_form_url", length = 500)
+    var googleFormUrl: String? = null
 ) : BaseJpaEntity() {
 
     fun toDomain(): Event {
@@ -53,6 +61,8 @@ class EventJpaEntity(
             startedAt = startedAt,
             expiredAt = expiredAt,
             thumbnailUrl = thumbnailUrl,
+            type = type,
+            googleFormUrl = googleFormUrl,
             status = status,
             createdAt = createdAt,
             updatedAt = updatedAt
@@ -67,6 +77,7 @@ class EventJpaEntity(
         this.expiredAt = event.expiredAt
         this.status = event.status
         this.thumbnailUrl = event.thumbnailUrl
+        this.googleFormUrl = event.googleFormUrl
     }
 
     companion object {
@@ -81,7 +92,9 @@ class EventJpaEntity(
                 startedAt = event.startedAt,
                 expiredAt = event.expiredAt,
                 status = event.status,
-                thumbnailUrl = event.thumbnailUrl
+                thumbnailUrl = event.thumbnailUrl,
+                type = event.type,
+                googleFormUrl = event.googleFormUrl
             )
         }
     }
