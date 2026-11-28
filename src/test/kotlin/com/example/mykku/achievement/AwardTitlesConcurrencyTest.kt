@@ -105,6 +105,7 @@ class AwardTitlesConcurrencyTest : BaseControllerTest() {
         TitleThreshold.forActivity(activityType).filter { it.threshold <= count }.map { it.roleName }
 
     private fun awardConcurrently(memberPk: Long, activities: List<ActivityType>): List<Throwable?> {
+        fillConnectionPool(activities.size)
         val executor = Executors.newFixedThreadPool(activities.size)
         val start = CountDownLatch(1)
         try {
