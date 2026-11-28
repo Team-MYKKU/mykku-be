@@ -1,0 +1,8 @@
+.+/api/v1/events/{eventId}/attendance+
+|===
+|파라미터|필수
+
+|`+eventId+`
+|O
+
+|===

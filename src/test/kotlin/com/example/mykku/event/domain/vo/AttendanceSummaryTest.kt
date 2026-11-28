@@ -1,6 +1,7 @@
 package com.example.mykku.event.domain.vo
 
 import com.example.mykku.event.domain.entity.Event
+import com.example.mykku.util.DefaultTimeZone
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -14,7 +15,6 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
-import java.util.TimeZone
 
 @DisplayName("AttendanceSummary 출석 일수 계산 테스트")
 class AttendanceSummaryTest {
@@ -197,7 +197,7 @@ class AttendanceSummaryTest {
         @CsvSource("UTC", "Asia/Seoul")
         @DisplayName("KST 23:59:59.999에는 오늘(12-03) 출석함, 00:00:00에는 오늘(12-04) 미출석이고 어제까지 3일 연속이다")
         fun `KST 자정 - 오늘이 바뀐다`(jvmZone: String) {
-            withDefaultTimeZone(jvmZone) {
+            DefaultTimeZone.with(jvmZone) {
                 assertSummary(summaryAt(event, kst("2026-12-03T14:59:59.999Z"), *attended), Expected(3, 3, true, false))
                 assertSummary(summaryAt(event, kst("2026-12-03T15:00:00Z"), *attended), Expected(3, 3, false, true))
             }
@@ -207,7 +207,7 @@ class AttendanceSummaryTest {
         @CsvSource("UTC", "Asia/Seoul")
         @DisplayName("종료 경계 KST 12-07 23:59:59.999는 진행 중, 12-08 00:00:00은 종료다")
         fun `KST 자정 - 종료 경계`(jvmZone: String) {
-            withDefaultTimeZone(jvmZone) {
+            DefaultTimeZone.with(jvmZone) {
                 assertThat(event.phaseAt(kst("2026-12-07T14:59:59.999Z"))).isEqualTo(EventPhase.IN_PROGRESS)
                 assertThat(event.phaseAt(kst("2026-12-07T15:00:00Z"))).isEqualTo(EventPhase.ENDED)
                 assertThat(event.attendancePeriod().endDate).isEqualTo(LocalDate.parse("2026-12-07"))
@@ -218,21 +218,10 @@ class AttendanceSummaryTest {
         @CsvSource("UTC", "Asia/Seoul")
         @DisplayName("시작 경계 KST 11-30 23:59:59.999는 시작 전, 12-01 00:00:00은 진행 중이다")
         fun `KST 자정 - 시작 경계`(jvmZone: String) {
-            withDefaultTimeZone(jvmZone) {
+            DefaultTimeZone.with(jvmZone) {
                 assertThat(event.phaseAt(kst("2026-11-30T14:59:59.999Z"))).isEqualTo(EventPhase.BEFORE)
                 assertThat(event.phaseAt(kst("2026-11-30T15:00:00Z"))).isEqualTo(EventPhase.IN_PROGRESS)
                 assertThat(event.attendancePeriod().startDate).isEqualTo(LocalDate.parse("2026-12-01"))
-            }
-        }
-
-        private fun withDefaultTimeZone(zone: String, action: () -> Unit) {
-            val original = TimeZone.getDefault()
-            TimeZone.setDefault(TimeZone.getTimeZone(zone))
-            try {
-                assertThat(ZoneId.systemDefault()).isEqualTo(ZoneId.of(zone))
-                action()
-            } finally {
-                TimeZone.setDefault(original)
             }
         }
     }

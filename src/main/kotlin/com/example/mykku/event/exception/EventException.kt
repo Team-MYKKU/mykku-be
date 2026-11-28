@@ -24,6 +24,7 @@ open class EventException(
         fun periodLockedAfterWinnerSelected(): EventException =
             EventException(EventErrorCode.PERIOD_LOCKED_AFTER_WINNER_SELECTED)
         fun invalidEventPeriod(): EventException = EventException(EventErrorCode.INVALID_EVENT_PERIOD)
+        fun eventTypeMismatch(): EventException = EventException(EventErrorCode.EVENT_TYPE_MISMATCH)
         fun invalidEventTypeSetting(): EventException = EventException(EventErrorCode.INVALID_EVENT_TYPE_SETTING)
         fun emptyWinners(): EventException = EventException(EventErrorCode.EMPTY_WINNERS)
         fun duplicateWinner(): EventException = EventException(EventErrorCode.DUPLICATE_WINNER)

@@ -118,6 +118,12 @@ required | lowercase-bearer | GET /api/v1/events/999999 | 401 application/json {
 required | double-space | GET /api/v1/events/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
 required | refresh-token | GET /api/v1/events/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
 required | withdrawn-member | GET /api/v1/events/999999 | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | none | POST /api/v1/events/999999/attendance | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | bearer-x | POST /api/v1/events/999999/attendance | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | lowercase-bearer | POST /api/v1/events/999999/attendance | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | double-space | POST /api/v1/events/999999/attendance | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | refresh-token | POST /api/v1/events/999999/attendance | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
+required | withdrawn-member | POST /api/v1/events/999999/attendance | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
 required | none | GET /api/v1/events/999999/my-winner-status | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
 required | bearer-x | GET /api/v1/events/999999/my-winner-status | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
 required | lowercase-bearer | GET /api/v1/events/999999/my-winner-status | 401 application/json {"code":"AU201","message":"인증이 필요합니다"}
@@ -483,6 +489,7 @@ precedence | none+query:size | GET /api/v1/events?size=abc | 400 application/jso
 precedence | none+query:page | GET /api/v1/events/my-awards?page=abc | 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
 precedence | none+query:size | GET /api/v1/events/my-awards?size=abc | 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
 precedence | none+path:eventId | GET /api/v1/events/abc | 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
+precedence | none+path:eventId | POST /api/v1/events/abc/attendance | 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
 precedence | none+path:eventId | GET /api/v1/events/abc/my-winner-status | 400 application/json {"code":"C106","message":"요청 값의 형식이 올바르지 않습니다"}
 precedence | none+part:request:malformed | POST /api/v1/feeds multipart[request={] | 400 application/json {"code":"C101","message":"입력값이 올바르지 않습니다"}
 precedence | none+part:request:constraint | POST /api/v1/feeds multipart[request={"title":"","content":"matrix","boardId":9201,"tags":[]}] | 400 application/json {"code":"C101","message":"제목은 필수입니다"}

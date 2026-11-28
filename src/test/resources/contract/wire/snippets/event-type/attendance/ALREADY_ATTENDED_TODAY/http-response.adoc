@@ -1,0 +1,10 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 409 Conflict
+Content-Type: application/json
+
+{
+  "code" : "EV304",
+  "message" : "오늘은 이미 출석했습니다"
+}
+----

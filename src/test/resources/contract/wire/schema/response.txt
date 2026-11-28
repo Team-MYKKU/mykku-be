@@ -970,6 +970,25 @@ $.data.images[].orderIndex integer non-null
 $.data.createdAt string non-null format=date-time java=LocalDateTime
 $.data.isWinner boolean non-null
 
+## POST /api/v1/events/{eventId}/attendance
+$ object non-null
+$.message string non-null
+$.data object non-null
+$.data.eventId integer non-null
+$.data.type string non-null enum=[GENERAL,ATTENDANCE,GOOGLE_FORM,ENTRY]
+$.data.isInProgress boolean non-null
+$.data.attendance object nullable
+$.data.attendance.today string non-null format=date java=LocalDate
+$.data.attendance.periodStartDate string nullable format=date java=LocalDate
+$.data.attendance.periodEndDate string nullable format=date java=LocalDate
+$.data.attendance.hasAttendedToday boolean non-null
+$.data.attendance.isAttendable boolean non-null
+$.data.attendance.totalAttendanceDays integer non-null
+$.data.attendance.consecutiveAttendanceDays integer non-null
+$.data.entry object nullable
+$.data.entry.hasEntered boolean non-null
+$.data.entry.isEnterable boolean non-null
+
 ## GET /api/v1/events/{eventId}/my-winner-status
 $ object non-null
 $.message string non-null

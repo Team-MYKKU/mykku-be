@@ -1,0 +1,10 @@
+[source,http,options="nowrap"]
+----
+HTTP/1.1 400 Bad Request
+Content-Type: application/json
+
+{
+  "code" : "EV108",
+  "message" : "이 이벤트에서 지원하지 않는 참여 방식입니다"
+}
+----

@@ -55,6 +55,10 @@ data class UpsertEventWinnerAnnouncementCommand(
     val announcedAt: LocalDate
 )
 
+data class AttendEventCommand(
+    val eventId: Long
+)
+
 data class UpdateEventCommand(
     val eventId: Long,
     val content: EventContent,

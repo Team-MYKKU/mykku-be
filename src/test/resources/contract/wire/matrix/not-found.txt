@@ -14,6 +14,7 @@ GET /api/v1/daily-messages/999999/comments | 404 application/json {"code":"DM001
 POST /api/v1/daily-messages/999999/comments body={"content":"matrix comment"} | 404 application/json {"code":"DM001","message":"일상 메시지를 찾을 수 없습니다"}
 GET /api/v1/daily-messages/999999 | 404 application/json {"code":"DM001","message":"일상 메시지를 찾을 수 없습니다"}
 GET /api/v1/events/999999 | 404 application/json {"code":"EV001","message":"이벤트를 찾을 수 없습니다"}
+POST /api/v1/events/999999/attendance | 404 application/json {"code":"EV001","message":"이벤트를 찾을 수 없습니다"}
 GET /api/v1/events/999999/my-winner-status | 404 application/json {"code":"EV001","message":"이벤트를 찾을 수 없습니다"}
 GET /api/v1/events/999999/winner-announcement | 404 application/json {"code":"EV001","message":"이벤트를 찾을 수 없습니다"}
 GET /api/v1/events/999999/winners | 404 application/json {"code":"EV001","message":"이벤트를 찾을 수 없습니다"}

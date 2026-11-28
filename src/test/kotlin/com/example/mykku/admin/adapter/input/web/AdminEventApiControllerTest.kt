@@ -126,8 +126,40 @@ class AdminEventApiControllerTest : BaseControllerTest() {
         assertThat(eventJpaRepository.count()).isZero()
     }
 
+    @Test
+    @DisplayName("이벤트 생성 - ATTENDANCE를 지정하면 구글폼 링크 없이 ATTENDANCE로 저장하고 응답 모양은 그대로다")
+    fun `create - ATTENDANCE 생성 허용`() {
+        val response = postEvent(createParts() + text("type", "ATTENDANCE"))
+            .statusCode(200)
+            .body("data", not(hasKey("type")))
+            .body("data", not(hasKey("googleFormUrl")))
+
+        assertThat(storedTypeColumns(createdId(response))).isEqualTo("ATTENDANCE" to null)
+    }
+
     @ParameterizedTest(name = "{displayName} [{0}]")
-    @EnumSource(value = EventType::class, names = ["ATTENDANCE", "GOOGLE_FORM", "ENTRY"])
+    @ValueSource(strings = ["", "   "])
+    @DisplayName("이벤트 생성 - ATTENDANCE에 빈 구글폼 링크를 보내면 미입력으로 보고 링크 없이 저장한다")
+    fun `create - ATTENDANCE 빈 구글폼 링크는 null로 저장`(googleFormUrl: String) {
+        val response = postEvent(createParts() + text("type", "ATTENDANCE") + text("googleFormUrl", googleFormUrl))
+            .statusCode(200)
+
+        assertThat(storedTypeColumns(createdId(response))).isEqualTo("ATTENDANCE" to null)
+    }
+
+    @Test
+    @DisplayName("이벤트 생성 - ATTENDANCE에 구글폼 링크를 보내면 EV109이고 이미지를 올리지 않는다")
+    fun `create - ATTENDANCE에 구글폼 링크는 EV109`() {
+        postEvent(createParts() + text("type", "ATTENDANCE") + text("googleFormUrl", FORM_URL))
+            .statusCode(400)
+            .body("code", equalTo(EventErrorCode.INVALID_EVENT_TYPE_SETTING.code))
+
+        assertThat(testImageUploadService.uploadedUrls).isEmpty()
+        assertThat(eventJpaRepository.count()).isZero()
+    }
+
+    @ParameterizedTest(name = "{displayName} [{0}]")
+    @EnumSource(value = EventType::class, names = ["GOOGLE_FORM", "ENTRY"])
     @DisplayName("이벤트 생성 - 아직 생성을 열지 않은 유형은 EV109이고 이미지를 올리지 않는다")
     fun `create - 생성 허용 목록 밖 유형은 EV109`(type: EventType) {
         val googleFormUrl = listOfNotNull(FORM_URL.takeIf { type == EventType.GOOGLE_FORM })
